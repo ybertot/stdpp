@@ -23,6 +23,7 @@ Arguments compose _ _ _ _ _ _ /.
 Arguments flip _ _ _ _ _ _ /.
 Arguments const _ _ _ _ /.
 Typeclasses Transparent id compose flip const.
+Instance: Params (@pair) 2.
 
 (** Change [True] and [False] into notations in order to enable overloading.
 We will use this in the file [assertions] to give [True] and [False] a
@@ -792,6 +793,11 @@ Instance pointwise_transitive {A} `{R : relation B} :
   Transitive R → Transitive (pointwise_relation A R) | 9.
 Proof. firstorder. Qed.
 
+(** ** Unit *)
+Instance unit_equiv : Equiv unit := λ _ _, True.
+Instance unit_equivalence : Equivalence (@equiv unit _).
+Proof. repeat split. Qed.
+
 (** ** Products *)
 Instance prod_map_injective {A A' B B'} (f : A → A') (g : B → B') :
   Injective (=) (=) f → Injective (=) (=) g →
@@ -824,6 +830,15 @@ Section prod_relation.
   Global Instance: Proper (prod_relation R1 R2 ==> R2) snd.
   Proof. firstorder eauto. Qed.
 End prod_relation.
+
+Instance prod_equiv `{Equiv A,Equiv B} : Equiv (A * B) := prod_relation (≡) (≡).
+Instance pair_proper `{Equiv A, Equiv B} :
+  Proper ((≡) ==> (≡) ==> (≡)) (@pair A B) | 0 := _.
+Instance fst_proper `{Equiv A, Equiv B} :
+  Proper ((≡) ==> (≡)) (@fst A B) | 0 := _.
+Instance snd_proper `{Equiv A, Equiv B} :
+  Proper ((≡) ==> (≡)) (@snd A B) | 0 := _.
+Typeclasses Opaque prod_equiv.
 
 (** ** Other *)
 Lemma or_l P Q : ¬Q → P ∨ Q ↔ P.

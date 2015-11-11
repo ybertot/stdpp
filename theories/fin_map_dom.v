@@ -77,15 +77,15 @@ Proof. rewrite not_elem_of_dom. apply delete_partial_alter. Qed.
 Lemma delete_insert_dom {A} (m : M A) i x :
   i ∉ dom D m → delete i (<[i:=x]>m) = m.
 Proof. rewrite not_elem_of_dom. apply delete_insert. Qed.
-Lemma map_disjoint_dom {A} (m1 m2 : M A) : m1 ⊥ m2 ↔ dom D m1 ∩ dom D m2 ≡ ∅.
+Lemma map_disjoint_dom {A} (m1 m2 : M A) : m1 ⊥ₘ m2 ↔ dom D m1 ∩ dom D m2 ≡ ∅.
 Proof.
   rewrite map_disjoint_spec, elem_of_equiv_empty.
   setoid_rewrite elem_of_intersection.
   setoid_rewrite elem_of_dom. unfold is_Some. naive_solver.
 Qed.
-Lemma map_disjoint_dom_1 {A} (m1 m2 : M A) : m1 ⊥ m2 → dom D m1 ∩ dom D m2 ≡ ∅.
+Lemma map_disjoint_dom_1 {A} (m1 m2 : M A) : m1 ⊥ₘ m2 → dom D m1 ∩ dom D m2 ≡ ∅.
 Proof. apply map_disjoint_dom. Qed.
-Lemma map_disjoint_dom_2 {A} (m1 m2 : M A) : dom D m1 ∩ dom D m2 ≡ ∅ → m1 ⊥ m2.
+Lemma map_disjoint_dom_2 {A} (m1 m2 : M A) : dom D m1 ∩ dom D m2 ≡ ∅ → m1 ⊥ₘ m2.
 Proof. apply map_disjoint_dom. Qed.
 Lemma dom_union {A} (m1 m2 : M A) : dom D (m1 ∪ m2) ≡ dom D m1 ∪ dom D m2.
 Proof.

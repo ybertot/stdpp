@@ -74,6 +74,40 @@ Proof. destruct x; unfold is_Some; naive_solver. Qed.
 Lemma not_eq_None_Some `(x : option A) : x ≠ None ↔ is_Some x.
 Proof. rewrite eq_None_not_Some. split. apply dec_stable. tauto. Qed.
 
+(** Lifting a relation point-wise to option *)
+Inductive option_Forall2 {A B} (P: A → B → Prop) : option A → option B → Prop :=
+  | Some_Forall2 x y : P x y → option_Forall2 P (Some x) (Some y)
+  | None_Forall2 : option_Forall2 P None None.
+Definition option_relation {A B} (R: A → B → Prop) (P: A → Prop) (Q: B → Prop)
+    (mx : option A) (my : option B) : Prop :=
+  match mx, my with
+  | Some x, Some y => R x y
+  | Some x, None => P x
+  | None, Some y => Q y
+  | None, None => True
+  end.
+
+(** Setoids *)
+Section setoids.
+  Context `{Equiv A}.
+  Global Instance option_equiv : Equiv (option A) := option_Forall2 (≡).
+  Global Instance option_equivalence `{!Equivalence ((≡) : relation A)} :
+    Equivalence ((≡) : relation (option A)).
+  Proof.
+    split.
+    * by intros []; constructor.
+    * by destruct 1; constructor.
+    * destruct 1; inversion 1; constructor; etransitivity; eauto.
+  Qed.
+  Global Instance Some_proper : Proper ((≡) ==> (≡)) (@Some A).
+  Proof. by constructor. Qed.
+  Global Instance option_leibniz `{!LeibnizEquiv A} : LeibnizEquiv (option A).
+  Proof.
+    intros x y; split; [destruct 1; fold_leibniz; congruence|].
+    by intros <-; destruct x; constructor; fold_leibniz.
+  Qed.
+End setoids.
+
 (** Equality on [option] is decidable. *)
 Instance option_eq_None_dec {A} (x : option A) : Decision (x = None) :=
   match x with Some _ => right (Some_ne_None _) | None => left eq_refl end.

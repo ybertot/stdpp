@@ -22,6 +22,11 @@ Section definitions.
     | rtc_refl x : rtc x x
     | rtc_l x y z : R x y → rtc y z → rtc x z.
 
+  (** The reflexive transitive closure for setoids. *)
+  Inductive rtcS `{Equiv A} : relation A :=
+    | rtcS_refl x y : x ≡ y → rtcS x y
+    | rtcS_l x y z : R x y → rtcS y z → rtcS x z.
+
   (** Reductions of exactly [n] steps. *)
   Inductive nsteps : nat → relation A :=
     | nsteps_O x : nsteps 0 x x

@@ -5,7 +5,7 @@ finite maps and collects some theory on it. Most importantly, it proves useful
 induction principles for finite maps and implements the tactic
 [simplify_map_equality] to simplify goals involving finite maps. *)
 Require Import Permutation.
-Require Export ars vector orders.
+Require Export relations vector orders.
 
 (** * Axiomatization of finite maps *)
 (** We require Leibniz equality to be extensional on finite maps. This of
@@ -71,25 +71,26 @@ Instance map_intersection_with `{Merge M} {A} : IntersectionWith A (M A) :=
 Instance map_difference_with `{Merge M} {A} : DifferenceWith A (M A) :=
   λ f, merge (difference_with f).
 
+Instance map_equiv `{∀ A, Lookup K A (M A), Equiv A} : Equiv (M A) | 1 := λ m1 m2,
+  ∀ i, m1 !! i ≡ m2 !! i.
+
 (** The relation [intersection_forall R] on finite maps describes that the
 relation [R] holds for each pair in the intersection. *)
 Definition map_Forall `{Lookup K A M} (P : K → A → Prop) : M → Prop :=
   λ m, ∀ i x, m !! i = Some x → P i x.
-Definition map_Forall2 `{∀ A, Lookup K A (M A)} {A B}
-    (R : A → B → Prop) (P : A → Prop) (Q : B → Prop)
-    (m1 : M A) (m2 : M B) : Prop := ∀ i,
-  match m1 !! i, m2 !! i with
-  | Some x, Some y => R x y
-  | Some x, None => P x
-  | None, Some y => Q y
-  | None, None => True
-  end.
+Definition map_relation `{∀ A, Lookup K A (M A)} {A B} (R : A → B → Prop)
+    (P : A → Prop) (Q : B → Prop) (m1 : M A) (m2 : M B) : Prop := ∀ i,
+  option_relation R P Q (m1 !! i) (m2 !! i).
 Definition map_included `{∀ A, Lookup K A (M A)} {A}
-  (R : relation A) : relation (M A) := map_Forall2 R (λ _, False) (λ _, True).
-Instance map_disjoint `{∀ A, Lookup K A (M A)} {A} : Disjoint (M A) :=
-  map_Forall2 (λ _ _, False) (λ _, True) (λ _, True).
+  (R : relation A) : relation (M A) := map_relation R (λ _, False) (λ _, True).
+Definition map_disjoint `{∀ A, Lookup K A (M A)} {A} : relation (M A) :=
+  map_relation (λ _ _, False) (λ _, True) (λ _, True).
+Infix "⊥ₘ" := map_disjoint (at level 70) : C_scope.
+Hint Extern 0 (_ ⊥ₘ _) => symmetry; eassumption.
+Notation "( m ⊥ₘ.)" := (map_disjoint m) (only parsing) : C_scope.
+Notation "(.⊥ₘ m )" := (λ m2, m2 ⊥ₘ m) (only parsing) : C_scope.
 Instance map_subseteq `{∀ A, Lookup K A (M A)} {A} : SubsetEq (M A) :=
-  map_Forall2 (=) (λ _, False) (λ _, True).
+  map_included (=).
 
 (** The union of two finite maps only has a meaningful definition for maps
 that are disjoint. However, as working with partial functions is inconvenient
@@ -114,12 +115,67 @@ Definition map_imap `{∀ A, Insert K A (M A), ∀ A, Empty (M A),
 Section theorems.
 Context `{FinMap K M}.
 
+(** ** Setoids *)
+Section setoid.
+  Context `{Equiv A}.
+  Global Instance map_equivalence `{!Equivalence ((≡) : relation A)} :
+    Equivalence ((≡) : relation (M A)).
+  Proof.
+    split.
+    * by intros m i.
+    * by intros m1 m2 ? i.
+    * by intros m1 m2 m3 ?? i; transitivity (m2 !! i).
+  Qed.
+  Global Instance lookup_proper (i : K) :
+    Proper ((≡) ==> (≡)) (lookup (M:=M A) i).
+  Proof. by intros m1 m2 Hm. Qed.
+  Global Instance partial_alter_proper :
+    Proper (((≡) ==> (≡)) ==> (=) ==> (≡) ==> (≡)) partial_alter.
+  Proof.
+    by intros f1 f2 Hf i ? <- m1 m2 Hm j; destruct (decide (i = j)) as [->|];
+      rewrite ?lookup_partial_alter, ?lookup_partial_alter_ne by done;
+      try apply Hf; apply lookup_proper.
+  Qed.
+  Global Instance insert_proper (i : K) :
+    Proper ((≡) ==> (≡) ==> (≡)) (insert (M:=M A) i).
+  Proof. by intros ???; apply partial_alter_proper; [constructor|]. Qed.
+  Global Instance delete_proper (i : K) :
+    Proper ((≡) ==> (≡)) (delete (M:=M A) i).
+  Proof. by apply partial_alter_proper; [constructor|]. Qed.
+  Global Instance alter_proper :
+    Proper (((≡) ==> (≡)) ==> (=) ==> (≡) ==> (≡)) (alter (A:=A) (M:=M A)).
+  Proof.
+    intros ?? Hf; apply partial_alter_proper.
+    by destruct 1; constructor; apply Hf.
+  Qed.
+  Lemma merge_ext f g
+      `{!PropHolds (f None None = None), !PropHolds (g None None = None)} :
+    ((≡) ==> (≡) ==> (≡))%signature f g →
+    ((≡) ==> (≡) ==> (≡))%signature (merge f) (merge g).
+  Proof.
+    by intros Hf ?? Hm1 ?? Hm2 i; rewrite !lookup_merge by done; apply Hf.
+  Qed.
+  Global Instance union_with_proper :
+    Proper (((≡) ==> (≡) ==> (≡)) ==> (≡) ==> (≡) ==> (≡)) union_with.
+  Proof.
+    intros ?? Hf ?? Hm1 ?? Hm2 i; apply (merge_ext _ _); auto.
+    by do 2 destruct 1; first [apply Hf | constructor].
+  Qed.    
+  Global Instance map_leibniz `{!LeibnizEquiv A} : LeibnizEquiv (M A).
+  Proof.
+    intros m1 m2; split.
+    * by intros Hm; apply map_eq; intros i; unfold_leibniz; apply lookup_proper.
+    * by intros <-; intros i; fold_leibniz.
+  Qed.
+End setoid.
+
+(** ** General properties *)
 Lemma map_eq_iff {A} (m1 m2 : M A) : m1 = m2 ↔ ∀ i, m1 !! i = m2 !! i.
 Proof. split. by intros ->. apply map_eq. Qed.
 Lemma map_subseteq_spec {A} (m1 m2 : M A) :
   m1 ⊆ m2 ↔ ∀ i x, m1 !! i = Some x → m2 !! i = Some x.
 Proof.
-  unfold subseteq, map_subseteq, map_Forall2. split; intros Hm i;
+  unfold subseteq, map_subseteq, map_relation. split; intros Hm i;
     specialize (Hm i); destruct (m1 !! i), (m2 !! i); naive_solver.
 Qed.
 Global Instance: EmptySpec (M A).
@@ -129,9 +185,10 @@ Proof.
 Qed.
 Global Instance: ∀ {A} (R : relation A), PreOrder R → PreOrder (map_included R).
 Proof.
-  split; [intros m i; by destruct (m !! i)|].
+  split; [intros m i; by destruct (m !! i); simpl|].
   intros m1 m2 m3 Hm12 Hm23 i; specialize (Hm12 i); specialize (Hm23 i).
-  destruct (m1 !! i), (m2 !! i), (m3 !! i); try done; etransitivity; eauto.
+  destruct (m1 !! i), (m2 !! i), (m3 !! i); simplify_equality';
+    done || etransitivity; eauto.
 Qed.
 Global Instance: PartialOrder ((⊆) : relation (M A)).
 Proof.
@@ -357,8 +414,8 @@ Lemma insert_included {A} R `{!Reflexive R} (m : M A) i x :
   (∀ y, m !! i = Some y → R y x) → map_included R m (<[i:=x]>m).
 Proof.
   intros ? j; destruct (decide (i = j)) as [->|].
-  * rewrite lookup_insert. destruct (m !! j); eauto.
-  * rewrite lookup_insert_ne by done. by destruct (m !! j).
+  * rewrite lookup_insert. destruct (m !! j); simpl; eauto.
+  * rewrite lookup_insert_ne by done. by destruct (m !! j); simpl.
 Qed.
 Lemma insert_subseteq {A} (m : M A) i x : m !! i = None → m ⊆ <[i:=x]>m.
 Proof. apply partial_alter_subseteq. Qed.
@@ -464,6 +521,17 @@ Proof.
   intros; apply map_eq; intros j; destruct (decide (i = j)) as [->|].
   * by rewrite lookup_omap, !lookup_singleton.
   * by rewrite lookup_omap, !lookup_singleton_ne.
+Qed.
+Lemma map_fmap_id {A} (m : M A) : id <$> m = m.
+Proof. apply map_eq; intros i; by rewrite lookup_fmap, option_fmap_id. Qed.
+Lemma map_fmap_compose {A B C} (f : A → B) (g : B → C) (m : M A) :
+  g ∘ f <$> m = g <$> f <$> m.
+Proof. apply map_eq; intros i; by rewrite !lookup_fmap,option_fmap_compose. Qed.
+Lemma map_fmap_ext {A B} (f1 f2 : A → B) m :
+  (∀ i x, m !! i = Some x → f1 x = f2 x) → f1 <$> m = f2 <$> m.
+Proof.
+  intros Hi; apply map_eq; intros i; rewrite !lookup_fmap.
+  by destruct (m !! i) eqn:?; simpl; erewrite ?Hi by eauto.
 Qed.
 
 (** ** Properties of conversion to lists *)
@@ -807,7 +875,7 @@ Lemma insert_merge_r m1 m2 i x z :
 Proof. by intros; apply partial_alter_merge_r. Qed.
 End more_merge.
 
-(** ** Properties on the [map_Forall2] relation *)
+(** ** Properties on the [map_relation] relation *)
 Section Forall2.
 Context {A B} (R : A → B → Prop) (P : A → Prop) (Q : B → Prop).
 Context `{∀ x y, Decision (R x y), ∀ x, Decision (P x), ∀ y, Decision (Q y)}.
@@ -819,8 +887,8 @@ Let f (mx : option A) (my : option B) : option bool :=
   | None, Some y => Some (bool_decide (Q y))
   | None, None => None
   end.
-Lemma map_Forall2_alt (m1 : M A) (m2 : M B) :
-  map_Forall2 R P Q m1 m2 ↔ map_Forall (λ _, Is_true) (merge f m1 m2).
+Lemma map_relation_alt (m1 : M A) (m2 : M B) :
+  map_relation R P Q m1 m2 ↔ map_Forall (λ _, Is_true) (merge f m1 m2).
 Proof.
   split.
   * intros Hm i P'; rewrite lookup_merge by done; intros.
@@ -830,71 +898,72 @@ Proof.
     destruct (m1 !! i), (m2 !! i); simplify_equality'; auto;
       by eapply bool_decide_unpack, Hm.
 Qed.
-Global Instance map_Forall2_dec `{∀ x y, Decision (R x y), ∀ x, Decision (P x),
-  ∀ y, Decision (Q y)} m1 m2 : Decision (map_Forall2 R P Q m1 m2).
+Global Instance map_relation_dec `{∀ x y, Decision (R x y), ∀ x, Decision (P x),
+  ∀ y, Decision (Q y)} m1 m2 : Decision (map_relation R P Q m1 m2).
 Proof.
   refine (cast_if (decide (map_Forall (λ _, Is_true) (merge f m1 m2))));
-    abstract by rewrite map_Forall2_alt.
+    abstract by rewrite map_relation_alt.
 Defined.
 (** Due to the finiteness of finite maps, we can extract a witness if the
 relation does not hold. *)
 Lemma map_not_Forall2 (m1 : M A) (m2 : M B) :
-  ¬map_Forall2 R P Q m1 m2 ↔ ∃ i,
+  ¬map_relation R P Q m1 m2 ↔ ∃ i,
     (∃ x y, m1 !! i = Some x ∧ m2 !! i = Some y ∧ ¬R x y)
     ∨ (∃ x, m1 !! i = Some x ∧ m2 !! i = None ∧ ¬P x)
     ∨ (∃ y, m1 !! i = None ∧ m2 !! i = Some y ∧ ¬Q y).
 Proof.
   split.
-  * rewrite map_Forall2_alt, (map_not_Forall _). intros (i&?&Hm&?); exists i.
+  * rewrite map_relation_alt, (map_not_Forall _). intros (i&?&Hm&?); exists i.
     rewrite lookup_merge in Hm by done.
     destruct (m1 !! i), (m2 !! i); naive_solver auto 2 using bool_decide_pack.
-  * by intros [i[(x&y&?&?&?)|[(x&?&?&?)|(y&?&?&?)]]] Hm;
+  * unfold map_relation, option_relation.
+    by intros [i[(x&y&?&?&?)|[(x&?&?&?)|(y&?&?&?)]]] Hm;
       specialize (Hm i); simplify_option_equality.
 Qed.
 End Forall2.
 
 (** ** Properties on the disjoint maps *)
 Lemma map_disjoint_spec {A} (m1 m2 : M A) :
-  m1 ⊥ m2 ↔ ∀ i x y, m1 !! i = Some x → m2 !! i = Some y → False.
+  m1 ⊥ₘ m2 ↔ ∀ i x y, m1 !! i = Some x → m2 !! i = Some y → False.
 Proof.
   split; intros Hm i; specialize (Hm i);
     destruct (m1 !! i), (m2 !! i); naive_solver.
 Qed.
 Lemma map_disjoint_alt {A} (m1 m2 : M A) :
-  m1 ⊥ m2 ↔ ∀ i, m1 !! i = None ∨ m2 !! i = None.
+  m1 ⊥ₘ m2 ↔ ∀ i, m1 !! i = None ∨ m2 !! i = None.
 Proof.
   split; intros Hm1m2 i; specialize (Hm1m2 i);
     destruct (m1 !! i), (m2 !! i); naive_solver.
 Qed.
 Lemma map_not_disjoint {A} (m1 m2 : M A) :
-  ¬m1 ⊥ m2 ↔ ∃ i x1 x2, m1 !! i = Some x1 ∧ m2 !! i = Some x2.
+  ¬m1 ⊥ₘ m2 ↔ ∃ i x1 x2, m1 !! i = Some x1 ∧ m2 !! i = Some x2.
 Proof.
   unfold disjoint, map_disjoint. rewrite map_not_Forall2 by solve_decision.
   split; [|naive_solver].
   intros [i[(x&y&?&?&?)|[(x&?&?&[])|(y&?&?&[])]]]; naive_solver.
 Qed.
-Global Instance: Symmetric (@disjoint (M A) _).
+Global Instance: Symmetric (map_disjoint : relation (M A)).
 Proof. intros A m1 m2. rewrite !map_disjoint_spec. naive_solver. Qed.
-Lemma map_disjoint_empty_l {A} (m : M A) : ∅ ⊥ m.
+Lemma map_disjoint_empty_l {A} (m : M A) : ∅ ⊥ₘ m.
 Proof. rewrite !map_disjoint_spec. intros i x y. by rewrite lookup_empty. Qed.
-Lemma map_disjoint_empty_r {A} (m : M A) : m ⊥ ∅.
+Lemma map_disjoint_empty_r {A} (m : M A) : m ⊥ₘ ∅.
 Proof. rewrite !map_disjoint_spec. intros i x y. by rewrite lookup_empty. Qed.
 Lemma map_disjoint_weaken {A} (m1 m1' m2 m2' : M A) :
-  m1' ⊥ m2' → m1 ⊆ m1' → m2 ⊆ m2' → m1 ⊥ m2.
+  m1' ⊥ₘ m2' → m1 ⊆ m1' → m2 ⊆ m2' → m1 ⊥ₘ m2.
 Proof. rewrite !map_subseteq_spec, !map_disjoint_spec. eauto. Qed.
 Lemma map_disjoint_weaken_l {A} (m1 m1' m2  : M A) :
-  m1' ⊥ m2 → m1 ⊆ m1' → m1 ⊥ m2.
+  m1' ⊥ₘ m2 → m1 ⊆ m1' → m1 ⊥ₘ m2.
 Proof. eauto using map_disjoint_weaken. Qed.
 Lemma map_disjoint_weaken_r {A} (m1 m2 m2' : M A) :
-  m1 ⊥ m2' → m2 ⊆ m2' → m1 ⊥ m2.
+  m1 ⊥ₘ m2' → m2 ⊆ m2' → m1 ⊥ₘ m2.
 Proof. eauto using map_disjoint_weaken. Qed.
 Lemma map_disjoint_Some_l {A} (m1 m2 : M A) i x:
-  m1 ⊥ m2 → m1 !! i = Some x → m2 !! i = None.
+  m1 ⊥ₘ m2 → m1 !! i = Some x → m2 !! i = None.
 Proof. rewrite map_disjoint_spec, eq_None_not_Some. intros ?? [??]; eauto. Qed.
 Lemma map_disjoint_Some_r {A} (m1 m2 : M A) i x:
-  m1 ⊥ m2 → m2 !! i = Some x → m1 !! i = None.
-Proof. rewrite (symmetry_iff (⊥)). apply map_disjoint_Some_l. Qed.
-Lemma map_disjoint_singleton_l {A} (m : M A) i x : {[i, x]} ⊥ m ↔ m !! i = None.
+  m1 ⊥ₘ m2 → m2 !! i = Some x → m1 !! i = None.
+Proof. rewrite (symmetry_iff map_disjoint). apply map_disjoint_Some_l. Qed.
+Lemma map_disjoint_singleton_l {A} (m: M A) i x : {[i, x]} ⊥ₘ m ↔ m !! i = None.
 Proof.
   split; [|rewrite !map_disjoint_spec].
   * intro. apply (map_disjoint_Some_l {[i, x]} _ _ x);
@@ -904,20 +973,20 @@ Proof.
     + by rewrite lookup_singleton_ne.
 Qed.
 Lemma map_disjoint_singleton_r {A} (m : M A) i x :
-  m ⊥ {[i, x]} ↔ m !! i = None.
-Proof. by rewrite (symmetry_iff (⊥)), map_disjoint_singleton_l. Qed.
+  m ⊥ₘ {[i, x]} ↔ m !! i = None.
+Proof. by rewrite (symmetry_iff map_disjoint), map_disjoint_singleton_l. Qed.
 Lemma map_disjoint_singleton_l_2 {A} (m : M A) i x :
-  m !! i = None → {[i, x]} ⊥ m.
+  m !! i = None → {[i, x]} ⊥ₘ m.
 Proof. by rewrite map_disjoint_singleton_l. Qed.
 Lemma map_disjoint_singleton_r_2 {A} (m : M A) i x :
-  m !! i = None → m ⊥ {[i, x]}.
+  m !! i = None → m ⊥ₘ {[i, x]}.
 Proof. by rewrite map_disjoint_singleton_r. Qed.
-Lemma map_disjoint_delete_l {A} (m1 m2 : M A) i : m1 ⊥ m2 → delete i m1 ⊥ m2.
+Lemma map_disjoint_delete_l {A} (m1 m2 : M A) i : m1 ⊥ₘ m2 → delete i m1 ⊥ₘ m2.
 Proof.
   rewrite !map_disjoint_alt. intros Hdisjoint j. destruct (Hdisjoint j); auto.
   rewrite lookup_delete_None. tauto.
 Qed.
-Lemma map_disjoint_delete_r {A} (m1 m2 : M A) i : m1 ⊥ m2 → m1 ⊥ delete i m2.
+Lemma map_disjoint_delete_r {A} (m1 m2 : M A) i : m1 ⊥ₘ m2 → m1 ⊥ₘ delete i m2.
 Proof. symmetry. by apply map_disjoint_delete_l. Qed.
 
 (** ** Properties of the [union_with] operation *)
@@ -1036,7 +1105,7 @@ Qed.
 Lemma map_positive_l_alt {A} (m1 m2 : M A) : m1 ≠ ∅ → m1 ∪ m2 ≠ ∅.
 Proof. eauto using map_positive_l. Qed.
 Lemma lookup_union_Some {A} (m1 m2 : M A) i x :
-  m1 ⊥ m2 → (m1 ∪ m2) !! i = Some x ↔ m1 !! i = Some x ∨ m2 !! i = Some x.
+  m1 ⊥ₘ m2 → (m1 ∪ m2) !! i = Some x ↔ m1 !! i = Some x ∨ m2 !! i = Some x.
 Proof.
   intros Hdisjoint. rewrite lookup_union_Some_raw.
   intuition eauto using map_disjoint_Some_r.
@@ -1045,9 +1114,9 @@ Lemma lookup_union_Some_l {A} (m1 m2 : M A) i x :
   m1 !! i = Some x → (m1 ∪ m2) !! i = Some x.
 Proof. intro. rewrite lookup_union_Some_raw; intuition. Qed.
 Lemma lookup_union_Some_r {A} (m1 m2 : M A) i x :
-  m1 ⊥ m2 → m2 !! i = Some x → (m1 ∪ m2) !! i = Some x.
+  m1 ⊥ₘ m2 → m2 !! i = Some x → (m1 ∪ m2) !! i = Some x.
 Proof. intro. rewrite lookup_union_Some; intuition. Qed.
-Lemma map_union_commutative {A} (m1 m2 : M A) : m1 ⊥ m2 → m1 ∪ m2 = m2 ∪ m1.
+Lemma map_union_commutative {A} (m1 m2 : M A) : m1 ⊥ₘ m2 → m1 ∪ m2 = m2 ∪ m1.
 Proof.
   intros Hdisjoint. apply (merge_commutative (union_with (λ x _, Some x))).
   intros i. specialize (Hdisjoint i).
@@ -1065,14 +1134,14 @@ Lemma map_union_subseteq_l {A} (m1 m2 : M A) : m1 ⊆ m1 ∪ m2.
 Proof.
   rewrite map_subseteq_spec. intros ? i x. rewrite lookup_union_Some_raw. tauto.
 Qed.
-Lemma map_union_subseteq_r {A} (m1 m2 : M A) : m1 ⊥ m2 → m2 ⊆ m1 ∪ m2.
+Lemma map_union_subseteq_r {A} (m1 m2 : M A) : m1 ⊥ₘ m2 → m2 ⊆ m1 ∪ m2.
 Proof.
   intros. rewrite map_union_commutative by done. by apply map_union_subseteq_l.
 Qed.
 Lemma map_union_subseteq_l_alt {A} (m1 m2 m3 : M A) : m1 ⊆ m2 → m1 ⊆ m2 ∪ m3.
 Proof. intros. transitivity m2; auto using map_union_subseteq_l. Qed.
 Lemma map_union_subseteq_r_alt {A} (m1 m2 m3 : M A) :
-  m2 ⊥ m3 → m1 ⊆ m3 → m1 ⊆ m2 ∪ m3.
+  m2 ⊥ₘ m3 → m1 ⊆ m3 → m1 ⊆ m2 ∪ m3.
 Proof. intros. transitivity m3; auto using map_union_subseteq_r. Qed.
 Lemma map_union_preserving_l {A} (m1 m2 m3 : M A) : m1 ⊆ m2 → m3 ∪ m1 ⊆ m3 ∪ m2.
 Proof.
@@ -1080,52 +1149,52 @@ Proof.
   rewrite !lookup_union_Some_raw. naive_solver.
 Qed.
 Lemma map_union_preserving_r {A} (m1 m2 m3 : M A) :
-  m2 ⊥ m3 → m1 ⊆ m2 → m1 ∪ m3 ⊆ m2 ∪ m3.
+  m2 ⊥ₘ m3 → m1 ⊆ m2 → m1 ∪ m3 ⊆ m2 ∪ m3.
 Proof.
   intros. rewrite !(map_union_commutative _ m3)
     by eauto using map_disjoint_weaken_l.
   by apply map_union_preserving_l.
 Qed.
 Lemma map_union_reflecting_l {A} (m1 m2 m3 : M A) :
-  m3 ⊥ m1 → m3 ⊥ m2 → m3 ∪ m1 ⊆ m3 ∪ m2 → m1 ⊆ m2.
+  m3 ⊥ₘ m1 → m3 ⊥ₘ m2 → m3 ∪ m1 ⊆ m3 ∪ m2 → m1 ⊆ m2.
 Proof.
   rewrite !map_subseteq_spec. intros Hm31 Hm32 Hm i x ?. specialize (Hm i x).
   rewrite !lookup_union_Some in Hm by done. destruct Hm; auto.
   by rewrite map_disjoint_spec in Hm31; destruct (Hm31 i x x).
 Qed.
 Lemma map_union_reflecting_r {A} (m1 m2 m3 : M A) :
-  m1 ⊥ m3 → m2 ⊥ m3 → m1 ∪ m3 ⊆ m2 ∪ m3 → m1 ⊆ m2.
+  m1 ⊥ₘ m3 → m2 ⊥ₘ m3 → m1 ∪ m3 ⊆ m2 ∪ m3 → m1 ⊆ m2.
 Proof.
   intros ??. rewrite !(map_union_commutative _ m3) by done.
   by apply map_union_reflecting_l.
 Qed.
 Lemma map_union_cancel_l {A} (m1 m2 m3 : M A) :
-  m1 ⊥ m3 → m2 ⊥ m3 → m3 ∪ m1 = m3 ∪ m2 → m1 = m2.
+  m1 ⊥ₘ m3 → m2 ⊥ₘ m3 → m3 ∪ m1 = m3 ∪ m2 → m1 = m2.
 Proof.
   intros. apply (anti_symmetric (⊆));
     apply map_union_reflecting_l with m3; auto using (reflexive_eq (R:=(⊆))).
 Qed.
 Lemma map_union_cancel_r {A} (m1 m2 m3 : M A) :
-  m1 ⊥ m3 → m2 ⊥ m3 → m1 ∪ m3 = m2 ∪ m3 → m1 = m2.
+  m1 ⊥ₘ m3 → m2 ⊥ₘ m3 → m1 ∪ m3 = m2 ∪ m3 → m1 = m2.
 Proof.
   intros. apply (anti_symmetric (⊆));
     apply map_union_reflecting_r with m3; auto using (reflexive_eq (R:=(⊆))).
 Qed.
 Lemma map_disjoint_union_l {A} (m1 m2 m3 : M A) :
-  m1 ∪ m2 ⊥ m3 ↔ m1 ⊥ m3 ∧ m2 ⊥ m3.
+  m1 ∪ m2 ⊥ₘ m3 ↔ m1 ⊥ₘ m3 ∧ m2 ⊥ₘ m3.
 Proof.
   rewrite !map_disjoint_alt. setoid_rewrite lookup_union_None. naive_solver.
 Qed.
 Lemma map_disjoint_union_r {A} (m1 m2 m3 : M A) :
-  m1 ⊥ m2 ∪ m3 ↔ m1 ⊥ m2 ∧ m1 ⊥ m3.
+  m1 ⊥ₘ m2 ∪ m3 ↔ m1 ⊥ₘ m2 ∧ m1 ⊥ₘ m3.
 Proof.
   rewrite !map_disjoint_alt. setoid_rewrite lookup_union_None. naive_solver.
 Qed.
 Lemma map_disjoint_union_l_2 {A} (m1 m2 m3 : M A) :
-  m1 ⊥ m3 → m2 ⊥ m3 → m1 ∪ m2 ⊥ m3.
+  m1 ⊥ₘ m3 → m2 ⊥ₘ m3 → m1 ∪ m2 ⊥ₘ m3.
 Proof. by rewrite map_disjoint_union_l. Qed.
 Lemma map_disjoint_union_r_2 {A} (m1 m2 m3 : M A) :
-  m1 ⊥ m2 → m1 ⊥ m3 → m1 ⊥ m2 ∪ m3.
+  m1 ⊥ₘ m2 → m1 ⊥ₘ m3 → m1 ⊥ₘ m2 ∪ m3.
 Proof. by rewrite map_disjoint_union_r. Qed.
 Lemma insert_union_singleton_l {A} (m : M A) i x : <[i:=x]>m = {[i,x]} ∪ m.
 Proof.
@@ -1142,22 +1211,22 @@ Proof.
   by apply map_disjoint_singleton_l.
 Qed.
 Lemma map_disjoint_insert_l {A} (m1 m2 : M A) i x :
-  <[i:=x]>m1 ⊥ m2 ↔ m2 !! i = None ∧ m1 ⊥ m2.
+  <[i:=x]>m1 ⊥ₘ m2 ↔ m2 !! i = None ∧ m1 ⊥ₘ m2.
 Proof.
   rewrite insert_union_singleton_l.
   by rewrite map_disjoint_union_l, map_disjoint_singleton_l.
 Qed.
 Lemma map_disjoint_insert_r {A} (m1 m2 : M A) i x :
-  m1 ⊥ <[i:=x]>m2 ↔ m1 !! i = None ∧ m1 ⊥ m2.
+  m1 ⊥ₘ <[i:=x]>m2 ↔ m1 !! i = None ∧ m1 ⊥ₘ m2.
 Proof.
   rewrite insert_union_singleton_l.
   by rewrite map_disjoint_union_r, map_disjoint_singleton_r.
 Qed.
 Lemma map_disjoint_insert_l_2 {A} (m1 m2 : M A) i x :
-  m2 !! i = None → m1 ⊥ m2 → <[i:=x]>m1 ⊥ m2.
+  m2 !! i = None → m1 ⊥ₘ m2 → <[i:=x]>m1 ⊥ₘ m2.
 Proof. by rewrite map_disjoint_insert_l. Qed.
 Lemma map_disjoint_insert_r_2 {A} (m1 m2 : M A) i x :
-  m1 !! i = None → m1 ⊥ m2 → m1 ⊥ <[i:=x]>m2.
+  m1 !! i = None → m1 ⊥ₘ m2 → m1 ⊥ₘ <[i:=x]>m2.
 Proof. by rewrite map_disjoint_insert_r. Qed.
 Lemma insert_union_l {A} (m1 m2 : M A) i x :
   <[i:=x]>(m1 ∪ m2) = <[i:=x]>m1 ∪ m2.
@@ -1181,7 +1250,7 @@ Proof. apply delete_union_with. Qed.
 
 (** ** Properties of the [union_list] operation *)
 Lemma map_disjoint_union_list_l {A} (ms : list (M A)) (m : M A) :
-  ⋃ ms ⊥ m ↔ Forall (.⊥ m) ms.
+  ⋃ ms ⊥ₘ m ↔ Forall (.⊥ₘ m) ms.
 Proof.
   split.
   * induction ms; simpl; rewrite ?map_disjoint_union_l; intuition.
@@ -1189,23 +1258,14 @@ Proof.
     by rewrite map_disjoint_union_l.
 Qed.
 Lemma map_disjoint_union_list_r {A} (ms : list (M A)) (m : M A) :
-  m ⊥ ⋃ ms ↔ Forall (.⊥ m) ms.
-Proof. by rewrite (symmetry_iff (⊥)), map_disjoint_union_list_l. Qed.
+  m ⊥ₘ ⋃ ms ↔ Forall (.⊥ₘ m) ms.
+Proof. by rewrite (symmetry_iff map_disjoint), map_disjoint_union_list_l. Qed.
 Lemma map_disjoint_union_list_l_2 {A} (ms : list (M A)) (m : M A) :
-  Forall (.⊥ m) ms → ⋃ ms ⊥ m.
+  Forall (.⊥ₘ m) ms → ⋃ ms ⊥ₘ m.
 Proof. by rewrite map_disjoint_union_list_l. Qed.
 Lemma map_disjoint_union_list_r_2 {A} (ms : list (M A)) (m : M A) :
-  Forall (.⊥ m) ms → m ⊥ ⋃ ms.
+  Forall (.⊥ₘ m) ms → m ⊥ₘ ⋃ ms.
 Proof. by rewrite map_disjoint_union_list_r. Qed.
-Lemma map_union_sublist {A} (ms1 ms2 : list (M A)) :
-  ⊥ ms2 → ms1 `sublist` ms2 → ⋃ ms1 ⊆ ⋃ ms2.
-Proof.
-  intros Hms2. revert ms1.
-  induction Hms2 as [|m2 ms2]; intros ms1; [by inversion 1|].
-  rewrite sublist_cons_r. intros [?|(ms1' &?&?)]; subst; simpl.
-  * transitivity (⋃ ms2); auto. by apply map_union_subseteq_r.
-  * apply map_union_preserving_l; auto.
-Qed.
 
 (** ** Properties of the folding the [delete] function *)
 Lemma lookup_foldr_delete {A} (m : M A) is j :
@@ -1231,10 +1291,10 @@ Proof.
   rewrite IHis, delete_insert_ne; intuition.
 Qed.
 Lemma map_disjoint_foldr_delete_l {A} (m1 m2 : M A) is :
-  m1 ⊥ m2 → foldr delete m1 is ⊥ m2.
+  m1 ⊥ₘ m2 → foldr delete m1 is ⊥ₘ m2.
 Proof. induction is; simpl; auto using map_disjoint_delete_l. Qed.
 Lemma map_disjoint_foldr_delete_r {A} (m1 m2 : M A) is :
-  m1 ⊥ m2 → m1 ⊥ foldr delete m2 is.
+  m1 ⊥ₘ m2 → m1 ⊥ₘ foldr delete m2 is.
 Proof. induction is; simpl; auto using map_disjoint_delete_r. Qed.
 Lemma foldr_delete_union {A} (m1 m2 : M A) is :
   foldr delete (m1 ∪ m2) is = foldr delete m1 is ∪ foldr delete m2 is.
@@ -1242,7 +1302,7 @@ Proof. apply foldr_delete_union_with. Qed.
 
 (** ** Properties on disjointness of conversion to lists *)
 Lemma map_disjoint_of_list_l {A} (m : M A) ixs :
-  map_of_list ixs ⊥ m ↔ Forall (λ ix, m !! ix.1 = None) ixs.
+  map_of_list ixs ⊥ₘ m ↔ Forall (λ ix, m !! ix.1 = None) ixs.
 Proof.
   split.
   * induction ixs; simpl; rewrite ?map_disjoint_insert_l in *; intuition.
@@ -1250,47 +1310,29 @@ Proof.
     rewrite map_disjoint_insert_l. auto.
 Qed.
 Lemma map_disjoint_of_list_r {A} (m : M A) ixs :
-  m ⊥ map_of_list ixs ↔ Forall (λ ix, m !! ix.1 = None) ixs.
-Proof. by rewrite (symmetry_iff (⊥)), map_disjoint_of_list_l. Qed.
+  m ⊥ₘ map_of_list ixs ↔ Forall (λ ix, m !! ix.1 = None) ixs.
+Proof. by rewrite (symmetry_iff map_disjoint), map_disjoint_of_list_l. Qed.
 Lemma map_disjoint_of_list_zip_l {A} (m : M A) is xs :
   length is = length xs →
-  map_of_list (zip is xs) ⊥ m ↔ Forall (λ i, m !! i = None) is.
+  map_of_list (zip is xs) ⊥ₘ m ↔ Forall (λ i, m !! i = None) is.
 Proof.
   intro. rewrite map_disjoint_of_list_l.
   rewrite <-(fst_zip is xs) at 2 by lia. by rewrite Forall_fmap.
 Qed.
 Lemma map_disjoint_of_list_zip_r {A} (m : M A) is xs :
   length is = length xs →
-  m ⊥ map_of_list (zip is xs) ↔ Forall (λ i, m !! i = None) is.
-Proof. intro. by rewrite (symmetry_iff (⊥)), map_disjoint_of_list_zip_l. Qed.
+  m ⊥ₘ map_of_list (zip is xs) ↔ Forall (λ i, m !! i = None) is.
+Proof.
+  intro. by rewrite (symmetry_iff map_disjoint), map_disjoint_of_list_zip_l.
+Qed.
 Lemma map_disjoint_of_list_zip_l_2 {A} (m : M A) is xs :
   length is = length xs → Forall (λ i, m !! i = None) is →
-  map_of_list (zip is xs) ⊥ m.
+  map_of_list (zip is xs) ⊥ₘ m.
 Proof. intro. by rewrite map_disjoint_of_list_zip_l. Qed.
 Lemma map_disjoint_of_list_zip_r_2 {A} (m : M A) is xs :
   length is = length xs → Forall (λ i, m !! i = None) is →
-  m ⊥ map_of_list (zip is xs).
+  m ⊥ₘ map_of_list (zip is xs).
 Proof. intro. by rewrite map_disjoint_of_list_zip_r. Qed.
-
-(** ** Properties with respect to vectors *)
-Lemma union_delete_vec {A n} (ms : vec (M A) n) (i : fin n) :
-  ⊥ ms → ms !!! i ∪ ⋃ delete (fin_to_nat i) (vec_to_list ms) = ⋃ ms.
-Proof.
-  induction ms as [|m ? ms IH]; inversion_clear 1; inv_fin i; simpl; auto.
-  intros i. rewrite (map_union_commutative m), (associative_L (∪)), IH.
-  * by rewrite map_union_commutative.
-  * done.
-  * apply map_disjoint_weaken_r with (⋃ ms); [done |].
-    apply map_union_sublist; auto using sublist_delete.
-Qed.
-Lemma union_insert_vec {A n} (ms : vec (M A) n) (i : fin n) m :
-  m ⊥ ⋃ delete (fin_to_nat i) (vec_to_list ms) →
-  ⋃ vinsert i m ms = m ∪ ⋃ delete (fin_to_nat i) (vec_to_list ms).
-Proof.
-  induction ms as [|m' ? ms IH]; inv_fin i; simpl; [done | intros i Hdisjoint].
-  rewrite map_disjoint_union_r in Hdisjoint.
-  rewrite IH, !(associative_L (∪)), (map_union_commutative m); intuition.
-Qed.
 
 (** ** Properties of the [intersection_with] operation *)
 Lemma lookup_intersection_with {A} (f : A → A → option A) m1 m2 i :
@@ -1344,13 +1386,13 @@ Proof.
   unfold difference, map_difference; rewrite lookup_difference_with.
   destruct (m1 !! i), (m2 !! i); compute; naive_solver.
 Qed.
-Lemma map_disjoint_difference_l {A} (m1 m2 : M A) : m1 ⊆ m2 → m2 ∖ m1 ⊥ m1.
+Lemma map_disjoint_difference_l {A} (m1 m2 : M A) : m1 ⊆ m2 → m2 ∖ m1 ⊥ₘ m1.
 Proof.
   intros Hm i; specialize (Hm i).
   unfold difference, map_difference; rewrite lookup_difference_with.
   by destruct (m1 !! i), (m2 !! i).
 Qed.
-Lemma map_disjoint_difference_r {A} (m1 m2 : M A) : m1 ⊆ m2 → m1 ⊥ m2 ∖ m1.
+Lemma map_disjoint_difference_r {A} (m1 m2 : M A) : m1 ⊆ m2 → m1 ⊥ₘ m2 ∖ m1.
 Proof. intros. symmetry. by apply map_disjoint_difference_l. Qed.
 Lemma map_difference_union {A} (m1 m2 : M A) :
   m1 ⊆ m2 → m1 ∪ m2 ∖ m1 = m2.
@@ -1372,23 +1414,20 @@ maps. This tactic does not yield any information loss as all simplifications
 performed are reversible. *)
 Ltac decompose_map_disjoint := repeat
   match goal with
-  | H : _ ∪ _ ⊥ _ |- _ => apply map_disjoint_union_l in H; destruct H
-  | H : _ ⊥ _ ∪ _ |- _ => apply map_disjoint_union_r in H; destruct H
-  | H : {[ _ ]} ⊥ _ |- _ => apply map_disjoint_singleton_l in H
-  | H : _ ⊥ {[ _ ]} |- _ =>  apply map_disjoint_singleton_r in H
-  | H : <[_:=_]>_ ⊥ _ |- _ => apply map_disjoint_insert_l in H; destruct H
-  | H : _ ⊥ <[_:=_]>_ |- _ => apply map_disjoint_insert_r in H; destruct H
-  | H : ⋃ _ ⊥ _ |- _ => apply map_disjoint_union_list_l in H
-  | H : _ ⊥ ⋃ _ |- _ => apply map_disjoint_union_list_r in H
-  | H : ∅ ⊥ _ |- _ => clear H
-  | H : _ ⊥ ∅ |- _ => clear H
-  | H : ⊥ [] |- _ => clear H
-  | H : ⊥ [_] |- _ => clear H
-  | H : ⊥ (_ :: _) |- _ => apply disjoint_list_cons in H; destruct H
-  | H : Forall (.⊥ _) _ |- _ => rewrite Forall_vlookup in H
-  | H : Forall (.⊥ _) [] |- _ => clear H
-  | H : Forall (.⊥ _) (_ :: _) |- _ => rewrite Forall_cons in H; destruct H
-  | H : Forall (.⊥ _) (_ :: _) |- _ => rewrite Forall_app in H; destruct H
+  | H : _ ∪ _ ⊥ₘ _ |- _ => apply map_disjoint_union_l in H; destruct H
+  | H : _ ⊥ₘ _ ∪ _ |- _ => apply map_disjoint_union_r in H; destruct H
+  | H : {[ _ ]} ⊥ₘ _ |- _ => apply map_disjoint_singleton_l in H
+  | H : _ ⊥ₘ {[ _ ]} |- _ =>  apply map_disjoint_singleton_r in H
+  | H : <[_:=_]>_ ⊥ₘ _ |- _ => apply map_disjoint_insert_l in H; destruct H
+  | H : _ ⊥ₘ <[_:=_]>_ |- _ => apply map_disjoint_insert_r in H; destruct H
+  | H : ⋃ _ ⊥ₘ _ |- _ => apply map_disjoint_union_list_l in H
+  | H : _ ⊥ₘ ⋃ _ |- _ => apply map_disjoint_union_list_r in H
+  | H : ∅ ⊥ₘ _ |- _ => clear H
+  | H : _ ⊥ₘ ∅ |- _ => clear H
+  | H : Forall (.⊥ₘ _) _ |- _ => rewrite Forall_vlookup in H
+  | H : Forall (.⊥ₘ _) [] |- _ => clear H
+  | H : Forall (.⊥ₘ _) (_ :: _) |- _ => rewrite Forall_cons in H; destruct H
+  | H : Forall (.⊥ₘ _) (_ :: _) |- _ => rewrite Forall_app in H; destruct H
   end.
 
 (** To prove a disjointness property, we first decompose all hypotheses, and
@@ -1399,30 +1438,28 @@ Ltac solve_map_disjoint :=
 
 (** We declare these hints using [Hint Extern] instead of [Hint Resolve] as
 [eauto] works badly with hints parametrized by type class constraints. *)
-Hint Extern 1 (_ ⊥ _) => done : map_disjoint.
-Hint Extern 2 (∅ ⊥ _) => apply map_disjoint_empty_l : map_disjoint.
-Hint Extern 2 (_ ⊥ ∅) => apply map_disjoint_empty_r : map_disjoint.
-Hint Extern 2 ({[ _ ]} ⊥ _) =>
+Hint Extern 1 (_ ⊥ₘ _) => done : map_disjoint.
+Hint Extern 2 (∅ ⊥ₘ _) => apply map_disjoint_empty_l : map_disjoint.
+Hint Extern 2 (_ ⊥ₘ ∅) => apply map_disjoint_empty_r : map_disjoint.
+Hint Extern 2 ({[ _ ]} ⊥ₘ _) =>
   apply map_disjoint_singleton_l_2 : map_disjoint.
-Hint Extern 2 (_ ⊥ {[ _ ]}) =>
+Hint Extern 2 (_ ⊥ₘ {[ _ ]}) =>
   apply map_disjoint_singleton_r_2 : map_disjoint.
-Hint Extern 2 (⊥ []) => apply disjoint_nil_2 : map_disjoint.
-Hint Extern 2 (⊥ (_ :: _)) => apply disjoint_cons_2 : map_disjoint.
-Hint Extern 2 (_ ∪ _ ⊥ _) => apply map_disjoint_union_l_2 : map_disjoint.
-Hint Extern 2 (_ ⊥ _ ∪ _) => apply map_disjoint_union_r_2 : map_disjoint.
-Hint Extern 2 (<[_:=_]>_ ⊥ _) => apply map_disjoint_insert_l_2 : map_disjoint.
-Hint Extern 2 (_ ⊥ <[_:=_]>_) => apply map_disjoint_insert_r_2 : map_disjoint.
-Hint Extern 2 (delete _ _ ⊥ _) => apply map_disjoint_delete_l : map_disjoint.
-Hint Extern 2 (_ ⊥ delete _ _) => apply map_disjoint_delete_r : map_disjoint.
-Hint Extern 2 (map_of_list _ ⊥ _) =>
+Hint Extern 2 (_ ∪ _ ⊥ₘ _) => apply map_disjoint_union_l_2 : map_disjoint.
+Hint Extern 2 (_ ⊥ₘ _ ∪ _) => apply map_disjoint_union_r_2 : map_disjoint.
+Hint Extern 2 (<[_:=_]>_ ⊥ₘ _) => apply map_disjoint_insert_l_2 : map_disjoint.
+Hint Extern 2 (_ ⊥ₘ <[_:=_]>_) => apply map_disjoint_insert_r_2 : map_disjoint.
+Hint Extern 2 (delete _ _ ⊥ₘ _) => apply map_disjoint_delete_l : map_disjoint.
+Hint Extern 2 (_ ⊥ₘ delete _ _) => apply map_disjoint_delete_r : map_disjoint.
+Hint Extern 2 (map_of_list _ ⊥ₘ _) =>
   apply map_disjoint_of_list_zip_l_2 : mem_disjoint.
-Hint Extern 2 (_ ⊥ map_of_list _) =>
+Hint Extern 2 (_ ⊥ₘ map_of_list _) =>
   apply map_disjoint_of_list_zip_r_2 : mem_disjoint.
-Hint Extern 2 (⋃ _ ⊥ _) => apply map_disjoint_union_list_l_2 : mem_disjoint.
-Hint Extern 2 (_ ⊥ ⋃ _) => apply map_disjoint_union_list_r_2 : mem_disjoint.
-Hint Extern 2 (foldr delete _ _ ⊥ _) =>
+Hint Extern 2 (⋃ _ ⊥ₘ _) => apply map_disjoint_union_list_l_2 : mem_disjoint.
+Hint Extern 2 (_ ⊥ₘ ⋃ _) => apply map_disjoint_union_list_r_2 : mem_disjoint.
+Hint Extern 2 (foldr delete _ _ ⊥ₘ _) =>
   apply map_disjoint_foldr_delete_l : map_disjoint.
-Hint Extern 2 (_ ⊥ foldr delete _ _) =>
+Hint Extern 2 (_ ⊥ₘ foldr delete _ _) =>
   apply map_disjoint_foldr_delete_r : map_disjoint.
 
 (** The tactic [simpl_map by tac] simplifies occurrences of finite map look
