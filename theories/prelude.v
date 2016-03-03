@@ -3,7 +3,6 @@
 From stdpp Require Export
   base
   tactics
-  decidable
   orders
   option
   vector
