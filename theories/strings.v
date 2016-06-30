@@ -2,7 +2,12 @@
 (* This file is distributed under the terms of the BSD license. *)
 From Coq Require Import Ascii.
 From Coq Require Export String.
-From stdpp Require Export countable.
+From stdpp Require Export list.
+From stdpp Require Import countable.
+
+(* To avoid randomly ending up with String.length because this module is
+imported hereditarily somewhere. *)
+Notation length := List.length.
 
 (** * Fix scopes *)
 Open Scope string_scope.
