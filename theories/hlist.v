@@ -1,4 +1,5 @@
 From stdpp Require Import tactics.
+Local Set Universe Polymorphism.
 
 (* Not using [list Type] in order to avoid universe inconsistencies *)
 Inductive tlist := tnil : tlist | tcons : Type → tlist → tlist.
