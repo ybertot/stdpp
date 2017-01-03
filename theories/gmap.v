@@ -4,6 +4,7 @@
 type. The implementation is based on [Pmap]s, radix-2 search trees. *)
 From stdpp Require Export countable fin_maps fin_map_dom.
 From stdpp Require Import pmap mapset set.
+Set Default Proof Using "Type*".
 
 (** * The data structure *)
 (** We pack a [Pmap] together with a proof that ensures that all keys correspond

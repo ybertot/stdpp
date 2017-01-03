@@ -4,6 +4,7 @@
 maps whose keys range over Coq's data type of binary naturals [N]. *)
 From stdpp Require Import pmap mapset.
 From stdpp Require Export prelude fin_maps.
+Set Default Proof Using "Type*".
 
 Local Open Scope N_scope.
 

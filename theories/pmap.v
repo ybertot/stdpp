@@ -10,6 +10,7 @@ Leibniz equality to become extensional. *)
 From Coq Require Import PArith.
 From stdpp Require Import mapset countable.
 From stdpp Require Export fin_maps.
+Set Default Proof Using "Type*".
 
 Local Open Scope positive_scope.
 Local Hint Extern 0 (@eq positive _ _) => congruence.

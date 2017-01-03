@@ -1,4 +1,5 @@
 From stdpp Require Import tactics.
+Set Default Proof Using "Type*".
 Local Set Universe Polymorphism.
 
 (* Not using [list Type] in order to avoid universe inconsistencies *)
