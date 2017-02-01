@@ -3,13 +3,8 @@ ifeq ($(Y), 1)
 	YFLAG=-y
 endif
 
-# Determine Coq version
-COQ_VERSION=$(shell coqc --version | egrep -o 'version 8.[0-9]' | egrep -o '8.[0-9]')
-COQ_MAKEFILE_FLAGS ?=
-
-ifeq ($(COQ_VERSION), 8.6)
-	COQ_MAKEFILE_FLAGS += -arg -w -arg -notation-overridden,-redundant-canonical-projection,-several-object-files
-endif
+# Configure Coq warnings
+COQ_MAKEFILE_FLAGS ?= -arg -w -arg -notation-overridden,-redundant-canonical-projection,-several-object-files
 
 # Forward most targets to Coq makefile (with some trick to make this phony)
 %: Makefile.coq phony
@@ -32,9 +27,9 @@ Makefile.coq: _CoqProject Makefile awk.Makefile
 build-dep:
 	build/opam-pins.sh < opam.pins
 	opam upgrade $(YFLAG) # it is not nice that we upgrade *all* packages here, but I found no nice way to upgrade only those that we pinned
-	opam pin add coq-prelude "$$(pwd)#HEAD" -k git -n -y
-	opam install coq-prelude --deps-only $(YFLAG)
-	opam pin remove coq-prelude
+	opam pin add coq-stdpp "$$(pwd)#HEAD" -k git -n -y
+	opam install coq-stdpp --deps-only $(YFLAG)
+	opam pin remove coq-stdpp
 
 # Some files that do *not* need to be forwarded to Makefile.coq
 Makefile: ;
