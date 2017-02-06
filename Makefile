@@ -3,9 +3,6 @@ ifeq ($(Y), 1)
 	YFLAG=-y
 endif
 
-# Configure Coq warnings
-COQ_MAKEFILE_FLAGS ?= -arg -w -arg -notation-overridden,-redundant-canonical-projection,-several-object-files
-
 # Forward most targets to Coq makefile (with some trick to make this phony)
 %: Makefile.coq phony
 	+@make -f Makefile.coq $@
