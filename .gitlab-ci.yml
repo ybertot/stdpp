@@ -1,5 +1,22 @@
 image: ralfjung/opam-ci:latest
 
+stdpp-coq8.5:
+  tags:
+  - coq
+  script:
+  # prepare
+  - . build/opam-ci.sh coq 8.5.3
+  # build
+  - 'time make -j8'
+  cache:
+    key: "coq8.5"
+    paths:
+    - opamroot/
+  only:
+  - master
+  - ci
+  - timing
+
 stdpp-coq8.6:
   tags:
   - coq
@@ -10,7 +27,7 @@ stdpp-coq8.6:
   - 'time make -j8 TIMED=y 2>&1 | tee build-log.txt'
   - 'if fgrep Axiom build-log.txt >/dev/null; then exit 1; fi'
   - 'cat build-log.txt | egrep "[a-zA-Z0-9_/-]+ \(user: [0-9]" | tee build-time.txt'
-  - 'make validate'
+  - 'if (( RANDOM % 10 == 0 )); then make validate; fi'
   cache:
     key: "coq8.6"
     paths:
