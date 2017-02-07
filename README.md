@@ -18,7 +18,7 @@ The key features of this library are as follows:
   `naive_solver`, an equality simplifier `simplify_eq`, a solver `solve_proper`
   for proving compatibility of functions with respect to relations, and a solver
   `set_solver` for goals involving set operations.
-- It is entirely axiom free.
+- It is entirely dependency- and axiom-free.
 
 ## History
 
@@ -32,8 +32,8 @@ developed by Robbert Krebbers, Ralf Jung, and Jacques Henri-Jourdan.
 
 This version is known to compile with:
 
- - Coq 8.5pl3 and Coq 8.6
+ - Coq 8.5pl3 / 8.6
 
 ## Building Instructions
 
-Run `make` to build the full development.
+Run `make` to build the full development.  Run `make install` to install the library.
