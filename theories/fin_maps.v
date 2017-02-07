@@ -792,8 +792,8 @@ Section map_of_to_collection.
   Proof.
     intros Hinj. assert (∀ x',
       (i, x) ∈ f <$> elements Y → (i, x') ∈ f <$> elements Y → x = x').
-    { intros x'. intros (y&Hx&?%elem_of_elements)%elem_of_list_fmap.
-      intros (y'&Hx'&?%elem_of_elements)%elem_of_list_fmap.
+    { intros x'. intros (y&Hx&Hy)%elem_of_list_fmap (y'&Hx'&Hy')%elem_of_list_fmap.
+      rewrite elem_of_elements in Hy, Hy'.
       cut (y = y'); [congruence|]. apply Hinj; auto. by rewrite <-Hx, <-Hx'. }
     unfold map_of_collection; rewrite <-elem_of_map_of_list' by done.
     rewrite elem_of_list_fmap. setoid_rewrite elem_of_elements; naive_solver.

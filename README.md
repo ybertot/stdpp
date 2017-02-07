@@ -20,7 +20,7 @@ The key features of this library are as follows:
   `set_solver` for goals involving set operations.
 - It is entirely axiom free.
 
-# History
+## History
 
 Coq-std++ has originally been developed by Robbert Krebbers as part of his
 formalization of the C programming language in his PhD thesis, called
@@ -32,7 +32,7 @@ developed by Robbert Krebbers, Ralf Jung, and Jacques Henri-Jourdan.
 
 This version is known to compile with:
 
- - Coq 8.6
+ - Coq 8.5pl3 and Coq 8.6
 
 ## Building Instructions
 

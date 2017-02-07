@@ -3,6 +3,14 @@ ifeq ($(Y), 1)
 	YFLAG=-y
 endif
 
+# Determine Coq version
+COQ_VERSION=$(shell coqc --version | egrep -o 'version 8.[0-9]' | egrep -o '8.[0-9]')
+COQ_MAKEFILE_FLAGS ?=
+
+ifeq ($(COQ_VERSION), 8.6)
+	COQ_MAKEFILE_FLAGS += -arg -w -arg -notation-overridden,-redundant-canonical-projection,-several-object-files
+endif
+
 # Forward most targets to Coq makefile (with some trick to make this phony)
 %: Makefile.coq phony
 	+@make -f Makefile.coq $@

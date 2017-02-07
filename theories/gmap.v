@@ -130,7 +130,7 @@ Definition gmap_curry `{Countable K1, Countable K2} {A} :
     map_fold (λ i2 x, <[(i1,i2):=x]>) macc m') ∅.
 Definition gmap_uncurry `{Countable K1, Countable K2} {A} :
     gmap (K1 * K2) A → gmap K1 (gmap K2 A) :=
-  map_fold (λ '(i1,i2) x,
+  map_fold (λ ii x, let '(i1,i2) := ii in
     partial_alter (Some ∘ <[i2:=x]> ∘ from_option id ∅) i1) ∅.
 
 Section curry_uncurry.
