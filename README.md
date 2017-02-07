@@ -14,7 +14,7 @@ The key features of this library are as follows:
   `m1 = m2` iff `∀ i, m1 !! i = m2 !! i`). On top of that, the library provides
   setoid instances for most types and operations.
 - It provides various tactics for common tasks, like an ssreflect inspired
-  `done` tactic for finishing trivial goals, a simply breadth-first solver
+  `done` tactic for finishing trivial goals, a simple breadth-first solver
   `naive_solver`, an equality simplifier `simplify_eq`, a solver `solve_proper`
   for proving compatibility of functions with respect to relations, and a solver
   `set_solver` for goals involving set operations.
