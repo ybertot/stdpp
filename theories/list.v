@@ -1873,6 +1873,10 @@ Proof.
 Qed.
 Global Instance: AntiSymm (≡ₚ) (@submseteq A).
 Proof. red. auto using submseteq_Permutation_length_le, submseteq_length. Qed.
+
+Lemma elem_of_submseteq l k x : x ∈ l → l ⊆+ k → x ∈ k.
+Proof. intros ? [l' ->]%submseteq_Permutation. apply elem_of_app; auto. Qed.
+
 Lemma submseteq_take l i : take i l ⊆+ l.
 Proof. auto using sublist_take, sublist_submseteq. Qed.
 Lemma submseteq_drop l i : drop i l ⊆+ l.
