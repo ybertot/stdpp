@@ -231,9 +231,15 @@ Proof. destruct mx; naive_solver. Qed.
 Lemma bind_with_Some {A} (mx : option A) : mx ≫= Some = mx.
 Proof. by destruct mx. Qed.
 
-Instance option_fmap_proper `{Equiv A, Equiv B} (f : A → B) :
-  Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡)) (fmap (M:=option) f).
+Instance option_fmap_proper `{Equiv A, Equiv B} :
+  Proper (((≡) ==> (≡)) ==> (≡) ==> (≡)) (fmap (M:=option) (A:=A) (B:=B)).
 Proof. destruct 2; constructor; auto. Qed.
+Instance option_mbind_proper `{Equiv A, Equiv B} :
+  Proper (((≡) ==> (≡)) ==> (≡) ==> (≡)) (mbind (M:=option) (A:=A) (B:=B)).
+Proof. destruct 2; simpl; try constructor; auto. Qed.
+Instance option_mjoin_proper `{Equiv A} :
+  Proper ((≡) ==> (≡)) (mjoin (M:=option) (A:=A)).
+Proof. destruct 1 as [?? []|]; simpl; by constructor. Qed.
 
 (** ** Inverses of constructors *)
 (** We can do this in a fancy way using dependent types, but rewrite does
