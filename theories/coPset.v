@@ -186,7 +186,7 @@ Qed.
 Instance coPset_leibniz : LeibnizEquiv coPset.
 Proof.
   intros X Y; rewrite elem_of_equiv; intros HXY.
-  apply (sig_eq_pi _), coPset_eq; try apply proj2_sig.
+  apply (sig_eq_pi _), coPset_eq; try apply @proj2_sig.
   intros p; apply eq_bool_prop_intro, (HXY p).
 Qed.
 

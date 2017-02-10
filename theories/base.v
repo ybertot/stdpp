@@ -551,7 +551,12 @@ Instance option_inhabited {A} : Inhabited (option A) := populate None.
 
 (** ** Sigma types *)
 Arguments existT {_ _} _ _.
+Arguments projT1 {_ _} _.
+Arguments projT2 {_ _} _.
+
+Arguments exist {_} _ _ _.
 Arguments proj1_sig {_ _} _.
+Arguments proj2_sig {_ _} _.
 Notation "x ↾ p" := (exist _ x p) (at level 20) : C_scope.
 Notation "` x" := (proj1_sig x) (at level 10, format "` x") : C_scope.
 
