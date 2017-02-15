@@ -338,6 +338,8 @@ Section simple_collection.
   Proof. set_solver. Qed.
 
   (** Union *)
+  Lemma union_subseteq X Y Z : X ∪ Y ⊆ Z ↔ X ⊆ Z ∧ Y ⊆ Z.
+  Proof. set_solver. Qed.
   Lemma not_elem_of_union x X Y : x ∉ X ∪ Y ↔ x ∉ X ∧ x ∉ Y.
   Proof. set_solver. Qed.
   Lemma elem_of_union_l x X Y : x ∈ X → x ∈ X ∪ Y.
