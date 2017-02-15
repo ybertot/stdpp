@@ -11,3 +11,4 @@
 .coq-native/
 Makefile.coq
 *.crashcoqide
+html/
