@@ -820,11 +820,11 @@ End quantifiers.
 Section more_quantifiers.
   Context `{SimpleCollection A B}.
 
-  Lemma set_Forall_weaken (P Q : A → Prop) (Hweaken : ∀ x, P x → Q x) X :
-    set_Forall P X → set_Forall Q X.
+  Lemma set_Forall_impl (P Q : A → Prop) X :
+    set_Forall P X → (∀ x, P x → Q x) → set_Forall Q X.
   Proof. unfold set_Forall. naive_solver. Qed.
-  Lemma set_Exists_weaken (P Q : A → Prop) (Hweaken : ∀ x, P x → Q x) X :
-    set_Exists P X → set_Exists Q X.
+  Lemma set_Exists_impl (P Q : A → Prop) X :
+    set_Exists P X → (∀ x, P x → Q x) → set_Exists Q X.
   Proof. unfold set_Exists. naive_solver. Qed.
 End more_quantifiers.
 
