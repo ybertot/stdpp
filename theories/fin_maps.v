@@ -425,6 +425,9 @@ Qed.
 Lemma lookup_insert_is_Some {A} (m : M A) i j x :
   is_Some (<[i:=x]>m !! j) ↔ i = j ∨ i ≠ j ∧ is_Some (m !! j).
 Proof. unfold is_Some; setoid_rewrite lookup_insert_Some; naive_solver. Qed.
+Lemma lookup_insert_is_Some' {A} (m : M A) i j x :
+  is_Some (<[i:=x]>m !! j) ↔ i = j ∨ is_Some (m !! j).
+Proof. rewrite lookup_insert_is_Some. destruct (decide (i=j)); naive_solver. Qed.
 Lemma lookup_insert_None {A} (m : M A) i j x :
   <[i:=x]>m !! j = None ↔ m !! j = None ∧ i ≠ j.
 Proof.
