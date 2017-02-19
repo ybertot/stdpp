@@ -642,12 +642,12 @@ Class SubsetEq A := subseteq: relation A.
 Instance: Params (@subseteq) 2.
 Infix "⊆" := subseteq (at level 70) : C_scope.
 Notation "(⊆)" := subseteq (only parsing) : C_scope.
-Notation "( X ⊆ )" := (subseteq X) (only parsing) : C_scope.
-Notation "( ⊆ X )" := (λ Y, Y ⊆ X) (only parsing) : C_scope.
+Notation "( X ⊆)" := (subseteq X) (only parsing) : C_scope.
+Notation "(⊆ X )" := (λ Y, Y ⊆ X) (only parsing) : C_scope.
 Notation "X ⊈ Y" := (¬X ⊆ Y) (at level 70) : C_scope.
 Notation "(⊈)" := (λ X Y, X ⊈ Y) (only parsing) : C_scope.
-Notation "( X ⊈ )" := (λ Y, X ⊈ Y) (only parsing) : C_scope.
-Notation "( ⊈ X )" := (λ Y, Y ⊈ X) (only parsing) : C_scope.
+Notation "( X ⊈)" := (λ Y, X ⊈ Y) (only parsing) : C_scope.
+Notation "(⊈ X )" := (λ Y, Y ⊈ X) (only parsing) : C_scope.
 Infix "⊆*" := (Forall2 (⊆)) (at level 70) : C_scope.
 Notation "(⊆*)" := (Forall2 (⊆)) (only parsing) : C_scope.
 Infix "⊆**" := (Forall2 (⊆*)) (at level 70) : C_scope.
@@ -662,12 +662,12 @@ Hint Extern 0 (_ ⊆** _) => reflexivity.
 
 Infix "⊂" := (strict (⊆)) (at level 70) : C_scope.
 Notation "(⊂)" := (strict (⊆)) (only parsing) : C_scope.
-Notation "( X ⊂ )" := (strict (⊆) X) (only parsing) : C_scope.
-Notation "( ⊂ X )" := (λ Y, Y ⊂ X) (only parsing) : C_scope.
-Notation "X ⊄  Y" := (¬X ⊂ Y) (at level 70) : C_scope.
+Notation "( X ⊂)" := (strict (⊆) X) (only parsing) : C_scope.
+Notation "(⊂ X )" := (λ Y, Y ⊂ X) (only parsing) : C_scope.
+Notation "X ⊄ Y" := (¬X ⊂ Y) (at level 70) : C_scope.
 Notation "(⊄)" := (λ X Y, X ⊄ Y) (only parsing) : C_scope.
-Notation "( X ⊄ )" := (λ Y, X ⊄ Y) (only parsing) : C_scope.
-Notation "( ⊄ X )" := (λ Y, Y ⊄ X) (only parsing) : C_scope.
+Notation "( X ⊄)" := (λ Y, X ⊄ Y) (only parsing) : C_scope.
+Notation "(⊄ X )" := (λ Y, Y ⊄ X) (only parsing) : C_scope.
 
 Notation "X ⊆ Y ⊆ Z" := (X ⊆ Y ∧ Y ⊆ Z) (at level 70, Y at next level) : C_scope.
 Notation "X ⊆ Y ⊂ Z" := (X ⊆ Y ∧ Y ⊂ Z) (at level 70, Y at next level) : C_scope.
