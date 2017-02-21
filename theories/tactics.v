@@ -281,41 +281,44 @@ Ltac f_equiv :=
   | H : ?R ?x ?y |- ?R2 (match ?x with _ => _ end) (match ?y with _ => _ end) =>
      destruct H
   (* First assume that the arguments need the same relation as the result *)
-  | |- ?R (?f ?x) _ => apply (_ : Proper (R ==> R) f)
+  | |- ?R (?f _) _ => apply (_ : Proper (R ==> R) f)
+  | |- ?R (?f _ _) _ => apply (_ : Proper (R ==> R ==> R) f)
+  | |- ?R (?f _ _ _) _ => apply (_ : Proper (R ==> R ==> R ==> R) f)
+  | |- ?R (?f _ _ _ _) _ => apply (_ : Proper (R ==> R ==> R ==> R ==> R) f)
   (* For the case in which R is polymorphic, or an operational type class,
   like equiv. *)
-  | |- (?R _) (?f ?x) _ => apply (_ : Proper (R _ ==> _) f)
-  | |- (?R _ _) (?f ?x) _ => apply (_ : Proper (R _ _ ==> _) f)
-  | |- (?R _ _ _) (?f ?x) _ => apply (_ : Proper (R _ _ _ ==> _) f)
-  | |- (?R _) (?f ?x ?y) _ => apply (_ : Proper (R _ ==> R _ ==> _) f)
-  | |- (?R _ _) (?f ?x ?y) _ => apply (_ : Proper (R _ _ ==> R _ _ ==> _) f)
-  | |- (?R _ _ _) (?f ?x ?y) _ => apply (_ : Proper (R _ _ _ ==> R _ _ _ ==> _) f)
+  | |- (?R _) (?f _) _ => apply (_ : Proper (R _ ==> _) f)
+  | |- (?R _ _) (?f _) _ => apply (_ : Proper (R _ _ ==> _) f)
+  | |- (?R _ _ _) (?f _) _ => apply (_ : Proper (R _ _ _ ==> _) f)
+  | |- (?R _) (?f _ _) _ => apply (_ : Proper (R _ ==> R _ ==> _) f)
+  | |- (?R _ _) (?f _ _) _ => apply (_ : Proper (R _ _ ==> R _ _ ==> _) f)
+  | |- (?R _ _ _) (?f _ _) _ => apply (_ : Proper (R _ _ _ ==> R _ _ _ ==> _) f)
+  | |- (?R _) (?f _ _ _) _ => apply (_ : Proper (R _ ==> R _ ==> R _ ==> _) f)
+  | |- (?R _ _) (?f _ _ _) _ => apply (_ : Proper (R _ _ ==> R _ _ ==> R _ _ ==> _) f)
+  | |- (?R _ _ _) (?f _ _ _) _ => apply (_ : Proper (R _ _ _ ==> R _ _ _ R _ _ _ ==> _) f)
+  | |- (?R _) (?f _ _ _ _) _ => apply (_ : Proper (R _ ==> R _ ==> R _ ==> R _ ==> _) f)
+  | |- (?R _ _) (?f _ _ _ _) _ => apply (_ : Proper (R _ _ ==> R _ _ ==> R _ _ ==> R _ _ ==> _) f)
+  | |- (?R _ _ _) (?f _ _ _ _) _ => apply (_ : Proper (R _ _ _ ==> R _ _ _ R _ _ _ ==> R _ _ _ ==> _) f)
   (* Next, try to infer the relation. Unfortunately, there is an instance
      of Proper for (eq ==> _), which will always be matched. *)
   (* TODO: Can we exclude that instance? *)
   (* TODO: If some of the arguments are the same, we could also
      query for "pointwise_relation"'s. But that leads to a combinatorial
      explosion about which arguments are and which are not the same. *)
-  | |- ?R (?f ?x) _ => apply (_ : Proper (_ ==> R) f)
-  | |- ?R (?f ?x ?y) _ => apply (_ : Proper (_ ==> _ ==> R) f)
+  | |- ?R (?f _) _ => apply (_ : Proper (_ ==> R) f)
+  | |- ?R (?f _ _) _ => apply (_ : Proper (_ ==> _ ==> R) f)
+  | |- ?R (?f _ _ _) _ => apply (_ : Proper (_ ==> _ ==> _ ==> R) f)
+  | |- ?R (?f _ _ _ _) _ => apply (_ : Proper (_ ==> _ ==> _ ==> _ ==> R) f)
    (* In case the function symbol differs, but the arguments are the same,
       maybe we have a pointwise_relation in our context. *)
   | H : pointwise_relation _ ?R ?f ?g |- ?R (?f ?x) (?g ?x) => apply H
   end;
   try reflexivity.
 
-(* The tactic [preprocess_solve_proper] unfolds the first head symbol, so that
+(* The tactic [solve_proper_unfold] unfolds the first head symbol, so that
 we proceed by repeatedly using [f_equiv]. *)
-Ltac preprocess_solve_proper :=
-  (* Introduce everything *)
-  intros;
-  repeat lazymatch goal with
-  | |- Proper _ _ => intros ???
-  | |- (_ ==> _)%signature _ _ => intros ???
-  | |- pointwise_relation _ _ _ _ => intros ?
-  | |- ?R ?f _ => try let f' := constr:(λ x, f x) in intros ?
-  end; simpl;
-  (* Unfold the head symbol, which is the one we are proving a new property about *)
+Ltac solve_proper_unfold :=
+  (* Try unfolding the head symbol, which is the one we are proving a new property about *)
   lazymatch goal with
   | |- ?R (?f _ _ _ _ _ _ _ _) (?f _ _ _ _ _ _ _ _) => unfold f
   | |- ?R (?f _ _ _ _ _ _ _) (?f _ _ _ _ _ _ _) => unfold f
@@ -325,15 +328,25 @@ Ltac preprocess_solve_proper :=
   | |- ?R (?f _ _ _) (?f _ _ _) => unfold f
   | |- ?R (?f _ _) (?f _ _) => unfold f
   | |- ?R (?f _) (?f _) => unfold f
-  end;
-  simplify_eq.
+  end; simpl.
 
-(** The tactic [solve_proper] solves goals of the form "Proper (R1 ==> R2)", for
+(** The tactic [solve_proper_core tac] solves goals of the form "Proper (R1 ==> R2)", for
 any number of relations. The actual work is done by repeatedly applying
-[f_equiv]. *)
-Ltac solve_proper :=
-  preprocess_solve_proper;
-  solve [repeat (f_equiv; try eassumption)].
+[tac]. *)
+Ltac solve_proper_core tac :=
+  (* Introduce everything *)
+  intros;
+  repeat lazymatch goal with
+  | |- Proper _ _ => intros ???
+  | |- (_ ==> _)%signature _ _ => intros ???
+  | |- pointwise_relation _ _ _ _ => intros ?
+  | |- ?R ?f _ => try let f' := constr:(λ x, f x) in intros ?
+  end; simplify_eq;
+  (* Now do the job. We try with and without unfolding. We have to backtrack on
+     that because unfolding may succeed, but then the proof may fail. *)
+  (solve_proper_unfold + idtac);
+  solve [repeat first [eassumption | tac ()] ].
+Ltac solve_proper := solve_proper_core ltac:(fun _ => f_equiv).
 
 (** The tactic [intros_revert tac] introduces all foralls/arrows, performs tac,
 and then reverts them. *)
