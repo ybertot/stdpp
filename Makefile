@@ -36,6 +36,12 @@ build-dep:
 	opam install opam-builddep-temp --deps-only $(YFLAG)
 	opam pin remove opam-builddep-temp
 
+html: Makefile.coq
+	+@make -f Makefile.coq html
+
+gallinahtml: Makefile.coq
+	+@make -f Makefile.coq gallinahtml
+
 # Some files that do *not* need to be forwarded to Makefile.coq
 Makefile: ;
 _CoqProject: ;
