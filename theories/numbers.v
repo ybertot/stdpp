@@ -25,7 +25,6 @@ Reserved Notation "x ≤ y ≤ z ≤ z'"
 Infix "≤" := le : nat_scope.
 Notation "x ≤ y ≤ z" := (x ≤ y ∧ y ≤ z)%nat : nat_scope.
 Notation "x ≤ y < z" := (x ≤ y ∧ y < z)%nat : nat_scope.
-Notation "x < y < z" := (x < y ∧ y < z)%nat : nat_scope.
 Notation "x < y ≤ z" := (x < y ∧ y ≤ z)%nat : nat_scope.
 Notation "x ≤ y ≤ z ≤ z'" := (x ≤ y ∧ y ≤ z ∧ z ≤ z')%nat : nat_scope.
 Notation "(≤)" := le (only parsing) : nat_scope.
@@ -106,7 +105,6 @@ Open Scope positive_scope.
 Infix "≤" := Pos.le : positive_scope.
 Notation "x ≤ y ≤ z" := (x ≤ y ∧ y ≤ z) : positive_scope.
 Notation "x ≤ y < z" := (x ≤ y ∧ y < z) : positive_scope.
-Notation "x < y < z" := (x < y ∧ y < z) : positive_scope.
 Notation "x < y ≤ z" := (x < y ∧ y ≤ z) : positive_scope.
 Notation "x ≤ y ≤ z ≤ z'" := (x ≤ y ∧ y ≤ z ∧ z ≤ z') : positive_scope.
 Notation "(≤)" := Pos.le (only parsing) : positive_scope.
@@ -186,7 +184,6 @@ Close Scope positive_scope.
 Infix "≤" := N.le : N_scope.
 Notation "x ≤ y ≤ z" := (x ≤ y ∧ y ≤ z)%N : N_scope.
 Notation "x ≤ y < z" := (x ≤ y ∧ y < z)%N : N_scope.
-Notation "x < y < z" := (x < y ∧ y < z)%N : N_scope.
 Notation "x < y ≤ z" := (x < y ∧ y ≤ z)%N : N_scope.
 Notation "x ≤ y ≤ z ≤ z'" := (x ≤ y ∧ y ≤ z ∧ z ≤ z')%N : N_scope.
 Notation "(≤)" := N.le (only parsing) : N_scope.
