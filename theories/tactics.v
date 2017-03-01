@@ -272,7 +272,6 @@ when having [Proper (equiv ==> dist) f] and [Proper (dist ==> dist) f], it will
 favor the second because the relation (dist) stays the same. *)
 Ltac f_equiv :=
   match goal with
-  | _ => reflexivity
   | |- pointwise_relation _ _ _ _ => intros ?
   (* We support matches on both sides, *if* they concern the same variable, or
      variables in some relation. *)

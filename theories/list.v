@@ -3113,7 +3113,7 @@ Section mapM.
     (∀ x y, f y = Some x → y = g x) → mapM f k = Some l → k = g <$> l.
   Proof.
     intros Hgf. revert l; induction k as [|??]; intros [|??] ?;
-      simplify_option_eq; f_equiv; eauto.
+      simplify_option_eq; try f_equiv; eauto.
   Qed.
 End mapM.
 
