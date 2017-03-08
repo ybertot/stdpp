@@ -72,6 +72,12 @@ Ltac done :=
 Tactic Notation "by" tactic(tac) :=
   tac; done.
 
+Ltac done_if b :=
+  match b with
+  | true => done
+  | false => idtac
+  end.
+
 (** Aliases for trans and etrans that are easier to type *)
 Tactic Notation "trans" constr(A) := transitivity A.
 Tactic Notation "etrans" := etransitivity.
