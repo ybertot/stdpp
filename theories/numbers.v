@@ -98,6 +98,9 @@ Lemma Nat_iter_S {A} n (f: A → A) x : Nat.iter (S n) f x = f (Nat.iter n f x).
 Proof. done. Qed.
 Lemma Nat_iter_S_r {A} n (f: A → A) x : Nat.iter (S n) f x = Nat.iter n f (f x).
 Proof. induction n; f_equal/=; auto. Qed.
+Lemma nat_iter_ind {A} (P : A → Prop) f x k :
+  P x → (∀ y, P y → P (f y)) → P (Nat.iter k f x).
+Proof. induction k; simpl; auto. Qed.
 
 (** * Notations and properties of [positive] *)
 Open Scope positive_scope.
