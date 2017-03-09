@@ -12,7 +12,11 @@ From Coq Require Export Morphisms RelationClasses List Bool Utf8 Setoid.
 Set Default Proof Using "Type".
 Export ListNotations.
 From Coq.Program Require Export Basics Syntax.
+
+(* Tweak program: don't let it automatically simplify obligations and hide
+them from the results of the [Search] commands. *)
 Obligation Tactic := idtac.
+Add Search Blacklist "_obligation_".
 
 (** Sealing off definitions *)
 Set Primitive Projections.
