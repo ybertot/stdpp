@@ -346,7 +346,6 @@ Section simple_collection.
   Proof. set_solver. Qed.
   Lemma elem_of_union_r x X Y : x ∈ Y → x ∈ X ∪ Y.
   Proof. set_solver. Qed.
-
   Lemma union_preserving_l X Y1 Y2 : Y1 ⊆ Y2 → X ∪ Y1 ⊆ X ∪ Y2.
   Proof. set_solver. Qed.
   Lemma union_preserving_r X1 X2 Y : X1 ⊆ X2 → X1 ∪ Y ⊆ X2 ∪ Y.
@@ -611,6 +610,14 @@ Section collection.
   Lemma difference_intersection_distr_l X Y Z : (X ∩ Y) ∖ Z ≡ X ∖ Z ∩ Y ∖ Z.
   Proof. set_solver. Qed.
   Lemma difference_disjoint X Y : X ⊥ Y → X ∖ Y ≡ X.
+  Proof. set_solver. Qed.
+
+  Lemma difference_preserving X1 X2 Y1 Y2 :
+    X1 ⊆ X2 → Y2 ⊆ Y1 → X1 ∖ Y1 ⊆ X2 ∖ Y2.
+  Proof. set_solver. Qed.
+  Lemma difference_preserving_l X Y1 Y2 : Y2 ⊆ Y1 → X ∖ Y1 ⊆ X ∖ Y2.
+  Proof. set_solver. Qed.
+  Lemma difference_preserving_r X1 X2 Y : X1 ⊆ X2 → X1 ∖ Y ⊆ X2 ∖ Y.
   Proof. set_solver. Qed.
 
   (** Disjointness *)
