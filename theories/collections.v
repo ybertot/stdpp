@@ -346,11 +346,11 @@ Section simple_collection.
   Proof. set_solver. Qed.
   Lemma elem_of_union_r x X Y : x ∈ Y → x ∈ X ∪ Y.
   Proof. set_solver. Qed.
-  Lemma union_preserving_l X Y1 Y2 : Y1 ⊆ Y2 → X ∪ Y1 ⊆ X ∪ Y2.
+  Lemma union_mono_l X Y1 Y2 : Y1 ⊆ Y2 → X ∪ Y1 ⊆ X ∪ Y2.
   Proof. set_solver. Qed.
-  Lemma union_preserving_r X1 X2 Y : X1 ⊆ X2 → X1 ∪ Y ⊆ X2 ∪ Y.
+  Lemma union_mono_r X1 X2 Y : X1 ⊆ X2 → X1 ∪ Y ⊆ X2 ∪ Y.
   Proof. set_solver. Qed.
-  Lemma union_preserving X1 X2 Y1 Y2 : X1 ⊆ X2 → Y1 ⊆ Y2 → X1 ∪ Y1 ⊆ X2 ∪ Y2.
+  Lemma union_mono X1 X2 Y1 Y2 : X1 ⊆ X2 → Y1 ⊆ Y2 → X1 ∪ Y1 ⊆ X2 ∪ Y2.
   Proof. set_solver. Qed.
 
   Global Instance union_idemp : IdemP ((≡) : relation C) (∪).
@@ -444,8 +444,8 @@ Section simple_collection.
     by rewrite reverse_cons, union_list_app,
       union_list_singleton, (comm _), IH.
   Qed.
-  Lemma union_list_preserving Xs Ys : Xs ⊆* Ys → ⋃ Xs ⊆ ⋃ Ys.
-  Proof. induction 1; simpl; auto using union_preserving. Qed.
+  Lemma union_list_mono Xs Ys : Xs ⊆* Ys → ⋃ Xs ⊆ ⋃ Ys.
+  Proof. induction 1; simpl; auto using union_mono. Qed.
   Lemma empty_union_list Xs : ⋃ Xs ≡ ∅ ↔ Forall (≡ ∅) Xs.
   Proof.
     split.
@@ -565,11 +565,11 @@ Section collection.
   Lemma intersection_greatest X Y Z : Z ⊆ X → Z ⊆ Y → Z ⊆ X ∩ Y.
   Proof. set_solver. Qed.
 
-  Lemma intersection_preserving_l X Y1 Y2 : Y1 ⊆ Y2 → X ∩ Y1 ⊆ X ∩ Y2.
+  Lemma intersection_mono_l X Y1 Y2 : Y1 ⊆ Y2 → X ∩ Y1 ⊆ X ∩ Y2.
   Proof. set_solver. Qed.
-  Lemma intersection_preserving_r X1 X2 Y : X1 ⊆ X2 → X1 ∩ Y ⊆ X2 ∩ Y.
+  Lemma intersection_mono_r X1 X2 Y : X1 ⊆ X2 → X1 ∩ Y ⊆ X2 ∩ Y.
   Proof. set_solver. Qed.
-  Lemma intersection_preserving X1 X2 Y1 Y2 :
+  Lemma intersection_mono X1 X2 Y1 Y2 :
     X1 ⊆ X2 → Y1 ⊆ Y2 → X1 ∩ Y1 ⊆ X2 ∩ Y2.
   Proof. set_solver. Qed.
 
@@ -612,12 +612,12 @@ Section collection.
   Lemma difference_disjoint X Y : X ⊥ Y → X ∖ Y ≡ X.
   Proof. set_solver. Qed.
 
-  Lemma difference_preserving X1 X2 Y1 Y2 :
+  Lemma difference_mono X1 X2 Y1 Y2 :
     X1 ⊆ X2 → Y2 ⊆ Y1 → X1 ∖ Y1 ⊆ X2 ∖ Y2.
   Proof. set_solver. Qed.
-  Lemma difference_preserving_l X Y1 Y2 : Y2 ⊆ Y1 → X ∖ Y1 ⊆ X ∖ Y2.
+  Lemma difference_mono_l X Y1 Y2 : Y2 ⊆ Y1 → X ∖ Y1 ⊆ X ∖ Y2.
   Proof. set_solver. Qed.
-  Lemma difference_preserving_r X1 X2 Y : X1 ⊆ X2 → X1 ∖ Y ⊆ X2 ∖ Y.
+  Lemma difference_mono_r X1 X2 Y : X1 ⊆ X2 → X1 ∖ Y ⊆ X2 ∖ Y.
   Proof. set_solver. Qed.
 
   (** Disjointness *)

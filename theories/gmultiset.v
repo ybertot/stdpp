@@ -288,12 +288,12 @@ Lemma gmultiset_union_subseteq_l X Y : X ⊆ X ∪ Y.
 Proof. intros x. rewrite multiplicity_union. omega. Qed.
 Lemma gmultiset_union_subseteq_r X Y : Y ⊆ X ∪ Y.
 Proof. intros x. rewrite multiplicity_union. omega. Qed.
-Lemma gmultiset_union_preserving X1 X2 Y1 Y2 : X1 ⊆ X2 → Y1 ⊆ Y2 → X1 ∪ Y1 ⊆ X2 ∪ Y2.
+Lemma gmultiset_union_mono X1 X2 Y1 Y2 : X1 ⊆ X2 → Y1 ⊆ Y2 → X1 ∪ Y1 ⊆ X2 ∪ Y2.
 Proof. intros ?? x. rewrite !multiplicity_union. by apply Nat.add_le_mono. Qed.
-Lemma gmultiset_union_preserving_l X Y1 Y2 : Y1 ⊆ Y2 → X ∪ Y1 ⊆ X ∪ Y2.
-Proof. intros. by apply gmultiset_union_preserving. Qed.
-Lemma gmultiset_union_preserving_r X1 X2 Y : X1 ⊆ X2 → X1 ∪ Y ⊆ X2 ∪ Y.
-Proof. intros. by apply gmultiset_union_preserving. Qed.
+Lemma gmultiset_union_mono_l X Y1 Y2 : Y1 ⊆ Y2 → X ∪ Y1 ⊆ X ∪ Y2.
+Proof. intros. by apply gmultiset_union_mono. Qed.
+Lemma gmultiset_union_mono_r X1 X2 Y : X1 ⊆ X2 → X1 ∪ Y ⊆ X2 ∪ Y.
+Proof. intros. by apply gmultiset_union_mono. Qed.
 
 Lemma gmultiset_subset X Y : X ⊆ Y → size X < size Y → X ⊂ Y.
 Proof. intros. apply strict_spec_alt; split; naive_solver auto with omega. Qed.

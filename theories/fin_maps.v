@@ -1322,17 +1322,17 @@ Proof. intros. trans m2; auto using map_union_subseteq_l. Qed.
 Lemma map_union_subseteq_r_alt {A} (m1 m2 m3 : M A) :
   m2 ⊥ₘ m3 → m1 ⊆ m3 → m1 ⊆ m2 ∪ m3.
 Proof. intros. trans m3; auto using map_union_subseteq_r. Qed.
-Lemma map_union_preserving_l {A} (m1 m2 m3 : M A) : m1 ⊆ m2 → m3 ∪ m1 ⊆ m3 ∪ m2.
+Lemma map_union_mono_l {A} (m1 m2 m3 : M A) : m1 ⊆ m2 → m3 ∪ m1 ⊆ m3 ∪ m2.
 Proof.
   rewrite !map_subseteq_spec. intros ???.
   rewrite !lookup_union_Some_raw. naive_solver.
 Qed.
-Lemma map_union_preserving_r {A} (m1 m2 m3 : M A) :
+Lemma map_union_mono_r {A} (m1 m2 m3 : M A) :
   m2 ⊥ₘ m3 → m1 ⊆ m2 → m1 ∪ m3 ⊆ m2 ∪ m3.
 Proof.
   intros. rewrite !(map_union_comm _ m3)
     by eauto using map_disjoint_weaken_l.
-  by apply map_union_preserving_l.
+  by apply map_union_mono_l.
 Qed.
 Lemma map_union_reflecting_l {A} (m1 m2 m3 : M A) :
   m3 ⊥ₘ m1 → m3 ⊥ₘ m2 → m3 ∪ m1 ⊆ m3 ∪ m2 → m1 ⊆ m2.
