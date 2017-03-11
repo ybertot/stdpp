@@ -59,13 +59,8 @@ Qed.
 Instance nat_lt_pi: ∀ x y : nat, ProofIrrel (x < y).
 Proof. apply _. Qed.
 
-Definition sum_list_with {A} (f : A → nat) : list A → nat :=
-  fix go l :=
-  match l with
-  | [] => 0
-  | x :: l => f x + go l
-  end.
-Notation sum_list := (sum_list_with id).
+Lemma nat_le_sum (x y : nat) : x ≤ y ↔ ∃ z, y = x + z.
+Proof. split. exists (y - x); lia. intros [z ->]; lia. Qed.
 
 Lemma Nat_lt_succ_succ n : n < S (S n).
 Proof. auto with arith. Qed.
@@ -98,9 +93,25 @@ Lemma Nat_iter_S {A} n (f: A → A) x : Nat.iter (S n) f x = f (Nat.iter n f x).
 Proof. done. Qed.
 Lemma Nat_iter_S_r {A} n (f: A → A) x : Nat.iter (S n) f x = Nat.iter n f (f x).
 Proof. induction n; f_equal/=; auto. Qed.
-Lemma nat_iter_ind {A} (P : A → Prop) f x k :
+Lemma Nat_iter_ind {A} (P : A → Prop) f x k :
   P x → (∀ y, P y → P (f y)) → P (Nat.iter k f x).
 Proof. induction k; simpl; auto. Qed.
+
+Definition sum_list_with {A} (f : A → nat) : list A → nat :=
+  fix go l :=
+  match l with
+  | [] => 0
+  | x :: l => f x + go l
+  end.
+Notation sum_list := (sum_list_with id).
+
+Definition max_list_with {A} (f : A → nat) : list A → nat :=
+  fix go l :=
+  match l with
+  | [] => 0
+  | x :: l => f x `max` go l
+  end.
+Notation max_list := (max_list_with id).
 
 (** * Notations and properties of [positive] *)
 Open Scope positive_scope.
@@ -122,10 +133,10 @@ Instance positive_eq_dec: EqDecision positive := Pos.eq_dec.
 Instance positive_inhabited: Inhabited positive := populate 1.
 
 Instance maybe_xO : Maybe xO := λ p, match p with p~0 => Some p | _ => None end.
-Instance maybe_x1 : Maybe xI := λ p, match p with p~1 => Some p | _ => None end.
-Instance: Inj (=) (=) (~0).
+Instance maybe_xI : Maybe xI := λ p, match p with p~1 => Some p | _ => None end.
+Instance xO_inj : Inj (=) (=) (~0).
 Proof. by injection 1. Qed.
-Instance: Inj (=) (=) (~1).
+Instance xI_inj : Inj (=) (=) (~1).
 Proof. by injection 1. Qed.
 
 (** Since [positive] represents lists of bits, we define list operations
@@ -150,14 +161,14 @@ Fixpoint Preverse_go (p1 p2 : positive) : positive :=
   end.
 Definition Preverse : positive → positive := Preverse_go 1.
 
-Global Instance: LeftId (=) 1 (++).
+Global Instance Papp_1_l : LeftId (=) 1 (++).
 Proof. intros p. by induction p; intros; f_equal/=. Qed.
-Global Instance: RightId (=) 1 (++).
+Global Instance Papp_1_r : RightId (=) 1 (++).
 Proof. done. Qed.
-Global Instance: Assoc (=) (++).
+Global Instance Papp_assoc : Assoc (=) (++).
 Proof. intros ?? p. by induction p; intros; f_equal/=. Qed.
-Global Instance: ∀ p : positive, Inj (=) (=) (++ p).
-Proof. intros p ???. induction p; simplify_eq; auto. Qed.
+Global Instance Papp_inj p : Inj (=) (=) (++ p).
+Proof. intros ???. induction p; simplify_eq; auto. Qed.
 
 Lemma Preverse_go_app p1 p2 p3 :
   Preverse_go p1 (p2 ++ p3) = Preverse_go p1 p3 ++ Preverse_go 1 p2.
@@ -181,6 +192,13 @@ Fixpoint Plength (p : positive) : nat :=
 Lemma Papp_length p1 p2 : Plength (p1 ++ p2) = (Plength p2 + Plength p1)%nat.
 Proof. by induction p2; f_equal/=. Qed.
 
+Lemma Plt_sum (x y : positive) : x < y ↔ ∃ z, y = x + z.
+Proof.
+  split.
+  - exists (y - x)%positive. symmetry. apply Pplus_minus. lia.
+  - intros [z ->]. lia.
+Qed.
+
 Close Scope positive_scope.
 
 (** * Notations and properties of [N] *)
@@ -196,7 +214,7 @@ Infix "`mod`" := N.modulo (at level 35) : N_scope.
 
 Arguments N.add _ _ : simpl never.
 
-Instance: Inj (=) (=) Npos.
+Instance Npos_inj : Inj (=) (=) Npos.
 Proof. by injection 1. Qed.
 
 Instance N_eq_dec: EqDecision N := N.eq_dec.
@@ -571,6 +589,15 @@ Qed.
 Lemma Qp_div_2 x : (x / 2 + x / 2 = x)%Qp.
 Proof.
   change 2%positive with (2 * 1)%positive. by rewrite Qp_div_S, Qp_div_1.
+Qed.
+
+Lemma Qp_lt_sum (x y : Qp) : (x < y)%Qc ↔ ∃ z, y = (x + z)%Qp.
+Proof.
+  split.
+  - intros Hlt%Qclt_minus_iff. exists (mk_Qp (y - x) Hlt). apply Qp_eq; simpl.
+    by rewrite (Qcplus_comm y), Qcplus_assoc, Qcplus_opp_r, Qcplus_0_l.
+  - intros [z ->]; simpl.
+    rewrite <-(Qcplus_0_r x) at 1. apply Qcplus_lt_mono_l, Qp_prf.
 Qed.
 
 Lemma Qp_lower_bound q1 q2 : ∃ q q1' q2', (q1 = q + q1' ∧ q2 = q + q2')%Qp.
