@@ -188,6 +188,8 @@ Section subrel.
   Proof. intros ? [y ?]; eauto. Qed.
   Lemma nf_subrel x : subrel → nf R2 x → nf R1 x.
   Proof. intros ? H1 H2; destruct H1; by apply red_subrel. Qed.
+  Lemma rtc_subrel x y : subrel → rtc R1 x y → rtc R2 x y.
+  Proof. induction 2; [by apply rtc_refl|]. eapply rtc_l; eauto. Qed.
 End subrel.
 
 (** * Theorems on well founded relations *)
