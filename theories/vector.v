@@ -189,11 +189,14 @@ Defined.
 Ltac inv_vec v :=
   let T := type of v in
   match eval hnf in T with
-  | vec _ 0 =>
-    revert dependent v; match goal with |- ∀ v, @?P v => apply (vec_0_inv P) end
-  | vec _ (S ?n) =>
-    revert dependent v; match goal with |- ∀ v, @?P v => apply (vec_S_inv P) end;
-    try (let x := fresh "x" in intros x v; inv_vec v; revert x)
+  | vec _ ?n =>
+    match eval hnf in n with
+    | 0 => revert dependent v; match goal with |- ∀ v, @?P v => apply (vec_0_inv P) end
+    | S ?n =>
+      revert dependent v; match goal with |- ∀ v, @?P v => apply (vec_S_inv P) end;
+      (* Try going on recursively. *)
+      try (let x := fresh "x" in intros x v; inv_vec v; revert x)
+    end
   end.
 
 (** The following tactic performs case analysis on all hypotheses of the shape
