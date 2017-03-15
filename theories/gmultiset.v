@@ -1,4 +1,4 @@
-(* Copyright (c) 2012-2016, Robbert Krebbers. *)
+(* Copyright (c) 2012-2017, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
 From stdpp Require Import gmap.
 Set Default Proof Using "Type".
