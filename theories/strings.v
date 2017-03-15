@@ -31,6 +31,21 @@ Fixpoint string_rev_app (s1 s2 : string) : string :=
   end.
 Definition string_rev (s : string) : string := string_rev_app s "".
 
+Definition is_nat (x : ascii) : option nat :=
+  match x with
+  | "0" => Some 0
+  | "1" => Some 1
+  | "2" => Some 2
+  | "3" => Some 3
+  | "4" => Some 4
+  | "5" => Some 5
+  | "6" => Some 6
+  | "7" => Some 7
+  | "8" => Some 8
+  | "9" => Some 9
+  | _ => None
+  end%char.
+
 (* Break a string up into lists of words, delimited by white space *)
 Definition is_space (x : Ascii.ascii) : bool :=
   match x with
