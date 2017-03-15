@@ -373,6 +373,8 @@ Section simple_collection.
   Proof. set_solver. Qed.
 
   (** Empty *)
+  Lemma empty_subseteq X : ∅ ⊆ X.
+  Proof. set_solver. Qed.
   Lemma elem_of_equiv_empty X : X ≡ ∅ ↔ ∀ x, x ∉ X.
   Proof. set_solver. Qed.
   Lemma elem_of_empty x : x ∈ ∅ ↔ False.
