@@ -359,12 +359,12 @@ Qed.
 Lemma vlookup_insert_self {A n} i (v : vec A n) : vinsert i (v !!! i) v = v.
 Proof. by induction v; inv_fin i; intros; f_equal/=. Qed.
 
-(* Vectors can be inhabited. *)
-Global Instance vec_nil_inh T : Inhabited (vec T 0) := populate [#].
+(** The function [vreplicate n x] generates a vector with length [n] of elements
+with value [x]. *)
+Fixpoint vreplicate {A} (n : nat) (x : A) : vec A n :=
+  match n with 0 => [#] | S n => x ::: vreplicate n x end.
 
-Global Instance vec_inh T n : Inhabited T → Inhabited (vec T n).
-Proof.
-  intros HT. induction n; [apply _|].
-  destruct IHn as [v]. destruct HT as [x].
-  exact (populate (x:::v)).
-Qed.
+(* Vectors can be inhabited. *)
+Global Instance vec_0_inhabited T : Inhabited (vec T 0) := populate [#].
+Global Instance vec_inhabited `{Inhabited T} n : Inhabited (vec T n) :=
+  populate (vreplicate n inhabitant).
