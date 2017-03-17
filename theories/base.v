@@ -937,7 +937,7 @@ Lemma elem_of_list_In {A} (l : list A) x : x ∈ l ↔ In x l.
 Proof.
   split.
   - induction 1; simpl; auto.
-  - induction l; intros []; subst; constructor; auto.
+  - induction l; destruct 1; subst; constructor; auto.
 Qed.
 
 Inductive NoDup {A} : list A → Prop :=
