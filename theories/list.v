@@ -193,24 +193,24 @@ Definition mapM `{MBind M, MRet M} {A B} (f : A → M B) : list A → M (list B)
 
 (** We define stronger variants of map and fold that allow the mapped
 function to use the index of the elements. *)
-Definition imap_go {A B} (f : nat → A → B) : nat → list A → list B :=
-  fix go (n : nat) (l : list A) :=
-  match l with [] => [] | x :: l => f n x :: go (S n) l end.
-Definition imap {A B} (f : nat → A → B) : list A → list B := imap_go f 0.
-Arguments imap : simpl never.
+Fixpoint imap {A B} (f : nat → A → B) (l : list A) : list B :=
+  match l with
+  | [] => []
+  | x :: l => f 0 x :: imap (f ∘ S) l
+  end.
 
 Definition zipped_map {A B} (f : list A → list A → A → B) :
-  list A → list A → list B := fix go l k :=
-  match k with [] => [] | x :: k => f l k x :: go (x :: l) k end.
-
-Definition imap2_go {A B C} (f : nat → A → B → C) :
-    nat → list A → list B → list C:=
-  fix go (n : nat) (l : list A) (k : list B) :=
-  match l, k with
-  | [], _ |_, [] => [] | x :: l, y :: k => f n x y :: go (S n) l k
+    list A → list A → list B := fix go l k :=
+  match k with
+  | [] => []
+  | x :: k => f l k x :: go (x :: l) k
   end.
-Definition imap2 {A B C} (f : nat → A → B → C) :
-  list A → list B → list C := imap2_go f 0.
+
+Fixpoint imap2 {A B C} (f : nat → A → B → C) (l : list A) (k : list B) : list C :=
+  match l, k with
+  | [], _ | _, [] => []
+  | x :: l, y :: k => f 0 x y :: imap2 (f ∘ S) l k
+  end.
 
 Inductive zipped_Forall {A} (P : list A → list A → A → Prop) :
     list A → list A → Prop :=
@@ -1285,33 +1285,28 @@ Proof. done. Qed.
 Lemma imap_app {B} (f : nat → A → B) l1 l2 :
   imap f (l1 ++ l2) = imap f l1 ++ imap (λ n, f (length l1 + n)) l2.
 Proof.
-  unfold imap. generalize 0. revert l2.
-  induction l1 as [|x l1 IH]; intros l2 n; f_equal/=; auto.
-  rewrite IH. f_equal. clear. revert n.
-  induction l2; simpl; auto with f_equal lia.
+  revert f. induction l1 as [|x l1 IH]; intros f; f_equal/=; auto.
+  by rewrite IH.
 Qed.
 Lemma imap_cons {B} (f : nat → A → B) x l :
   imap f (x :: l) = f 0 x :: imap (f ∘ S) l.
-Proof. apply (imap_app _ [_]). Qed.
+Proof. done. Qed.
 
 Lemma imap_ext {B} (f g : nat → A → B) l :
   (∀ i x, l !! i = Some x → f i x = g i x) → imap f l = imap g l.
-Proof.
-  revert f g; induction l as [|x l IH]; intros f g Hfg; auto.
-  rewrite !imap_cons; f_equal; eauto.
-Qed.
+Proof. revert f g; induction l as [|x l IH]; intros; f_equal/=; eauto. Qed.
 
 Lemma imap_fmap {B C} (f : nat → B → C) (g : A → B) l :
   imap f (g <$> l) = imap (λ n, f n ∘ g) l.
-Proof. unfold imap. generalize 0. induction l; csimpl; auto with f_equal. Qed.
+Proof. revert f. induction l; intros; f_equal/=; eauto. Qed.
 
 Lemma imap_const {B} (f : A → B) l : imap (const f) l = f <$> l.
-Proof. unfold imap. generalize 0. induction l; csimpl; auto with f_equal. Qed.
+Proof. induction l; f_equal/=; auto. Qed.
 
 Lemma list_lookup_imap {B} (f : nat → A → B) l i : imap f l !! i = f i <$> l !! i.
 Proof.
-  revert f i. induction l as [|x l IH]; intros f [|i]; try done.
-  rewrite imap_cons; simpl. by rewrite IH.
+  revert f i. induction l as [|x l IH]; intros f [|i]; f_equal/=; auto.
+  by rewrite IH.
 Qed.
 
 (** ** Properties of the [mask] function *)
