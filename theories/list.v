@@ -2301,6 +2301,7 @@ Qed.
 Lemma Forall_Forall2 {A} (Q : A → A → Prop) l :
   Forall (λ x, Q x x) l → Forall2 Q l l.
 Proof. induction 1; constructor; auto. Qed.
+
 Lemma Forall2_forall `{Inhabited A} B C (Q : A → B → C → Prop) l k :
   Forall2 (λ x y, ∀ z, Q z x y) l k ↔ ∀ z, Forall2 (Q z) l k.
 Proof.
@@ -2309,6 +2310,10 @@ Proof.
   - intros z. by feed inversion (Hlk z).
   - apply IH. intros z. by feed inversion (Hlk z).
 Qed.
+
+Lemma Forall2_Forall {A} P (l1 l2 : list A) :
+  Forall2 P l1 l2 → Forall (curry P) (zip l1 l2).
+Proof. induction 1; constructor; auto. Qed.
 
 Section Forall2.
   Context {A B} (P : A → B → Prop).
