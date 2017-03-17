@@ -933,28 +933,22 @@ Inductive elem_of_list {A} : ElemOf A (list A) :=
   | elem_of_list_further (x y : A) l : x ∈ l → x ∈ y :: l.
 Existing Instance elem_of_list.
 
-Lemma elem_of_list_In {A} (l : list A) x :
-  x ∈ l ↔ In x l.
+Lemma elem_of_list_In {A} (l : list A) x : x ∈ l ↔ In x l.
 Proof.
-  induction l.
-  - split; inversion 1.
-  - split; inversion 1; subst; (left + (right; apply IHl)); now auto.
+  split.
+  - induction 1; simpl; auto.
+  - induction l; intros []; subst; constructor; auto.
 Qed.
 
 Inductive NoDup {A} : list A → Prop :=
   | NoDup_nil_2 : NoDup []
   | NoDup_cons_2 x l : x ∉ l → NoDup l → NoDup (x :: l).
 
-Lemma NoDup_ListNoDup {A} (l : list A) :
-  NoDup l ↔ List.NoDup l.
+Lemma NoDup_ListNoDup {A} (l : list A) : NoDup l ↔ List.NoDup l.
 Proof.
-  induction l.
-  - split; intros _; now constructor.
-  - split; inversion 1; subst.
-    + constructor; [now rewrite <-elem_of_list_In|].
-      now apply IHl.
-    + constructor; [now rewrite elem_of_list_In|].
-      now apply IHl.
+  split.
+  - induction 1; constructor; rewrite <-?elem_of_list_In; auto.
+  - induction 1; constructor; rewrite ?elem_of_list_In; auto.
 Qed.
 
 (** Decidability of equality of the carrier set is admissible, but we add it
