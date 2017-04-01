@@ -270,9 +270,13 @@ End set_unfold_list.
 Ltac set_unfold :=
   let rec unfold_hyps :=
     try match goal with
-    | H : _ |- _ =>
-       apply set_unfold_1 in H; revert H;
-       first [unfold_hyps; intros H | intros H; fail 1]
+    | H : ?P |- _ =>
+       lazymatch type of P with
+       | Prop =>
+         apply set_unfold_1 in H; revert H;
+         first [unfold_hyps; intros H | intros H; fail 1]
+       | _ => fail
+       end
     end in
   apply set_unfold_2; unfold_hyps; csimpl in *.
 
