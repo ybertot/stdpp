@@ -1421,6 +1421,50 @@ Qed.
 Lemma elem_of_Permutation l x : x ∈ l → ∃ k, l ≡ₚ x :: k.
 Proof. intros [i ?]%elem_of_list_lookup. eauto using delete_Permutation. Qed.
 
+Lemma length_delete l i :
+  is_Some (l !! i) → length (delete i l) = length l - 1.
+Proof.
+  rewrite lookup_lt_is_Some. revert i.
+  induction l as [|x l IH]; intros [|i] ?; simpl in *; [lia..|].
+  rewrite IH by lia. lia.
+Qed.
+Lemma lookup_delete_lt l i j : j < i → delete i l !! j = l !! j.
+Proof. revert i j; induction l; intros [] []; naive_solver eauto with lia. Qed.
+Lemma lookup_delete_ge l i j : i ≤ j → delete i l !! j = l !! S j.
+Proof. revert i j; induction l; intros [] []; naive_solver eauto with lia. Qed.
+
+Lemma Permutation_inj l1 l2 :
+  Permutation l1 l2 ↔
+    length l1 = length l2 ∧
+    ∃ f : nat → nat, Inj (=) (=) f ∧ ∀ i, l1 !! i = l2 !! f i.
+Proof.
+  split.
+  - intros Hl; split; [by apply Permutation_length|].
+    induction Hl as [|x l1 l2 _ [f [??]]|x y l|l1 l2 l3 _ [f [? Hf]] _ [g [? Hg]]].
+    + exists id; split; [apply _|done].
+    + exists (λ i, match i with 0 => 0 | S i => S (f i) end); split.
+      * by intros [|i] [|j] ?; simplify_eq/=.
+      * intros [|i]; simpl; auto.
+    + exists (λ i, match i with 0 => 1 | 1 => 0 | _ => i end); split.
+      * intros [|[|i]] [|[|j]]; congruence.
+      * by intros [|[|i]].
+    + exists (g ∘ f); split; [apply _|]. intros i; simpl. by rewrite <-Hg, <-Hf.
+  - intros (Hlen & f & Hf & Hl). revert l2 f Hlen Hf Hl.
+    induction l1 as [|x l1 IH]; intros l2 f Hlen Hf Hl; [by destruct l2|].
+    rewrite (delete_Permutation l2 (f 0) x) by (by rewrite <-Hl).
+    pose (g n := let m := f (S n) in if lt_eq_lt_dec m (f 0) then m else m - 1).
+    eapply Permutation_cons, (IH _ g).
+    + rewrite length_delete by (rewrite <-Hl; eauto); simpl in *; lia.
+    + unfold g. intros i j Hg.
+      repeat destruct (lt_eq_lt_dec _ _) as [[?|?]|?]; simplify_eq/=; try omega.
+      apply (inj S), (inj f); lia.
+    + intros i. unfold g. destruct (lt_eq_lt_dec _ _) as [[?|?]|?].
+      * by rewrite lookup_delete_lt, <-Hl.
+      * simplify_eq.
+      * rewrite lookup_delete_ge, <-Nat.sub_succ_l by lia; simpl.
+        by rewrite Nat.sub_0_r, <-Hl.
+Qed.
+
 (** ** Properties of the [prefix] and [suffix] predicates *)
 Global Instance: PreOrder (@prefix A).
 Proof.
