@@ -261,7 +261,7 @@ Lemma map_subset_alt {A} (m1 m2 : M A) :
 Proof.
   rewrite strict_spec_alt. split.
   - intros [? Heq]; split; [done|].
-    destruct (decide (Exists (λ '(i,_), m1 !! i = None) (map_to_list m2)))
+    destruct (decide (Exists (λ ix, m1 !! ix.1 = None) (map_to_list m2)))
       as [[[i x] [?%elem_of_map_to_list ?]]%Exists_exists
          |Hm%(not_Exists_Forall _)]; [eauto|].
     destruct Heq; apply (anti_symm _), map_subseteq_spec; [done|intros i x Hi].
