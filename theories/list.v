@@ -3259,10 +3259,26 @@ Lemma foldl_app {A B} (f : A → B → A) (l k : list B) (a : A) :
   foldl f a (l ++ k) = foldl f (foldl f a l) k.
 Proof. revert a. induction l; simpl; auto. Qed.
 Lemma foldr_permutation {A B} (R : relation B) `{!PreOrder R}
+    (f : A → B → B) (b : B) `{Hf : !∀ x, Proper (R ==> R) (f x)} (l1 l2 : list A) :
+  (∀ j1 a1 j2 a2 b,
+    j1 ≠ j2 → l1 !! j1 = Some a1 → l1 !! j2 = Some a2 →
+    R (f a1 (f a2 b)) (f a2 (f a1 b))) →
+  l1 ≡ₚ l2 → R (foldr f b l1) (foldr f b l2).
+Proof.
+  intros Hf'. induction 1 as [|x l1 l2 _ IH|x y l|l1 l2 l3 Hl12 IH _ IH']; simpl.
+  - done.
+  - apply Hf, IH; eauto.
+  - apply (Hf' 0 _ 1); eauto.
+  - etrans; [eapply IH, Hf'|].
+    apply IH'; intros j1 a1 j2 a2 b' ???.
+    symmetry in Hl12; apply Permutation_inj in Hl12 as [_ (g&?&Hg)].
+    apply (Hf' (g j1) _ (g j2)); [naive_solver|by rewrite <-Hg..].
+Qed.
+Lemma foldr_permutation_proper {A B} (R : relation B) `{!PreOrder R}
     (f : A → B → B) (b : B) `{!∀ x, Proper (R ==> R) (f x)}
     (Hf : ∀ a1 a2 b, R (f a1 (f a2 b)) (f a2 (f a1 b))) :
   Proper ((≡ₚ) ==> R) (foldr f b).
-Proof. induction 1; simpl; [done|by f_equiv|apply Hf|etrans; eauto]. Qed.
+Proof. intros l1 l2 Hl. apply foldr_permutation; auto. Qed.
 
 (** ** Properties of the [zip_with] and [zip] functions *)
 Section zip_with.

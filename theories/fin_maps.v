@@ -928,15 +928,23 @@ Proof. unfold map_fold; simpl. by rewrite map_to_list_empty. Qed.
 Lemma map_fold_insert {A B} (R : relation B) `{!PreOrder R}
     (f : K → A → B → B) (b : B) (i : K) (x : A) (m : M A) :
   (∀ j z, Proper (R ==> R) (f j z)) →
-  (∀ j1 j2 z1 z2 y, R (f j1 z1 (f j2 z2 y)) (f j2 z2 (f j1 z1 y))) →
+  (∀ j1 j2 z1 z2 y,
+    j1 ≠ j2 → <[i:=x]> m !! j1 = Some z1 → <[i:=x]> m !! j2 = Some z2 →
+    R (f j1 z1 (f j2 z2 y)) (f j2 z2 (f j1 z1 y))) →
   m !! i = None →
   R (map_fold f b (<[i:=x]> m)) (f i x (map_fold f b m)).
 Proof.
-  intros. unfold map_fold; simpl.
+  intros Hf_proper Hf Hi. unfold map_fold; simpl.
   assert (∀ kz, Proper (R ==> R) (curry f kz)) by (intros []; apply _).
   trans (foldr (curry f) b ((i, x) :: map_to_list m)); [|done].
   eapply (foldr_permutation R (curry f) b), map_to_list_insert; auto.
-  intros [] []; simpl; eauto.
+  intros j1 [k1 y1] j2 [k2 y2] c Hj Hj1 Hj2. apply Hf.
+  - intros ->.
+    eapply Hj, NoDup_lookup; [apply (NoDup_fst_map_to_list (<[i:=x]> m))| | ].
+    + by rewrite list_lookup_fmap, Hj1.
+    + by rewrite list_lookup_fmap, Hj2.
+  - by eapply elem_of_map_to_list, elem_of_list_lookup_2.
+  - by eapply elem_of_map_to_list, elem_of_list_lookup_2.
 Qed.
 
 Lemma map_fold_ind {A B} (P : B → M A → Prop) (f : K → A → B → B) (b : B) :
