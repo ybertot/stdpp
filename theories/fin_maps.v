@@ -48,8 +48,8 @@ Class FinMap K M `{FMap M, ∀ A, Lookup K A (M A), ∀ A, Empty (M A), ∀ A,
 (** * Derived operations *)
 (** All of the following functions are defined in a generic way for arbitrary
 finite map implementations. These generic implementations do not cause a
-significant performance loss to make including them in the finite map interface
-worthwhile. *)
+significant performance loss, which justifies including them in the finite map
+interface as primitive operations. *)
 Instance map_insert `{PartialAlter K A M} : Insert K A M :=
   λ i x, partial_alter (λ _, Some x) i.
 Instance map_alter `{PartialAlter K A M} : Alter K A M :=
@@ -115,6 +115,13 @@ of the elements. Implemented by conversion to lists, so not very efficient. *)
 Definition map_imap `{∀ A, Insert K A (M A), ∀ A, Empty (M A),
     ∀ A, FinMapToList K A (M A)} {A B} (f : K → A → option B) (m : M A) : M B :=
   map_of_list (omap (λ ix, (fst ix,) <$> curry f ix) (map_to_list m)).
+
+(* The zip operation on maps combines two maps key-wise. The keys of resulting
+map correspond to the keys that are in both maps. *)
+Definition map_zip_with `{Merge M} {A B C} (f : A → B → C) : M A → M B → M C :=
+  merge (λ mx my,
+    match mx, my with Some x, Some y => Some (f x y) | _, _ => None end).
+Notation map_zip := (map_zip_with pair).
 
 (* Folds a function [f] over a map. The order in which the function is called
 is unspecified. *)
@@ -834,6 +841,14 @@ Proof.
     intros ([i' x]&->&Hi'); simplify_eq/=.
     rewrite elem_of_list_omap in Hi'; destruct Hi' as ([j y]&Hj&?).
     rewrite elem_of_map_to_list in Hj; simplify_option_eq.
+Qed.
+
+(** Properties of the zip_with function *)
+Lemma map_lookup_zip_with {A B C} (f : A → B → C) m1 m2 i :
+  map_zip_with f m1 m2 !! i = x ← m1 !! i; y ← m2 !! i; Some (f x y).
+Proof.
+  unfold map_zip_with. rewrite lookup_merge by done.
+  by destruct (m1 !! i), (m2 !! i).
 Qed.
 
 (** ** Properties of conversion from collections *)
