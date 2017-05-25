@@ -947,6 +947,14 @@ Proof.
   - by eapply elem_of_map_to_list, elem_of_list_lookup_2.
 Qed.
 
+Lemma map_fold_insert_L {A B} (f : K → A → B → B) (b : B) (i : K) (x : A) (m : M A) :
+  (∀ j1 j2 z1 z2 y,
+    j1 ≠ j2 → <[i:=x]> m !! j1 = Some z1 → <[i:=x]> m !! j2 = Some z2 →
+    f j1 z1 (f j2 z2 y) = f j2 z2 (f j1 z1 y)) →
+  m !! i = None →
+  map_fold f b (<[i:=x]> m) = f i x (map_fold f b m).
+Proof. apply map_fold_insert; apply _. Qed.
+
 Lemma map_fold_ind {A B} (P : B → M A → Prop) (f : K → A → B → B) (b : B) :
   P b ∅ →
   (∀ i x m r, m !! i = None → P r m → P (f i x r) (<[i:=x]> m)) →
