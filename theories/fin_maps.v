@@ -1136,11 +1136,8 @@ Proof.
   by destruct (m1 !! i), (m2 !! i).
 Qed.
 
-Lemma map_zip_with_empty {A B C} (f : A → B → C) :
-  map_zip_with f ∅ ∅ = ∅.
-Proof.
-  unfold map_zip_with. by rewrite merge_empty by done.
-Qed.
+Lemma map_zip_with_empty {A B C} (f : A → B → C) : map_zip_with f ∅ ∅ = ∅.
+Proof. unfold map_zip_with. by rewrite merge_empty by done. Qed.
 
 Lemma map_insert_zip_with {A B C} (f : A → B → C) m1 m2 i x y z :
   f y z = x →
@@ -1151,11 +1148,10 @@ Proof.
 Qed.
 
 Lemma map_zip_with_fmap {A' A B' B C} (f : A → B → C)
-      (g1 : A' → A) (g2 : B' → B) m1 m2 :
+    (g1 : A' → A) (g2 : B' → B) m1 m2 :
   map_zip_with f (g1 <$> m1) (g2 <$> m2) = map_zip_with (λ x y, f (g1 x) (g2 y)) m1 m2.
 Proof.
-  apply map_eq; intro i.
-  rewrite ?map_lookup_zip_with. rewrite ?lookup_fmap.
+  apply map_eq; intro i. rewrite !map_lookup_zip_with, !lookup_fmap.
   by destruct (m1 !! i), (m2 !! i).
 Qed.
 
@@ -1163,42 +1159,35 @@ Lemma map_zip_with_fmap_1 {A' A B C} (f : A → B → C)
       (g : A' → A) m1 m2 :
   map_zip_with f (g <$> m1) m2 = map_zip_with (λ x y, f (g x) y) m1 m2.
 Proof.
-  rewrite <- (map_fmap_id m2) at 1.
-  by rewrite map_zip_with_fmap; simpl. 
+  rewrite <- (map_fmap_id m2) at 1. by rewrite map_zip_with_fmap. 
 Qed.
 
-Lemma map_zip_with_fmap_2 {A B' B C} (f : A → B → C)
-      (g : B' → B) m1 m2 :
+Lemma map_zip_with_fmap_2 {A B' B C} (f : A → B → C) (g : B' → B) m1 m2 :
   map_zip_with f m1 (g <$> m2) = map_zip_with (λ x y, f x (g y)) m1 m2.
 Proof.
-  rewrite <- (map_fmap_id m1) at 1.
-  by rewrite map_zip_with_fmap; simpl. 
+  rewrite <- (map_fmap_id m1) at 1. by rewrite map_zip_with_fmap.
 Qed.
 
 Lemma map_fmap_zip_with {A B C D} (f : A → B → C) (g : C → D) m1 m2 :
   g <$> map_zip_with f m1 m2 = map_zip_with (λ x y, g (f x y)) m1 m2.
 Proof.
-  apply map_eq; intro i.
-  rewrite lookup_fmap. rewrite ?map_lookup_zip_with.
+  apply map_eq; intro i. rewrite lookup_fmap, !map_lookup_zip_with.
   by destruct (m1 !! i), (m2 !! i).
 Qed.
 
 Lemma map_zip_with_map_zip {A B C} (f : A → B → C) m1 m2 :
   map_zip_with f m1 m2 = curry f <$> map_zip m1 m2.
 Proof.
-  apply map_eq; intro i.
-  rewrite lookup_fmap; rewrite ?map_lookup_zip_with; rewrite ?lookup_fmap.
+  apply map_eq; intro i. rewrite lookup_fmap, !map_lookup_zip_with.
   by destruct (m1 !! i), (m2 !! i).
 Qed.
 
 Lemma map_fmap_zip {A' A B' B} (g1 : A' → A) (g2 : B' → B) m1 m2 :
-  map_zip (fmap g1 m1) (fmap g2 m2)
-  = prod_map g1 g2 <$> map_zip m1 m2.
+  map_zip (fmap g1 m1) (fmap g2 m2) = prod_map g1 g2 <$> map_zip m1 m2.
 Proof.
-  rewrite map_zip_with_fmap. 
-  rewrite map_zip_with_map_zip.
+  rewrite map_zip_with_fmap, map_zip_with_map_zip.
   generalize (map_zip m1 m2); intro m. apply map_eq; intro i.
-  by rewrite ?lookup_fmap; destruct (m !! i) as [[x1 x2]|].
+  by rewrite !lookup_fmap; destruct (m !! i) as [[x1 x2]|].
 Qed.
 
 (** ** Properties on the [map_relation] relation *)
