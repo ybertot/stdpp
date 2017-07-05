@@ -1,6 +1,7 @@
 (* Copyright (c) 2012-2017, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
-From stdpp Require Export list.
+From Coq.QArith Require Import QArith_base Qcanon.
+From stdpp Require Export list numbers.
 Set Default Proof Using "Type".
 Local Open Scope positive.
 
@@ -267,4 +268,46 @@ Program Instance nat_countable : Countable nat :=
   {| encode x := encode (N.of_nat x); decode p := N.to_nat <$> decode p |}.
 Next Obligation.
   by intros x; lazy beta; rewrite decode_encode; csimpl; rewrite Nat2N.id.
+Qed.
+
+
+Definition _Q2pair (p: Q): _ := (Qnum p, Qden p).
+
+Definition _pair2Q (p: Z * positive) : Q :=
+  match p with
+  | (num,den) => Qmake num den
+  end.
+
+Instance Q_dec_eq : EqDecision Q :=
+  injective_dec_eq _Q2pair (Some ∘ _pair2Q) _.
+Proof. by destruct 0. Qed.
+
+Instance Q_countable : Countable Q :=
+  injective_countable _Q2pair (Some ∘ _pair2Q) _.
+Proof. by destruct 0. Qed.
+
+Definition _Qc_to_Q (p: Qc): _ :=
+  match p with
+  | Qcmake pb _ => pb
+  end.
+
+Global Instance Qc_countable : Countable Qc :=
+  injective_countable _Qc_to_Q (Some ∘ Q2Qc) _.
+Proof.
+  intros [p Can]. simpl. f_equal. apply Qc_is_canon.
+  simpl. rewrite Can. reflexivity.
+Qed.
+
+Definition _Qc2Qp (p: Qc) : option Qp :=
+  match (decide (0 < p)%Qc) with
+  | left G0 => Some (mk_Qp p G0)
+  | _ => None
+  end.
+
+Global Instance Qp_countable : Countable Qp :=
+  injective_countable Qp_car (_Qc2Qp) _.
+Proof.
+  intros [p G0]. unfold _Qc2Qp. simpl.
+  destruct (decide (0 < p)%Qc); [|tauto].
+  f_equal. apply Qp_eq. auto.
 Qed.

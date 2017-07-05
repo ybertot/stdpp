@@ -200,3 +200,12 @@ Lemma not_and_l_alt {P Q : Prop} `{Decision P} : ¬(P ∧ Q) ↔ ¬P ∨ (¬Q �
 Proof. destruct (decide P); tauto. Qed.
 Lemma not_and_r_alt {P Q : Prop} `{Decision Q} : ¬(P ∧ Q) ↔ (¬P ∧ Q) ∨ ¬Q.
 Proof. destruct (decide Q); tauto. Qed.
+
+Lemma injective_dec_eq `{EqDecision A} {B : Type}
+  f (g : A -> option B) (Inj : ∀ x, g (f x) = Some x)
+  : EqDecision B.
+Proof.
+  intros x y. destruct (decide (f x = f y)) as [Eq%(f_equal g)|NEq].
+  - rewrite !Inj in Eq. inversion Eq. left; auto.
+  - right. intros Eq. apply NEq. rewrite Eq. auto.
+Qed.
