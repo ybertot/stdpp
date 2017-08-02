@@ -84,14 +84,14 @@ Qed.
 
 (** * Instances *)
 (** ** Injection *)
-Section injective_countable.
+Section inj_countable.
   Context `{Countable A, EqDecision B}.
   Context (f : B → A) (g : A → option B) (fg : ∀ x, g (f x) = Some x).
 
-  Program Instance injective_countable : Countable B :=
+  Program Instance inj_countable : Countable B :=
     {| encode y := encode (f y); decode p := x ← decode p; g x |}.
   Next Obligation. intros y; simpl; rewrite decode_encode; eauto. Qed.
-End injective_countable.
+End inj_countable.
 
 (** ** Option *)
 Program Instance option_countable `{Countable A} : Countable (option A) := {|
@@ -257,7 +257,8 @@ Program Instance N_countable : Countable N := {|
   decode p := if decide (p = 1) then Some 0%N else Some (Npos (Pos.pred p))
 |}.
 Next Obligation.
-  by intros [|p];simpl;[|rewrite decide_False,Pos.pred_succ by (by destruct p)].
+  intros [|p]; simpl; [done|].
+  by rewrite decide_False, Pos.pred_succ by (by destruct p).
 Qed.
 Program Instance Z_countable : Countable Z := {|
   encode x := match x with Z0 => 1 | Zpos p => p~0 | Zneg p => p~1 end;
@@ -270,44 +271,19 @@ Next Obligation.
   by intros x; lazy beta; rewrite decode_encode; csimpl; rewrite Nat2N.id.
 Qed.
 
-
-Definition _Q2pair (p: Q): _ := (Qnum p, Qden p).
-
-Definition _pair2Q (p: Z * positive) : Q :=
-  match p with
-  | (num,den) => Qmake num den
-  end.
-
-Instance Q_dec_eq : EqDecision Q :=
-  injective_dec_eq _Q2pair (Some ∘ _pair2Q) _.
-Proof. by destruct 0. Qed.
-
-Instance Q_countable : Countable Q :=
-  injective_countable _Q2pair (Some ∘ _pair2Q) _.
-Proof. by destruct 0. Qed.
-
-Definition _Qc_to_Q (p: Qc): _ :=
-  match p with
-  | Qcmake pb _ => pb
-  end.
-
-Global Instance Qc_countable : Countable Qc :=
-  injective_countable _Qc_to_Q (Some ∘ Q2Qc) _.
-Proof.
-  intros [p Can]. simpl. f_equal. apply Qc_is_canon.
-  simpl. rewrite Can. reflexivity.
+Global Program Instance Qc_countable : Countable Qc :=
+  inj_countable
+    (λ p : Qc, let 'Qcmake (x # y) _ := p return _ in (x,y))
+    (λ q : Z * positive, let '(x,y) := q return _ in Some (Q2Qc (x # y))) _.
+Next Obligation.
+  intros [[x y] Hcan]. f_equal. apply Qc_is_canon. simpl. by rewrite Hcan.
 Qed.
 
-Definition _Qc2Qp (p: Qc) : option Qp :=
-  match (decide (0 < p)%Qc) with
-  | left G0 => Some (mk_Qp p G0)
-  | _ => None
-  end.
-
-Global Instance Qp_countable : Countable Qp :=
-  injective_countable Qp_car (_Qc2Qp) _.
-Proof.
-  intros [p G0]. unfold _Qc2Qp. simpl.
-  destruct (decide (0 < p)%Qc); [|tauto].
-  f_equal. apply Qp_eq. auto.
+Global Program Instance Qp_countable : Countable Qp :=
+  inj_countable
+    Qp_car
+    (λ p : Qc, guard (0 < p)%Qc as Hp; Some (mk_Qp p Hp)) _.
+Next Obligation.
+  intros [p Hp]. unfold mguard, option_guard; simpl.
+  case_match; [|done]. f_equal. by apply Qp_eq.
 Qed.

@@ -201,11 +201,6 @@ Proof. destruct (decide P); tauto. Qed.
 Lemma not_and_r_alt {P Q : Prop} `{Decision Q} : ¬(P ∧ Q) ↔ (¬P ∧ Q) ∨ ¬Q.
 Proof. destruct (decide Q); tauto. Qed.
 
-Lemma injective_dec_eq `{EqDecision A} {B : Type}
-  f (g : A -> option B) (Inj : ∀ x, g (f x) = Some x)
-  : EqDecision B.
-Proof.
-  intros x y. destruct (decide (f x = f y)) as [Eq%(f_equal g)|NEq].
-  - rewrite !Inj in Eq. inversion Eq. left; auto.
-  - right. intros Eq. apply NEq. rewrite Eq. auto.
-Qed.
+Program Definition inj_eq_dec `{EqDecision A} {B} (f : B → A)
+  `{!Inj (=) (=) f} : EqDecision B := λ x y, cast_if (decide (f x = f y)).
+Solve Obligations with firstorder congruence.
