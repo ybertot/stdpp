@@ -200,3 +200,7 @@ Lemma not_and_l_alt {P Q : Prop} `{Decision P} : ¬(P ∧ Q) ↔ ¬P ∨ (¬Q �
 Proof. destruct (decide P); tauto. Qed.
 Lemma not_and_r_alt {P Q : Prop} `{Decision Q} : ¬(P ∧ Q) ↔ (¬P ∧ Q) ∨ ¬Q.
 Proof. destruct (decide Q); tauto. Qed.
+
+Program Definition inj_eq_dec `{EqDecision A} {B} (f : B → A)
+  `{!Inj (=) (=) f} : EqDecision B := λ x y, cast_if (decide (f x = f y)).
+Solve Obligations with firstorder congruence.

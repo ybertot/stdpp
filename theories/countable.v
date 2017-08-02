@@ -1,6 +1,7 @@
 (* Copyright (c) 2012-2017, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
-From stdpp Require Export list.
+From Coq.QArith Require Import QArith_base Qcanon.
+From stdpp Require Export list numbers.
 Set Default Proof Using "Type".
 Local Open Scope positive.
 
@@ -83,14 +84,14 @@ Qed.
 
 (** * Instances *)
 (** ** Injection *)
-Section injective_countable.
+Section inj_countable.
   Context `{Countable A, EqDecision B}.
   Context (f : B → A) (g : A → option B) (fg : ∀ x, g (f x) = Some x).
 
-  Program Instance injective_countable : Countable B :=
+  Program Instance inj_countable : Countable B :=
     {| encode y := encode (f y); decode p := x ← decode p; g x |}.
   Next Obligation. intros y; simpl; rewrite decode_encode; eauto. Qed.
-End injective_countable.
+End inj_countable.
 
 (** ** Option *)
 Program Instance option_countable `{Countable A} : Countable (option A) := {|
@@ -256,7 +257,8 @@ Program Instance N_countable : Countable N := {|
   decode p := if decide (p = 1) then Some 0%N else Some (Npos (Pos.pred p))
 |}.
 Next Obligation.
-  by intros [|p];simpl;[|rewrite decide_False,Pos.pred_succ by (by destruct p)].
+  intros [|p]; simpl; [done|].
+  by rewrite decide_False, Pos.pred_succ by (by destruct p).
 Qed.
 Program Instance Z_countable : Countable Z := {|
   encode x := match x with Z0 => 1 | Zpos p => p~0 | Zneg p => p~1 end;
@@ -267,4 +269,21 @@ Program Instance nat_countable : Countable nat :=
   {| encode x := encode (N.of_nat x); decode p := N.to_nat <$> decode p |}.
 Next Obligation.
   by intros x; lazy beta; rewrite decode_encode; csimpl; rewrite Nat2N.id.
+Qed.
+
+Global Program Instance Qc_countable : Countable Qc :=
+  inj_countable
+    (λ p : Qc, let 'Qcmake (x # y) _ := p return _ in (x,y))
+    (λ q : Z * positive, let '(x,y) := q return _ in Some (Q2Qc (x # y))) _.
+Next Obligation.
+  intros [[x y] Hcan]. f_equal. apply Qc_is_canon. simpl. by rewrite Hcan.
+Qed.
+
+Global Program Instance Qp_countable : Countable Qp :=
+  inj_countable
+    Qp_car
+    (λ p : Qc, guard (0 < p)%Qc as Hp; Some (mk_Qp p Hp)) _.
+Next Obligation.
+  intros [p Hp]. unfold mguard, option_guard; simpl.
+  case_match; [|done]. f_equal. by apply Qp_eq.
 Qed.
