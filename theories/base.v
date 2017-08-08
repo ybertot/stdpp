@@ -25,6 +25,16 @@ Arguments unseal {_ _} _.
 Arguments seal_eq {_ _} _.
 Unset Primitive Projections.
 
+(* The [Or] class is useful for efficiency: instead of having two instances
+[P → Q1 → R] and [P → Q2 → R] we could have one instance [P → Or Q1 Q2 → R],
+which avoids the need to derive [P] twice. *)
+Inductive Or (P1 P2 : Type) :=
+  | Or_l : P1 → Or P1 P2
+  | Or_r : P2 → Or P1 P2.
+Existing Class Or.
+Existing Instance Or_l | 9.
+Existing Instance Or_r | 10.
+
 (** Throughout this development we use [C_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
 Delimit Scope C_scope with C.
