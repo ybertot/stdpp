@@ -35,6 +35,14 @@ Existing Class Or.
 Existing Instance Or_l | 9.
 Existing Instance Or_r | 10.
 
+Inductive And (P1 P2 : Type) := And_intro : P1 → P2 → And P1 P2.
+Existing Class And.
+Existing Instance And_intro.
+
+Inductive Unit := Unit_intro : Unit.
+Existing Class Unit.
+Existing Instance Unit_intro.
+
 (** Throughout this development we use [C_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
 Delimit Scope C_scope with C.
