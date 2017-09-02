@@ -43,6 +43,13 @@ Inductive TCTrue : Prop := TCTrue_intro : TCTrue.
 Existing Class TCTrue.
 Existing Instance TCTrue_intro.
 
+Inductive TCForall {A} (P : A → Prop) : list A → Prop :=
+  | TCForall_nil : TCForall P []
+  | TCForall_cons x xs : P x → TCForall P xs → TCForall P (x :: xs).
+Existing Class TCForall.
+Existing Instance TCForall_nil.
+Existing Instance TCForall_cons.
+
 (** Throughout this development we use [C_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
 Delimit Scope C_scope with C.
