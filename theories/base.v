@@ -28,20 +28,20 @@ Unset Primitive Projections.
 (* The [Or] class is useful for efficiency: instead of having two instances
 [P → Q1 → R] and [P → Q2 → R] we could have one instance [P → Or Q1 Q2 → R],
 which avoids the need to derive [P] twice. *)
-Inductive Or (P1 P2 : Type) :=
-  | Or_l : P1 → Or P1 P2
-  | Or_r : P2 → Or P1 P2.
-Existing Class Or.
-Existing Instance Or_l | 9.
-Existing Instance Or_r | 10.
+Inductive TCOr (P1 P2 : Type) :=
+  | TCOr_l : P1 → TCOr P1 P2
+  | TCOr_r : P2 → TCOr P1 P2.
+Existing Class TCOr.
+Existing Instance TCOr_l | 9.
+Existing Instance TCOr_r | 10.
 
-Inductive And (P1 P2 : Type) := And_intro : P1 → P2 → And P1 P2.
-Existing Class And.
-Existing Instance And_intro.
+Inductive TCAnd (P1 P2 : Type) := TCAnd_intro : P1 → P2 → TCAnd P1 P2.
+Existing Class TCAnd.
+Existing Instance TCAnd_intro.
 
-Inductive Unit := Unit_intro : Unit.
-Existing Class Unit.
-Existing Instance Unit_intro.
+Inductive TCUnit := TCUnit_intro : TCUnit.
+Existing Class TCUnit.
+Existing Instance TCUnit_intro.
 
 (** Throughout this development we use [C_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
