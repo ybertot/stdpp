@@ -3489,6 +3489,13 @@ Proof.
   inversion_clear 1. rewrite reverse_cons, <-(assoc_L (++)). by apply IH.
 Qed.
 
+Lemma TCForall_Forall {A} (P : A → Prop) xs : TCForall P xs ↔ Forall P xs.
+Proof. split; induction 1; constructor; auto. Qed.
+
+Instance TCForall_app {A} (P : A → Prop) xs ys :
+  TCForall P xs → TCForall P ys → TCForall P (xs ++ ys).
+Proof. rewrite !TCForall_Forall. apply Forall_app_2. Qed.
+
 (** * Relection over lists *)
 (** We define a simple data structure [rlist] to capture a syntactic
 representation of lists consisting of constants, applications and the nil list.
