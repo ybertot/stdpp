@@ -25,9 +25,22 @@ Arguments unseal {_ _} _.
 Arguments seal_eq {_ _} _.
 Unset Primitive Projections.
 
-(* The [Or] class is useful for efficiency: instead of having two instances
-[P → Q1 → R] and [P → Q2 → R] we could have one instance [P → Or Q1 Q2 → R],
-which avoids the need to derive [P] twice. *)
+(* Below we define type class versions of the common logical operators. It is
+important to note that we duplicate the definitions, and do not declare the
+existing logical operators as type classes. That is, we do not say:
+
+  Existing Class or.
+  Existing Class and.
+
+If we could define the existing logical operators as classes, there is no way
+of disambiguating whether a premise of a lemma should be solved by type class
+resolution or not.
+
+These classes are useful for two purposes: writing complicated type class
+premises in a more concise way, and for efficiency. For example, using the [Or]
+class, instead of defining two instances [P → Q1 → R] and [P → Q2 → R] we could
+have one instance [P → Or Q1 Q2 → R]. When we declare the instance that way, we
+avoid the need to derive [P] twice. *)
 Inductive TCOr (P1 P2 : Prop) : Prop :=
   | TCOr_l : P1 → TCOr P1 P2
   | TCOr_r : P2 → TCOr P1 P2.
