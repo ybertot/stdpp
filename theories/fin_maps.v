@@ -409,6 +409,9 @@ Proof.
   intros. apply map_eq. intros j. by destruct (decide (i = j)) as [->|?];
     rewrite ?lookup_delete, ?lookup_delete_ne.
 Qed.
+Lemma delete_idemp {A} (m : M A) i :
+  delete i (delete i m) = delete i m.
+Proof. by setoid_rewrite <-partial_alter_compose. Qed.
 Lemma delete_partial_alter {A} (m : M A) i f :
   m !! i = None → delete i (partial_alter f i m) = m.
 Proof.
@@ -418,6 +421,9 @@ Qed.
 Lemma delete_insert {A} (m : M A) i x :
   m !! i = None → delete i (<[i:=x]>m) = m.
 Proof. apply delete_partial_alter. Qed.
+Lemma delete_insert_delete {A} (m : M A) i x :
+  delete i (<[i:=x]>m) = delete i m.
+Proof. by setoid_rewrite <-partial_alter_compose. Qed.
 Lemma insert_delete {A} (m : M A) i x : <[i:=x]>(delete i m) = <[i:=x]> m.
 Proof. symmetry; apply (partial_alter_compose (λ _, Some x)). Qed.
 Lemma delete_subseteq {A} (m : M A) i : delete i m ⊆ m.
@@ -572,6 +578,9 @@ Proof.
 Qed.
 Lemma singleton_non_empty {A} i (x : A) : {[i:=x]} ≠ ∅.
 Proof. apply insert_non_empty. Qed.
+Lemma delete_singleton_ne {A} i j (x : A) :
+  j ≠ i → delete i {[j := x]} = {[j := x]}. 
+Proof. intro. apply delete_notin. by apply lookup_singleton_ne. Qed.
 
 (** ** Properties of the map operations *)
 Lemma fmap_empty {A B} (f : A → B) : f <$> ∅ = ∅.

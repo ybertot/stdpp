@@ -609,6 +609,8 @@ Section collection.
   Proof. set_solver. Qed.
   Lemma difference_diag X : X ∖ X ≡ ∅.
   Proof. set_solver. Qed.
+  Lemma difference_empty X : X ∖ ∅ ≡ X.
+  Proof. set_solver. Qed.
   Lemma difference_union_distr_l X Y Z : (X ∪ Y) ∖ Z ≡ X ∖ Z ∪ Y ∖ Z.
   Proof. set_solver. Qed.
   Lemma difference_union_distr_r X Y Z : Z ∖ (X ∪ Y) ≡ (Z ∖ X) ∩ (Z ∖ Y).
@@ -671,6 +673,8 @@ Section collection.
     Proof. unfold_leibniz. apply subseteq_empty_difference. Qed.
     Lemma difference_diag_L X : X ∖ X = ∅.
     Proof. unfold_leibniz. apply difference_diag. Qed.
+    Lemma difference_empty_L X : X ∖ ∅ = X.
+    Proof. unfold_leibniz. apply difference_empty. Qed.
     Lemma difference_union_distr_l_L X Y Z : (X ∪ Y) ∖ Z = X ∖ Z ∪ Y ∖ Z.
     Proof. unfold_leibniz. apply difference_union_distr_l. Qed.
     Lemma difference_union_distr_r_L X Y Z : Z ∖ (X ∪ Y) = (Z ∖ X) ∩ (Z ∖ Y).
@@ -697,6 +701,11 @@ Section collection.
       intros ? x; split; rewrite !elem_of_union, elem_of_difference; [|intuition].
       destruct (decide (x ∈ X)); intuition.
     Qed.
+    Lemma difference_union X Y : X ∖ Y ∪ Y ≡ X ∪ Y.
+    Proof.
+      intros x. rewrite !elem_of_union; rewrite elem_of_difference.
+      split; [ | destruct (decide (x ∈ Y)) ]; intuition.
+    Qed.
     Lemma subseteq_disjoint_union X Y : X ⊆ Y ↔ ∃ Z, Y ≡ X ∪ Z ∧ X ⊥ Z.
     Proof.
       split; [|set_solver].
@@ -706,16 +715,28 @@ Section collection.
     Proof. intros [HXY1 HXY2] Hdiff. destruct HXY2. set_solver. Qed.
     Lemma empty_difference_subseteq X Y : X ∖ Y ≡ ∅ → X ⊆ Y.
     Proof. set_solver. Qed.
+    Lemma singleton_union_difference X Y x :
+      {[x]} ∪ (X ∖ Y) ≡ ({[x]} ∪ X) ∖ (Y ∖ {[x]}).
+    Proof.
+      intro y; split; intros Hy; [ set_solver | ].
+      destruct (decide (y ∈ {[x]})); set_solver.
+    Qed.
 
     Context `{!LeibnizEquiv C}.
     Lemma union_difference_L X Y : X ⊆ Y → Y = X ∪ Y ∖ X.
     Proof. unfold_leibniz. apply union_difference. Qed.
+    Lemma difference_union_L X Y : X ∖ Y ∪ Y = X ∪ Y.
+    Proof. unfold_leibniz. apply difference_union. Qed.
     Lemma non_empty_difference_L X Y : X ⊂ Y → Y ∖ X ≠ ∅.
     Proof. unfold_leibniz. apply non_empty_difference. Qed.
     Lemma empty_difference_subseteq_L X Y : X ∖ Y = ∅ → X ⊆ Y.
     Proof. unfold_leibniz. apply empty_difference_subseteq. Qed.
     Lemma subseteq_disjoint_union_L X Y : X ⊆ Y ↔ ∃ Z, Y = X ∪ Z ∧ X ⊥ Z.
     Proof. unfold_leibniz. apply subseteq_disjoint_union. Qed.
+    Lemma singleton_union_difference_L X Y x :
+      {[x]} ∪ (X ∖ Y) = ({[x]} ∪ X) ∖ (Y ∖ {[x]}).
+    Proof. unfold_leibniz. apply singleton_union_difference. Qed.
+
   End dec.
 End collection.
 
