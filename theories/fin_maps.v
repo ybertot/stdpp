@@ -396,8 +396,6 @@ Proof.
 Qed.
 Lemma delete_empty {A} i : delete i (∅ : M A) = ∅.
 Proof. rewrite <-(partial_alter_self ∅) at 2. by rewrite lookup_empty. Qed.
-Lemma delete_singleton {A} i (x : A) : delete i {[i := x]} = ∅.
-Proof. setoid_rewrite <-partial_alter_compose. apply delete_empty. Qed.
 Lemma delete_commute {A} (m : M A) i j :
   delete i (delete j m) = delete j (delete i m).
 Proof. destruct (decide (i = j)). by subst. by apply partial_alter_commute. Qed.
@@ -578,8 +576,10 @@ Proof.
 Qed.
 Lemma singleton_non_empty {A} i (x : A) : {[i:=x]} ≠ ∅.
 Proof. apply insert_non_empty. Qed.
+Lemma delete_singleton {A} i (x : A) : delete i {[i := x]} = ∅.
+Proof. setoid_rewrite <-partial_alter_compose. apply delete_empty. Qed.
 Lemma delete_singleton_ne {A} i j (x : A) :
-  j ≠ i → delete i {[j := x]} = {[j := x]}. 
+  j ≠ i → delete i {[j := x]} = {[j := x]}.
 Proof. intro. apply delete_notin. by apply lookup_singleton_ne. Qed.
 
 (** ** Properties of the map operations *)
