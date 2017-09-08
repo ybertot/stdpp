@@ -4,7 +4,7 @@ From stdpp Require Export tactics.
 Set Default Proof Using "Type".
 
 CoInductive stream (A : Type) : Type := scons : A → stream A → stream A.
-Arguments scons {_} _ _.
+Arguments scons {_} _ _ : assert.
 Delimit Scope stream_scope with stream.
 Bind Scope stream_scope with stream.
 Open Scope stream_scope.

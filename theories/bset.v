@@ -5,8 +5,9 @@ From stdpp Require Export prelude.
 Set Default Proof Using "Type".
 
 Record bset (A : Type) : Type := mkBSet { bset_car : A → bool }.
-Arguments mkBSet {_} _.
-Arguments bset_car {_} _ _.
+Arguments mkBSet {_} _ : assert.
+Arguments bset_car {_} _ _ : assert.
+
 Instance bset_top {A} : Top (bset A) := mkBSet (λ _, true).
 Instance bset_empty {A} : Empty (bset A) := mkBSet (λ _, false).
 Instance bset_singleton `{EqDecision A} : Singleton A (bset A) := λ x,

@@ -37,7 +37,7 @@ Fixpoint himpl (As : tlist) (B : Type) : Type :=
 
 Definition hinit {B} (y : B) : himpl tnil B := y.
 Definition hlam {A As B} (f : A → himpl As B) : himpl (tcons A As) B := f.
-Arguments hlam _ _ _ _ _/.
+Arguments hlam _ _ _ _ _ / : assert.
 
 Definition hcurry {As B} (f : himpl As B) (xs : hlist As) : B :=
   (fix go As xs :=

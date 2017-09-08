@@ -4,8 +4,8 @@ From stdpp Require Import gmap.
 Set Default Proof Using "Type".
 
 Record gmultiset A `{Countable A} := GMultiSet { gmultiset_car : gmap A nat }.
-Arguments GMultiSet {_ _ _} _.
-Arguments gmultiset_car {_ _ _} _.
+Arguments GMultiSet {_ _ _} _ : assert.
+Arguments gmultiset_car {_ _ _} _ : assert.
 
 Lemma gmultiset_eq_dec `{Countable A} : EqDecision (gmultiset A).
 Proof. solve_decision. Defined.

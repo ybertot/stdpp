@@ -24,8 +24,8 @@ all nodes. *)
 Inductive Pmap_raw (A : Type) : Type :=
   | PLeaf: Pmap_raw A
   | PNode: option A → Pmap_raw A → Pmap_raw A → Pmap_raw A.
-Arguments PLeaf {_}.
-Arguments PNode {_} _ _ _.
+Arguments PLeaf {_} : assert.
+Arguments PNode {_} _ _ _ : assert.
 
 Instance Pmap_raw_eq_dec `{EqDecision A} : EqDecision (Pmap_raw A).
 Proof. solve_decision. Defined.
@@ -36,7 +36,7 @@ Fixpoint Pmap_wf {A} (t : Pmap_raw A) : bool :=
   | PNode None PLeaf PLeaf => false
   | PNode _ l r => Pmap_wf l && Pmap_wf r
   end.
-Arguments Pmap_wf _ !_ / : simpl nomatch.
+Arguments Pmap_wf _ !_ / : simpl nomatch, assert.
 Lemma Pmap_wf_l {A} o (l r : Pmap_raw A) : Pmap_wf (PNode o l r) → Pmap_wf l.
 Proof. destruct o, l, r; simpl; rewrite ?andb_True; tauto. Qed.
 Lemma Pmap_wf_r {A} o (l r : Pmap_raw A) : Pmap_wf (PNode o l r) → Pmap_wf r.
@@ -44,7 +44,7 @@ Proof. destruct o, l, r; simpl; rewrite ?andb_True; tauto. Qed.
 Local Hint Immediate Pmap_wf_l Pmap_wf_r.
 Definition PNode' {A} (o : option A) (l r : Pmap_raw A) :=
   match l, o, r with PLeaf, None, PLeaf => PLeaf | _, _, _ => PNode o l r end.
-Arguments PNode' _ _ _ _ : simpl never.
+Arguments PNode' : simpl never.
 Lemma PNode_wf {A} o (l r : Pmap_raw A) :
   Pmap_wf l → Pmap_wf r → Pmap_wf (PNode' o l r).
 Proof. destruct o, l, r; simpl; auto. Qed.
@@ -59,7 +59,7 @@ Instance Plookup_raw {A} : Lookup positive A (Pmap_raw A) :=
   | PLeaf => None
   | PNode o l r => match i with 1 => o | i~0 => l !! i | i~1 => r !! i end
   end.
-Local Arguments lookup _ _ _ _ _ !_ / : simpl nomatch.
+Local Arguments lookup _ _ _ _ _ !_ / : simpl nomatch, assert.
 Fixpoint Psingleton_raw {A} (i : positive) (x : A) : Pmap_raw A :=
   match i with
   | 1 => PNode (Some x) PLeaf PLeaf
@@ -258,9 +258,9 @@ Qed.
 (** Packed version and instance of the finite map type class *)
 Inductive Pmap (A : Type) : Type :=
   PMap { pmap_car : Pmap_raw A; pmap_prf : Pmap_wf pmap_car }.
-Arguments PMap {_} _ _.
-Arguments pmap_car {_} _.
-Arguments pmap_prf {_} _.
+Arguments PMap {_} _ _ : assert.
+Arguments pmap_car {_} _ : assert.
+Arguments pmap_prf {_} _ : assert.
 Lemma Pmap_eq {A} (m1 m2 : Pmap A) : m1 = m2 ↔ pmap_car m1 = pmap_car m2.
 Proof.
   split; [by intros ->|intros]; destruct m1 as [t1 ?], m2 as [t2 ?].

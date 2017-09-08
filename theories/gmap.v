@@ -15,8 +15,8 @@ Record gmap K `{Countable K} A := GMap {
   gmap_car : Pmap A;
   gmap_prf : bool_decide (gmap_wf gmap_car)
 }.
-Arguments GMap {_ _ _ _} _ _.
-Arguments gmap_car {_ _ _ _} _.
+Arguments GMap {_ _ _ _} _ _ : assert.
+Arguments gmap_car {_ _ _ _} _ : assert.
 Lemma gmap_eq `{Countable K} {A} (m1 m2 : gmap K A) :
   m1 = m2 ↔ gmap_car m1 = gmap_car m2.
 Proof.

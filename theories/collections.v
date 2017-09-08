@@ -92,7 +92,7 @@ This transformation is implemented using type classes instead of setoid
 rewriting to ensure that we traverse each term at most once and to be able to
 deal with occurences of the set operations under binders. *)
 Class SetUnfold (P Q : Prop) := { set_unfold : P ↔ Q }.
-Arguments set_unfold _ _ {_}.
+Arguments set_unfold _ _ {_} : assert.
 Hint Mode SetUnfold + - : typeclass_instances.
 
 Class SetUnfoldSimpl (P Q : Prop) := { set_unfold_simpl : SetUnfold P Q }.

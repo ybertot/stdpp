@@ -9,9 +9,9 @@ Set Default Proof Using "Type".
 Local Open Scope N_scope.
 
 Record Nmap (A : Type) : Type := NMap { Nmap_0 : option A; Nmap_pos : Pmap A }.
-Arguments Nmap_0 {_} _.
-Arguments Nmap_pos {_} _.
-Arguments NMap {_} _ _.
+Arguments Nmap_0 {_} _ : assert.
+Arguments Nmap_pos {_} _ : assert.
+Arguments NMap {_} _ _ : assert.
 
 Instance Nmap_eq_dec `{EqDecision A} : EqDecision (Nmap A).
 Proof.

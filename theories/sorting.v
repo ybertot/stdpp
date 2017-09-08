@@ -18,7 +18,7 @@ Section merge_sort.
        if decide_rel R x1 x2 then x1 :: list_merge l1 (x2 :: l2)
        else x2 :: list_merge_aux l2
     end.
-  Global Arguments list_merge !_ !_ /.
+  Global Arguments list_merge !_ !_ / : assert.
 
   Local Notation stack := (list (option (list A))).
   Fixpoint merge_list_to_stack (st : stack) (l : list A) : stack :=

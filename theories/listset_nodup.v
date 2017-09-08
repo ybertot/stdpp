@@ -9,9 +9,9 @@ Set Default Proof Using "Type".
 Record listset_nodup A := ListsetNoDup {
   listset_nodup_car : list A; listset_nodup_prf : NoDup listset_nodup_car
 }.
-Arguments ListsetNoDup {_} _ _.
-Arguments listset_nodup_car {_} _.
-Arguments listset_nodup_prf {_} _.
+Arguments ListsetNoDup {_} _ _ : assert.
+Arguments listset_nodup_car {_} _ : assert.
+Arguments listset_nodup_prf {_} _ : assert.
 
 Section list_collection.
 Context `{EqDecision A}.

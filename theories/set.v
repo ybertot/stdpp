@@ -6,8 +6,8 @@ Set Default Proof Using "Type".
 
 Record set (A : Type) : Type := mkSet { set_car : A → Prop }.
 Add Printing Constructor set.
-Arguments mkSet {_} _.
-Arguments set_car {_} _ _.
+Arguments mkSet {_} _ : assert.
+Arguments set_car {_} _ _ : assert.
 Notation "{[ x | P ]}" := (mkSet (λ x, P))
   (at level 1, format "{[  x  |  P  ]}") : C_scope.
 

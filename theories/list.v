@@ -6,9 +6,9 @@ From Coq Require Export Permutation.
 From stdpp Require Export numbers base option.
 Set Default Proof Using "Type*".
 
-Arguments length {_} _.
-Arguments cons {_} _ _.
-Arguments app {_} _ _.
+Arguments length {_} _ : assert.
+Arguments cons {_} _ _ : assert.
+Arguments app {_} _ _ : assert.
 
 Instance: Params (@length) 1.
 Instance: Params (@cons) 1.
@@ -18,16 +18,16 @@ Notation tail := tl.
 Notation take := firstn.
 Notation drop := skipn.
 
-Arguments tail {_} _.
-Arguments take {_} !_ !_ /.
-Arguments drop {_} !_ !_ /.
+Arguments tail {_} _ : assert.
+Arguments take {_} !_ !_ / : assert.
+Arguments drop {_} !_ !_ / : assert.
 
 Instance: Params (@tail) 1.
 Instance: Params (@take) 1.
 Instance: Params (@drop) 1.
 
-Arguments Permutation {_} _ _.
-Arguments Forall_cons {_} _ _ _ _ _.
+Arguments Permutation {_} _ _ : assert.
+Arguments Forall_cons {_} _ _ _ _ _ : assert.
 Remove Hints Permutation_cons : typeclass_instances.
 
 Notation "(::)" := cons (only parsing) : C_scope.
@@ -148,7 +148,7 @@ Fixpoint resize {A} (n : nat) (y : A) (l : list A) : list A :=
   | [] => replicate n y
   | x :: l => match n with 0 => [] | S n => x :: resize n y l end
   end.
-Arguments resize {_} !_ _ !_.
+Arguments resize {_} !_ _ !_ : assert.
 Instance: Params (@resize) 2.
 
 (** The function [reshape k l] transforms [l] into a list of lists whose sizes
@@ -217,8 +217,8 @@ Inductive zipped_Forall {A} (P : list A → list A → A → Prop) :
   | zipped_Forall_nil l : zipped_Forall P l []
   | zipped_Forall_cons l k x :
      P l k x → zipped_Forall P (x :: l) k → zipped_Forall P l (x :: k).
-Arguments zipped_Forall_nil {_ _} _.
-Arguments zipped_Forall_cons {_ _} _ _ _ _ _.
+Arguments zipped_Forall_nil {_ _} _ : assert.
+Arguments zipped_Forall_cons {_ _} _ _ _ _ _ : assert.
 
 (** The function [mask f βs l] applies the function [f] to elements in [l] at
 positions that are [true] in [βs]. *)
@@ -3504,9 +3504,9 @@ over the type of constants, but later we use [nat]s and a list representing
 a corresponding environment. *)
 Inductive rlist (A : Type) :=
   rnil : rlist A | rnode : A → rlist A | rapp : rlist A → rlist A → rlist A.
-Arguments rnil {_}.
-Arguments rnode {_} _.
-Arguments rapp {_} _ _.
+Arguments rnil {_} : assert.
+Arguments rnode {_} _ : assert.
+Arguments rapp {_} _ _ : assert.
 
 Module rlist.
 Fixpoint to_list {A} (t : rlist A) : list A :=

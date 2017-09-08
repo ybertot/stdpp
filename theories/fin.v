@@ -18,7 +18,7 @@ Notation fin := Fin.t.
 Notation FS := Fin.FS.
 
 Delimit Scope fin_scope with fin.
-Arguments Fin.FS _ _%fin.
+Arguments Fin.FS _ _%fin : assert.
 
 Notation "0" := Fin.F1 : fin_scope. Notation "1" := (FS 0) : fin_scope.
 Notation "2" := (FS 1) : fin_scope. Notation "3" := (FS 2) : fin_scope.

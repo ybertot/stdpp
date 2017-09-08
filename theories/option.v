@@ -24,7 +24,7 @@ Proof. congruence. Qed.
 Definition from_option {A B} (f : A → B) (y : B) (mx : option A) : B :=
   match mx with None => y | Some x => f x end.
 Instance: Params (@from_option) 3.
-Arguments from_option {_ _} _ _ !_ /.
+Arguments from_option {_ _} _ _ !_ / : assert.
 
 (* The eliminator again, but with the arguments in different order, which is
 sometimes more convenient. *)
@@ -246,27 +246,27 @@ Proof. destruct 1 as [?? []|]; simpl; by constructor. Qed.
 not particularly like type level reductions. *)
 Class Maybe {A B : Type} (c : A → B) :=
   maybe : B → option A.
-Arguments maybe {_ _} _ {_} !_ /.
+Arguments maybe {_ _} _ {_} !_ / : assert.
 Class Maybe2 {A1 A2 B : Type} (c : A1 → A2 → B) :=
   maybe2 : B → option (A1 * A2).
-Arguments maybe2 {_ _ _} _ {_} !_ /.
+Arguments maybe2 {_ _ _} _ {_} !_ / : assert.
 Class Maybe3 {A1 A2 A3 B : Type} (c : A1 → A2 → A3 → B) :=
   maybe3 : B → option (A1 * A2 * A3).
-Arguments maybe3 {_ _ _ _} _ {_} !_ /.
+Arguments maybe3 {_ _ _ _} _ {_} !_ / : assert.
 Class Maybe4 {A1 A2 A3 A4 B : Type} (c : A1 → A2 → A3 → A4 → B) :=
   maybe4 : B → option (A1 * A2 * A3 * A4).
-Arguments maybe4 {_ _ _ _ _} _ {_} !_ /.
+Arguments maybe4 {_ _ _ _ _} _ {_} !_ / : assert.
 
 Instance maybe_comp `{Maybe B C c1, Maybe A B c2} : Maybe (c1 ∘ c2) := λ x,
   maybe c1 x ≫= maybe c2.
-Arguments maybe_comp _ _ _ _ _ _ _ !_ /.
+Arguments maybe_comp _ _ _ _ _ _ _ !_ / : assert.
 
 Instance maybe_inl {A B} : Maybe (@inl A B) := λ xy,
   match xy with inl x => Some x | _ => None end.
 Instance maybe_inr {A B} : Maybe (@inr A B) := λ xy,
   match xy with inr y => Some y | _ => None end.
 Instance maybe_Some {A} : Maybe (@Some A) := id.
-Arguments maybe_Some _ !_ /.
+Arguments maybe_Some _ !_ / : assert.
 
 (** * Union, intersection and difference *)
 Instance option_union_with {A} : UnionWith A (option A) := λ f mx my,

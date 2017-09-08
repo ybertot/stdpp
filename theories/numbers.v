@@ -14,7 +14,7 @@ Instance comparison_eq_dec : EqDecision comparison.
 Proof. solve_decision. Defined.
 
 (** * Notations and properties of [nat] *)
-Arguments minus !_ !_ /.
+Arguments minus !_ !_ / : assert.
 Reserved Notation "x ≤ y ≤ z" (at level 70, y at next level).
 Reserved Notation "x ≤ y < z" (at level 70, y at next level).
 Reserved Notation "x < y < z" (at level 70, y at next level).
@@ -212,7 +212,7 @@ Notation "(<)" := N.lt (only parsing) : N_scope.
 Infix "`div`" := N.div (at level 35) : N_scope.
 Infix "`mod`" := N.modulo (at level 35) : N_scope.
 
-Arguments N.add _ _ : simpl never.
+Arguments N.add : simpl never.
 
 Instance Npos_inj : Inj (=) (=) Npos.
 Proof. by injection 1. Qed.
@@ -281,15 +281,15 @@ Qed.
 
 (* Note that we cannot disable simpl for [Z.of_nat] as that would break
 tactics as [lia]. *)
-Arguments Z.to_nat _ : simpl never.
-Arguments Z.mul _ _ : simpl never.
-Arguments Z.add _ _ : simpl never.
-Arguments Z.opp _ : simpl never.
-Arguments Z.pow _ _ : simpl never.
-Arguments Z.div _ _ : simpl never.
-Arguments Z.modulo _ _ : simpl never.
-Arguments Z.quot _ _ : simpl never.
-Arguments Z.rem _ _ : simpl never.
+Arguments Z.to_nat : simpl never.
+Arguments Z.mul : simpl never.
+Arguments Z.add : simpl never.
+Arguments Z.opp : simpl never.
+Arguments Z.pow : simpl never.
+Arguments Z.div : simpl never.
+Arguments Z.modulo : simpl never.
+Arguments Z.quot : simpl never.
+Arguments Z.rem : simpl never.
 
 Lemma Z_to_nat_neq_0_pos x : Z.to_nat x ≠ 0%nat → 0 < x.
 Proof. by destruct x. Qed.
@@ -362,7 +362,7 @@ Notation "(≤)" := Qcle (only parsing) : Qc_scope.
 Notation "(<)" := Qclt (only parsing) : Qc_scope.
 
 Hint Extern 1 (_ ≤ _) => reflexivity || discriminate.
-Arguments Qred _ : simpl never.
+Arguments Qred : simpl never.
 
 Instance Qc_eq_dec: EqDecision Qc := Qc_eq_dec.
 Program Instance Qc_le_dec (x y : Qc) : Decision (x ≤ y) :=
@@ -512,7 +512,7 @@ Record Qp := mk_Qp { Qp_car :> Qc ; Qp_prf : (0 < Qp_car)%Qc }.
 Hint Resolve Qp_prf.
 Delimit Scope Qp_scope with Qp.
 Bind Scope Qp_scope with Qp.
-Arguments Qp_car _%Qp.
+Arguments Qp_car _%Qp : assert.
 
 Definition Qp_one : Qp := mk_Qp 1 eq_refl.
 Program Definition Qp_plus (x y : Qp) : Qp := mk_Qp (x + y) _.

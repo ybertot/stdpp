@@ -8,17 +8,17 @@ Class Finite A `{EqDecision A} := {
   NoDup_enum : NoDup enum;
   elem_of_enum x : x ∈ enum
 }.
-Arguments enum _ _ _ : clear implicits.
-Arguments enum _ {_ _}.
-Arguments NoDup_enum _ _ _ : clear implicits.
-Arguments NoDup_enum _ {_ _}.
+Arguments enum : clear implicits.
+Arguments enum _ {_ _} : assert.
+Arguments NoDup_enum : clear implicits.
+Arguments NoDup_enum _ {_ _} : assert.
 Definition card A `{Finite A} := length (enum A).
 Program Instance finite_countable `{Finite A} : Countable A := {|
   encode := λ x,
     Pos.of_nat $ S $ from_option id 0 $ fst <$> list_find (x =) (enum A);
   decode := λ p, enum A !! pred (Pos.to_nat p)
 |}.
-Arguments Pos.of_nat _ : simpl never.
+Arguments Pos.of_nat : simpl never.
 Next Obligation.
   intros ?? [xs Hxs HA] x; unfold encode, decode; simpl.
   destruct (list_find_elem_of (x =) xs x) as [[i y] Hi]; auto.

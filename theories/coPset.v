@@ -30,7 +30,7 @@ Fixpoint coPset_wf (t : coPset_raw) : bool :=
   | coPNode false (coPLeaf false) (coPLeaf false) => false
   | coPNode b l r => coPset_wf l && coPset_wf r
   end.
-Arguments coPset_wf !_ / : simpl nomatch.
+Arguments coPset_wf !_ / : simpl nomatch, assert.
 
 Lemma coPNode_wf_l b l r : coPset_wf (coPNode b l r) → coPset_wf l.
 Proof. destruct b, l as [[]|],r as [[]|]; simpl; rewrite ?andb_True; tauto. Qed.
@@ -44,7 +44,7 @@ Definition coPNode' (b : bool) (l r : coPset_raw) : coPset_raw :=
   | false, coPLeaf false, coPLeaf false => coPLeaf false
   | _, _, _ => coPNode b l r
   end.
-Arguments coPNode' _ _ _ : simpl never.
+Arguments coPNode' : simpl never.
 Lemma coPNode_wf b l r : coPset_wf l → coPset_wf r → coPset_wf (coPNode' b l r).
 Proof. destruct b, l as [[]|], r as [[]|]; simpl; auto. Qed.
 Hint Resolve coPNode_wf.
@@ -57,7 +57,7 @@ Fixpoint coPset_elem_of_raw (p : positive) (t : coPset_raw) {struct t} : bool :=
   | coPNode _ _ r, p~1 => coPset_elem_of_raw p r
   end.
 Local Notation e_of := coPset_elem_of_raw.
-Arguments coPset_elem_of_raw _ !_ / : simpl nomatch.
+Arguments coPset_elem_of_raw _ !_ / : simpl nomatch, assert.
 Lemma coPset_elem_of_node b l r p :
   e_of p (coPNode' b l r) = e_of p (coPNode b l r).
 Proof. by destruct p, b, l as [[]|], r as [[]|]. Qed.
@@ -99,7 +99,7 @@ Instance coPset_union_raw : Union coPset_raw :=
   | coPLeaf false, coPNode b l r => coPNode b l r
   | coPNode b1 l1 r1, coPNode b2 l2 r2 => coPNode' (b1||b2) (l1 ∪ l2) (r1 ∪ r2)
   end.
-Local Arguments union _ _!_ !_ /.
+Local Arguments union _ _!_ !_ / : assert.
 Instance coPset_intersection_raw : Intersection coPset_raw :=
   fix go t1 t2 := let _ : Intersection _ := @go in
   match t1, t2 with
@@ -110,7 +110,7 @@ Instance coPset_intersection_raw : Intersection coPset_raw :=
   | coPLeaf true, coPNode b l r => coPNode b l r
   | coPNode b1 l1 r1, coPNode b2 l2 r2 => coPNode' (b1&&b2) (l1 ∩ l2) (r1 ∩ r2)
   end.
-Local Arguments intersection _ _!_ !_ /.
+Local Arguments intersection _ _!_ !_ / : assert.
 Fixpoint coPset_opp_raw (t : coPset_raw) : coPset_raw :=
   match t with
   | coPLeaf b => coPLeaf (negb b)

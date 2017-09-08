@@ -8,8 +8,8 @@ From stdpp Require Export fin_map_dom.
 
 Record mapset (M : Type → Type) : Type :=
   Mapset { mapset_car: M (unit : Type) }.
-Arguments Mapset {_} _.
-Arguments mapset_car {_} _.
+Arguments Mapset {_} _ : assert.
+Arguments mapset_car {_} _ : assert.
 
 Section mapset.
 Context `{FinMap K M}.
@@ -143,4 +143,5 @@ Hint Extern 1 (Difference (mapset _)) =>
   eapply @mapset_difference : typeclass_instances.
 Hint Extern 1 (Elements _ (mapset _)) =>
   eapply @mapset_elems : typeclass_instances.
-Arguments mapset_eq_dec _ _ _ _ : simpl never.
+
+Arguments mapset_eq_dec : simpl never.

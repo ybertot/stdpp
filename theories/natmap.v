@@ -28,9 +28,9 @@ Record natmap (A : Type) : Type := NatMap {
   natmap_car : natmap_raw A;
   natmap_prf : natmap_wf natmap_car
 }.
-Arguments NatMap {_} _ _.
-Arguments natmap_car {_} _.
-Arguments natmap_prf {_} _.
+Arguments NatMap {_} _ _ : assert.
+Arguments natmap_car {_} _ : assert.
+Arguments natmap_prf {_} _ : assert.
 Lemma natmap_eq {A} (m1 m2 : natmap A) :
   m1 = m2 ↔ natmap_car m1 = natmap_car m2.
 Proof.

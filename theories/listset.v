@@ -6,8 +6,8 @@ From stdpp Require Export collections list.
 Set Default Proof Using "Type".
 
 Record listset A := Listset { listset_car: list A }.
-Arguments listset_car {_} _.
-Arguments Listset {_} _.
+Arguments listset_car {_} _ : assert.
+Arguments Listset {_} _ : assert.
 
 Section listset.
 Context {A : Type}.

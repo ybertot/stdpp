@@ -21,8 +21,8 @@ Add Search Blacklist "_obligation_".
 (** Sealing off definitions *)
 Set Primitive Projections.
 Record seal {A} (f : A) := { unseal : A; seal_eq : unseal = f }.
-Arguments unseal {_ _} _.
-Arguments seal_eq {_ _} _.
+Arguments unseal {_ _} _ : assert.
+Arguments seal_eq {_ _} _ : assert.
 Unset Primitive Projections.
 
 (* Below we define type class versions of the common logical operators. It is
@@ -149,13 +149,13 @@ propositions. For example to declare a parameter expressing decidable equality
 on a type [A] we write [`{∀ x y : A, Decision (x = y)}] and use it by writing
 [decide (x = y)]. *)
 Class Decision (P : Prop) := decide : {P} + {¬P}.
-Arguments decide _ {_}.
+Arguments decide _ {_} : assert.
 Notation EqDecision A := (∀ x y : A, Decision (x = y)).
 
 (** ** Inhabited types *)
 (** This type class collects types that are inhabited. *)
 Class Inhabited (A : Type) : Type := populate { inhabitant : A }.
-Arguments populate {_} _.
+Arguments populate {_} _ : assert.
 
 (** ** Proof irrelevant types *)
 (** This type class collects types that are proof irrelevant. That means, all
@@ -198,22 +198,22 @@ Class Trichotomy {A} (R : relation A) :=
 Class TrichotomyT {A} (R : relation A) :=
   trichotomyT x y : {R x y} + {x = y} + {R y x}.
 
-Arguments irreflexivity {_} _ {_} _ _.
-Arguments inj {_ _ _ _} _ {_} _ _ _.
-Arguments inj2 {_ _ _ _ _ _} _ {_} _ _ _ _ _.
-Arguments cancel {_ _ _} _ _ {_} _.
-Arguments surj {_ _ _} _ {_} _.
-Arguments idemp {_ _} _ {_} _.
-Arguments comm {_ _ _} _ {_} _ _.
-Arguments left_id {_ _} _ _ {_} _.
-Arguments right_id {_ _} _ _ {_} _.
-Arguments assoc {_ _} _ {_} _ _ _.
-Arguments left_absorb {_ _} _ _ {_} _.
-Arguments right_absorb {_ _} _ _ {_} _.
-Arguments anti_symm {_ _} _ {_} _ _ _ _.
-Arguments total {_} _ {_} _ _.
-Arguments trichotomy {_} _ {_} _ _.
-Arguments trichotomyT {_} _ {_} _ _.
+Arguments irreflexivity {_} _ {_} _ _ : assert.
+Arguments inj {_ _ _ _} _ {_} _ _ _ : assert.
+Arguments inj2 {_ _ _ _ _ _} _ {_} _ _ _ _ _: assert.
+Arguments cancel {_ _ _} _ _ {_} _ : assert.
+Arguments surj {_ _ _} _ {_} _ : assert.
+Arguments idemp {_ _} _ {_} _ : assert.
+Arguments comm {_ _ _} _ {_} _ _ : assert.
+Arguments left_id {_ _} _ _ {_} _ : assert.
+Arguments right_id {_ _} _ _ {_} _ : assert.
+Arguments assoc {_ _} _ {_} _ _ _ : assert.
+Arguments left_absorb {_ _} _ _ {_} _ : assert.
+Arguments right_absorb {_ _} _ _ {_} _ : assert.
+Arguments anti_symm {_ _} _ {_} _ _ _ _ : assert.
+Arguments total {_} _ {_} _ _ : assert.
+Arguments trichotomy {_} _ {_} _ _ : assert.
+Arguments trichotomyT {_} _ {_} _ _ : assert.
 
 Lemma not_symmetry `{R : relation A, !Symmetric R} x y : ¬R x y → ¬R y x.
 Proof. intuition. Qed.
@@ -371,10 +371,10 @@ Instance impl_inhabited {A} `{Inhabited B} : Inhabited (A → B) :=
 
 (** Ensure that [simpl] unfolds [id], [compose], and [flip] when fully
 applied. *)
-Arguments id _ _ /.
-Arguments compose _ _ _ _ _ _ /.
-Arguments flip _ _ _ _ _ _ /.
-Arguments const _ _ _ _ /.
+Arguments id _ _ / : assert.
+Arguments compose _ _ _ _ _ _ / : assert.
+Arguments flip _ _ _ _ _ _ / : assert.
+Arguments const _ _ _ _ / : assert.
 Typeclasses Transparent id compose flip const.
 
 Definition fun_map {A A' B B'} (f: A' → A) (g: B → B') (h : A → B) : A' → B' :=
@@ -476,11 +476,11 @@ Definition curry4 {A B C D E} (f : A → B → C → D → E) (p : A * B * C * D
 
 Definition prod_map {A A' B B'} (f: A → A') (g: B → B') (p : A * B) : A' * B' :=
   (f (p.1), g (p.2)).
-Arguments prod_map {_ _ _ _} _ _ !_ /.
+Arguments prod_map {_ _ _ _} _ _ !_ / : assert.
 
 Definition prod_zip {A A' A'' B B' B''} (f : A → A' → A'') (g : B → B' → B'')
     (p : A * B) (q : A' * B') : A'' * B'' := (f (p.1) (q.1), g (p.2) (q.2)).
-Arguments prod_zip {_ _ _ _ _ _} _ _ !_ !_ /.
+Arguments prod_zip {_ _ _ _ _ _} _ _ !_ !_ / : assert.
 
 Instance prod_inhabited {A B} (iA : Inhabited A)
     (iB : Inhabited B) : Inhabited (A * B) :=
@@ -536,7 +536,7 @@ Proof. intros [??] [??] [??]; f_equal; apply leibniz_equiv; auto. Qed.
 (** ** Sums *)
 Definition sum_map {A A' B B'} (f: A → A') (g: B → B') (xy : A + B) : A' + B' :=
   match xy with inl x => inl (f x) | inr y => inr (g y) end.
-Arguments sum_map {_ _ _ _} _ _ !_ /.
+Arguments sum_map {_ _ _ _} _ _ !_ / : assert.
 
 Instance sum_inhabited_l {A B} (iA : Inhabited A) : Inhabited (A + B) :=
   match iA with populate x => populate (inl x) end.
@@ -592,13 +592,13 @@ Typeclasses Opaque sum_equiv.
 Instance option_inhabited {A} : Inhabited (option A) := populate None.
 
 (** ** Sigma types *)
-Arguments existT {_ _} _ _.
-Arguments projT1 {_ _} _.
-Arguments projT2 {_ _} _.
+Arguments existT {_ _} _ _ : assert.
+Arguments projT1 {_ _} _ : assert.
+Arguments projT2 {_ _} _ : assert.
 
-Arguments exist {_} _ _ _.
-Arguments proj1_sig {_ _} _.
-Arguments proj2_sig {_ _} _.
+Arguments exist {_} _ _ _ : assert.
+Arguments proj1_sig {_ _} _ : assert.
+Arguments proj2_sig {_ _} _ : assert.
 Notation "x ↾ p" := (exist _ x p) (at level 20) : C_scope.
 Notation "` x" := (proj1_sig x) (at level 10, format "` x") : C_scope.
 
@@ -616,7 +616,7 @@ Section sig_map.
     apply (inj f) in Hxy; subst. rewrite (proof_irrel _ Hy). auto.
   Qed.
 End sig_map.
-Arguments sig_map _ _ _ _ _ _ !_ /.
+Arguments sig_map _ _ _ _ _ _ !_ / : assert.
 
 
 (** * Operations on collections *)
@@ -646,7 +646,7 @@ Infix "∪*∪**" := (zip_with (prod_zip (∪) (∪*)))
   (at level 50, left associativity) : C_scope.
 
 Definition union_list `{Empty A} `{Union A} : list A → A := fold_right (∪) ∅.
-Arguments union_list _ _ _ !_ /.
+Arguments union_list _ _ _ !_ / : assert.
 Notation "⋃ l" := (union_list l) (at level 20, format "⋃  l") : C_scope.
 
 Class Intersection A := intersection: A → A → A.
@@ -792,19 +792,19 @@ and fmap. We use these type classes merely for convenient overloading of
 notations and do not formalize any theory on monads (we do not even define a
 class with the monad laws). *)
 Class MRet (M : Type → Type) := mret: ∀ {A}, A → M A.
-Arguments mret {_ _ _} _.
+Arguments mret {_ _ _} _ : assert.
 Instance: Params (@mret) 3.
 Class MBind (M : Type → Type) := mbind : ∀ {A B}, (A → M B) → M A → M B.
-Arguments mbind {_ _ _ _} _ !_ /.
+Arguments mbind {_ _ _ _} _ !_ / : assert.
 Instance: Params (@mbind) 4.
 Class MJoin (M : Type → Type) := mjoin: ∀ {A}, M (M A) → M A.
-Arguments mjoin {_ _ _} !_ /.
+Arguments mjoin {_ _ _} !_ / : assert.
 Instance: Params (@mjoin) 3.
 Class FMap (M : Type → Type) := fmap : ∀ {A B}, (A → B) → M A → M B.
-Arguments fmap {_ _ _ _} _ !_ /.
+Arguments fmap {_ _ _ _} _ !_ / : assert.
 Instance: Params (@fmap) 4.
 Class OMap (M : Type → Type) := omap: ∀ {A B}, (A → option B) → M A → M B.
-Arguments omap {_ _ _ _} _ !_ /.
+Arguments omap {_ _ _ _} _ !_ / : assert.
 Instance: Params (@omap) 4.
 
 Notation "m ≫= f" := (mbind f m) (at level 60, right associativity) : C_scope.
@@ -838,7 +838,7 @@ Notation "ps .*2" := (fmap (M:=list) snd ps)
 
 Class MGuard (M : Type → Type) :=
   mguard: ∀ P {dec : Decision P} {A}, (P → M A) → M A.
-Arguments mguard _ _ _ !_ _ _ /.
+Arguments mguard _ _ _ !_ _ _ / : assert.
 Notation "'guard' P ; o" := (mguard P (λ _, o))
   (at level 65, only parsing, right associativity) : C_scope.
 Notation "'guard' P 'as' H ; o" := (mguard P (λ H, o))
@@ -855,7 +855,7 @@ Notation "m !! i" := (lookup i m) (at level 20) : C_scope.
 Notation "(!!)" := lookup (only parsing) : C_scope.
 Notation "( m !!)" := (λ i, m !! i) (only parsing) : C_scope.
 Notation "(!! i )" := (lookup i) (only parsing) : C_scope.
-Arguments lookup _ _ _ _ !_ !_ / : simpl nomatch.
+Arguments lookup _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The singleton map *)
 Class SingletonM K A M := singletonM: K → A → M.
@@ -868,20 +868,20 @@ Class Insert (K A M : Type) := insert: K → A → M → M.
 Instance: Params (@insert) 5.
 Notation "<[ k := a ]>" := (insert k a)
   (at level 5, right associativity, format "<[ k := a ]>") : C_scope.
-Arguments insert _ _ _ _ !_ _ !_ / : simpl nomatch.
+Arguments insert _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 
 (** The function delete [delete k m] should delete the value at key [k] in
 [m]. If the key [k] is not a member of [m], the original map should be
 returned. *)
 Class Delete (K M : Type) := delete: K → M → M.
 Instance: Params (@delete) 4.
-Arguments delete _ _ _ !_ !_ / : simpl nomatch.
+Arguments delete _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The function [alter f k m] should update the value at key [k] using the
 function [f], which is called with the original value. *)
 Class Alter (K A M : Type) := alter: (A → A) → K → M → M.
 Instance: Params (@alter) 5.
-Arguments alter {_ _ _ _} _ !_ !_ / : simpl nomatch.
+Arguments alter {_ _ _ _} _ !_ !_ / : simpl nomatch, assert.
 
 (** The function [alter f k m] should update the value at key [k] using the
 function [f], which is called with the original value at key [k] or [None]
@@ -890,21 +890,21 @@ yields [None]. *)
 Class PartialAlter (K A M : Type) :=
   partial_alter: (option A → option A) → K → M → M.
 Instance: Params (@partial_alter) 4.
-Arguments partial_alter _ _ _ _ _ !_ !_ / : simpl nomatch.
+Arguments partial_alter _ _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The function [dom C m] should yield the domain of [m]. That is a finite
 collection of type [C] that contains the keys that are a member of [m]. *)
 Class Dom (M C : Type) := dom: M → C.
 Instance: Params (@dom) 3.
-Arguments dom _ _ _ _ : clear implicits.
-Arguments dom {_} _ {_} !_ / : simpl nomatch.
+Arguments dom : clear implicits.
+Arguments dom {_} _ {_} !_ / : simpl nomatch, assert.
 
 (** The function [merge f m1 m2] should merge the maps [m1] and [m2] by
 constructing a new map whose value at key [k] is [f (m1 !! k) (m2 !! k)].*)
 Class Merge (M : Type → Type) :=
   merge: ∀ {A B C}, (option A → option B → option C) → M A → M B → M C.
 Instance: Params (@merge) 4.
-Arguments merge _ _ _ _ _ _ !_ !_ / : simpl nomatch.
+Arguments merge _ _ _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The function [union_with f m1 m2] is supposed to yield the union of [m1]
 and [m2] using the function [f] to combine values of members that are in
@@ -912,35 +912,35 @@ both [m1] and [m2]. *)
 Class UnionWith (A M : Type) :=
   union_with: (A → A → option A) → M → M → M.
 Instance: Params (@union_with) 3.
-Arguments union_with {_ _ _} _ !_ !_ / : simpl nomatch.
+Arguments union_with {_ _ _} _ !_ !_ / : simpl nomatch, assert.
 
 (** Similarly for intersection and difference. *)
 Class IntersectionWith (A M : Type) :=
   intersection_with: (A → A → option A) → M → M → M.
 Instance: Params (@intersection_with) 3.
-Arguments intersection_with {_ _ _} _ !_ !_ / : simpl nomatch.
+Arguments intersection_with {_ _ _} _ !_ !_ / : simpl nomatch, assert.
 
 Class DifferenceWith (A M : Type) :=
   difference_with: (A → A → option A) → M → M → M.
 Instance: Params (@difference_with) 3.
-Arguments difference_with {_ _ _} _ !_ !_ / : simpl nomatch.
+Arguments difference_with {_ _ _} _ !_ !_ / : simpl nomatch, assert.
 
 Definition intersection_with_list `{IntersectionWith A M}
   (f : A → A → option A) : M → list M → M := fold_right (intersection_with f).
-Arguments intersection_with_list _ _ _ _ _ !_ /.
+Arguments intersection_with_list _ _ _ _ _ !_ / : assert.
 
 Class LookupE (E K A M : Type) := lookupE: E → K → M → option A.
 Instance: Params (@lookupE) 6.
 Notation "m !!{ Γ } i" := (lookupE Γ i m)
   (at level 20, format "m  !!{ Γ }  i") : C_scope.
 Notation "(!!{ Γ } )" := (lookupE Γ) (only parsing, Γ at level 1) : C_scope.
-Arguments lookupE _ _ _ _ _ _ !_ !_ / : simpl nomatch.
+Arguments lookupE _ _ _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 Class InsertE (E K A M : Type) := insertE: E → K → A → M → M.
 Instance: Params (@insertE) 6.
 Notation "<[ k := a ]{ Γ }>" := (insertE Γ k a)
   (at level 5, right associativity, format "<[ k := a ]{ Γ }>") : C_scope.
-Arguments insertE _ _ _ _ _ _ !_ _ !_ / : simpl nomatch.
+Arguments insertE _ _ _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 
 
 (** * Axiomatization of collections *)
@@ -998,7 +998,7 @@ Class FinCollection A C `{ElemOf A C, Empty C, Singleton A C, Union C,
   NoDup_elements X : NoDup (elements X)
 }.
 Class Size C := size: C → nat.
-Arguments size {_ _} !_ / : simpl nomatch.
+Arguments size {_ _} !_ / : simpl nomatch, assert.
 Instance: Params (@size) 2.
 
 (** The class [Collection M] axiomatizes a type constructor [M] that can be

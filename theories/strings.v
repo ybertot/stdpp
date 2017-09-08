@@ -14,7 +14,7 @@ Notation length := List.length.
 Open Scope string_scope.
 Open Scope list_scope.
 Infix "+:+" := String.append (at level 60, right associativity) : C_scope.
-Arguments String.append _ _ : simpl never.
+Arguments String.append : simpl never.
 
 (** * Decision of equality *)
 Instance assci_eq_dec : EqDecision ascii := ascii_dec.

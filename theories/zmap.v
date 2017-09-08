@@ -9,10 +9,10 @@ Local Open Scope Z_scope.
 
 Record Zmap (A : Type) : Type :=
   ZMap { Zmap_0 : option A; Zmap_pos : Pmap A; Zmap_neg : Pmap A }.
-Arguments Zmap_0 {_} _.
-Arguments Zmap_pos {_} _.
-Arguments Zmap_neg {_} _.
-Arguments ZMap {_} _ _ _.
+Arguments Zmap_0 {_} _ : assert.
+Arguments Zmap_pos {_} _ : assert.
+Arguments Zmap_neg {_} _ : assert.
+Arguments ZMap {_} _ _ _ : assert.
 
 Instance Zmap_eq_dec `{EqDecision A} : EqDecision (Zmap A).
 Proof.
