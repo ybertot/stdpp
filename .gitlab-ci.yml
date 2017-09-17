@@ -44,7 +44,3 @@ stdpp-coq8.6:
   variables:
     COQ_VERSION: "8.6"
 
-stdpp-coq8.5.3:
-  <<: *template
-  variables:
-    COQ_VERSION: "8.5.3"
