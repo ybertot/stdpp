@@ -427,7 +427,7 @@ Proof.
   rewrite !coPset_finite_spec; destruct X as [t Ht]; simpl; clear Ht.
   induction t as [[]|]; simpl; rewrite ?coPset_finite_node, ?andb_True; tauto.
 Qed.
-Lemma coPset_split X :
+Lemma coPset_split (X : coPset) :
   ¬set_finite X →
   ∃ X1 X2, X = X1 ∪ X2 ∧ X1 ∩ X2 = ∅ ∧ ¬set_finite X1 ∧ ¬set_finite X2.
 Proof.

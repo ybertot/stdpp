@@ -14,18 +14,18 @@ Arguments mapset_car {_} _ : assert.
 Section mapset.
 Context `{FinMap K M}.
 
-Instance mapset_elem_of: ElemOf K (mapset M) := λ x X,
+Global Instance mapset_elem_of: ElemOf K (mapset M) := λ x X,
   mapset_car X !! x = Some ().
-Instance mapset_empty: Empty (mapset M) := Mapset ∅.
-Instance mapset_singleton: Singleton K (mapset M) := λ x,
+Global Instance mapset_empty: Empty (mapset M) := Mapset ∅.
+Global Instance mapset_singleton: Singleton K (mapset M) := λ x,
   Mapset {[ x := () ]}.
-Instance mapset_union: Union (mapset M) := λ X1 X2,
+Global Instance mapset_union: Union (mapset M) := λ X1 X2,
   let (m1) := X1 in let (m2) := X2 in Mapset (m1 ∪ m2).
-Instance mapset_intersection: Intersection (mapset M) := λ X1 X2,
+Global Instance mapset_intersection: Intersection (mapset M) := λ X1 X2,
   let (m1) := X1 in let (m2) := X2 in Mapset (m1 ∩ m2).
-Instance mapset_difference: Difference (mapset M) := λ X1 X2,
+Global Instance mapset_difference: Difference (mapset M) := λ X1 X2,
   let (m1) := X1 in let (m2) := X2 in Mapset (m1 ∖ m2).
-Instance mapset_elems: Elements K (mapset M) := λ X,
+Global Instance mapset_elements: Elements K (mapset M) := λ X,
   let (m) := X in (map_to_list m).*1.
 
 Lemma mapset_eq (X1 X2 : mapset M) : X1 = X2 ↔ ∀ x, x ∈ X1 ↔ x ∈ X2.
@@ -35,7 +35,7 @@ Proof.
   f_equal. apply map_eq. intros i. apply option_eq. intros []. by apply E.
 Qed.
 
-Instance: Collection K (mapset M).
+Instance mapset_collection: Collection K (mapset M).
 Proof.
   split; [split | | ].
   - unfold empty, elem_of, mapset_empty, mapset_elem_of.
@@ -54,17 +54,17 @@ Proof.
     intros [m1] [m2] ?. simpl. rewrite lookup_difference_Some.
     destruct (m2 !! x) as [[]|]; intuition congruence.
 Qed.
-Global Instance: LeibnizEquiv (mapset M).
+Global Instance mapset_leibniz : LeibnizEquiv (mapset M).
 Proof. intros ??. apply mapset_eq. Qed.
-Global Instance: FinCollection K (mapset M).
+Global Instance mapset_fin_collection : FinCollection K (mapset M).
 Proof.
   split.
   - apply _.
-  - unfold elements, elem_of at 2, mapset_elems, mapset_elem_of.
+  - unfold elements, elem_of at 2, mapset_elements, mapset_elem_of.
     intros [m] x. simpl. rewrite elem_of_list_fmap. split.
     + intros ([y []] &?& Hy). subst. by rewrite <-elem_of_map_to_list.
     + intros. exists (x, ()). by rewrite elem_of_map_to_list.
-  - unfold elements, mapset_elems. intros [m]. simpl.
+  - unfold elements, mapset_elements. intros [m]. simpl.
     apply NoDup_fst_map_to_list.
 Qed.
 
@@ -126,22 +126,5 @@ Proof.
   rewrite elem_of_mapset_dom_with; naive_solver.
 Qed.
 End mapset.
-
-(** These instances are declared using [Hint Extern] to avoid too
-eager type class search. *)
-Hint Extern 1 (ElemOf _ (mapset _)) =>
-  eapply @mapset_elem_of : typeclass_instances.
-Hint Extern 1 (Empty (mapset _)) =>
-  eapply @mapset_empty : typeclass_instances.
-Hint Extern 1 (Singleton _ (mapset _)) =>
-  eapply @mapset_singleton : typeclass_instances.
-Hint Extern 1 (Union (mapset _)) =>
-  eapply @mapset_union : typeclass_instances.
-Hint Extern 1 (Intersection (mapset _)) =>
-  eapply @mapset_intersection : typeclass_instances.
-Hint Extern 1 (Difference (mapset _)) =>
-  eapply @mapset_difference : typeclass_instances.
-Hint Extern 1 (Elements _ (mapset _)) =>
-  eapply @mapset_elems : typeclass_instances.
 
 Arguments mapset_eq_dec : simpl never.

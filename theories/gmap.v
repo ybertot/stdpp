@@ -136,8 +136,10 @@ Definition gmap_uncurry `{Countable K1, Countable K2} {A} :
 Section curry_uncurry.
   Context `{Countable K1, Countable K2} {A : Type}.
 
+  (* FIXME: the type annotations `option (gmap K2 A)` are silly. Maybe these are
+  a consequence of Coq bug #5735 *)
   Lemma lookup_gmap_curry (m : gmap K1 (gmap K2 A)) i j :
-    gmap_curry m !! (i,j) = m !! i ≫= (!! j).
+    gmap_curry m !! (i,j) = (m !! i : option (gmap K2 A)) ≫= (!! j).
   Proof.
     apply (map_fold_ind (λ mr m, mr !! (i,j) = m !! i ≫= (!! j))).
     { by rewrite !lookup_empty. }
@@ -154,7 +156,7 @@ Section curry_uncurry.
   Qed.
 
   Lemma lookup_gmap_uncurry (m : gmap (K1 * K2) A) i j :
-    gmap_uncurry m !! i ≫= (!! j) = m !! (i, j).
+    (gmap_uncurry m !! i : option (gmap K2 A)) ≫= (!! j) = m !! (i, j).
   Proof.
     apply (map_fold_ind (λ mr m, mr !! i ≫= (!! j) = m !! (i, j))).
     { by rewrite !lookup_empty. }
@@ -229,7 +231,7 @@ Qed.
 (* This is pretty ad-hoc and just for the case of [gset positive]. We need a
 notion of countable non-finite types to generalize this. *)
 Instance gset_positive_fresh : Fresh positive (gset positive) := λ X,
-  let 'Mapset (GMap m _) := X in fresh (dom _ m).
+  let 'Mapset (GMap m _) := X in fresh (dom Pset m).
 Instance gset_positive_fresh_spec : FreshSpec positive (gset positive).
 Proof.
   split.

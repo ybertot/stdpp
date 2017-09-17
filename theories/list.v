@@ -311,7 +311,7 @@ Instance list_subseteq {A} : SubsetEq (list A) := λ l1 l2, ∀ x, x ∈ l1 → 
 
 Section list_set.
   Context `{dec : EqDecision A}.
-  Global Instance elem_of_list_dec (x : A) : ∀ l, Decision (x ∈ l).
+  Global Instance elem_of_list_dec (x : A) : ∀ l : list A, Decision (x ∈ l).
   Proof.
    refine (
     fix go l :=
@@ -2857,6 +2857,7 @@ Proof. induction l; f_equal/=; auto. Qed.
 
 Section fmap.
   Context {A B : Type} (f : A → B).
+  Implicit Types l : list A.
 
   Lemma list_fmap_compose {C} (g : B → C) l : g ∘ f <$> l = g <$> f <$> l.
   Proof. induction l; f_equal/=; auto. Qed.
@@ -2975,24 +2976,24 @@ Section fmap.
   Lemma Exists_fmap (P : B → Prop) l : Exists P (f <$> l) ↔ Exists (P ∘ f) l.
   Proof. split; induction l; inversion 1; constructor; by auto. Qed.
 
-  Lemma Forall2_fmap_l {C} (P : B → C → Prop) l1 l2 :
-    Forall2 P (f <$> l1) l2 ↔ Forall2 (P ∘ f) l1 l2.
+  Lemma Forall2_fmap_l {C} (P : B → C → Prop) l k :
+    Forall2 P (f <$> l) k ↔ Forall2 (P ∘ f) l k.
   Proof.
-    split; revert l2; induction l1; inversion_clear 1; constructor; auto.
+    split; revert k; induction l; inversion_clear 1; constructor; auto.
   Qed.
-  Lemma Forall2_fmap_r {C} (P : C → B → Prop) l1 l2 :
-    Forall2 P l1 (f <$> l2) ↔ Forall2 (λ x, P x ∘ f) l1 l2.
+  Lemma Forall2_fmap_r {C} (P : C → B → Prop) k l :
+    Forall2 P k (f <$> l) ↔ Forall2 (λ x, P x ∘ f) k l.
   Proof.
-    split; revert l1; induction l2; inversion_clear 1; constructor; auto.
+    split; revert k; induction l; inversion_clear 1; constructor; auto.
   Qed.
-  Lemma Forall2_fmap_1 {C D} (g : C → D) (P : B → D → Prop) l1 l2 :
-    Forall2 P (f <$> l1) (g <$> l2) → Forall2 (λ x1 x2, P (f x1) (g x2)) l1 l2.
-  Proof. revert l2; induction l1; intros [|??]; inversion_clear 1; auto. Qed.
-  Lemma Forall2_fmap_2 {C D} (g : C → D) (P : B → D → Prop) l1 l2 :
-    Forall2 (λ x1 x2, P (f x1) (g x2)) l1 l2 → Forall2 P (f <$> l1) (g <$> l2).
+  Lemma Forall2_fmap_1 {C D} (g : C → D) (P : B → D → Prop) l k :
+    Forall2 P (f <$> l) (g <$> k) → Forall2 (λ x1 x2, P (f x1) (g x2)) l k.
+  Proof. revert k; induction l; intros [|??]; inversion_clear 1; auto. Qed.
+  Lemma Forall2_fmap_2 {C D} (g : C → D) (P : B → D → Prop) l k :
+    Forall2 (λ x1 x2, P (f x1) (g x2)) l k → Forall2 P (f <$> l) (g <$> k).
   Proof. induction 1; csimpl; auto. Qed.
-  Lemma Forall2_fmap {C D} (g : C → D) (P : B → D → Prop) l1 l2 :
-    Forall2 P (f <$> l1) (g <$> l2) ↔ Forall2 (λ x1 x2, P (f x1) (g x2)) l1 l2.
+  Lemma Forall2_fmap {C D} (g : C → D) (P : B → D → Prop) l k :
+    Forall2 P (f <$> l) (g <$> k) ↔ Forall2 (λ x1 x2, P (f x1) (g x2)) l k.
   Proof. split; auto using Forall2_fmap_1, Forall2_fmap_2. Qed.
 
   Lemma list_fmap_bind {C} (g : B → list C) l : (f <$> l) ≫= g = l ≫= g ∘ f.
@@ -3081,7 +3082,7 @@ Section ret_join.
   Lemma elem_of_list_ret (x y : A) : x ∈ @mret list _ A y ↔ x = y.
   Proof. apply elem_of_list_singleton. Qed.
   Lemma elem_of_list_join (x : A) (ls : list (list A)) :
-    x ∈ mjoin ls ↔ ∃ l, x ∈ l ∧ l ∈ ls.
+    x ∈ mjoin ls ↔ ∃ l : list A, x ∈ l ∧ l ∈ ls.
   Proof. by rewrite list_join_bind, elem_of_list_bind. Qed.
   Lemma join_nil (ls : list (list A)) : mjoin ls = [] ↔ Forall (= []) ls.
   Proof.

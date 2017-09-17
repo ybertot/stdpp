@@ -94,6 +94,9 @@ Proof. split; repeat intro; congruence. Qed.
 (** We define an operational type class for setoid equality. This is based on
 (Spitters/van der Weegen, 2011). *)
 Class Equiv A := equiv: relation A.
+(* No Hint Mode set because of Coq bug #5735
+Hint Mode Equiv ! : typeclass_instances. *)
+
 Infix "≡" := equiv (at level 70, no associativity) : C_scope.
 Notation "(≡)" := equiv (only parsing) : C_scope.
 Notation "( X ≡)" := (equiv X) (only parsing) : C_scope.
@@ -108,10 +111,12 @@ with Leibniz equality. We provide the tactic [fold_leibniz] to transform such
 setoid equalities into Leibniz equalities, and [unfold_leibniz] for the
 reverse. *)
 Class LeibnizEquiv A `{Equiv A} := leibniz_equiv x y : x ≡ y → x = y.
+Hint Mode LeibnizEquiv ! - : typeclass_instances.
+
 Lemma leibniz_equiv_iff `{LeibnizEquiv A, !Reflexive (@equiv A _)} (x y : A) :
   x ≡ y ↔ x = y.
 Proof. split. apply leibniz_equiv. intros ->; reflexivity. Qed.
- 
+
 Ltac fold_leibniz := repeat
   match goal with
   | H : context [ @equiv ?A _ _ _ ] |- _ =>
@@ -149,12 +154,14 @@ propositions. For example to declare a parameter expressing decidable equality
 on a type [A] we write [`{∀ x y : A, Decision (x = y)}] and use it by writing
 [decide (x = y)]. *)
 Class Decision (P : Prop) := decide : {P} + {¬P}.
+Hint Mode Decision ! : typeclass_instances.
 Arguments decide _ {_} : assert.
 Notation EqDecision A := (∀ x y : A, Decision (x = y)).
 
 (** ** Inhabited types *)
 (** This type class collects types that are inhabited. *)
 Class Inhabited (A : Type) : Type := populate { inhabitant : A }.
+Hint Mode Inhabited ! : typeclass_instances.
 Arguments populate {_} _ : assert.
 
 (** ** Proof irrelevant types *)
@@ -162,6 +169,7 @@ Arguments populate {_} _ : assert.
 elements of the type are equal. We use this notion only used for propositions,
 but by universe polymorphism we can generalize it. *)
 Class ProofIrrel (A : Type) : Prop := proof_irrel (x y : A) : x = y.
+Hint Mode ProofIrrel ! : typeclass_instances.
 
 (** ** Common properties *)
 (** These operational type classes allow us to refer to common mathematical
@@ -625,14 +633,17 @@ relations on collections: the empty collection [∅], the union [(∪)],
 intersection [(∩)], and difference [(∖)], the singleton [{[_]}], the subset
 [(⊆)] and element of [(∈)] relation, and disjointess [(⊥)]. *)
 Class Empty A := empty: A.
+Hint Mode Empty ! : typeclass_instances.
 Notation "∅" := empty : C_scope.
 
 Instance empty_inhabited `(Empty A) : Inhabited A := populate ∅.
 
 Class Top A := top : A.
+Hint Mode Top ! : typeclass_instances.
 Notation "⊤" := top : C_scope.
 
 Class Union A := union: A → A → A.
+Hint Mode Union ! : typeclass_instances.
 Instance: Params (@union) 2.
 Infix "∪" := union (at level 50, left associativity) : C_scope.
 Notation "(∪)" := union (only parsing) : C_scope.
@@ -650,6 +661,7 @@ Arguments union_list _ _ _ !_ / : assert.
 Notation "⋃ l" := (union_list l) (at level 20, format "⋃  l") : C_scope.
 
 Class Intersection A := intersection: A → A → A.
+Hint Mode Intersection ! : typeclass_instances.
 Instance: Params (@intersection) 2.
 Infix "∩" := intersection (at level 40) : C_scope.
 Notation "(∩)" := intersection (only parsing) : C_scope.
@@ -657,6 +669,7 @@ Notation "( x ∩)" := (intersection x) (only parsing) : C_scope.
 Notation "(∩ x )" := (λ y, intersection y x) (only parsing) : C_scope.
 
 Class Difference A := difference: A → A → A.
+Hint Mode Difference ! : typeclass_instances.
 Instance: Params (@difference) 2.
 Infix "∖" := difference (at level 40, left associativity) : C_scope.
 Notation "(∖)" := difference (only parsing) : C_scope.
@@ -670,6 +683,7 @@ Infix "∖*∖**" := (zip_with (prod_zip (∖) (∖*)))
   (at level 50, left associativity) : C_scope.
 
 Class Singleton A B := singleton: A → B.
+Hint Mode Singleton - ! : typeclass_instances.
 Instance: Params (@singleton) 3.
 Notation "{[ x ]}" := (singleton x) (at level 1) : C_scope.
 Notation "{[ x ; y ; .. ; z ]}" :=
@@ -681,6 +695,7 @@ Notation "{[ x , y , z ]}" := (singleton (x,y,z))
   (at level 1, y at next level, z at next level) : C_scope.
 
 Class SubsetEq A := subseteq: relation A.
+Hint Mode SubsetEq ! : typeclass_instances.
 Instance: Params (@subseteq) 2.
 Infix "⊆" := subseteq (at level 70) : C_scope.
 Notation "(⊆)" := subseteq (only parsing) : C_scope.
@@ -720,8 +735,10 @@ Notation "X ⊂ Y ⊂ Z" := (X ⊂ Y ∧ Y ⊂ Z) (at level 70, Y at next level)
 is used to create finite maps, finite sets, etc, and is typically different from
 the order [(⊆)]. *)
 Class Lexico A := lexico: relation A.
+Hint Mode Lexico ! : typeclass_instances.
 
 Class ElemOf A B := elem_of: A → B → Prop.
+Hint Mode ElemOf - ! : typeclass_instances.
 Instance: Params (@elem_of) 3.
 Infix "∈" := elem_of (at level 70) : C_scope.
 Notation "(∈)" := elem_of (only parsing) : C_scope.
@@ -733,6 +750,7 @@ Notation "( x ∉)" := (λ X, x ∉ X) (only parsing) : C_scope.
 Notation "(∉ X )" := (λ x, x ∉ X) (only parsing) : C_scope.
 
 Class Disjoint A := disjoint : A → A → Prop.
+Hint Mode Disjoint ! : typeclass_instances.
 Instance: Params (@disjoint) 2.
 Infix "⊥" := disjoint (at level 70) : C_scope.
 Notation "(⊥)" := disjoint (only parsing) : C_scope.
@@ -749,6 +767,7 @@ Hint Extern 0 (_ ⊥ _) => symmetry; eassumption.
 Hint Extern 0 (_ ⊥* _) => symmetry; eassumption.
 
 Class DisjointE E A := disjointE : E → A → A → Prop.
+Hint Mode DisjointE - ! : typeclass_instances.
 Instance: Params (@disjointE) 4.
 Notation "X ⊥{ Γ } Y" := (disjointE Γ X Y)
   (at level 70, format "X  ⊥{ Γ }  Y") : C_scope.
@@ -765,11 +784,14 @@ Notation "Xs ⊥{ Γ1 , Γ2 , .. , Γ3 }* Ys" :=
 Hint Extern 0 (_ ⊥{_} _) => symmetry; eassumption.
 
 Class DisjointList A := disjoint_list : list A → Prop.
+Hint Mode DisjointList ! : typeclass_instances.
 Instance: Params (@disjoint_list) 2.
 Notation "⊥ Xs" := (disjoint_list Xs) (at level 20, format "⊥  Xs") : C_scope.
 
 Section disjoint_list.
   Context `{Disjoint A, Union A, Empty A}.
+  Implicit Types X : A.
+
   Inductive disjoint_list_default : DisjointList A :=
     | disjoint_nil_2 : ⊥ (@nil A)
     | disjoint_cons_2 (X : A) (Xs : list A) : X ⊥ ⋃ Xs → ⊥ Xs → ⊥ (X :: Xs).
@@ -782,8 +804,10 @@ Section disjoint_list.
 End disjoint_list.
 
 Class Filter A B := filter: ∀ (P : A → Prop) `{∀ x, Decision (P x)}, B → B.
+Hint Mode Filter - ! : typeclass_instances.
 
 Class UpClose A B := up_close : A → B.
+Hint Mode UpClose - ! : typeclass_instances.
 Notation "↑ x" := (up_close x) (at level 20, format "↑ x").
 
 (** * Monadic operations *)
@@ -850,6 +874,7 @@ Notation "'guard' P 'as' H ; o" := (mguard P (λ H, o))
 on maps. In the file [fin_maps] we will axiomatize finite maps.
 The function look up [m !! k] should yield the element at key [k] in [m]. *)
 Class Lookup (K A M : Type) := lookup: K → M → option A.
+Hint Mode Lookup - - ! : typeclass_instances.
 Instance: Params (@lookup) 4.
 Notation "m !! i" := (lookup i m) (at level 20) : C_scope.
 Notation "(!!)" := lookup (only parsing) : C_scope.
@@ -859,12 +884,14 @@ Arguments lookup _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The singleton map *)
 Class SingletonM K A M := singletonM: K → A → M.
+Hint Mode SingletonM - - ! : typeclass_instances.
 Instance: Params (@singletonM) 5.
 Notation "{[ k := a ]}" := (singletonM k a) (at level 1) : C_scope.
 
 (** The function insert [<[k:=a]>m] should update the element at key [k] with
 value [a] in [m]. *)
 Class Insert (K A M : Type) := insert: K → A → M → M.
+Hint Mode Insert - - ! : typeclass_instances.
 Instance: Params (@insert) 5.
 Notation "<[ k := a ]>" := (insert k a)
   (at level 5, right associativity, format "<[ k := a ]>") : C_scope.
@@ -874,12 +901,14 @@ Arguments insert _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 [m]. If the key [k] is not a member of [m], the original map should be
 returned. *)
 Class Delete (K M : Type) := delete: K → M → M.
+Hint Mode Delete - ! : typeclass_instances.
 Instance: Params (@delete) 4.
 Arguments delete _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The function [alter f k m] should update the value at key [k] using the
 function [f], which is called with the original value. *)
 Class Alter (K A M : Type) := alter: (A → A) → K → M → M.
+Hint Mode Alter - - ! : typeclass_instances.
 Instance: Params (@alter) 5.
 Arguments alter {_ _ _ _} _ !_ !_ / : simpl nomatch, assert.
 
@@ -889,12 +918,14 @@ if [k] is not a member of [m]. The value at [k] should be deleted if [f]
 yields [None]. *)
 Class PartialAlter (K A M : Type) :=
   partial_alter: (option A → option A) → K → M → M.
+Hint Mode PartialAlter - - ! : typeclass_instances.
 Instance: Params (@partial_alter) 4.
 Arguments partial_alter _ _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The function [dom C m] should yield the domain of [m]. That is a finite
 collection of type [C] that contains the keys that are a member of [m]. *)
 Class Dom (M C : Type) := dom: M → C.
+Hint Mode Dom ! ! : typeclass_instances.
 Instance: Params (@dom) 3.
 Arguments dom : clear implicits.
 Arguments dom {_} _ {_} !_ / : simpl nomatch, assert.
@@ -903,6 +934,7 @@ Arguments dom {_} _ {_} !_ / : simpl nomatch, assert.
 constructing a new map whose value at key [k] is [f (m1 !! k) (m2 !! k)].*)
 Class Merge (M : Type → Type) :=
   merge: ∀ {A B C}, (option A → option B → option C) → M A → M B → M C.
+Hint Mode Merge ! : typeclass_instances.
 Instance: Params (@merge) 4.
 Arguments merge _ _ _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
@@ -911,17 +943,20 @@ and [m2] using the function [f] to combine values of members that are in
 both [m1] and [m2]. *)
 Class UnionWith (A M : Type) :=
   union_with: (A → A → option A) → M → M → M.
+Hint Mode UnionWith - ! : typeclass_instances.
 Instance: Params (@union_with) 3.
 Arguments union_with {_ _ _} _ !_ !_ / : simpl nomatch, assert.
 
 (** Similarly for intersection and difference. *)
 Class IntersectionWith (A M : Type) :=
   intersection_with: (A → A → option A) → M → M → M.
+Hint Mode IntersectionWith - ! : typeclass_instances.
 Instance: Params (@intersection_with) 3.
 Arguments intersection_with {_ _ _} _ !_ !_ / : simpl nomatch, assert.
 
 Class DifferenceWith (A M : Type) :=
   difference_with: (A → A → option A) → M → M → M.
+Hint Mode DifferenceWith - ! : typeclass_instances.
 Instance: Params (@difference_with) 3.
 Arguments difference_with {_ _ _} _ !_ !_ / : simpl nomatch, assert.
 
@@ -930,6 +965,7 @@ Definition intersection_with_list `{IntersectionWith A M}
 Arguments intersection_with_list _ _ _ _ _ !_ / : assert.
 
 Class LookupE (E K A M : Type) := lookupE: E → K → M → option A.
+Hint Mode LookupE - - - ! : typeclass_instances.
 Instance: Params (@lookupE) 6.
 Notation "m !!{ Γ } i" := (lookupE Γ i m)
   (at level 20, format "m  !!{ Γ }  i") : C_scope.
@@ -937,6 +973,7 @@ Notation "(!!{ Γ } )" := (lookupE Γ) (only parsing, Γ at level 1) : C_scope.
 Arguments lookupE _ _ _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 Class InsertE (E K A M : Type) := insertE: E → K → A → M → M.
+Hint Mode InsertE - - - ! : typeclass_instances.
 Instance: Params (@insertE) 6.
 Notation "<[ k := a ]{ Γ }>" := (insertE Γ k a)
   (at level 5, right associativity, format "<[ k := a ]{ Γ }>") : C_scope.
@@ -963,6 +1000,7 @@ Class Collection A C `{ElemOf A C, Empty C, Singleton A C,
 enumerated as a list. These elements, given by the [elements] function, may be
 in any order and should not contain duplicates. *)
 Class Elements A C := elements: C → list A.
+Hint Mode Elements - ! : typeclass_instances.
 Instance: Params (@elements) 3.
 
 (** We redefine the standard library's [In] and [NoDup] using type classes. *)
@@ -998,6 +1036,7 @@ Class FinCollection A C `{ElemOf A C, Empty C, Singleton A C, Union C,
   NoDup_elements X : NoDup (elements X)
 }.
 Class Size C := size: C → nat.
+Hint Mode Size ! : typeclass_instances.
 Arguments size {_ _} !_ / : simpl nomatch, assert.
 Instance: Params (@size) 2.
 
@@ -1025,6 +1064,7 @@ Class CollectionMonad M `{∀ A, ElemOf A (M A),
 will later prove that [fresh] is [Proper] with respect to the induced setoid
 equality on collections. *)
 Class Fresh A C := fresh: C → A.
+Hint Mode Fresh - ! : typeclass_instances.
 Instance: Params (@fresh) 3.
 Class FreshSpec A C `{ElemOf A C,
     Empty C, Singleton A C, Union C, Fresh A C} : Prop := {
@@ -1035,5 +1075,6 @@ Class FreshSpec A C `{ElemOf A C,
 
 (** * Miscellaneous *)
 Class Half A := half: A → A.
+Hint Mode Half ! : typeclass_instances.
 Notation "½" := half : C_scope.
 Notation "½*" := (fmap (M:=list) half) : C_scope.

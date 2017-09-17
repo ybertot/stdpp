@@ -12,14 +12,14 @@ Arguments Listset {_} _ : assert.
 Section listset.
 Context {A : Type}.
 
-Instance listset_elem_of: ElemOf A (listset A) := λ x l, x ∈ listset_car l.
-Instance listset_empty: Empty (listset A) := Listset [].
-Instance listset_singleton: Singleton A (listset A) := λ x, Listset [x].
-Instance listset_union: Union (listset A) := λ l k,
+Global Instance listset_elem_of: ElemOf A (listset A) := λ x l, x ∈ listset_car l.
+Global Instance listset_empty: Empty (listset A) := Listset [].
+Global Instance listset_singleton: Singleton A (listset A) := λ x, Listset [x].
+Global Instance listset_union: Union (listset A) := λ l k,
   let (l') := l in let (k') := k in Listset (l' ++ k').
 Global Opaque listset_singleton listset_empty.
 
-Global Instance: SimpleCollection A (listset A).
+Global Instance listset_simple_collection : SimpleCollection A (listset A).
 Proof.
   split.
   - by apply not_elem_of_nil.
@@ -40,20 +40,21 @@ Defined.
 
 Context `{!EqDecision A}.
 
-Instance listset_intersection: Intersection (listset A) := λ l k,
+Global Instance listset_intersection: Intersection (listset A) := λ l k,
   let (l') := l in let (k') := k in Listset (list_intersection l' k').
-Instance listset_difference: Difference (listset A) := λ l k,
+Global Instance listset_difference: Difference (listset A) := λ l k,
   let (l') := l in let (k') := k in Listset (list_difference l' k').
 
-Instance: Collection A (listset A).
+Instance listset_collection: Collection A (listset A).
 Proof.
   split.
   - apply _.
   - intros [?] [?]. apply elem_of_list_intersection.
   - intros [?] [?]. apply elem_of_list_difference.
 Qed.
-Instance listset_elems: Elements A (listset A) := remove_dups ∘ listset_car.
-Global Instance: FinCollection A (listset A).
+Global Instance listset_elements: Elements A (listset A) :=
+  remove_dups ∘ listset_car.
+Global Instance listset_fin_collection : FinCollection A (listset A).
 Proof.
   split.
   - apply _.
@@ -62,23 +63,6 @@ Proof.
 Qed.
 End listset.
 
-(** These instances are declared using [Hint Extern] to avoid too
-eager type class search. *)
-Hint Extern 1 (ElemOf _ (listset _)) =>
-  eapply @listset_elem_of : typeclass_instances.
-Hint Extern 1 (Empty (listset _)) =>
-  eapply @listset_empty : typeclass_instances.
-Hint Extern 1 (Singleton _ (listset _)) =>
-  eapply @listset_singleton : typeclass_instances.
-Hint Extern 1 (Union (listset _)) =>
-  eapply @listset_union : typeclass_instances.
-Hint Extern 1 (Intersection (listset _)) =>
-  eapply @listset_intersection : typeclass_instances.
-Hint Extern 1 (Difference (listset _)) =>
-  eapply @listset_difference : typeclass_instances.
-Hint Extern 1 (Elements _ (listset _)) =>
-  eapply @listset_elems : typeclass_instances.
-
 Instance listset_ret: MRet listset := λ A x, {[ x ]}.
 Instance listset_fmap: FMap listset := λ A B f l,
   let (l') := l in Listset (f <$> l').
@@ -86,7 +70,7 @@ Instance listset_bind: MBind listset := λ A B f l,
   let (l') := l in Listset (mbind (listset_car ∘ f) l').
 Instance listset_join: MJoin listset := λ A, mbind id.
 
-Instance: CollectionMonad listset.
+Instance listset_collection_monad : CollectionMonad listset.
 Proof.
   split.
   - intros. apply _.

@@ -63,14 +63,14 @@ Proof.
   intros y; rewrite elem_of_elements, elem_of_union, elem_of_singleton.
   by rewrite elem_of_cons, elem_of_elements.
 Qed.
-Lemma elements_singleton x : elements {[ x ]} = [x].
+Lemma elements_singleton x : elements ({[ x ]} : C) = [x].
 Proof.
   apply Permutation_singleton. by rewrite <-(right_id ∅ (∪) {[x]}),
     elements_union_singleton, elements_empty by set_solver.
 Qed.
 Lemma elements_submseteq X Y : X ⊆ Y → elements X ⊆+ elements Y.
 Proof.
-  intros; apply NoDup_submseteq; auto using NoDup_elements.
+  intros; apply NoDup_submseteq; eauto using NoDup_elements.
   intros x. rewrite !elem_of_elements; auto.
 Qed.
 
@@ -106,7 +106,7 @@ Proof.
   contradict Hsz. rewrite HX, size_empty; lia.
 Qed.
 
-Lemma size_singleton (x : A) : size {[ x ]} = 1.
+Lemma size_singleton (x : A) : size ({[ x ]} : C) = 1.
 Proof. unfold size, collection_size. simpl. by rewrite elements_singleton. Qed.
 Lemma size_singleton_inv X x y : size X = 1 → x ∈ X → y ∈ X → x = y.
 Proof.
@@ -200,9 +200,9 @@ Proof.
   { destruct IH as (x' & Hx' & Hmin); [set_solver|].
     destruct (decide (R x x')).
     - exists x; split; [set_solver|].
-      eauto using union_minimal, singleton_minimal, minimal_weaken.
+      eauto using (union_minimal (C:=C)), (singleton_minimal (C:=C)), minimal_weaken.
     - exists x'; split; [set_solver|].
-      auto using union_minimal, singleton_minimal_not_above. }
+      eauto using (union_minimal (C:=C)), (singleton_minimal_not_above (C:=C)). }
   exists x; split; [set_solver|].
   rewrite HX, (right_id _ (∪)). apply singleton_minimal.
 Qed.

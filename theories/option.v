@@ -207,7 +207,7 @@ Proof. by destruct mx. Qed.
 Lemma option_fmap_ext {A B} (f g : A → B) mx :
   (∀ x, f x = g x) → f <$> mx = g <$> mx.
 Proof. intros; destruct mx; f_equal/=; auto. Qed.
-Lemma option_fmap_equiv_ext `{Equiv A, Equiv B} (f g : A → B) mx :
+Lemma option_fmap_equiv_ext `{Equiv A, Equiv B} (f g : A → B) (mx : option A) :
   (∀ x, f x ≡ g x) → f <$> mx ≡ g <$> mx.
 Proof. destruct mx; constructor; auto. Qed.
 Lemma option_fmap_bind {A B C} (f : A → B) (g : B → option C) mx :
@@ -306,13 +306,15 @@ Section union_intersection_difference.
   Proof. by intros [?|]. Qed.
   Global Instance union_with_right_id : RightId (=) None (union_with f).
   Proof. by intros [?|]. Qed.
-  Global Instance union_with_comm : Comm (=) f → Comm (=) (union_with f).
+  Global Instance union_with_comm :
+    Comm (=) f → Comm (=) (union_with (M:=option A) f).
   Proof. by intros ? [?|] [?|]; compute; rewrite 1?(comm f). Qed.
   Global Instance intersection_with_left_ab : LeftAbsorb (=) None (intersection_with f).
   Proof. by intros [?|]. Qed.
   Global Instance intersection_with_right_ab : RightAbsorb (=) None (intersection_with f).
   Proof. by intros [?|]. Qed.
-  Global Instance difference_with_comm : Comm (=) f → Comm (=) (intersection_with f).
+  Global Instance difference_with_comm :
+    Comm (=) f → Comm (=) (intersection_with (M:=option A) f).
   Proof. by intros ? [?|] [?|]; compute; rewrite 1?(comm f). Qed.
   Global Instance difference_with_right_id : RightId (=) None (difference_with f).
   Proof. by intros [?|]. Qed.

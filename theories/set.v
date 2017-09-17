@@ -24,7 +24,7 @@ Instance set_difference {A} : Difference (set A) := λ X1 X2,
 Instance set_collection : Collection A (set A).
 Proof. split; [split | |]; by repeat intro. Qed.
 
-Lemma elem_of_top {A} (x : A) : x ∈ ⊤ ↔ True.
+Lemma elem_of_top {A} (x : A) : x ∈ (⊤ : set A) ↔ True.
 Proof. done. Qed.
 Lemma elem_of_mkSet {A} (P : A → Prop) x : x ∈ {[ x | P x ]} ↔ P x.
 Proof. done. Qed.
@@ -40,7 +40,7 @@ Instance set_bind : MBind set := λ A B (f : A → set B) (X : set A),
 Instance set_fmap : FMap set := λ A B (f : A → B) (X : set A),
   {[ b | ∃ a, b = f a ∧ a ∈ X ]}.
 Instance set_join : MJoin set := λ A (XX : set (set A)),
-  {[ a | ∃ X, a ∈ X ∧ X ∈ XX ]}.
+  {[ a | ∃ X : set A, a ∈ X ∧ X ∈ XX ]}.
 Instance set_collection_monad : CollectionMonad set.
 Proof. by split; try apply _. Qed.
 

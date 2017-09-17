@@ -145,9 +145,9 @@ Section set_unfold_simple.
   Implicit Types x y : A.
   Implicit Types X Y : C.
 
-  Global Instance set_unfold_empty x : SetUnfold (x ∈ ∅) False.
+  Global Instance set_unfold_empty x : SetUnfold (x ∈ (∅ : C)) False.
   Proof. constructor. split. apply not_elem_of_empty. done. Qed.
-  Global Instance set_unfold_singleton x y : SetUnfold (x ∈ {[ y ]}) (x = y).
+  Global Instance set_unfold_singleton x y : SetUnfold (x ∈ ({[ y ]} : C)) (x = y).
   Proof. constructor; apply elem_of_singleton. Qed.
   Global Instance set_unfold_union x X Y P Q :
     SetUnfold (x ∈ X) P → SetUnfold (x ∈ Y) Q → SetUnfold (x ∈ X ∪ Y) (P ∨ Q).
@@ -161,30 +161,30 @@ Section set_unfold_simple.
     (∀ x, SetUnfold (x ∈ X) (P x)) → SetUnfold (∅ ≡ X) (∀ x, ¬P x) | 5.
   Proof.
     intros ?; constructor. unfold equiv, collection_equiv.
-    pose proof not_elem_of_empty; naive_solver.
+    pose proof (not_elem_of_empty (C:=C)); naive_solver.
   Qed.
-  Global Instance set_unfold_equiv_empty_r (P : A → Prop) :
+  Global Instance set_unfold_equiv_empty_r (P : A → Prop) X :
     (∀ x, SetUnfold (x ∈ X) (P x)) → SetUnfold (X ≡ ∅) (∀ x, ¬P x) | 5.
   Proof.
     intros ?; constructor. unfold equiv, collection_equiv.
-    pose proof not_elem_of_empty; naive_solver.
+    pose proof (not_elem_of_empty (C:=C)); naive_solver.
   Qed.
-  Global Instance set_unfold_equiv (P Q : A → Prop) :
+  Global Instance set_unfold_equiv (P Q : A → Prop) X :
     (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
     SetUnfold (X ≡ Y) (∀ x, P x ↔ Q x) | 10.
   Proof. constructor. apply forall_proper; naive_solver. Qed.
-  Global Instance set_unfold_subseteq (P Q : A → Prop) :
+  Global Instance set_unfold_subseteq (P Q : A → Prop) X Y :
     (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
     SetUnfold (X ⊆ Y) (∀ x, P x → Q x).
   Proof. constructor. apply forall_proper; naive_solver. Qed.
-  Global Instance set_unfold_subset (P Q : A → Prop) :
+  Global Instance set_unfold_subset (P Q : A → Prop) X :
     (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
     SetUnfold (X ⊂ Y) ((∀ x, P x → Q x) ∧ ¬∀ x, Q x → P x).
   Proof.
     constructor. unfold strict.
     repeat f_equiv; apply forall_proper; naive_solver.
   Qed.
-  Global Instance set_unfold_disjoint (P Q : A → Prop) :
+  Global Instance set_unfold_disjoint (P Q : A → Prop) X Y :
     (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
     SetUnfold (X ⊥ Y) (∀ x, P x → Q x → False).
   Proof. constructor. unfold disjoint, collection_disjoint. naive_solver. Qed.
@@ -195,10 +195,10 @@ Section set_unfold_simple.
   Global Instance set_unfold_equiv_empty_l_L X (P : A → Prop) :
     (∀ x, SetUnfold (x ∈ X) (P x)) → SetUnfold (∅ = X) (∀ x, ¬P x) | 5.
   Proof. constructor. unfold_leibniz. by apply set_unfold_equiv_empty_l. Qed.
-  Global Instance set_unfold_equiv_empty_r_L (P : A → Prop) :
+  Global Instance set_unfold_equiv_empty_r_L (P : A → Prop) X :
     (∀ x, SetUnfold (x ∈ X) (P x)) → SetUnfold (X = ∅) (∀ x, ¬P x) | 5.
   Proof. constructor. unfold_leibniz. by apply set_unfold_equiv_empty_r. Qed.
-  Global Instance set_unfold_equiv_L (P Q : A → Prop) :
+  Global Instance set_unfold_equiv_L (P Q : A → Prop) X Y :
     (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
     SetUnfold (X = Y) (∀ x, P x ↔ Q x) | 10.
   Proof. constructor. unfold_leibniz. by apply set_unfold_equiv. Qed.
@@ -224,20 +224,20 @@ Section set_unfold.
 End set_unfold.
 
 Section set_unfold_monad.
-  Context `{CollectionMonad M} {A : Type}.
-  Implicit Types x y : A.
+  Context `{CollectionMonad M}.
 
-  Global Instance set_unfold_ret x y : SetUnfold (x ∈ mret y) (x = y).
+  Global Instance set_unfold_ret {A} (x y : A) :
+    SetUnfold (x ∈ mret (M:=M) y) (x = y).
   Proof. constructor; apply elem_of_ret. Qed.
-  Global Instance set_unfold_bind {B} (f : A → M B) X (P Q : A → Prop) :
+  Global Instance set_unfold_bind {A B} (f : A → M B) X (P Q : A → Prop) :
     (∀ y, SetUnfold (y ∈ X) (P y)) → (∀ y, SetUnfold (x ∈ f y) (Q y)) →
     SetUnfold (x ∈ X ≫= f) (∃ y, Q y ∧ P y).
   Proof. constructor. rewrite elem_of_bind; naive_solver. Qed.
-  Global Instance set_unfold_fmap {B} (f : A → B) X (P : A → Prop) :
+  Global Instance set_unfold_fmap {A B} (f : A → B) (X : M A) (P : A → Prop) :
     (∀ y, SetUnfold (y ∈ X) (P y)) →
     SetUnfold (x ∈ f <$> X) (∃ y, x = f y ∧ P y).
   Proof. constructor. rewrite elem_of_fmap; naive_solver. Qed.
-  Global Instance set_unfold_join (X : M (M A)) (P : M A → Prop) :
+  Global Instance set_unfold_join {A} (X : M (M A)) (P : M A → Prop) :
     (∀ Y, SetUnfold (Y ∈ X) (P Y)) → SetUnfold (x ∈ mjoin X) (∃ Y, x ∈ Y ∧ P Y).
   Proof. constructor. rewrite elem_of_join; naive_solver. Qed.
 End set_unfold_monad.
@@ -381,7 +381,7 @@ Section simple_collection.
   Proof. set_solver. Qed.
   Lemma elem_of_equiv_empty X : X ≡ ∅ ↔ ∀ x, x ∉ X.
   Proof. set_solver. Qed.
-  Lemma elem_of_empty x : x ∈ ∅ ↔ False.
+  Lemma elem_of_empty x : x ∈ (∅ : C) ↔ False.
   Proof. set_solver. Qed.
   Lemma equiv_empty X : X ⊆ ∅ → X ≡ ∅.
   Proof. set_solver. Qed.
@@ -393,15 +393,15 @@ Section simple_collection.
   Proof. set_solver. Qed.
 
   (** Singleton *)
-  Lemma elem_of_singleton_1 x y : x ∈ {[y]} → x = y.
+  Lemma elem_of_singleton_1 x y : x ∈ ({[y]} : C) → x = y.
   Proof. by rewrite elem_of_singleton. Qed.
-  Lemma elem_of_singleton_2 x y : x = y → x ∈ {[y]}.
+  Lemma elem_of_singleton_2 x y : x = y → x ∈ ({[y]} : C).
   Proof. by rewrite elem_of_singleton. Qed.
   Lemma elem_of_subseteq_singleton x X : x ∈ X ↔ {[ x ]} ⊆ X.
   Proof. set_solver. Qed.
   Lemma non_empty_singleton x : ({[ x ]} : C) ≢ ∅.
   Proof. set_solver. Qed.
-  Lemma not_elem_of_singleton x y : x ∉ {[ y ]} ↔ x ≠ y.
+  Lemma not_elem_of_singleton x y : x ∉ ({[ y ]} : C) ↔ x ≠ y.
   Proof. by rewrite elem_of_singleton. Qed.
 
   (** Disjointness *)
@@ -512,7 +512,7 @@ Section simple_collection.
     Proof. unfold_leibniz. apply non_empty_inhabited. Qed.
 
     (** Singleton *)
-    Lemma non_empty_singleton_L x : {[ x ]} ≠ ∅.
+    Lemma non_empty_singleton_L x : {[ x ]} ≠ (∅ : C).
     Proof. unfold_leibniz. apply non_empty_singleton. Qed.
 
     (** Big unions *)
@@ -554,6 +554,7 @@ End simple_collection.
 (** * Collections with [∪], [∩], [∖], [∅] and [{[_]}] *)
 Section collection.
   Context `{Collection A C}.
+  Implicit Types x y : A.
   Implicit Types X Y : C.
 
   (** Intersection *)
@@ -654,7 +655,7 @@ Section collection.
     Global Instance intersection_empty_r_L: RightAbsorb ((=) : relation C) ∅ (∩).
     Proof. intros ?. unfold_leibniz. apply (right_absorb _ _). Qed.
 
-    Lemma intersection_singletons_L x : {[x]} ∩ {[x]} = {[x]}.
+    Lemma intersection_singletons_L x : {[x]} ∩ {[x]} = ({[x]} : C).
     Proof. unfold_leibniz. apply intersection_singletons. Qed.
 
     Lemma union_intersection_l_L X Y Z : X ∪ (Y ∩ Z) = (X ∪ Y) ∩ (X ∪ Z).
@@ -719,7 +720,7 @@ Section collection.
       {[x]} ∪ (X ∖ Y) ≡ ({[x]} ∪ X) ∖ (Y ∖ {[x]}).
     Proof.
       intro y; split; intros Hy; [ set_solver | ].
-      destruct (decide (y ∈ {[x]})); set_solver.
+      destruct (decide (y ∈ ({[x]} : C))); set_solver.
     Qed.
 
     Context `{!LeibnizEquiv C}.
@@ -736,7 +737,6 @@ Section collection.
     Lemma singleton_union_difference_L X Y x :
       {[x]} ∪ (X ∖ Y) = ({[x]} ∪ X) ∖ (Y ∖ {[x]}).
     Proof. unfold_leibniz. apply singleton_union_difference. Qed.
-
   End dec.
 End collection.
 
@@ -751,26 +751,26 @@ Section of_option_list.
   Context `{SimpleCollection A C}.
   Implicit Types l : list A.
 
-  Lemma elem_of_of_option (x : A) mx: x ∈ of_option mx ↔ mx = Some x.
+  Lemma elem_of_of_option (x : A) mx: x ∈ of_option (C:=C) mx ↔ mx = Some x.
   Proof. destruct mx; set_solver. Qed.
-  Lemma not_elem_of_of_option (x : A) mx: x ∉ of_option mx ↔ mx ≠ Some x.
+  Lemma not_elem_of_of_option (x : A) mx: x ∉ of_option (C:=C) mx ↔ mx ≠ Some x.
   Proof. by rewrite elem_of_of_option. Qed.
 
-  Lemma elem_of_of_list (x : A) l : x ∈ of_list l ↔ x ∈ l.
+  Lemma elem_of_of_list (x : A) l : x ∈ of_list (C:=C) l ↔ x ∈ l.
   Proof.
     split.
     - induction l; simpl; [by rewrite elem_of_empty|].
       rewrite elem_of_union,elem_of_singleton; intros [->|?]; constructor; auto.
     - induction 1; simpl; rewrite elem_of_union, elem_of_singleton; auto.
   Qed.
-  Lemma not_elem_of_of_list (x : A) l : x ∉ of_list l ↔ x ∉ l.
+  Lemma not_elem_of_of_list (x : A) l : x ∉ of_list (C:=C) l ↔ x ∉ l.
   Proof. by rewrite elem_of_of_list. Qed.
 
   Global Instance set_unfold_of_option (mx : option A) x :
-    SetUnfold (x ∈ of_option mx) (mx = Some x).
+    SetUnfold (x ∈ of_option (C:=C) mx) (mx = Some x).
   Proof. constructor; apply elem_of_of_option. Qed.
   Global Instance set_unfold_of_list (l : list A) x P :
-    SetUnfold (x ∈ l) P → SetUnfold (x ∈ of_list l) P.
+    SetUnfold (x ∈ l) P → SetUnfold (x ∈ of_list (C:=C) l) P.
   Proof. constructor. by rewrite elem_of_of_list, (set_unfold (x ∈ l) P). Qed.
 
   Lemma of_list_nil : of_list (C:=C) [] = ∅.
@@ -810,7 +810,7 @@ Section collection_monad_base.
     rewrite !elem_of_equiv_empty; setoid_rewrite elem_of_guard.
     destruct (decide P); naive_solver.
   Qed.
-  Global Instance set_unfold_guard `{Decision P} {A} (x : A) X Q :
+  Global Instance set_unfold_guard `{Decision P} {A} (x : A) (X : M A) Q :
     SetUnfold (x ∈ X) Q → SetUnfold (x ∈ guard P; X) (P ∧ Q).
   Proof. constructor. by rewrite elem_of_guard, (set_unfold (x ∈ X) Q). Qed.
   Lemma bind_empty {A B} (f : A → M B) X :
@@ -824,11 +824,12 @@ Definition set_Forall `{ElemOf A C} (P : A → Prop) (X : C) := ∀ x, x ∈ X �
 Definition set_Exists `{ElemOf A C} (P : A → Prop) (X : C) := ∃ x, x ∈ X ∧ P x.
 
 Section quantifiers.
-  Context `{SimpleCollection A B} (P : A → Prop).
+  Context `{SimpleCollection A C} (P : A → Prop).
+  Implicit Types X Y : C.
 
-  Lemma set_Forall_empty : set_Forall P ∅.
+  Lemma set_Forall_empty : set_Forall P (∅ : C).
   Proof. unfold set_Forall. set_solver. Qed.
-  Lemma set_Forall_singleton x : set_Forall P {[ x ]} ↔ P x.
+  Lemma set_Forall_singleton x : set_Forall P ({[ x ]} : C) ↔ P x.
   Proof. unfold set_Forall. set_solver. Qed.
   Lemma set_Forall_union X Y :
     set_Forall P X → set_Forall P Y → set_Forall P (X ∪ Y).
@@ -838,9 +839,9 @@ Section quantifiers.
   Lemma set_Forall_union_inv_2 X Y : set_Forall P (X ∪ Y) → set_Forall P Y.
   Proof. unfold set_Forall. set_solver. Qed.
 
-  Lemma set_Exists_empty : ¬set_Exists P ∅.
+  Lemma set_Exists_empty : ¬set_Exists P (∅ : C).
   Proof. unfold set_Exists. set_solver. Qed.
-  Lemma set_Exists_singleton x : set_Exists P {[ x ]} ↔ P x.
+  Lemma set_Exists_singleton x : set_Exists P ({[ x ]} : C) ↔ P x.
   Proof. unfold set_Exists. set_solver. Qed.
   Lemma set_Exists_union_1 X Y : set_Exists P X → set_Exists P (X ∪ Y).
   Proof. unfold set_Exists. set_solver. Qed.
@@ -852,7 +853,8 @@ Section quantifiers.
 End quantifiers.
 
 Section more_quantifiers.
-  Context `{SimpleCollection A B}.
+  Context `{SimpleCollection A C}.
+  Implicit Types X : C.
 
   Lemma set_Forall_impl (P Q : A → Prop) X :
     set_Forall P X → (∀ x, P x → Q x) → set_Forall Q X.
@@ -987,15 +989,17 @@ End collection_monad.
 Definition set_finite `{ElemOf A B} (X : B) := ∃ l : list A, ∀ x, x ∈ X → x ∈ l.
 
 Section finite.
-  Context `{SimpleCollection A B}.
+  Context `{SimpleCollection A C}.
+  Implicit Types X Y : C.
+
   Global Instance set_finite_subseteq :
-     Proper (flip (⊆) ==> impl) (@set_finite A B _).
+    Proper (flip (⊆) ==> impl) (@set_finite A C _).
   Proof. intros X Y HX [l Hl]; exists l; set_solver. Qed.
-  Global Instance set_finite_proper : Proper ((≡) ==> iff) (@set_finite A B _).
+  Global Instance set_finite_proper : Proper ((≡) ==> iff) (@set_finite A C _).
   Proof. intros X Y HX; apply exist_proper. by setoid_rewrite HX. Qed.
-  Lemma empty_finite : set_finite ∅.
+  Lemma empty_finite : set_finite (∅ : C).
   Proof. by exists []; intros ?; rewrite elem_of_empty. Qed.
-  Lemma singleton_finite (x : A) : set_finite {[ x ]}.
+  Lemma singleton_finite (x : A) : set_finite ({[ x ]} : C).
   Proof. exists [x]; intros y ->%elem_of_singleton; left. Qed.
   Lemma union_finite X Y : set_finite X → set_finite Y → set_finite (X ∪ Y).
   Proof.
@@ -1009,7 +1013,9 @@ Section finite.
 End finite.
 
 Section more_finite.
-  Context `{Collection A B}.
+  Context `{Collection A C}.
+  Implicit Types X Y : C.
+
   Lemma intersection_finite_l X Y : set_finite X → set_finite (X ∩ Y).
   Proof. intros [l ?]; exists l; intros x [??]%elem_of_intersection; auto. Qed.
   Lemma intersection_finite_r X Y : set_finite Y → set_finite (X ∩ Y).
@@ -1038,14 +1044,15 @@ Section seq_set.
   Implicit Types start len x : nat.
 
   Lemma elem_of_seq_set start len x :
-    x ∈ seq_set start len ↔ start ≤ x < start + len.
+    x ∈ seq_set (C:=C) start len ↔ start ≤ x < start + len.
   Proof.
     revert start. induction len as [|len IH]; intros start; simpl.
     - rewrite elem_of_empty. omega.
     - rewrite elem_of_union, elem_of_singleton, IH. omega.
   Qed.
 
-  Lemma seq_set_S_disjoint start len : {[ start + len ]} ⊥ seq_set start len.
+  Lemma seq_set_S_disjoint start len :
+    {[ start + len ]} ⊥ seq_set (C:=C) start len.
   Proof. intros x. rewrite elem_of_singleton, elem_of_seq_set. omega. Qed.
 
   Lemma seq_set_S_union start len :
@@ -1055,7 +1062,7 @@ Section seq_set.
   Qed.
 
   Lemma seq_set_S_union_L `{!LeibnizEquiv C} start len :
-    seq_set start (S len) = {[ start + len ]} ∪ seq_set start len.
+    seq_set start (C:=C) (S len) = {[ start + len ]} ∪ seq_set start len.
   Proof. unfold_leibniz. apply seq_set_S_union. Qed.
 End seq_set.
 
@@ -1067,6 +1074,7 @@ Typeclasses Opaque minimal.
 
 Section minimal.
   Context `{SimpleCollection A C} {R : relation A}.
+  Implicit Types X Y : C.
 
   Global Instance minimal_proper x : Proper (@equiv C _ ==> iff) (minimal R x).
   Proof. intros X X' y; unfold minimal; set_solver. Qed.
@@ -1085,11 +1093,11 @@ Section minimal.
     minimal R x X ↔ ∀ y, y ∈ X → ¬R y x.
   Proof. unfold minimal; split; [eauto using minimal_strict_1|naive_solver]. Qed.
 
-  Lemma empty_minimal x : minimal R x ∅.
+  Lemma empty_minimal x : minimal R x (∅ : C).
   Proof. unfold minimal; set_solver. Qed.
-  Lemma singleton_minimal x : minimal R x {[ x ]}.
+  Lemma singleton_minimal x : minimal R x ({[ x ]} : C).
   Proof. unfold minimal; set_solver. Qed.
-  Lemma singleton_minimal_not_above y x : ¬R y x → minimal R x {[ y ]}.
+  Lemma singleton_minimal_not_above y x : ¬R y x → minimal R x ({[ y ]} : C).
   Proof. unfold minimal; set_solver. Qed.
   Lemma union_minimal X Y x :
     minimal R x X → minimal R x Y → minimal R x (X ∪ Y).

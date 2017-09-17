@@ -25,27 +25,27 @@ Section definitions.
 
   Definition multiplicity (x : A) (X : gmultiset A) : nat :=
     match gmultiset_car X !! x with Some n => S n | None => 0 end.
-  Instance gmultiset_elem_of : ElemOf A (gmultiset A) := λ x X,
+  Global Instance gmultiset_elem_of : ElemOf A (gmultiset A) := λ x X,
     0 < multiplicity x X.
-  Instance gmultiset_subseteq : SubsetEq (gmultiset A) := λ X Y, ∀ x,
+  Global Instance gmultiset_subseteq : SubsetEq (gmultiset A) := λ X Y, ∀ x,
     multiplicity x X ≤ multiplicity x Y.
 
-  Instance gmultiset_elements : Elements A (gmultiset A) := λ X,
+  Global Instance gmultiset_elements : Elements A (gmultiset A) := λ X,
     let (X) := X in '(x,n) ← map_to_list X; replicate (S n) x.
-  Instance gmultiset_size : Size (gmultiset A) := length ∘ elements.
+  Global Instance gmultiset_size : Size (gmultiset A) := length ∘ elements.
 
-  Instance gmultiset_empty : Empty (gmultiset A) := GMultiSet ∅.
-  Instance gmultiset_singleton : Singleton A (gmultiset A) := λ x,
+  Global Instance gmultiset_empty : Empty (gmultiset A) := GMultiSet ∅.
+  Global Instance gmultiset_singleton : Singleton A (gmultiset A) := λ x,
     GMultiSet {[ x := 0 ]}.
-  Instance gmultiset_union : Union (gmultiset A) := λ X Y,
+  Global Instance gmultiset_union : Union (gmultiset A) := λ X Y,
     let (X) := X in let (Y) := Y in
     GMultiSet $ union_with (λ x y, Some (S (x + y))) X Y.
-  Instance gmultiset_difference : Difference (gmultiset A) := λ X Y,
+  Global Instance gmultiset_difference : Difference (gmultiset A) := λ X Y,
     let (X) := X in let (Y) := Y in
     GMultiSet $ difference_with (λ x y,
       let z := x - y in guard (0 < z); Some (pred z)) X Y.
 
-  Instance gmultiset_dom : Dom (gmultiset A) (gset A) := λ X,
+  Global Instance gmultiset_dom : Dom (gmultiset A) (gset A) := λ X,
     let (X) := X in dom _ X.
 End definitions.
 
@@ -53,27 +53,6 @@ Typeclasses Opaque gmultiset_elem_of gmultiset_subseteq.
 Typeclasses Opaque gmultiset_elements gmultiset_size gmultiset_empty.
 Typeclasses Opaque gmultiset_singleton gmultiset_union gmultiset_difference.
 Typeclasses Opaque gmultiset_dom.
-
-(** These instances are declared using [Hint Extern] to avoid too
-eager type class search. *)
-Hint Extern 1 (ElemOf _ (gmultiset _)) =>
-  eapply @gmultiset_elem_of : typeclass_instances.
-Hint Extern 1 (SubsetEq (gmultiset _)) =>
-  eapply @gmultiset_subseteq : typeclass_instances.
-Hint Extern 1 (Empty (gmultiset _)) =>
-  eapply @gmultiset_empty : typeclass_instances.
-Hint Extern 1 (Singleton _ (gmultiset _)) =>
-  eapply @gmultiset_singleton : typeclass_instances.
-Hint Extern 1 (Union (gmultiset _)) =>
-  eapply @gmultiset_union : typeclass_instances.
-Hint Extern 1 (Difference (gmultiset _)) =>
-  eapply @gmultiset_difference : typeclass_instances.
-Hint Extern 1 (Elements _ (gmultiset _)) =>
-  eapply @gmultiset_elements : typeclass_instances.
-Hint Extern 1 (Size (gmultiset _)) =>
-  eapply @gmultiset_size : typeclass_instances.
-Hint Extern 1 (Dom (gmultiset _) _) =>
-  eapply @gmultiset_dom : typeclass_instances.
 
 Section lemmas.
 Context `{Countable A}.
