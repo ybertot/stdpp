@@ -287,3 +287,58 @@ Next Obligation.
   intros [p Hp]. unfold mguard, option_guard; simpl.
   case_match; [|done]. f_equal. by apply Qp_eq.
 Qed.
+
+(** ** Generic trees *)
+Close Scope positive.
+
+Inductive gen_tree (T : Type) : Type :=
+  | GenLeaf : T → gen_tree T
+  | GenNode : nat → list (gen_tree T) → gen_tree T.
+Arguments GenLeaf {_} _ : assert.
+Arguments GenNode {_} _ _ : assert.
+
+Instance gen_tree_dec `{EqDecision T} : EqDecision (gen_tree T).
+Proof.
+ refine (
+  fix go t1 t2 :=
+  match t1, t2 with
+  | GenLeaf x1, GenLeaf x2 => cast_if (decide (x1 = x2))
+  | GenNode n1 ts1, GenNode n2 ts2 =>
+     cast_if_and (decide (n1 = n2)) (decide (ts1 = ts2))
+  | _, _ => right _
+  end); abstract congruence.
+Defined.
+
+Fixpoint gen_tree_to_list {T} (t : gen_tree T) : list (nat * nat + T) :=
+  match t with
+  | GenLeaf x => [inr x]
+  | GenNode n ts => (ts ≫= gen_tree_to_list) ++ [inl (length ts, n)]
+  end.
+
+Fixpoint gen_tree_of_list {T}
+    (k : list (gen_tree T)) (l : list (nat * nat + T)) : option (gen_tree T) :=
+  match l with
+  | [] => head k
+  | inr x :: l => gen_tree_of_list (GenLeaf x :: k) l
+  | inl (len,n) :: l =>
+     gen_tree_of_list (GenNode n (reverse (take len k)) :: drop len k) l
+  end.
+
+Lemma gen_tree_of_to_list {T} k l (t : gen_tree T) :
+  gen_tree_of_list k (gen_tree_to_list t ++ l) = gen_tree_of_list (t :: k) l.
+Proof.
+  revert t k l; fix 1; intros [|n ts] k l; simpl; auto.
+  trans (gen_tree_of_list (reverse ts ++ k) ([inl (length ts, n)] ++ l)).
+  - rewrite <-(assoc_L _). revert k. generalize ([inl (length ts, n)] ++ l).
+    induction ts as [|t ts'' IH]; intros k ts'''; csimpl; auto.
+    rewrite reverse_cons, <-!(assoc_L _), gen_tree_of_to_list; simpl; auto.
+  - simpl. by rewrite take_app_alt, drop_app_alt, reverse_involutive
+      by (by rewrite reverse_length).
+Qed.
+
+Program Instance gen_tree_countable `{Countable T} : Countable (gen_tree T) :=
+  inj_countable gen_tree_to_list (gen_tree_of_list []) _.
+Next Obligation.
+  intros T ?? t.
+  by rewrite <-(right_id_L [] _ (gen_tree_to_list _)), gen_tree_of_to_list.
+Qed.
