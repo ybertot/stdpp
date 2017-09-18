@@ -93,6 +93,18 @@ Section inj_countable.
   Next Obligation. intros y; simpl; rewrite decode_encode; eauto. Qed.
 End inj_countable.
 
+(** ** Unit *)
+Program Instance unit_countable : Countable unit :=
+  {| encode u := 1; decode p := Some () |}.
+Next Obligation. by intros []. Qed.
+
+(** ** Bool *)
+Program Instance bool_countable : Countable bool := {|
+  encode b := if b then 1 else 2;
+  decode p := Some match p return bool with 1 => true | _ => false end
+|}.
+Next Obligation. by intros []. Qed.
+
 (** ** Option *)
 Program Instance option_countable `{Countable A} : Countable (option A) := {|
   encode o := match o with None => 1 | Some x => Pos.succ (encode x) end;

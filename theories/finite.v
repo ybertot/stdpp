@@ -13,7 +13,8 @@ Arguments enum _ {_ _} : assert.
 Arguments NoDup_enum : clear implicits.
 Arguments NoDup_enum _ {_ _} : assert.
 Definition card A `{Finite A} := length (enum A).
-Program Instance finite_countable `{Finite A} : Countable A := {|
+
+Program Definition finite_countable `{Finite A} : Countable A := {|
   encode := λ x,
     Pos.of_nat $ S $ from_option id 0 $ fst <$> list_find (x =) (enum A);
   decode := λ p, enum A !! pred (Pos.to_nat p)
@@ -25,6 +26,8 @@ Next Obligation.
   rewrite Nat2Pos.id by done; simpl; rewrite Hi; simpl.
   destruct (list_find_Some (x =) xs i y); naive_solver.
 Qed.
+Hint Immediate finite_countable : typeclass_instances.
+
 Definition find `{Finite A} P `{∀ x, Decision (P x)} : option A :=
   list_find P (enum A) ≫= decode_nat ∘ fst.
 
