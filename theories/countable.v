@@ -93,6 +93,14 @@ Section inj_countable.
   Next Obligation. intros y; simpl; rewrite decode_encode; eauto. Qed.
 End inj_countable.
 
+Section inj_countable'.
+  Context `{Countable A, EqDecision B}.
+  Context (f : B → A) (g : A → B) (fg : ∀ x, g (f x) = x).
+
+  Program Instance inj_countable' : Countable B := inj_countable f (Some ∘ g) _.
+  Next Obligation. intros x. by f_equal/=. Qed.
+End inj_countable'.
+
 (** ** Unit *)
 Program Instance unit_countable : Countable unit :=
   {| encode u := 1; decode p := Some () |}.
