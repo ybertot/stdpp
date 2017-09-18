@@ -482,6 +482,11 @@ Definition curry3 {A B C D} (f : A → B → C → D) (p : A * B * C) : D :=
 Definition curry4 {A B C D E} (f : A → B → C → D → E) (p : A * B * C * D) : E :=
   let '(a,b,c,d) := p in f a b c d.
 
+Definition uncurry3 {A B C D} (f : A * B * C → D) (a : A) (b : B) (c : C) : D :=
+  f (a, b, c).
+Definition uncurry4 {A B C D E} (f : A * B * C * D → E)
+  (a : A) (b : B) (c : C) (d : D) : E := f (a, b, c, d).
+
 Definition prod_map {A A' B B'} (f: A → A') (g: B → B') (p : A * B) : A' * B' :=
   (f (p.1), g (p.2)).
 Arguments prod_map {_ _ _ _} _ _ !_ / : assert.
