@@ -1,6 +1,5 @@
 opam-version: "1.2"
 name: "coq-stdpp"
-version: "dev"
 maintainer: "Ralf Jung <jung@mpi-sws.org>"
 homepage: "https://gitlab.mpi-sws.org/robbertkrebbers/coq-stdpp"
 authors: "Robbert Krebbers, Jacques-Henri Jourdan, Ralf Jung"
