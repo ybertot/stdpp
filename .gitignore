@@ -12,3 +12,4 @@
 Makefile.coq*
 *.crashcoqide
 html/
+build-dep/

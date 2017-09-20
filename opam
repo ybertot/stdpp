@@ -7,9 +7,7 @@ authors: "Robbert Krebbers, Jacques-Henri Jourdan, Ralf Jung"
 bug-reports: "https://gitlab.mpi-sws.org/robbertkrebbers/coq-stdpp/issues"
 license: "BSD"
 dev-repo: "https://gitlab.mpi-sws.org/robbertkrebbers/coq-stdpp.git"
-build: [
-  [make "-j%{jobs}%"]
-]
+build: [make "-j%{jobs}%"]
 install: [make "install"]
 remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/stdpp'" ]
 depends: [
