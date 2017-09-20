@@ -6,10 +6,10 @@ function in a generic way, to allow more efficient implementations. *)
 From stdpp Require Export collections fin_maps.
 Set Default Proof Using "Type*".
 
-Class FinMapDom K M D `{FMap M,
+Class FinMapDom K M D `{∀ A, Dom (M A) D, FMap M,
     ∀ A, Lookup K A (M A), ∀ A, Empty (M A), ∀ A, PartialAlter K A (M A),
     OMap M, Merge M, ∀ A, FinMapToList K A (M A), EqDecision K,
-    ∀ A, Dom (M A) D, ElemOf K D, Empty D, Singleton K D,
+    ElemOf K D, Empty D, Singleton K D,
     Union D, Intersection D, Difference D} := {
   finmap_dom_map :>> FinMap K M;
   finmap_dom_collection :>> Collection K D;
