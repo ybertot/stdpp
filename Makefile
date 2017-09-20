@@ -29,7 +29,7 @@ build-dep: phony
 	@fgrep builddep build-dep/opam >/dev/null || (echo "sed failed to fix the package name" && exit 1) # sanity check
 	@# Reinstallation is needed in case the pin already exists, but the builddep package changed.
 	@BUILD_DEP_PACKAGE="$$(egrep "^name:" build-dep/opam | sed 's/^name: *"\(.*\)" */\1/')"; \
-	  opam pin add "$$BUILD_DEP_PACKAGE" "$$(pwd)/build-dep" -k path $(OPAMFLAGS) && \
+	  opam pin add "$$BUILD_DEP_PACKAGE".dev "$$(pwd)/build-dep" -k path $(OPAMFLAGS) && \
 	  opam reinstall "$$BUILD_DEP_PACKAGE"
 
 # Some files that do *not* need to be forwarded to Makefile.coq
