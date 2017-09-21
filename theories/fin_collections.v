@@ -23,9 +23,9 @@ Implicit Types X Y : C.
 Lemma fin_collection_finite X : set_finite X.
 Proof. by exists (elements X); intros; rewrite elem_of_elements. Qed.
 
-Instance elem_of_dec_slow (x : A) (X : C) : Decision (x ∈ X) | 100.
+Instance elem_of_dec_slow : RelDecision (@elem_of A C _) | 100.
 Proof.
-  refine (cast_if (decide_rel (∈) x (elements X)));
+  refine (λ x X, cast_if (decide_rel (∈) x (elements X)));
     by rewrite <-(elem_of_elements _).
 Defined.
 

@@ -311,13 +311,13 @@ Instance list_subseteq {A} : SubsetEq (list A) := λ l1 l2, ∀ x, x ∈ l1 → 
 
 Section list_set.
   Context `{dec : EqDecision A}.
-  Global Instance elem_of_list_dec (x : A) : ∀ l : list A, Decision (x ∈ l).
+  Global Instance elem_of_list_dec : RelDecision (@elem_of A (list A) _).
   Proof.
    refine (
-    fix go l :=
+    fix go x l :=
     match l return Decision (x ∈ l) with
     | [] => right _
-    | y :: l => cast_if_or (decide (x = y)) (go l)
+    | y :: l => cast_if_or (decide (x = y)) (go x l)
     end); clear go dec; subst; try (by constructor); abstract by inversion 1.
   Defined.
   Fixpoint remove_dups (l : list A) : list A :=
@@ -1505,9 +1505,9 @@ Proof.
   - intros ?. by eexists [].
   - intros ???[k1->] [k2->]. exists (k2 ++ k1). by rewrite (assoc_L (++)).
 Qed.
-Global Instance prefix_dec `{!EqDecision A} : ∀ l1 l2,
-    Decision (l1 `prefix_of` l2) := fix go l1 l2 :=
-  match l1, l2 return { l1 `prefix_of` l2 } + { ¬l1 `prefix_of` l2 } with
+Global Instance prefix_dec `{!EqDecision A} : RelDecision prefix :=
+  fix go l1 l2 :=
+  match l1, l2  with
   | [], _ => left (prefix_nil _)
   | _, [] => right (prefix_nil_not _ _)
   | x :: l1, y :: l2 =>
@@ -1639,10 +1639,9 @@ Lemma suffix_length l1 l2 : l1 `suffix_of` l2 → length l1 ≤ length l2.
 Proof. intros [? ->]. rewrite app_length. lia. Qed.
 Lemma suffix_cons_not x l : ¬x :: l `suffix_of` l.
 Proof. intros [??]. discriminate_list. Qed.
-Global Instance suffix_dec `{!EqDecision A} l1 l2 :
-  Decision (l1 `suffix_of` l2).
+Global Instance suffix_dec `{!EqDecision A} : RelDecision (@suffix A).
 Proof.
-  refine (cast_if (decide_rel prefix (reverse l1) (reverse l2)));
+  refine (λ l1 l2, cast_if (decide_rel prefix (reverse l1) (reverse l2)));
    abstract (by rewrite suffix_prefix_reverse).
 Defined.
 
@@ -2087,14 +2086,14 @@ Section submseteq_dec.
       destruct (list_remove x l2) as [k'|] eqn:?; intros; simplify_eq.
       rewrite submseteq_cons_l. eauto using list_remove_Some.
   Qed.
-  Global Instance submseteq_dec l1 l2 : Decision (l1 ⊆+ l2).
+  Global Instance submseteq_dec : RelDecision (submseteq : relation (list A)).
   Proof.
-   refine (cast_if (decide (is_Some (list_remove_list l1 l2))));
+   refine (λ l1 l2, cast_if (decide (is_Some (list_remove_list l1 l2))));
     abstract (rewrite list_remove_list_submseteq; tauto).
   Defined.
-  Global Instance Permutation_dec l1 l2 : Decision (l1 ≡ₚ l2).
+  Global Instance Permutation_dec : RelDecision (Permutation : relation (list A)).
   Proof.
-   refine (cast_if_and
+   refine (λ l1 l2, cast_if_and
     (decide (length l1 = length l2)) (decide (l1 ⊆+ l2)));
     abstract (rewrite Permutation_alt; tauto).
   Defined.
@@ -2621,7 +2620,7 @@ Section Forall2.
   Qed.
 
   Global Instance Forall2_dec `{dec : ∀ x y, Decision (P x y)} :
-    ∀ l k, Decision (Forall2 P l k).
+    RelDecision (Forall2 P).
   Proof.
    refine (
     fix go l k : Decision (Forall2 P l k) :=

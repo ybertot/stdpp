@@ -10,6 +10,7 @@ Class Countable A `{EqDecision A} := {
   decode : positive → option A;
   decode_encode x : decode (encode x) = Some x
 }.
+Hint Mode Countable ! - : typeclass_instances.
 Arguments encode : simpl never.
 Arguments decode : simpl never.
 
@@ -36,8 +37,8 @@ Section choice.
   Context `{Countable A} (P : A → Prop).
 
   Inductive choose_step: relation positive :=
-    | choose_step_None {p} : decode p = None → choose_step (Psucc p) p
-    | choose_step_Some {p x} :
+    | choose_step_None {p} : decode (A:=A) p = None → choose_step (Psucc p) p
+    | choose_step_Some {p} {x : A} :
        decode p = Some x → ¬P x → choose_step (Psucc p) p.
   Lemma choose_step_acc : (∃ x, P x) → Acc choose_step 1%positive.
   Proof.
@@ -320,7 +321,7 @@ Arguments GenNode {_} _ _ : assert.
 Instance gen_tree_dec `{EqDecision T} : EqDecision (gen_tree T).
 Proof.
  refine (
-  fix go t1 t2 :=
+  fix go t1 t2 := let _ : EqDecision _ := @go in
   match t1, t2 with
   | GenLeaf x1, GenLeaf x2 => cast_if (decide (x1 = x2))
   | GenNode n1 ts1, GenNode n2 ts2 =>

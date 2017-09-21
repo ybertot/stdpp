@@ -6,8 +6,6 @@ type class. *)
 From stdpp Require Export proof_irrel.
 Set Default Proof Using "Type*".
 
-Hint Extern 200 (Decision _) => progress (lazy beta) : typeclass_instances.
-
 Lemma dec_stable `{Decision P} : ¬¬P → P.
 Proof. firstorder. Qed.
 
@@ -15,17 +13,6 @@ Lemma Is_true_reflect (b : bool) : reflect b b.
 Proof. destruct b. left; constructor. right. intros []. Qed.
 Instance: Inj (=) (↔) Is_true.
 Proof. intros [] []; simpl; intuition. Qed.
-
-(** We introduce [decide_rel] to avoid inefficienct computation due to eager
-evaluation of propositions by [vm_compute]. This inefficiency occurs if
-[(x = y) := (f x = f y)] as [decide (x = y)] evaluates to [decide (f x = f y)]
-which then might lead to evaluation of [f x] and [f y]. Using [decide_rel]
-we hide [f] under a lambda abstraction to avoid this unnecessary evaluation. *)
-Definition decide_rel {A B} (R : A → B → Prop) {dec : ∀ x y, Decision (R x y)}
-  (x : A) (y : B) : Decision (R x y) := dec x y.
-Lemma decide_rel_correct {A B} (R : A → B → Prop) `{∀ x y, Decision (R x y)}
-  (x : A) (y : B) : decide_rel R x y = decide (R x y).
-Proof. reflexivity. Qed.
 
 Lemma decide_True {A} `{Decision P} (x y : A) :
   P → (if decide P then x else y) = x.
@@ -75,9 +62,10 @@ Ltac solve_trivial_decision :=
   | |- Decision (?P) => apply _
   | |- sumbool ?P (¬?P) => change (Decision P); apply _
   end.
-Ltac solve_decision := intros; first
-  [ solve_trivial_decision
-  | unfold Decision; decide equality; solve_trivial_decision ].
+Ltac solve_decision :=
+  unfold EqDecision; intros; first
+    [ solve_trivial_decision
+    | unfold Decision; decide equality; solve_trivial_decision ].
 
 (** The following combinators are useful to create Decision proofs in
 combination with the [refine] tactic. *)

@@ -150,13 +150,30 @@ Hint Extern 0 (_ ≡ _) => symmetry; assumption.
 (** * Type classes *)
 (** ** Decidable propositions *)
 (** This type class by (Spitters/van der Weegen, 2011) collects decidable
-propositions. For example to declare a parameter expressing decidable equality
-on a type [A] we write [`{∀ x y : A, Decision (x = y)}] and use it by writing
-[decide (x = y)]. *)
+propositions. *)
 Class Decision (P : Prop) := decide : {P} + {¬P}.
 Hint Mode Decision ! : typeclass_instances.
-Arguments decide _ {_} : assert.
-Notation EqDecision A := (∀ x y : A, Decision (x = y)).
+Arguments decide _ {_} : simpl never, assert.
+
+(** Although [RelDecision R] is just [∀ x y, Decision (R x y)], we make this
+an explicit class instead of a notation for two reasons:
+
+- It allows us to control [Hint Mode] more precisely. In particular, if it were
+  defined as a notation, the above [Hint Mode] for [Decision] would not prevent
+  diverging instance search when looking for [RelDecision (@eq ?A)], which would
+  result in it looking for [Decision (@eq ?A x y)], i.e. an instance where the
+  head position of [Decision] is not en evar.
+- We use it to avoid inefficient computation due to eager evaluation of
+  propositions by [vm_compute]. This inefficiency arises for example if
+  [(x = y) := (f x = f y)]. Since [decide (x = y)] evaluates to
+  [decide (f x = f y)], this would then lead to evaluation of [f x] and [f y].
+  Using the [RelDecision], the [f] is hidden under a lambda, which prevents
+  unnecessary evaluation. *)
+Class RelDecision {A B} (R : A → B → Prop) :=
+  decide_rel x y :> Decision (R x y).
+Hint Mode RelDecision ! ! ! : typeclass_instances.
+Arguments decide_rel {_ _} _ {_} _ _ : simpl never, assert.
+Notation EqDecision A := (RelDecision (@eq A)).
 
 (** ** Inhabited types *)
 (** This type class collects types that are inhabited. *)

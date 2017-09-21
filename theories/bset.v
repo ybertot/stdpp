@@ -29,7 +29,8 @@ Proof.
   - intros X Y x; unfold elem_of, bset_elem_of; simpl. 
     destruct (bset_car X x), (bset_car Y x); simpl; tauto.
 Qed.
-Instance bset_elem_of_dec {A} x (X : bset A) : Decision (x ∈ X) := _.
+Instance bset_elem_of_dec {A} : RelDecision (@elem_of _ (bset A) _).
+Proof. refine (λ x X, cast_if (decide (bset_car X x))); done. Defined.
 
 Typeclasses Opaque bset_elem_of.
 Global Opaque bset_empty bset_singleton bset_union

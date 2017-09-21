@@ -8,6 +8,7 @@ Class Finite A `{EqDecision A} := {
   NoDup_enum : NoDup enum;
   elem_of_enum x : x ∈ enum
 }.
+Hint Mode Finite ! - : typeclass_instances.
 Arguments enum : clear implicits.
 Arguments enum _ {_ _} : assert.
 Arguments NoDup_enum : clear implicits.

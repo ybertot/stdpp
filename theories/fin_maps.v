@@ -1238,10 +1238,9 @@ Proof.
     destruct (m1 !! i), (m2 !! i); simplify_eq/=; auto;
       by eapply bool_decide_unpack, Hm.
 Qed.
-Global Instance map_relation_dec `{∀ x y, Decision (R x y), ∀ x, Decision (P x),
-  ∀ y, Decision (Q y)} (m1 : M A) (m2 : M B) : Decision (map_relation R P Q m1 m2).
+Global Instance map_relation_dec : RelDecision (map_relation (M:=M) R P Q).
 Proof.
-  refine (cast_if (decide (map_Forall (λ _, Is_true) (merge f m1 m2))));
+  refine (λ m1 m2, cast_if (decide (map_Forall (λ _, Is_true) (merge f m1 m2))));
     abstract by rewrite map_relation_alt.
 Defined.
 (** Due to the finiteness of finite maps, we can extract a witness if the

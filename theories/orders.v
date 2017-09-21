@@ -41,15 +41,16 @@ Section orders.
     split; try apply _.
     eauto using strict_transitive_r, strict_include.
   Qed.
-  Global Instance preorder_subset_dec_slow `{∀ X Y, Decision (X ⊆ Y)}
-    (X Y : A) : Decision (X ⊂ Y) | 100 := _.
+  Global Instance preorder_subset_dec_slow `{!RelDecision R} :
+    RelDecision (strict R) | 100.
+  Proof. solve_decision. Defined.
   Lemma strict_spec_alt `{!AntiSymm (=) R} X Y : X ⊂ Y ↔ X ⊆ Y ∧ X ≠ Y.
   Proof.
     split.
     - intros [? HYX]. split. done. by intros <-.
     - intros [? HXY]. split. done. by contradict HXY; apply (anti_symm R).
   Qed.
-  Lemma po_eq_dec `{!PartialOrder R, ∀ X Y, Decision (X ⊆ Y)} : EqDecision A.
+  Lemma po_eq_dec `{!PartialOrder R, !RelDecision R} : EqDecision A.
   Proof.
     refine (λ X Y, cast_if_and (decide (X ⊆ Y)) (decide (Y ⊆ X)));
      abstract (rewrite anti_symm_iff; tauto).
@@ -76,8 +77,8 @@ Section strict_orders.
   Lemma strict_anti_symm `{!StrictOrder R} X Y :
     X ⊂ Y → Y ⊂ X → False.
   Proof. intros. apply (irreflexivity R X). by trans Y. Qed.
-  Global Instance trichotomyT_dec `{!TrichotomyT R, !StrictOrder R} X Y :
-      Decision (X ⊂ Y) :=
+  Global Instance trichotomyT_dec `{!TrichotomyT R, !StrictOrder R} :
+      RelDecision R := λ X Y,
     match trichotomyT R X Y with
     | inleft (left H) => left H
     | inleft (right H) => right (irreflexive_eq _ _ H)

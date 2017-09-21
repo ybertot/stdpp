@@ -36,8 +36,8 @@ Infix "`max`" := Nat.max (at level 35) : nat_scope.
 Infix "`min`" := Nat.min (at level 35) : nat_scope.
 
 Instance nat_eq_dec: EqDecision nat := eq_nat_dec.
-Instance nat_le_dec: ∀ x y : nat, Decision (x ≤ y) := le_dec.
-Instance nat_lt_dec: ∀ x y : nat, Decision (x < y) := lt_dec.
+Instance nat_le_dec: RelDecision le := le_dec.
+Instance nat_lt_dec: RelDecision lt := lt_dec.
 Instance nat_inhabited: Inhabited nat := populate 0%nat.
 Instance S_inj: Inj (=) (=) S.
 Proof. by injection 1. Qed.
@@ -77,9 +77,9 @@ Proof. intros. destruct (Nat_mul_split_l n x2 x1 y2 y1); auto with lia. Qed.
 Notation lcm := Nat.lcm.
 Notation divide := Nat.divide.
 Notation "( x | y )" := (divide x y) : nat_scope.
-Instance Nat_divide_dec x y : Decision (x | y).
+Instance Nat_divide_dec : RelDecision Nat.divide.
 Proof.
-  refine (cast_if (decide (lcm x y = y))); by rewrite Nat.divide_lcm_iff.
+  refine (λ x y, cast_if (decide (lcm x y = y))); by rewrite Nat.divide_lcm_iff.
 Defined.
 Instance: PartialOrder divide.
 Proof.
@@ -130,6 +130,10 @@ Arguments Pos.of_nat : simpl never.
 Arguments Pmult : simpl never.
 
 Instance positive_eq_dec: EqDecision positive := Pos.eq_dec.
+Instance positive_le_dec: RelDecision Pos.le.
+Proof. refine (λ x y, decide ((x ?= y) ≠ Gt)). Defined.
+Instance positive_lt_dec: RelDecision Pos.lt.
+Proof. refine (λ x y, decide ((x ?= y) = Lt)). Defined.
 Instance positive_inhabited: Inhabited positive := populate 1.
 
 Instance maybe_xO : Maybe xO := λ p, match p with p~0 => Some p | _ => None end.
@@ -218,10 +222,10 @@ Instance Npos_inj : Inj (=) (=) Npos.
 Proof. by injection 1. Qed.
 
 Instance N_eq_dec: EqDecision N := N.eq_dec.
-Program Instance N_le_dec (x y : N) : Decision (x ≤ y)%N :=
+Program Instance N_le_dec : RelDecision N.le := λ x y,
   match Ncompare x y with Gt => right _ | _ => left _ end.
 Solve Obligations with naive_solver.
-Program Instance N_lt_dec (x y : N) : Decision (x < y)%N :=
+Program Instance N_lt_dec : RelDecision N.lt := λ x y,
   match Ncompare x y with Lt => left _ | _ => right _ end.
 Solve Obligations with naive_solver.
 Instance N_inhabited: Inhabited N := populate 1%N.
@@ -259,8 +263,8 @@ Instance Z_of_nat_inj : Inj (=) (=) Z.of_nat.
 Proof. intros n1 n2. apply Nat2Z.inj. Qed.
 
 Instance Z_eq_dec: EqDecision Z := Z.eq_dec.
-Instance Z_le_dec: ∀ x y : Z, Decision (x ≤ y) := Z_le_dec.
-Instance Z_lt_dec: ∀ x y : Z, Decision (x < y) := Z_lt_dec.
+Instance Z_le_dec: RelDecision Z.le := Z_le_dec.
+Instance Z_lt_dec: RelDecision Z.lt := Z_lt_dec.
 Instance Z_inhabited: Inhabited Z := populate 1.
 Instance Z_le_po : PartialOrder (≤).
 Proof.
@@ -365,11 +369,11 @@ Hint Extern 1 (_ ≤ _) => reflexivity || discriminate.
 Arguments Qred : simpl never.
 
 Instance Qc_eq_dec: EqDecision Qc := Qc_eq_dec.
-Program Instance Qc_le_dec (x y : Qc) : Decision (x ≤ y) :=
+Program Instance Qc_le_dec: RelDecision Qcle := λ x y,
   if Qclt_le_dec y x then right _ else left _.
 Next Obligation. intros x y; apply Qclt_not_le. Qed.
 Next Obligation. done. Qed.
-Program Instance Qc_lt_dec (x y : Qc) : Decision (x < y) :=
+Program Instance Qc_lt_dec: RelDecision Qclt := λ x y,
   if Qclt_le_dec x y then left _ else right _.
 Solve Obligations with done.
 Next Obligation. intros x y; apply Qcle_not_lt. Qed.

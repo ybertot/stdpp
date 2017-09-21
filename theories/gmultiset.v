@@ -7,18 +7,14 @@ Record gmultiset A `{Countable A} := GMultiSet { gmultiset_car : gmap A nat }.
 Arguments GMultiSet {_ _ _} _ : assert.
 Arguments gmultiset_car {_ _ _} _ : assert.
 
-Lemma gmultiset_eq_dec `{Countable A} : EqDecision (gmultiset A).
+Instance gmultiset_eq_dec `{Countable A} : EqDecision (gmultiset A).
 Proof. solve_decision. Defined.
-Hint Extern 1 (Decision (@eq (gmultiset _) _ _)) =>
-  eapply @gmultiset_eq_dec : typeclass_instances.
 
-Program Definition gmultiset_countable `{Countable A} :
+Program Instance gmultiset_countable `{Countable A} :
     Countable (gmultiset A) := {|
   encode X := encode (gmultiset_car X);  decode p := GMultiSet <$> decode p
 |}.
 Next Obligation. intros A ?? [X]; simpl. by rewrite decode_encode. Qed.
-Hint Extern 1 (Countable (gmultiset _)) =>
-  eapply @gmultiset_countable : typeclass_instances.
 
 Section definitions.
   Context `{Countable A}.
@@ -102,8 +98,8 @@ Proof.
       by split; auto with lia.
   - intros X Y x. rewrite !elem_of_multiplicity, multiplicity_union. omega.
 Qed.
-Global Instance gmultiset_elem_of_dec x X : Decision (x ∈ X).
-Proof. unfold elem_of, gmultiset_elem_of. apply _. Defined.
+Global Instance gmultiset_elem_of_dec : RelDecision (@elem_of _ (gmultiset A) _).
+Proof. refine (λ x X, cast_if (decide (0 < multiplicity x X))); done. Defined.
 
 (* Algebraic laws *)
 Global Instance gmultiset_comm : Comm (@eq (gmultiset A)) (∪).
@@ -144,8 +140,9 @@ Qed.
 Lemma gmultiset_elements_empty_inv X : elements X = [] → X = ∅.
 Proof.
   destruct X as [X]; unfold elements, gmultiset_elements; simpl.
-  intros; apply (f_equal GMultiSet). destruct (map_to_list X)
-    as [|[]] eqn:?; naive_solver eauto using map_to_list_empty_inv.
+  intros; apply (f_equal GMultiSet). destruct (map_to_list X) as [|[]] eqn:?.
+  - by apply map_to_list_empty_inv.
+  - naive_solver.
 Qed.
 Lemma gmultiset_elements_empty' X : elements X = [] ↔ X = ∅.
 Proof.
@@ -249,9 +246,9 @@ Proof.
   apply forall_proper; intros x. unfold multiplicity.
   destruct (gmultiset_car X !! x), (gmultiset_car Y !! x); naive_solver omega.
 Qed.
-Global Instance gmultiset_subseteq_dec X Y : Decision (X ⊆ Y).
+Global Instance gmultiset_subseteq_dec : RelDecision (@subseteq (gmultiset A) _).
 Proof.
- refine (cast_if (decide (map_relation (≤)
+ refine (λ X Y, cast_if (decide (map_relation (≤)
    (λ _, False) (λ _, True) (gmultiset_car X) (gmultiset_car Y))));
    by rewrite gmultiset_subseteq_alt.
 Defined.

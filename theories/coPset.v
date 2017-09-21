@@ -190,17 +190,18 @@ Proof.
   intros p; apply eq_bool_prop_intro, (HXY p).
 Qed.
 
-Instance coPset_elem_of_dec (p : positive) (X : coPset) : Decision (p ∈ X) := _.
-Instance coPset_equiv_dec (X Y : coPset) : Decision (X ≡ Y).
-Proof. refine (cast_if (decide (X = Y))); abstract (by fold_leibniz). Defined.
-Instance mapset_disjoint_dec (X Y : coPset) : Decision (X ⊥ Y).
+Instance coPset_elem_of_dec : RelDecision (@elem_of _ coPset _).
+Proof. solve_decision. Defined.
+Instance coPset_equiv_dec : RelDecision (@equiv coPset _).
+Proof. refine (λ X Y, cast_if (decide (X = Y))); abstract (by fold_leibniz). Defined.
+Instance mapset_disjoint_dec : RelDecision (@disjoint coPset _).
 Proof.
- refine (cast_if (decide (X ∩ Y = ∅)));
+ refine (λ X Y, cast_if (decide (X ∩ Y = ∅)));
   abstract (by rewrite disjoint_intersection_L).
 Defined.
-Instance mapset_subseteq_dec (X Y : coPset) : Decision (X ⊆ Y).
+Instance mapset_subseteq_dec : RelDecision (@subseteq coPset _).
 Proof.
- refine (cast_if (decide (X ∪ Y = Y))); abstract (by rewrite subseteq_union_L).
+ refine (λ X Y, cast_if (decide (X ∪ Y = Y))); abstract (by rewrite subseteq_union_L).
 Defined.
 
 (** * Top *)

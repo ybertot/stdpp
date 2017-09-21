@@ -527,7 +527,7 @@ Section simple_collection.
   End leibniz.
 
   Section dec.
-    Context `{∀ (X Y : C), Decision (X ≡ Y)}.
+    Context `{!RelDecision (@equiv C _)}.
     Lemma collection_subseteq_inv X Y : X ⊆ Y → X ⊂ Y ∨ X ≡ Y.
     Proof. destruct (decide (X ≡ Y)); [by right|left;set_solver]. Qed.
     Lemma collection_not_subset_inv X Y : X ⊄ Y → X ⊈ Y ∨ X ≡ Y.
@@ -692,7 +692,7 @@ Section collection.
   End leibniz.
 
   Section dec.
-    Context `{∀ (x : A) (X : C), Decision (x ∈ X)}.
+    Context `{!RelDecision (@elem_of A C _)}.
     Lemma not_elem_of_intersection x X Y : x ∉ X ∩ Y ↔ x ∉ X ∨ x ∉ Y.
     Proof. rewrite elem_of_intersection. destruct (decide (x ∈ X)); tauto. Qed.
     Lemma not_elem_of_difference x X Y : x ∉ X ∖ Y ↔ x ∉ X ∨ x ∈ Y.

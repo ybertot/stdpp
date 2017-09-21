@@ -15,7 +15,7 @@ Section merge_sort.
     | [], _ => l2
     | _, [] => l1
     | x1 :: l1, x2 :: l2 =>
-       if decide_rel R x1 x2 then x1 :: list_merge l1 (x2 :: l2)
+       if decide (R x1 x2) then x1 :: list_merge l1 (x2 :: l2)
        else x2 :: list_merge_aux l2
     end.
   Global Arguments list_merge !_ !_ / : assert.
