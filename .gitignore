@@ -9,7 +9,8 @@
 *~
 *.bak
 .coq-native/
-Makefile.coq*
+Makefile.coq
+Makefile.coq.conf
 *.crashcoqide
 html/
 build-dep/
