@@ -198,6 +198,9 @@ Notation wf := well_founded.
 Section wf.
   Context `{R : relation A}.
 
+  Lemma Acc_def x : Acc R x ↔ (∀ y : A, R y x → Acc R y).
+  Proof. split. by destruct 1. by constructor. Qed.
+
   (** A trick by Thomas Braibant to compute with well-founded recursions:
   it lazily adds [2^n] [Acc_intro] constructors in front of a well foundedness
   proof, so that the actual proof is never reached in practise. *)
