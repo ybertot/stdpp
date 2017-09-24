@@ -986,6 +986,19 @@ Proof.
     f_equal/=; auto using take_drop with lia.
 Qed.
 
+Lemma app_eq_inv l1 l2 k1 k2 :
+  l1 ++ l2 = k1 ++ k2 →
+  (∃ k, l1 = k1 ++ k ∧ k2 = k ++ l2) ∨ (∃ k, k1 = l1 ++ k ∧ l2 = k ++ k2).
+Proof.
+  intros Hlk. destruct (decide (length l1 < length k1)).
+  - right. rewrite <-(take_drop (length l1) k1), <-(assoc_L _) in Hlk.
+    apply app_inj_1 in Hlk as [Hl1 Hl2]; [|rewrite take_length; lia].
+    exists (drop (length l1) k1). by rewrite Hl1 at 1; rewrite take_drop.
+  - left. rewrite <-(take_drop (length k1) l1), <-(assoc_L _) in Hlk.
+    apply app_inj_1 in Hlk as [Hk1 Hk2]; [|rewrite take_length; lia].
+    exists (drop (length k1) l1). by rewrite <-Hk1 at 1; rewrite take_drop.
+Qed.
+
 (** ** Properties of the [replicate] function *)
 Lemma replicate_length n x : length (replicate n x) = n.
 Proof. induction n; simpl; auto. Qed.
@@ -1420,6 +1433,17 @@ Proof.
 Qed.
 Lemma elem_of_Permutation l x : x ∈ l → ∃ k, l ≡ₚ x :: k.
 Proof. intros [i ?]%elem_of_list_lookup. eauto using delete_Permutation. Qed.
+
+Lemma Permutation_cons_inv l k x :
+  k ≡ₚ x :: l → ∃ k1 k2, k = k1 ++ x :: k2 ∧ l ≡ₚ k1 ++ k2.
+Proof.
+  intros Hk. assert (∃ i, k !! i = Some x) as [i Hi].
+  { apply elem_of_list_lookup. rewrite Hk, elem_of_cons; auto. }
+  exists (take i k), (drop (S i) k). split.
+  - by rewrite take_drop_middle.
+  - rewrite <-delete_take_drop. apply (inj (x ::)).
+    by rewrite <-Hk, <-(delete_Permutation k) by done.
+Qed.
 
 Lemma length_delete l i :
   is_Some (l !! i) → length (delete i l) = length l - 1.
@@ -1993,7 +2017,7 @@ Qed.
 Lemma submseteq_app_inv_l l1 l2 k : k ++ l1 ⊆+ k ++ l2 → l1 ⊆+ l2.
 Proof.
   induction k as [|y k IH]; simpl; [done |]. rewrite submseteq_cons_l.
-  intros (?&E&?). apply Permutation_cons_inv in E. apply IH. by rewrite E.
+  intros (?&E%(inj _)&?). apply IH. by rewrite E.
 Qed.
 Lemma submseteq_app_inv_r l1 l2 k : l1 ++ k ⊆+ l2 ++ k → l1 ⊆+ l2.
 Proof.
