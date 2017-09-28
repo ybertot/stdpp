@@ -130,6 +130,9 @@ is unspecified. *)
 Definition map_fold `{FinMapToList K A M} {B}
   (f : K → A → B → B) (b : B) : M → B := foldr (curry f) b ∘ map_to_list.
 
+Instance map_filter `{FinMap K M} {A} : Filter (K * A) (M A) :=
+  λ P _, map_fold (λ k v m, if decide (P (k,v)) then <[k := v]>m else m) ∅.
+
 (** * Theorems *)
 Section theorems.
 Context `{FinMap K M}.
@@ -1001,6 +1004,67 @@ Proof.
   - intros ?; split; [intros ->|by right].
     assert (m !! j = Some y) by (apply Hm; by right). naive_solver.
 Qed.
+
+(** ** The filter operation *)
+Section map_Filter.
+  Context {A} (P : K * A → Prop) `{!∀ x, Decision (P x)}.
+
+  Lemma map_filter_lookup_Some:
+    ∀ m k v, filter P m !! k = Some v ↔ m !! k = Some v ∧ P (k,v).
+  Proof.
+    apply (map_fold_ind (λ m1 m2, ∀ k v, m1 !! k = Some v
+                                    ↔ m2 !! k = Some v ∧ P _)).
+    - setoid_rewrite lookup_empty. naive_solver.
+    - intros k v m m' Hm Eq k' v'.
+      case_match; case (decide (k' = k))as [->|?].
+      + rewrite 2!lookup_insert. naive_solver.
+      + do 2 (rewrite lookup_insert_ne; [|auto]). by apply Eq.
+      + rewrite Eq, Hm, lookup_insert. split; [naive_solver|].
+        destruct 1 as [Eq' ]. inversion Eq'. by subst.
+      + by rewrite lookup_insert_ne.
+  Qed.
+
+  Lemma map_filter_lookup_None:
+    ∀ m k,
+    filter P m !! k = None ↔ m !! k = None ∨ ∀ v, m !! k = Some v → ¬ P (k,v).
+  Proof.
+    intros m k. rewrite eq_None_not_Some. unfold is_Some.
+    setoid_rewrite map_filter_lookup_Some. naive_solver.
+  Qed.
+
+  Lemma map_filter_lookup_equiv m1 m2:
+    (∀ k v, P (k,v) → m1 !! k = Some v ↔ m2 !! k = Some v)
+    → filter P m1 = filter P m2.
+  Proof.
+    intros HP. apply map_eq. intros k.
+    destruct (filter P m2 !! k) as [v2|] eqn:Hv2;
+      [apply map_filter_lookup_Some in Hv2 as [Hv2 HP2];
+        specialize (HP k v2 HP2)
+       |apply map_filter_lookup_None; right; intros v EqS ISP;
+        apply map_filter_lookup_None in Hv2 as [Hv2|Hv2]].
+    - apply map_filter_lookup_Some. by rewrite HP.
+    - specialize (HP _ _ ISP). rewrite HP, Hv2 in EqS. naive_solver.
+    - apply (Hv2 v); [by apply HP|done].
+  Qed.
+
+  Lemma map_filter_lookup_insert m k v:
+    P (k,v) → <[k := v]> (filter P m) = filter P (<[k := v]> m).
+  Proof.
+    intros HP. apply map_eq. intros k'.
+    case (decide (k' = k)) as [->|?];
+      [rewrite lookup_insert|rewrite lookup_insert_ne; [|auto]].
+    - symmetry. apply map_filter_lookup_Some. by rewrite lookup_insert.
+    - destruct (filter P (<[k:=v]> m) !! k') eqn: Hk; revert Hk;
+        [rewrite map_filter_lookup_Some, lookup_insert_ne; [|by auto];
+          by rewrite <-map_filter_lookup_Some
+         |rewrite map_filter_lookup_None, lookup_insert_ne; [|auto];
+          by rewrite <-map_filter_lookup_None].
+  Qed.
+
+  Lemma map_filter_empty : filter P ∅ = ∅.
+  Proof. apply map_fold_empty. Qed.
+
+End map_Filter.
 
 (** ** Properties of the [map_Forall] predicate *)
 Section map_Forall.
