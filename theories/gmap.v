@@ -256,15 +256,8 @@ Section filter.
     ∀ m k,
     filter P m !! k = None ↔ m !! k = None ∨ ∀ v, m !! k = Some v → ¬ P (k,v).
   Proof.
-    apply (map_fold_ind (λ m1 m2, ∀ k, m1 !! k = None
-                         ↔ (m2 !! k = None ∨ ∀ v, m2 !! k = Some v → ¬ P _))).
-    - naive_solver.
-    - intros k v m m' Hm Eq k'.
-      case_match; case (decide (k' = k)) as [->|?].
-      + rewrite 2!lookup_insert. naive_solver.
-      + do 2 (rewrite lookup_insert_ne; [|auto]). by apply Eq.
-      + rewrite Eq, Hm, lookup_insert. naive_solver.
-      + by rewrite lookup_insert_ne.
+    intros m k. rewrite eq_None_not_Some. unfold is_Some.
+    setoid_rewrite gmap_filter_lookup_Some. naive_solver.
   Qed.
 
   Lemma gmap_filter_dom m:
@@ -274,51 +267,37 @@ Section filter.
     destruct 1 as [?[Eq _]%gmap_filter_lookup_Some]. by eexists.
   Qed.
 
-  Lemma gmap_filter_lookup_equiv `{Equiv A} `{Reflexive A (≡)} m1 m2:
+  Lemma gmap_filter_lookup_equiv m1 m2:
     (∀ k v, P (k,v) → m1 !! k = Some v ↔ m2 !! k = Some v)
-    → filter P m1 ≡ filter P m2.
+    → filter P m1 = filter P m2.
   Proof.
-    intros HP k.
-    destruct (filter P m1 !! k) as [v1|] eqn:Hv1;
-      [apply gmap_filter_lookup_Some in Hv1 as [Hv1 HP1];
-        specialize (HP k v1 HP1)|];
-      destruct (filter P m2 !! k) as [v2|] eqn: Hv2.
-    - apply gmap_filter_lookup_Some in Hv2 as [Hv2 _].
-      rewrite Hv1, Hv2 in HP. destruct HP as [HP _].
-      specialize (HP (eq_refl _)) as []. by apply option_Forall2_refl.
-    - apply gmap_filter_lookup_None in Hv2 as [Hv2|Hv2];
-        [naive_solver|by apply HP, Hv2 in Hv1].
-    - apply gmap_filter_lookup_Some in Hv2 as [Hv2 HP2].
-      specialize (HP k v2 HP2).
-      apply gmap_filter_lookup_None in Hv1 as [Hv1|Hv1].
-      + rewrite Hv1 in HP. naive_solver.
-      + by apply HP, Hv1 in Hv2.
-    - by apply option_Forall2_refl.
+    intros HP. apply map_eq. intros k.
+    destruct (filter P m2 !! k) as [v2|] eqn:Hv2;
+      [apply gmap_filter_lookup_Some in Hv2 as [Hv2 HP2];
+        specialize (HP k v2 HP2)
+       |apply gmap_filter_lookup_None; right; intros v EqS ISP;
+        apply gmap_filter_lookup_None in Hv2 as [Hv2|Hv2]].
+    - apply gmap_filter_lookup_Some. by rewrite HP.
+    - specialize (HP _ _ ISP). rewrite HP, Hv2 in EqS. naive_solver.
+    - apply (Hv2 v); [by apply HP|done].
   Qed.
 
-  Lemma gmap_filter_lookup_insert `{Equiv A} `{Reflexive A (≡)} m k v:
-    P (k,v) → <[k := v]> (filter P m) ≡ filter P (<[k := v]> m).
+  Lemma gmap_filter_lookup_insert m k v:
+    P (k,v) → <[k := v]> (filter P m) = filter P (<[k := v]> m).
   Proof.
-    intros HP k'.
+    intros HP. apply map_eq. intros k'.
     case (decide (k' = k)) as [->|?];
       [rewrite lookup_insert|rewrite lookup_insert_ne; [|auto]].
-    - destruct (filter P (<[k:=v]> m) !! k) eqn: Hk.
-      + apply gmap_filter_lookup_Some in Hk.
-        rewrite lookup_insert in Hk. destruct Hk as [Hk _].
-        inversion Hk. by apply option_Forall2_refl.
-      + apply gmap_filter_lookup_None in Hk.
-        rewrite lookup_insert in Hk.
-        destruct Hk as [->|HNP]. by apply option_Forall2_refl.
-        by specialize (HNP v (eq_refl _)).
+    - symmetry. apply gmap_filter_lookup_Some. by rewrite lookup_insert.
     - destruct (filter P (<[k:=v]> m) !! k') eqn: Hk; revert Hk;
-        [rewrite gmap_filter_lookup_Some|rewrite gmap_filter_lookup_None];
-        (rewrite lookup_insert_ne ; [|by auto]);
-        [rewrite <-gmap_filter_lookup_Some|rewrite <-gmap_filter_lookup_None];
-        intros Hk; rewrite Hk; by apply option_Forall2_refl.
+        [rewrite gmap_filter_lookup_Some, lookup_insert_ne; [|by auto];
+          by rewrite <-gmap_filter_lookup_Some
+         |rewrite gmap_filter_lookup_None, lookup_insert_ne; [|auto];
+          by rewrite <-gmap_filter_lookup_None].
   Qed.
 
-  Lemma gmap_filter_empty `{Equiv A} : filter P (∅  : gmap K A) ≡ ∅.
-  Proof. intro l. rewrite lookup_empty. constructor. Qed.
+  Lemma gmap_filter_empty `{Equiv A} : filter P (∅  : gmap K A) = ∅.
+  Proof. apply map_fold_empty. Qed.
 
 End filter.
 
