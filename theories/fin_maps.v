@@ -130,7 +130,7 @@ is unspecified. *)
 Definition map_fold `{FinMapToList K A M} {B}
   (f : K → A → B → B) (b : B) : M → B := foldr (curry f) b ∘ map_to_list.
 
-Instance map_filter `{FinMap K M} {A} : Filter (K * A) (M A) :=
+Instance map_filter `{FinMapToList K A M, Insert K A M, Empty M} : Filter (K * A) M :=
   λ P _, map_fold (λ k v m, if decide (P (k,v)) then <[k := v]>m else m) ∅.
 
 (** * Theorems *)
