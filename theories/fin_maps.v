@@ -130,6 +130,9 @@ is unspecified. *)
 Definition map_fold `{FinMapToList K A M} {B}
   (f : K → A → B → B) (b : B) : M → B := foldr (curry f) b ∘ map_to_list.
 
+Instance map_filter `{FinMapToList K A M, Insert K A M, Empty M} : Filter (K * A) M :=
+  λ P _, map_fold (λ k v m, if decide (P (k,v)) then <[k := v]>m else m) ∅.
+
 (** * Theorems *)
 Section theorems.
 Context `{FinMap K M}.
@@ -1001,6 +1004,53 @@ Proof.
   - intros ?; split; [intros ->|by right].
     assert (m !! j = Some y) by (apply Hm; by right). naive_solver.
 Qed.
+
+(** ** The filter operation *)
+Section map_Filter.
+  Context {A} (P : K * A → Prop) `{!∀ x, Decision (P x)}.
+  Implicit Types m : M A.
+
+  Lemma map_filter_lookup_Some m i x :
+    filter P m !! i = Some x ↔ m !! i = Some x ∧ P (i,x).
+  Proof.
+    revert m i x. apply (map_fold_ind (λ m1 m2,
+      ∀ i x, m1 !! i = Some x ↔ m2 !! i = Some x ∧ P _)); intros i x.
+    - rewrite lookup_empty. naive_solver.
+    - intros m m' Hm Eq j y. case_decide; case (decide (j = i))as [->|?].
+      + rewrite 2!lookup_insert. naive_solver.
+      + rewrite !lookup_insert_ne by done. by apply Eq.
+      + rewrite Eq, Hm, lookup_insert. naive_solver.
+      + by rewrite lookup_insert_ne.
+  Qed.
+
+  Lemma map_filter_lookup_None m i :
+    filter P m !! i = None ↔ m !! i = None ∨ ∀ x, m !! i = Some x → ¬ P (i,x).
+  Proof.
+    rewrite eq_None_not_Some. unfold is_Some.
+    setoid_rewrite map_filter_lookup_Some. naive_solver.
+  Qed.
+
+  Lemma map_filter_lookup_eq m1 m2 :
+    (∀ k x, P (k,x) → m1 !! k = Some x ↔ m2 !! k = Some x) →
+    filter P m1 = filter P m2.
+  Proof.
+    intros HP. apply map_eq. intros i. apply option_eq; intros x.
+    rewrite !map_filter_lookup_Some. naive_solver.
+  Qed.
+
+  Lemma map_filter_lookup_insert m i x :
+    P (i,x) → <[i:=x]> (filter P m) = filter P (<[i:=x]> m).
+  Proof.
+    intros HP. apply map_eq. intros j. apply option_eq; intros y.
+    destruct (decide (j = i)) as [->|?].
+    - rewrite map_filter_lookup_Some, !lookup_insert. naive_solver.
+    - rewrite lookup_insert_ne, !map_filter_lookup_Some, lookup_insert_ne by done.
+      naive_solver.
+  Qed.
+
+  Lemma map_filter_empty : filter P (∅ : M A) = ∅.
+  Proof. apply map_fold_empty. Qed.
+End map_Filter.
 
 (** ** Properties of the [map_Forall] predicate *)
 Section map_Forall.

@@ -19,6 +19,13 @@ Class FinMapDom K M D `{∀ A, Dom (M A) D, FMap M,
 Section fin_map_dom.
 Context `{FinMapDom K M D}.
 
+Lemma dom_map_filter {A} (P : K * A → Prop) `{!∀ x, Decision (P x)} (m : M A):
+  dom D (filter P m) ⊆ dom D m.
+Proof.
+  intros ?. rewrite 2!elem_of_dom.
+  destruct 1 as [?[Eq _]%map_filter_lookup_Some]. by eexists.
+Qed.
+
 Lemma elem_of_dom_2 {A} (m : M A) i x : m !! i = Some x → i ∈ dom D m.
 Proof. rewrite elem_of_dom; eauto. Qed.
 Lemma not_elem_of_dom {A} (m : M A) i : i ∉ dom D m ↔ m !! i = None.
