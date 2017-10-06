@@ -24,6 +24,13 @@ Arguments unseal {_ _} _ : assert.
 Arguments seal_eq {_ _} _ : assert.
 Unset Primitive Projections.
 
+(** Typeclass opaque definitions *)
+(* The constant [tc_opaque] is used to make definitions opaque for just type
+class search. Note that [simpl] is set up to always unfold [tc_opaque]. *)
+Definition tc_opaque {A} (x : A) : A := x.
+Typeclasses Opaque tc_opaque.
+Arguments tc_opaque {_} _ /.
+
 (* Below we define type class versions of the common logical operators. It is
 important to note that we duplicate the definitions, and do not declare the
 existing logical operators as type classes. That is, we do not say:
