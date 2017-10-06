@@ -1124,6 +1124,16 @@ Proof.
   intros ??. apply map_eq. intros.
   by rewrite !(lookup_merge f), lookup_empty, (right_id_L None f).
 Qed.
+Global Instance: LeftAbsorb (=) None f → LeftAbsorb (=) (∅ : M A) (merge f).
+Proof.
+  intros ??. apply map_eq. intros.
+  by rewrite !(lookup_merge f), lookup_empty, (left_absorb_L None f).
+Qed.
+Global Instance: RightAbsorb (=) None f → RightAbsorb (=) (∅ : M A) (merge f).
+Proof.
+  intros ??. apply map_eq. intros.
+  by rewrite !(lookup_merge f), lookup_empty, (right_absorb_L None f).
+Qed.
 Lemma merge_comm m1 m2 :
   (∀ i, f (m1 !! i) (m2 !! i) = f (m2 !! i) (m1 !! i)) →
   merge f m1 m2 = merge f m2 m1.
@@ -1725,18 +1735,72 @@ Lemma map_disjoint_of_list_zip_r_2 {A} (m : M A) is xs :
 Proof. intro. by rewrite map_disjoint_of_list_zip_r. Qed.
 
 (** ** Properties of the [intersection_with] operation *)
-Lemma lookup_intersection_with {A} (f : A → A → option A) (m1 m2 : M A) i :
+Section intersection_with.
+Context {A} (f : A → A → option A).
+Implicit Type (m: M A).
+Global Instance : LeftAbsorb (@eq (M A)) ∅ (intersection_with f).
+Proof. unfold intersection_with, map_intersection_with. apply _. Qed.
+Global Instance: RightAbsorb (@eq (M A)) ∅ (intersection_with f).
+Proof. unfold intersection_with, map_intersection_with. apply _. Qed.
+Lemma lookup_intersection_with m1 m2 i :
   intersection_with f m1 m2 !! i = intersection_with f (m1 !! i) (m2 !! i).
 Proof. by rewrite <-(lookup_merge _). Qed.
-Lemma lookup_intersection_with_Some {A} (f : A → A → option A) (m1 m2 : M A) i z :
+Lemma lookup_intersection_with_Some m1 m2 i z :
   intersection_with f m1 m2 !! i = Some z ↔
     (∃ x y, m1 !! i = Some x ∧ m2 !! i = Some y ∧ f x y = Some z).
 Proof.
   rewrite lookup_intersection_with.
   destruct (m1 !! i), (m2 !! i); compute; naive_solver.
 Qed.
+Lemma intersection_with_comm m1 m2 :
+  (∀ i x y, m1 !! i = Some x → m2 !! i = Some y → f x y = f y x) →
+  intersection_with f m1 m2 = intersection_with f m2 m1.
+Proof.
+  intros. apply (merge_comm _). intros i.
+  destruct (m1 !! i) eqn:?, (m2 !! i) eqn:?; simpl; eauto.
+Qed.
+Global Instance: Comm (=) f → Comm (@eq (M A)) (intersection_with f).
+Proof. intros ???. apply intersection_with_comm. eauto. Qed.
+Lemma intersection_with_idemp m :
+  (∀ i x, m !! i = Some x → f x x = Some x) → intersection_with f m m = m.
+Proof.
+  intros. apply (merge_idemp _). intros i.
+  destruct (m !! i) eqn:?; simpl; eauto.
+Qed.
+Lemma alter_intersection_with (g : A → A) m1 m2 i :
+  (∀ x y, m1 !! i = Some x → m2 !! i = Some y → g <$> f x y = f (g x) (g y)) →
+  alter g i (intersection_with f m1 m2) =
+    intersection_with f (alter g i m1) (alter g i m2).
+Proof.
+  intros. apply (partial_alter_merge _).
+  destruct (m1 !! i) eqn:?, (m2 !! i) eqn:?; simpl; eauto.
+Qed.
+Lemma delete_intersection_with m1 m2 i :
+  delete i (intersection_with f m1 m2) = intersection_with f (delete i m1) (delete i m2).
+Proof. by apply (partial_alter_merge _). Qed.
+Lemma foldr_delete_intersection_with (m1 m2 : M A) is :
+  foldr delete (intersection_with f m1 m2) is =
+    intersection_with f (foldr delete m1 is) (foldr delete m2 is).
+Proof. induction is; simpl. done. by rewrite IHis, delete_intersection_with. Qed.
+Lemma insert_intersection_with m1 m2 i x y z :
+  f x y = Some z →
+  <[i:=z]>(intersection_with f m1 m2) = intersection_with f (<[i:=x]>m1) (<[i:=y]>m2).
+Proof. by intros; apply (partial_alter_merge _). Qed.
+End intersection_with.
 
 (** ** Properties of the [intersection] operation *)
+Global Instance: LeftAbsorb (@eq (M A)) ∅ (∩) := _.
+Global Instance: RightAbsorb (@eq (M A)) ∅ (∩) := _.
+Global Instance: Assoc (@eq (M A)) (∩).
+Proof.
+  intros A m1 m2 m3.
+  unfold intersection, map_intersection, intersection_with, map_intersection_with.
+  apply (merge_assoc _). intros i.
+  by destruct (m1 !! i), (m2 !! i), (m3 !! i).
+Qed.
+Global Instance: IdemP (@eq (M A)) (∩).
+Proof. intros A ?. by apply intersection_with_idemp. Qed.
+
 Lemma lookup_intersection_Some {A} (m1 m2 : M A) i x :
   (m1 ∩ m2) !! i = Some x ↔ m1 !! i = Some x ∧ is_Some (m2 !! i).
 Proof.
