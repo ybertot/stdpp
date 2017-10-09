@@ -333,7 +333,7 @@ Ltac solve_proper_unfold :=
   | |- ?R (?f _ _ _) (?f _ _ _) => unfold f
   | |- ?R (?f _ _) (?f _ _) => unfold f
   | |- ?R (?f _) (?f _) => unfold f
-  end; simpl.
+  end.
 
 (** The tactic [solve_proper_core tac] solves goals of the form "Proper (R1 ==> R2)", for
 any number of relations. The actual work is done by repeatedly applying
@@ -349,7 +349,7 @@ Ltac solve_proper_core tac :=
   end; simplify_eq;
   (* Now do the job. We try with and without unfolding. We have to backtrack on
      that because unfolding may succeed, but then the proof may fail. *)
-  (solve_proper_unfold + idtac);
+  (solve_proper_unfold + idtac); simpl;
   solve [repeat first [eassumption | tac ()] ].
 Ltac solve_proper := solve_proper_core ltac:(fun _ => f_equiv).
 
