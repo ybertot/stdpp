@@ -18,11 +18,12 @@ Obligation Tactic := idtac.
 Add Search Blacklist "_obligation_".
 
 (** Sealing off definitions *)
-Set Primitive Projections.
-Record seal {A} (f : A) := { unseal : A; seal_eq : unseal = f }.
-Arguments unseal {_ _} _ : assert.
-Arguments seal_eq {_ _} _ : assert.
-Unset Primitive Projections.
+Section seal.
+  Local Set Primitive Projections.
+  Record seal {A} (f : A) := { unseal : A; seal_eq : unseal = f }.
+  Arguments unseal {_ _} _ : assert.
+  Arguments seal_eq {_ _} _ : assert.
+End seal.
 
 (** Typeclass opaque definitions *)
 (* The constant [tc_opaque] is used to make definitions opaque for just type
