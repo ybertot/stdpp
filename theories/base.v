@@ -21,9 +21,9 @@ Add Search Blacklist "_obligation_".
 Section seal.
   Local Set Primitive Projections.
   Record seal {A} (f : A) := { unseal : A; seal_eq : unseal = f }.
-  Arguments unseal {_ _} _ : assert.
-  Arguments seal_eq {_ _} _ : assert.
 End seal.
+Arguments unseal {_ _} _ : assert.
+Arguments seal_eq {_ _} _ : assert.
 
 (** Typeclass opaque definitions *)
 (* The constant [tc_opaque] is used to make definitions opaque for just type
