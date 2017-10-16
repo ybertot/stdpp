@@ -168,6 +168,19 @@ Section curry_uncurry.
     - by rewrite lookup_partial_alter_ne, lookup_insert_ne by congruence.
   Qed.
 
+  Lemma lookup_gmap_uncurry_None (m : gmap (K1 * K2) A) i :
+    gmap_uncurry m !! i = None ↔ (∀ j, m !! (i, j) = None).
+  Proof.
+    apply (map_fold_ind (λ mr m, mr !! i = None ↔ (∀ j, m !! (i, j) = None)));
+      [done|].
+    clear m; intros [i' j'] x m12 mr Hij' IH.
+    destruct (decide (i = i')) as [->|].
+    - split; [by rewrite lookup_partial_alter|].
+      intros Hi. specialize (Hi j'). by rewrite lookup_insert in Hi.
+    - rewrite lookup_partial_alter_ne, IH; [|done]. apply forall_proper.
+      intros j. rewrite lookup_insert_ne; [done|congruence].
+  Qed.
+
   Lemma gmap_curry_uncurry (m : gmap (K1 * K2) A) :
     gmap_curry (gmap_uncurry m) = m.
   Proof.
