@@ -32,7 +32,7 @@ developed by Robbert Krebbers, Ralf Jung, and Jacques Henri-Jourdan.
 
 This version is known to compile with:
 
- - Coq version 8.6 / 8.6.1 / 8.7beta
+ - Coq version 8.6 / 8.6.1 / 8.7.0
 
 ## Building Instructions
 
