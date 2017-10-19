@@ -38,17 +38,17 @@ opam:
   only:
   - master
 
-build-coq8.7.dev:
+build-coq.8.7.dev:
   <<: *template
   variables:
     COQ_VERSION: "8.7.dev"
 
-build-coq8.7:
+build-coq.8.7:
   <<: *template
   variables:
     COQ_VERSION: "8.7.0"
 
-build-coq8.6.1:
+build-coq.8.6.1:
   <<: *template
   variables:
     COQ_VERSION: "8.6.1"
@@ -58,7 +58,7 @@ build-coq8.6.1:
     - build-time.txt
     - build-env.txt
 
-build-coq8.6:
+build-coq.8.6:
   <<: *template
   variables:
     COQ_VERSION: "8.6"
