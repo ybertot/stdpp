@@ -37,16 +37,22 @@ opam:
     OPAM_PKG: "coq-stdpp"
   only:
   - master
+  except:
+  - triggers
 
 build-coq.8.7.dev:
   <<: *template
   variables:
     OPAM_PINS: "coq version 8.7.dev"
+  except:
+  - triggers
 
 build-coq.8.7:
   <<: *template
   variables:
     OPAM_PINS: "coq version 8.7.0"
+  except:
+  - triggers
 
 build-coq.8.6.1:
   <<: *template
@@ -57,9 +63,12 @@ build-coq.8.6.1:
     paths:
     - build-time.txt
     - build-env.txt
+  except:
+  - triggers
 
 build-coq.8.6:
   <<: *template
   variables:
     OPAM_PINS: "coq version 8.6"
-
+  except:
+  - triggers
