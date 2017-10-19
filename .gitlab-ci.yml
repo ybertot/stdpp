@@ -2,7 +2,7 @@ image: ralfjung/opam-ci:latest
 
 stages:
   - build
-  - opam
+  - deploy
 
 variables:
   CPU_CORES: "9"
@@ -21,7 +21,7 @@ variables:
   - 'cat build-log.txt | egrep "[a-zA-Z0-9_/-]+ \((real|user): [0-9]" | tee build-time.txt'
   - 'if test -n "$VALIDATE" && (( RANDOM % 10 == 0 )); then make validate; fi'
   cache:
-    key: "coq.$COQ_VERSION"
+    key: "$CI_JOB_NAME"
     paths:
     - opamroot/
   only:
@@ -29,10 +29,10 @@ variables:
   - /^ci/
 
 opam:
-  stage: opam
+  stage: deploy
   script:
   # Send a trigger to the repository doing the work
-  - curl --fail -X POST -F "token=$OPAM_UPDATE_SECRET" -F "ref=master" -F "variables[REPO]=$CI_PROJECT_URL.git" -F "variables[REF]=$CI_COMMIT_REF_NAME" -F "variables[SHA]=$CI_COMMIT_SHA" -F "variables[NAME]=$OPAM_PKG" https://gitlab.mpi-sws.org/api/v3/projects/581/trigger/builds
+  - curl --fail -X POST -F "token=$OPAM_UPDATE_SECRET" -F "ref=master" -F "variables[REPO]=$CI_PROJECT_URL.git" -F "variables[REF]=$CI_COMMIT_REF_NAME" -F "variables[SHA]=$CI_COMMIT_SHA" -F "variables[NAME]=$OPAM_PKG" https://gitlab.mpi-sws.org/api/v4/projects/581/trigger/pipeline
   variables:
     OPAM_PKG: "coq-stdpp"
   only:
