@@ -13,7 +13,7 @@ variables:
   - fp-timing
   script:
   # prepare
-  - . build/opam-ci.sh coq "$COQ_VERSION"
+  - . build/opam-ci.sh $OPAM_PINS
   - env | egrep '^(CI_BUILD_REF|CI_RUNNER)' > build-env.txt
   # build
   - 'time make -k -j$CPU_CORES TIMED=y 2>&1 | tee build-log.txt'
@@ -41,17 +41,17 @@ opam:
 build-coq.8.7.dev:
   <<: *template
   variables:
-    COQ_VERSION: "8.7.dev"
+    OPAM_PINS: "coq version 8.7.dev"
 
 build-coq.8.7:
   <<: *template
   variables:
-    COQ_VERSION: "8.7.0"
+    OPAM_PINS: "coq version 8.7.0"
 
 build-coq.8.6.1:
   <<: *template
   variables:
-    COQ_VERSION: "8.6.1"
+    OPAM_PINS: "coq version 8.6.1"
     VALIDATE: "1"
   artifacts:
     paths:
@@ -61,5 +61,5 @@ build-coq.8.6.1:
 build-coq.8.6:
   <<: *template
   variables:
-    COQ_VERSION: "8.6"
+    OPAM_PINS: "coq version 8.6"
 
