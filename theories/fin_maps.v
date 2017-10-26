@@ -1212,7 +1212,7 @@ End more_merge.
 
 (** Properties of the zip_with function *)
 Lemma map_lookup_zip_with {A B C} (f : A → B → C) (m1 : M A) (m2 : M B) i :
-  map_zip_with f m1 m2 !! i = x ← m1 !! i; y ← m2 !! i; Some (f x y).
+  map_zip_with f m1 m2 !! i = (x ← m1 !! i; y ← m2 !! i; Some (f x y)).
 Proof.
   unfold map_zip_with. rewrite lookup_merge by done.
   by destruct (m1 !! i), (m2 !! i).

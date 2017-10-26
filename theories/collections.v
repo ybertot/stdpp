@@ -797,7 +797,7 @@ Global Instance collection_guard `{CollectionMonad M} : MGuard M :=
 Section collection_monad_base.
   Context `{CollectionMonad M}.
   Lemma elem_of_guard `{Decision P} {A} (x : A) (X : M A) :
-    x ∈ guard P; X ↔ P ∧ x ∈ X.
+    (x ∈ guard P; X) ↔ P ∧ x ∈ X.
   Proof.
     unfold mguard, collection_guard; simpl; case_match;
       rewrite ?elem_of_empty; naive_solver.
@@ -805,7 +805,7 @@ Section collection_monad_base.
   Lemma elem_of_guard_2 `{Decision P} {A} (x : A) (X : M A) :
     P → x ∈ X → x ∈ guard P; X.
   Proof. by rewrite elem_of_guard. Qed.
-  Lemma guard_empty `{Decision P} {A} (X : M A) : guard P; X ≡ ∅ ↔ ¬P ∨ X ≡ ∅.
+  Lemma guard_empty `{Decision P} {A} (X : M A) : (guard P; X) ≡ ∅ ↔ ¬P ∨ X ≡ ∅.
   Proof.
     rewrite !elem_of_equiv_empty; setoid_rewrite elem_of_guard.
     destruct (decide P); naive_solver.
@@ -945,7 +945,7 @@ Section collection_monad.
 
   Lemma collection_bind_singleton {A B} (f : A → M B) x : {[ x ]} ≫= f ≡ f x.
   Proof. set_solver. Qed.
-  Lemma collection_guard_True {A} `{Decision P} (X : M A) : P → guard P; X ≡ X.
+  Lemma collection_guard_True {A} `{Decision P} (X : M A) : P → (guard P; X) ≡ X.
   Proof. set_solver. Qed.
   Lemma collection_fmap_compose {A B C} (f : A → B) (g : B → C) (X : M A) :
     g ∘ f <$> X ≡ g <$> (f <$> X).
