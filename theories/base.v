@@ -660,7 +660,7 @@ Arguments sig_map _ _ _ _ _ _ !_ / : assert.
 (** We define operational type classes for the traditional operations and
 relations on collections: the empty collection [∅], the union [(∪)],
 intersection [(∩)], and difference [(∖)], the singleton [{[_]}], the subset
-[(⊆)] and element of [(∈)] relation, and disjointess [(⊥)]. *)
+[(⊆)] and element of [(∈)] relation, and disjointess [(##)]. *)
 Class Empty A := empty: A.
 Hint Mode Empty ! : typeclass_instances.
 Notation "∅" := empty : C_scope.
@@ -779,56 +779,56 @@ Notation "( x ∉)" := (λ X, x ∉ X) (only parsing) : C_scope.
 Notation "(∉ X )" := (λ x, x ∉ X) (only parsing) : C_scope.
 
 Class Disjoint A := disjoint : A → A → Prop.
-Hint Mode Disjoint ! : typeclass_instances.
+ Hint Mode Disjoint ! : typeclass_instances.
 Instance: Params (@disjoint) 2.
-Infix "⊥" := disjoint (at level 70) : C_scope.
-Notation "(⊥)" := disjoint (only parsing) : C_scope.
-Notation "( X ⊥.)" := (disjoint X) (only parsing) : C_scope.
-Notation "(.⊥ X )" := (λ Y, Y ⊥ X) (only parsing) : C_scope.
-Infix "⊥*" := (Forall2 (⊥)) (at level 70) : C_scope.
-Notation "(⊥*)" := (Forall2 (⊥)) (only parsing) : C_scope.
-Infix "⊥**" := (Forall2 (⊥*)) (at level 70) : C_scope.
-Infix "⊥1*" := (Forall2 (λ p q, p.1 ⊥ q.1)) (at level 70) : C_scope.
-Infix "⊥2*" := (Forall2 (λ p q, p.2 ⊥ q.2)) (at level 70) : C_scope.
-Infix "⊥1**" := (Forall2 (λ p q, p.1 ⊥* q.1)) (at level 70) : C_scope.
-Infix "⊥2**" := (Forall2 (λ p q, p.2 ⊥* q.2)) (at level 70) : C_scope.
-Hint Extern 0 (_ ⊥ _) => symmetry; eassumption.
-Hint Extern 0 (_ ⊥* _) => symmetry; eassumption.
+Infix "##" := disjoint (at level 70) : C_scope.
+Notation "(##)" := disjoint (only parsing) : C_scope.
+Notation "( X ##.)" := (disjoint X) (only parsing) : C_scope.
+Notation "(.## X )" := (λ Y, Y ## X) (only parsing) : C_scope.
+Infix "##*" := (Forall2 (##)) (at level 70) : C_scope.
+Notation "(##*)" := (Forall2 (##)) (only parsing) : C_scope.
+Infix "##**" := (Forall2 (##*)) (at level 70) : C_scope.
+Infix "##1*" := (Forall2 (λ p q, p.1 ## q.1)) (at level 70) : C_scope.
+Infix "##2*" := (Forall2 (λ p q, p.2 ## q.2)) (at level 70) : C_scope.
+Infix "##1**" := (Forall2 (λ p q, p.1 ##* q.1)) (at level 70) : C_scope.
+Infix "##2**" := (Forall2 (λ p q, p.2 ##* q.2)) (at level 70) : C_scope.
+Hint Extern 0 (_ ## _) => symmetry; eassumption.
+Hint Extern 0 (_ ##* _) => symmetry; eassumption.
 
 Class DisjointE E A := disjointE : E → A → A → Prop.
 Hint Mode DisjointE - ! : typeclass_instances.
 Instance: Params (@disjointE) 4.
-Notation "X ⊥{ Γ } Y" := (disjointE Γ X Y)
-  (at level 70, format "X  ⊥{ Γ }  Y") : C_scope.
-Notation "(⊥{ Γ } )" := (disjointE Γ) (only parsing, Γ at level 1) : C_scope.
-Notation "Xs ⊥{ Γ }* Ys" := (Forall2 (⊥{Γ}) Xs Ys)
-  (at level 70, format "Xs  ⊥{ Γ }*  Ys") : C_scope.
-Notation "(⊥{ Γ }* )" := (Forall2 (⊥{Γ}))
+Notation "X ##{ Γ } Y" := (disjointE Γ X Y)
+  (at level 70, format "X  ##{ Γ }  Y") : C_scope.
+Notation "(##{ Γ } )" := (disjointE Γ) (only parsing, Γ at level 1) : C_scope.
+Notation "Xs ##{ Γ }* Ys" := (Forall2 (##{Γ}) Xs Ys)
+  (at level 70, format "Xs  ##{ Γ }*  Ys") : C_scope.
+Notation "(##{ Γ }* )" := (Forall2 (##{Γ}))
   (only parsing, Γ at level 1) : C_scope.
-Notation "X ⊥{ Γ1 , Γ2 , .. , Γ3 } Y" := (disjoint (pair .. (Γ1, Γ2) .. Γ3) X Y)
-  (at level 70, format "X  ⊥{ Γ1 , Γ2 , .. , Γ3 }  Y") : C_scope.
-Notation "Xs ⊥{ Γ1 , Γ2 , .. , Γ3 }* Ys" :=
+Notation "X ##{ Γ1 , Γ2 , .. , Γ3 } Y" := (disjoint (pair .. (Γ1, Γ2) .. Γ3) X Y)
+  (at level 70, format "X  ##{ Γ1 , Γ2 , .. , Γ3 }  Y") : C_scope.
+Notation "Xs ##{ Γ1 , Γ2 , .. , Γ3 }* Ys" :=
   (Forall2 (disjoint (pair .. (Γ1, Γ2) .. Γ3)) Xs Ys)
-  (at level 70, format "Xs  ⊥{ Γ1 ,  Γ2 , .. , Γ3 }*  Ys") : C_scope.
-Hint Extern 0 (_ ⊥{_} _) => symmetry; eassumption.
+  (at level 70, format "Xs  ##{ Γ1 ,  Γ2 , .. , Γ3 }*  Ys") : C_scope.
+Hint Extern 0 (_ ##{_} _) => symmetry; eassumption.
 
 Class DisjointList A := disjoint_list : list A → Prop.
 Hint Mode DisjointList ! : typeclass_instances.
 Instance: Params (@disjoint_list) 2.
-Notation "⊥ Xs" := (disjoint_list Xs) (at level 20, format "⊥  Xs") : C_scope.
+Notation "## Xs" := (disjoint_list Xs) (at level 20, format "##  Xs") : C_scope.
 
 Section disjoint_list.
   Context `{Disjoint A, Union A, Empty A}.
   Implicit Types X : A.
 
   Inductive disjoint_list_default : DisjointList A :=
-    | disjoint_nil_2 : ⊥ (@nil A)
-    | disjoint_cons_2 (X : A) (Xs : list A) : X ⊥ ⋃ Xs → ⊥ Xs → ⊥ (X :: Xs).
+    | disjoint_nil_2 : ## (@nil A)
+    | disjoint_cons_2 (X : A) (Xs : list A) : X ## ⋃ Xs → ## Xs → ## (X :: Xs).
   Global Existing Instance disjoint_list_default.
 
-  Lemma disjoint_list_nil  : ⊥ @nil A ↔ True.
+  Lemma disjoint_list_nil  : ## @nil A ↔ True.
   Proof. split; constructor. Qed.
-  Lemma disjoint_list_cons X Xs : ⊥ (X :: Xs) ↔ X ⊥ ⋃ Xs ∧ ⊥ Xs.
+  Lemma disjoint_list_cons X Xs : ## (X :: Xs) ↔ X ## ⋃ Xs ∧ ## Xs.
   Proof. split. inversion_clear 1; auto. intros [??]. constructor; auto. Qed.
 End disjoint_list.
 
