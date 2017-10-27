@@ -190,11 +190,9 @@ Section curry_uncurry.
   Lemma gmap_uncurry_non_empty (m : gmap (K1 * K2) A) i x :
     gmap_uncurry m !! i = Some x → x ≠ ∅.
   Proof.
-    intros Hm ->. revert m Hm.
-    apply (map_fold_ind (λ mr _, mr !! i = Some ∅ → False)); [done|].
-    intros [i' j] x m mr ??. destruct (decide (i = i')) as [->|].
-    - rewrite lookup_partial_alter. intros [= []%insert_non_empty].
-    - by rewrite lookup_partial_alter_ne by done.
+    intros Hm ->. eapply eq_None_not_Some; [|by eexists].
+    eapply lookup_gmap_uncurry_None; intros j.
+    by rewrite <-lookup_gmap_uncurry, Hm.
   Qed.
 
   Lemma gmap_uncurry_curry_non_empty (m : gmap K1 (gmap K2 A)) :
