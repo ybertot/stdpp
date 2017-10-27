@@ -186,6 +186,37 @@ Section curry_uncurry.
   Proof.
    apply map_eq; intros [i j]. by rewrite lookup_gmap_curry, lookup_gmap_uncurry.
   Qed.
+
+  Lemma gmap_uncurry_nonempty (m : gmap (K1 * K2) A):
+   ∀ i x, gmap_uncurry m !! i = Some x → x ≠ ∅.
+  Proof.
+    apply (map_fold_ind (λ mr m, ∀ i x, mr !! i = Some x → x ≠ ∅)); [done|].
+    intros [i j] x m12 mr Hij IH i' x'.
+    destruct (decide (i = i')) as [->|];
+      [rewrite lookup_partial_alter
+      |rewrite lookup_partial_alter_ne; [apply IH|done]].
+    inversion 1. apply insert_non_empty.
+  Qed.
+
+  Lemma gmap_uncurry_curry_nonempty (m : gmap K1 (gmap K2 A))
+    (NE: ∀ i x, m !! i = Some x → x ≠ ∅) :
+    gmap_uncurry (gmap_curry m) = m.
+  Proof.
+    apply map_eq; intros i. destruct (m !! i) as [x'|] eqn:Eqx'.
+    - destruct (gmap_uncurry (gmap_curry m) !! i) as [x2|] eqn:Eq2.
+      + f_equal. apply map_eq. intros j.
+        assert (Eq3: x' !! j = (m !! i  : option (gmap _ _)) ≫= (!! j)).
+          { by rewrite Eqx'. }
+        assert (Eq4: x2 !! j = (
+            gmap_uncurry (gmap_curry m) !! i : option (gmap _ _)) ≫= (!! j)).
+          { by rewrite Eq2. }
+        by rewrite Eq3, <- lookup_gmap_curry, Eq4, lookup_gmap_uncurry.
+      + revert Eq2. rewrite lookup_gmap_uncurry_None.
+        setoid_rewrite lookup_gmap_curry. rewrite Eqx'.
+        intros Eq2. exfalso. apply (NE _ _ Eqx'), map_eq, Eq2.
+    - apply lookup_gmap_uncurry_None.
+      intros j. by rewrite lookup_gmap_curry, Eqx'.
+  Qed.
 End curry_uncurry.
 
 (** * Finite sets *)
