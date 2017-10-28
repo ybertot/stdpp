@@ -32,7 +32,7 @@ Notably:
   [bug in Coq](https://github.com/coq/coq/issues/6030).
 * The behavior of `Program` is tweaked: `Unset Transparent Obligations`,
   `Obligation Tactic := idtac`, `Add Search Blacklist "_obligation_"`.  See
-  [`base.v`](`theories/base.v`) for further details.
+  [`base.v`](theories/base.v) for further details.
 
 ## History
 
