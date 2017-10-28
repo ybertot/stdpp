@@ -28,7 +28,7 @@ Notably:
 * `Generalizable All Variables`: This option enables implicit generalization in
   arguments of the form `` `{...}`` (i.e., anonymous arguments).  Unfortunately, it
   also enables implicit generalization in `Instance`.  We think that the fact
-  taht both behaviors are coupled together is a
+  that both behaviors are coupled together is a
   [bug in Coq](https://github.com/coq/coq/issues/6030).
 * The behavior of `Program` is tweaked: `Unset Transparent Obligations`,
   `Obligation Tactic := idtac`, `Add Search Blacklist "_obligation_"`.  See
