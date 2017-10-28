@@ -186,7 +186,7 @@ Section set_unfold_simple.
   Qed.
   Global Instance set_unfold_disjoint (P Q : A → Prop) X Y :
     (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
-    SetUnfold (X ⊥ Y) (∀ x, P x → Q x → False).
+    SetUnfold (X ## Y) (∀ x, P x → Q x → False).
   Proof. constructor. unfold disjoint, collection_disjoint. naive_solver. Qed.
 
   Context `{!LeibnizEquiv C}.
@@ -371,9 +371,9 @@ Section simple_collection.
   Lemma empty_union X Y : X ∪ Y ≡ ∅ ↔ X ≡ ∅ ∧ Y ≡ ∅.
   Proof. set_solver. Qed.
 
-  Lemma union_cancel_l X Y Z : Z ⊥ X → Z ⊥ Y → Z ∪ X ≡ Z ∪ Y → X ≡ Y.
+  Lemma union_cancel_l X Y Z : Z ## X → Z ## Y → Z ∪ X ≡ Z ∪ Y → X ≡ Y.
   Proof. set_solver. Qed.
-  Lemma union_cancel_r X Y Z : X ⊥ Z → Y ⊥ Z → X ∪ Z ≡ Y ∪ Z → X ≡ Y.
+  Lemma union_cancel_r X Y Z : X ## Z → Y ## Z → X ∪ Z ≡ Y ∪ Z → X ≡ Y.
   Proof. set_solver. Qed.
 
   (** Empty *)
@@ -405,22 +405,22 @@ Section simple_collection.
   Proof. by rewrite elem_of_singleton. Qed.
 
   (** Disjointness *)
-  Lemma elem_of_disjoint X Y : X ⊥ Y ↔ ∀ x, x ∈ X → x ∈ Y → False.
+  Lemma elem_of_disjoint X Y : X ## Y ↔ ∀ x, x ∈ X → x ∈ Y → False.
   Proof. done. Qed.
 
   Global Instance disjoint_sym : Symmetric (@disjoint C _).
   Proof. intros X Y. set_solver. Qed.
-  Lemma disjoint_empty_l Y : ∅ ⊥ Y.
+  Lemma disjoint_empty_l Y : ∅ ## Y.
   Proof. set_solver. Qed.
-  Lemma disjoint_empty_r X : X ⊥ ∅.
+  Lemma disjoint_empty_r X : X ## ∅.
   Proof. set_solver. Qed.
-  Lemma disjoint_singleton_l x Y : {[ x ]} ⊥ Y ↔ x ∉ Y.
+  Lemma disjoint_singleton_l x Y : {[ x ]} ## Y ↔ x ∉ Y.
   Proof. set_solver. Qed.
-  Lemma disjoint_singleton_r y X : X ⊥ {[ y ]} ↔ y ∉ X.
+  Lemma disjoint_singleton_r y X : X ## {[ y ]} ↔ y ∉ X.
   Proof. set_solver. Qed.
-  Lemma disjoint_union_l X1 X2 Y : X1 ∪ X2 ⊥ Y ↔ X1 ⊥ Y ∧ X2 ⊥ Y.
+  Lemma disjoint_union_l X1 X2 Y : X1 ∪ X2 ## Y ↔ X1 ## Y ∧ X2 ## Y.
   Proof. set_solver. Qed.
-  Lemma disjoint_union_r X Y1 Y2 : X ⊥ Y1 ∪ Y2 ↔ X ⊥ Y1 ∧ X ⊥ Y2.
+  Lemma disjoint_union_r X Y1 Y2 : X ## Y1 ∪ Y2 ↔ X ## Y1 ∧ X ## Y2.
   Proof. set_solver. Qed.
 
   (** Big unions *)
@@ -494,9 +494,9 @@ Section simple_collection.
     Lemma empty_union_L X Y : X ∪ Y = ∅ ↔ X = ∅ ∧ Y = ∅.
     Proof. unfold_leibniz. apply empty_union. Qed.
 
-    Lemma union_cancel_l_L X Y Z : Z ⊥ X → Z ⊥ Y → Z ∪ X = Z ∪ Y → X = Y.
+    Lemma union_cancel_l_L X Y Z : Z ## X → Z ## Y → Z ∪ X = Z ∪ Y → X = Y.
     Proof. unfold_leibniz. apply union_cancel_l. Qed.
-    Lemma union_cancel_r_L X Y Z : X ⊥ Z → Y ⊥ Z → X ∪ Z = Y ∪ Z → X = Y.
+    Lemma union_cancel_r_L X Y Z : X ## Z → Y ## Z → X ∪ Z = Y ∪ Z → X = Y.
     Proof. unfold_leibniz. apply union_cancel_r. Qed.
 
     (** Empty *)
@@ -618,7 +618,7 @@ Section collection.
   Proof. set_solver. Qed.
   Lemma difference_intersection_distr_l X Y Z : (X ∩ Y) ∖ Z ≡ X ∖ Z ∩ Y ∖ Z.
   Proof. set_solver. Qed.
-  Lemma difference_disjoint X Y : X ⊥ Y → X ∖ Y ≡ X.
+  Lemma difference_disjoint X Y : X ## Y → X ∖ Y ≡ X.
   Proof. set_solver. Qed.
 
   Lemma difference_mono X1 X2 Y1 Y2 :
@@ -630,7 +630,7 @@ Section collection.
   Proof. set_solver. Qed.
 
   (** Disjointness *)
-  Lemma disjoint_intersection X Y : X ⊥ Y ↔ X ∩ Y ≡ ∅.
+  Lemma disjoint_intersection X Y : X ## Y ↔ X ∩ Y ≡ ∅.
   Proof. set_solver. Qed.
 
   Section leibniz.
@@ -683,11 +683,11 @@ Section collection.
     Lemma difference_intersection_distr_l_L X Y Z :
       (X ∩ Y) ∖ Z = X ∖ Z ∩ Y ∖ Z.
     Proof. unfold_leibniz. apply difference_intersection_distr_l. Qed.
-    Lemma difference_disjoint_L X Y : X ⊥ Y → X ∖ Y = X.
+    Lemma difference_disjoint_L X Y : X ## Y → X ∖ Y = X.
     Proof. unfold_leibniz. apply difference_disjoint. Qed.
 
     (** Disjointness *)
-    Lemma disjoint_intersection_L X Y : X ⊥ Y ↔ X ∩ Y = ∅.
+    Lemma disjoint_intersection_L X Y : X ## Y ↔ X ∩ Y = ∅.
     Proof. unfold_leibniz. apply disjoint_intersection. Qed.
   End leibniz.
 
@@ -707,7 +707,7 @@ Section collection.
       intros x. rewrite !elem_of_union; rewrite elem_of_difference.
       split; [ | destruct (decide (x ∈ Y)) ]; intuition.
     Qed.
-    Lemma subseteq_disjoint_union X Y : X ⊆ Y ↔ ∃ Z, Y ≡ X ∪ Z ∧ X ⊥ Z.
+    Lemma subseteq_disjoint_union X Y : X ⊆ Y ↔ ∃ Z, Y ≡ X ∪ Z ∧ X ## Z.
     Proof.
       split; [|set_solver].
       exists (Y ∖ X); split; [auto using union_difference|set_solver].
@@ -732,7 +732,7 @@ Section collection.
     Proof. unfold_leibniz. apply non_empty_difference. Qed.
     Lemma empty_difference_subseteq_L X Y : X ∖ Y = ∅ → X ⊆ Y.
     Proof. unfold_leibniz. apply empty_difference_subseteq. Qed.
-    Lemma subseteq_disjoint_union_L X Y : X ⊆ Y ↔ ∃ Z, Y = X ∪ Z ∧ X ⊥ Z.
+    Lemma subseteq_disjoint_union_L X Y : X ⊆ Y ↔ ∃ Z, Y = X ∪ Z ∧ X ## Z.
     Proof. unfold_leibniz. apply subseteq_disjoint_union. Qed.
     Lemma singleton_union_difference_L X Y x :
       {[x]} ∪ (X ∖ Y) = ({[x]} ∪ X) ∖ (Y ∖ {[x]}).
@@ -1052,7 +1052,7 @@ Section seq_set.
   Qed.
 
   Lemma seq_set_S_disjoint start len :
-    {[ start + len ]} ⊥ seq_set (C:=C) start len.
+    {[ start + len ]} ## seq_set (C:=C) start len.
   Proof. intros x. rewrite elem_of_singleton, elem_of_seq_set. omega. Qed.
 
   Lemma seq_set_S_union start len :
