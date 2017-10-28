@@ -336,13 +336,13 @@ Tactic Notation "case_option_guard" :=
   let H := fresh in case_option_guard as H.
 
 Lemma option_guard_True {A} P `{Decision P} (mx : option A) :
-  P → guard P; mx = mx.
+  P → (guard P; mx) = mx.
 Proof. intros. by case_option_guard. Qed.
 Lemma option_guard_False {A} P `{Decision P} (mx : option A) :
-  ¬P → guard P; mx = None.
+  ¬P → (guard P; mx) = None.
 Proof. intros. by case_option_guard. Qed.
 Lemma option_guard_iff {A} P Q `{Decision P, Decision Q} (mx : option A) :
-  (P ↔ Q) → guard P; mx = guard Q; mx.
+  (P ↔ Q) → (guard P; mx) = guard Q; mx.
 Proof. intros [??]. repeat case_option_guard; intuition. Qed.
 
 Tactic Notation "simpl_option" "by" tactic3(tac) :=

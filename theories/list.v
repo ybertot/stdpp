@@ -3394,7 +3394,7 @@ Section zip_with.
     Forall2 P l k → length (zip_with f l k) = length k.
   Proof. induction 1; simpl; auto. Qed.
   Lemma lookup_zip_with l k i :
-    zip_with f l k !! i = x ← l !! i; y ← k !! i; Some (f x y).
+    zip_with f l k !! i = (x ← l !! i; y ← k !! i; Some (f x y)).
   Proof.
     revert k i. induction l; intros [|??] [|?]; f_equal/=; auto.
     by destruct (_ !! _).

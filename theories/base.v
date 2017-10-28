@@ -5,18 +5,32 @@ that are used throughout the whole development. Most importantly it contains
 abstract interfaces for ordered structures, collections, and various other data
 structures. *)
 Global Generalizable All Variables.
-Global Unset Transparent Obligations.
 From Coq Require Export Morphisms RelationClasses List Bool Utf8 Setoid.
 Set Default Proof Using "Type".
 Export ListNotations.
 From Coq.Program Require Export Basics Syntax.
 
-(* Tweak program: don't let it automatically simplify obligations and hide
-them from the results of the [Search] commands. *)
+(** * Tweak program *)
+(** 1. Since we only use Program to solve logical side-conditions, they should
+always be made Opaque, otherwise we end up with performance problems due to
+Coq blindly unfolding them.
+
+Note that in most cases we use [Next Obligation. (* ... *) Qed.], for which
+this option does not matter. However, sometimes we write things like
+[Solve Obligations with naive_solver (* ... *)], and then the obligations
+should surely be opaque. *)
+Global Unset Transparent Obligations.
+
+(** 2. Do not let Program automatically simplify obligations. The default
+obligation tactic is [Tactics.program_simpl], which, among other things,
+introduces all variables and gives them fresh names. As such, it becomes
+impossible to refer to hypotheses in a robust way. *)
 Obligation Tactic := idtac.
+
+(** 3. Hide obligations from the results of the [Search] commands. *)
 Add Search Blacklist "_obligation_".
 
-(** Sealing off definitions *)
+(** * Sealing off definitions *)
 Section seal.
   Local Set Primitive Projections.
   Record seal {A} (f : A) := { unseal : A; seal_eq : unseal = f }.
@@ -24,7 +38,7 @@ End seal.
 Arguments unseal {_ _} _ : assert.
 Arguments seal_eq {_ _} _ : assert.
 
-(** Typeclass opaque definitions *)
+(** * Typeclass opaque definitions *)
 (* The constant [tc_opaque] is used to make definitions opaque for just type
 class search. Note that [simpl] is set up to always unfold [tc_opaque]. *)
 Definition tc_opaque {A} (x : A) : A := x.
@@ -865,23 +879,26 @@ Notation "(≫= f )" := (mbind f) (only parsing) : C_scope.
 Notation "(≫=)" := (λ m f, mbind f m) (only parsing) : C_scope.
 
 Notation "x ← y ; z" := (y ≫= (λ x : _, z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, only parsing, right associativity) : C_scope.
+
 Infix "<$>" := fmap (at level 60, right associativity) : C_scope.
 Notation "' ( x1 , x2 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1, x2) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 Notation "' ( x1 , x2 , x3 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 Notation "' ( x1 , x2 , x3  , x4 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3,x4) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 Notation "' ( x1 , x2 , x3  , x4 , x5 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3,x4,x5) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 Notation "' ( x1 , x2 , x3  , x4 , x5 , x6 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3,x4,x5,x6) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+Notation "x ;; z" := (x ≫= λ _, z)
+  (at level 100, z at level 200, only parsing, right associativity): C_scope.
 
 Notation "ps .*1" := (fmap (M:=list) fst ps)
   (at level 10, format "ps .*1").
@@ -891,11 +908,10 @@ Notation "ps .*2" := (fmap (M:=list) snd ps)
 Class MGuard (M : Type → Type) :=
   mguard: ∀ P {dec : Decision P} {A}, (P → M A) → M A.
 Arguments mguard _ _ _ !_ _ _ / : assert.
-Notation "'guard' P ; o" := (mguard P (λ _, o))
-  (at level 65, only parsing, right associativity) : C_scope.
-Notation "'guard' P 'as' H ; o" := (mguard P (λ H, o))
-  (at level 65, only parsing, right associativity) : C_scope.
-
+Notation "'guard' P ; z" := (mguard P (λ _, z))
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+Notation "'guard' P 'as' H ; z" := (mguard P (λ H, z))
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 
 (** * Operations on maps *)
 (** In this section we define operational type classes for the operations
