@@ -5,18 +5,32 @@ that are used throughout the whole development. Most importantly it contains
 abstract interfaces for ordered structures, collections, and various other data
 structures. *)
 Global Generalizable All Variables.
-Global Unset Transparent Obligations.
 From Coq Require Export Morphisms RelationClasses List Bool Utf8 Setoid.
 Set Default Proof Using "Type".
 Export ListNotations.
 From Coq.Program Require Export Basics Syntax.
 
-(* Tweak program: don't let it automatically simplify obligations and hide
-them from the results of the [Search] commands. *)
+(** * Tweak program *)
+(** 1. Since we only use Program to solve logical side-conditions, they should
+always be made Opaque, otherwise we end up with performance problems due to
+Coq blindly unfolding them.
+
+Note that in most cases we use [Next Obligation. (* ... *) Qed.], for which
+this option does not matter. However, sometimes we write things like
+[Solve Obligations with naive_solver (* ... *)], and then the obligations
+should surely be opaque. *)
+Global Unset Transparent Obligations.
+
+(** 2. Do not let Program automatically simplify obligations. The default
+obligation tactic is [Tactics.program_simpl], which, among other things,
+introduces all variables and gives them fresh names. As such, it becomes
+impossible to refer to hypotheses in a robust way. *)
 Obligation Tactic := idtac.
+
+(** 3. Hide obligations from the results of the [Search] commands. *)
 Add Search Blacklist "_obligation_".
 
-(** Sealing off definitions *)
+(** * Sealing off definitions *)
 Section seal.
   Local Set Primitive Projections.
   Record seal {A} (f : A) := { unseal : A; seal_eq : unseal = f }.
@@ -24,7 +38,7 @@ End seal.
 Arguments unseal {_ _} _ : assert.
 Arguments seal_eq {_ _} _ : assert.
 
-(** Typeclass opaque definitions *)
+(** * Typeclass opaque definitions *)
 (* The constant [tc_opaque] is used to make definitions opaque for just type
 class search. Note that [simpl] is set up to always unfold [tc_opaque]. *)
 Definition tc_opaque {A} (x : A) : A := x.
