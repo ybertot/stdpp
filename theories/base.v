@@ -865,23 +865,26 @@ Notation "(≫= f )" := (mbind f) (only parsing) : C_scope.
 Notation "(≫=)" := (λ m f, mbind f m) (only parsing) : C_scope.
 
 Notation "x ← y ; z" := (y ≫= (λ x : _, z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, only parsing, right associativity) : C_scope.
+
 Infix "<$>" := fmap (at level 60, right associativity) : C_scope.
 Notation "' ( x1 , x2 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1, x2) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 Notation "' ( x1 , x2 , x3 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 Notation "' ( x1 , x2 , x3  , x4 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3,x4) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 Notation "' ( x1 , x2 , x3  , x4 , x5 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3,x4,x5) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 Notation "' ( x1 , x2 , x3  , x4 , x5 , x6 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3,x4,x5,x6) := x in z))
-  (at level 65, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+Notation "x ;; z" := (x ≫= λ _, z)
+  (at level 100, z at level 200, only parsing, right associativity): C_scope.
 
 Notation "ps .*1" := (fmap (M:=list) fst ps)
   (at level 10, format "ps .*1").
@@ -891,11 +894,10 @@ Notation "ps .*2" := (fmap (M:=list) snd ps)
 Class MGuard (M : Type → Type) :=
   mguard: ∀ P {dec : Decision P} {A}, (P → M A) → M A.
 Arguments mguard _ _ _ !_ _ _ / : assert.
-Notation "'guard' P ; o" := (mguard P (λ _, o))
-  (at level 65, only parsing, right associativity) : C_scope.
-Notation "'guard' P 'as' H ; o" := (mguard P (λ H, o))
-  (at level 65, only parsing, right associativity) : C_scope.
-
+Notation "'guard' P ; z" := (mguard P (λ _, z))
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+Notation "'guard' P 'as' H ; z" := (mguard P (λ H, z))
+  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
 
 (** * Operations on maps *)
 (** In this section we define operational type classes for the operations
