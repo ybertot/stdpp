@@ -4,11 +4,19 @@
 that are used throughout the whole development. Most importantly it contains
 abstract interfaces for ordered structures, collections, and various other data
 structures. *)
-Global Generalizable All Variables.
+
 From Coq Require Export Morphisms RelationClasses List Bool Utf8 Setoid.
 Set Default Proof Using "Type".
 Export ListNotations.
 From Coq.Program Require Export Basics Syntax.
+
+(** Enable implicit generalization. *)
+(* This option enables implicit generalization in arguments of the form
+   `{...} (i.e., anonymous arguments).  Unfortunately, it also enables
+   implicit generalization in `Instance`.  We think that the fact taht both
+   behaviors are coupled together is a [bug in
+   Coq](https://github.com/coq/coq/issues/6030). *)
+Global Generalizable All Variables.
 
 (** * Tweak program *)
 (** 1. Since we only use Program to solve logical side-conditions, they should

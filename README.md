@@ -20,6 +20,20 @@ The key features of this library are as follows:
   `set_solver` for goals involving set operations.
 - It is entirely dependency- and axiom-free.
 
+## Side-effects
+
+Importing std++ has some side effects as the library sets some global options.
+Notably:
+
+* `Generalizable All Variables`: This option enables implicit generalization in
+  arguments of the form `` `{...}`` (i.e., anonymous arguments).  Unfortunately, it
+  also enables implicit generalization in `Instance`.  We think that the fact
+  taht both behaviors are coupled together is a
+  [bug in Coq](https://github.com/coq/coq/issues/6030).
+* The behavior of `Program` is tweaked: `Unset Transparent Obligations`,
+  `Obligation Tactic := idtac`, `Add Search Blacklist "_obligation_"`.  See
+  [`base.v`](`theories/base.v`) for further details.
+
 ## History
 
 Coq-std++ has originally been developed by Robbert Krebbers as part of his
