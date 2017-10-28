@@ -40,10 +40,10 @@ Definition hlam {A As B} (f : A → himpl As B) : himpl (tcons A As) B := f.
 Arguments hlam _ _ _ _ _ / : assert.
 
 Definition hcurry {As B} (f : himpl As B) (xs : hlist As) : B :=
-  (fix go As xs :=
+  (fix go {As} xs :=
     match xs in hlist As return himpl As B → B with
     | hnil => λ f, f
-    | @hcons A As x xs => λ f, go As xs (f x)
+    | hcons x xs => λ f, go xs (f x)
     end) _ xs f.
 Coercion hcurry : himpl >-> Funclass.
 
