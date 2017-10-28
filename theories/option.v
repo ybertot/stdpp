@@ -65,7 +65,7 @@ Proof.
   set (f mx := match mx return P mx → is_Some mx with
     Some _ => λ _, ex_intro _ _ eq_refl | None => False_rect _ end).
   set (g mx (H : is_Some mx) :=
-    match H return P mx with ex_intro _ p => eq_rect _ _ I _ (eq_sym p) end).
+    match H return P mx with ex_intro _ _ p => eq_rect _ _ I _ (eq_sym p) end).
   assert (∀ mx H, f mx (g mx H) = H) as f_g by (by intros ? [??]; subst).
   intros p1 p2. rewrite <-(f_g _ p1), <-(f_g _ p2). by destruct mx, p1.
 Qed.

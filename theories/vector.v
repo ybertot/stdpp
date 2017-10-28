@@ -238,7 +238,7 @@ Qed.
 Fixpoint vinsert {A n} (i : fin n) (x : A) : vec A n → vec A n :=
   match i with
   | 0%fin => vec_S_inv _ (λ _ v, x ::: v)
-  | FS _ i => vec_S_inv _ (λ y v, y ::: vinsert i x v)
+  | FS i => vec_S_inv _ (λ y v, y ::: vinsert i x v)
   end.
 
 Lemma vec_to_list_insert {A n} i x (v : vec A n) :

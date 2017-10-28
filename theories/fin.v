@@ -28,7 +28,7 @@ Notation "8" := (FS 7) : fin_scope. Notation "9" := (FS 8) : fin_scope.
 Notation "10" := (FS 9) : fin_scope.
 
 Fixpoint fin_to_nat {n} (i : fin n) : nat :=
-  match i with 0%fin => 0 | FS _ i => S (fin_to_nat i) end.
+  match i with 0%fin => 0 | FS i => S (fin_to_nat i) end.
 Coercion fin_to_nat : fin >-> nat.
 
 Notation fin_of_nat := Fin.of_nat_lt.
@@ -57,7 +57,7 @@ Definition fin_S_inv {n} (P : fin (S n) → Type)
   (H0 : P 0%fin) (HS : ∀ i, P (FS i)) (i : fin (S n)) : P i.
 Proof.
   revert P H0 HS.
-  refine match i with 0%fin => λ _ H0 _, H0 | FS _ i => λ _ _ HS, HS i end.
+  refine match i with 0%fin => λ _ H0 _, H0 | FS i => λ _ _ HS, HS i end.
 Defined.
 
 Ltac inv_fin i :=

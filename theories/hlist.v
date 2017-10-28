@@ -14,12 +14,12 @@ Inductive hlist : tlist → Type :=
 Fixpoint tapp (As Bs : tlist) : tlist :=
   match As with tnil => Bs | tcons A As => tcons A (tapp As Bs) end.
 Fixpoint happ {As Bs} (xs : hlist As) (ys : hlist Bs) : hlist (tapp As Bs) :=
-  match xs with hnil => ys | hcons _ _ x xs => hcons x (happ xs ys) end.
+  match xs with hnil => ys | hcons x xs => hcons x (happ xs ys) end.
 
 Fixpoint hhead {A As} (xs : hlist (tcons A As)) : A :=
-  match xs with hnil => () | hcons _ _ x _ => x end.
+  match xs with hnil => () | hcons x _ => x end.
 Fixpoint htail {A As} (xs : hlist (tcons A As)) : hlist As :=
-  match xs with hnil => () | hcons _ _ _ xs => xs end.
+  match xs with hnil => () | hcons _ xs => xs end.
 
 Fixpoint hheads {As Bs} : hlist (tapp As Bs) → hlist As :=
   match As with
@@ -43,7 +43,7 @@ Definition hcurry {As B} (f : himpl As B) (xs : hlist As) : B :=
   (fix go As xs :=
     match xs in hlist As return himpl As B → B with
     | hnil => λ f, f
-    | hcons A As x xs => λ f, go As xs (f x)
+    | @hcons A As x xs => λ f, go As xs (f x)
     end) _ xs f.
 Coercion hcurry : himpl >-> Funclass.
 

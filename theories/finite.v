@@ -72,7 +72,7 @@ Definition encode_fin `{Finite A} (x : A) : fin (card A) :=
   Fin.of_nat_lt (encode_lt_card x).
 Program Definition decode_fin `{Finite A} (i : fin (card A)) : A :=
   match Some_dec (decode_nat i) return _ with
-  | inleft (exist x _) => x | inright _ => _
+  | inleft (exist _ x _) => x | inright _ => _
   end.
 Next Obligation.
   intros A ?? i ?; exfalso.
