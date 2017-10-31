@@ -283,4 +283,89 @@ Proof.
  refine (cast_if (decide (Exists P (elements X))));
    by rewrite set_Exists_elements.
 Defined.
+
+(** * Fresh elements *)
+Section Fresh.
+  Context `{Infinite A, ∀ (x: A) (s: C), Decision (x ∈ s)}.
+
+  Lemma subset_difference_in {x: A} {s: C} (inx: x ∈ s): s ∖ {[ x ]} ⊂ s.
+  Proof. set_solver. Qed.
+
+  Definition fresh_generic_body (s: C) (rec: ∀ s', s' ⊂ s → nat → A) (n: nat) :=
+    let cand := inject n in
+    match decide (cand ∈ s) with
+    | left H => rec _ (subset_difference_in H) (S n)
+    | right _ => cand
+    end.
+  Lemma fresh_generic_body_proper s (f g: ∀ y, y ⊂ s → nat → A):
+    (∀ y Hy Hy', pointwise_relation nat eq (f y Hy) (g y Hy')) →
+    pointwise_relation nat eq (fresh_generic_body s f) (fresh_generic_body s g).
+  Proof.
+    intros relfg i.
+    unfold fresh_generic_body.
+    destruct decide.
+    2: done.
+    apply relfg.
+  Qed.
+
+  Global Instance fresh_generic: Fresh A C | 20 :=
+    λ s, Fix collection_wf (const (nat → A)) fresh_generic_body s 0.
+
+  Global Instance fresh_generic_spec: FreshSpec A C.
+  Proof.
+    assert (unfold: ∀ s n,
+               Fix collection_wf (const (nat → A)) fresh_generic_body s n =
+                   fresh_generic_body s
+                   (λ s' _ n, Fix collection_wf (const (nat → A)) fresh_generic_body s' n)
+                   n).
+    { intros.
+      apply (Fix_unfold_rel collection_wf (const (nat → A)) (const (pointwise_relation nat (=)))
+                            fresh_generic_body fresh_generic_body_proper s n). }
+    split.
+    - apply _.
+    - unfold fresh, fresh_generic.
+      intro X.
+      generalize 0 as n.
+      induction X as [X IH] using (well_founded_ind collection_wf).
+      intros n Y eqXY.
+      rewrite (unfold X n), (unfold Y n).
+      unfold fresh_generic_body at 1 3.
+      destruct decide as [case|case], decide as [case'|case'].
+      2,3: specialize (eqXY (inject n)); tauto.
+      2: done.
+      erewrite (IH (X ∖ {[inject n]})).
+      + done.
+      + by apply subset_difference_in.
+      + by intro; rewrite !elem_of_difference, eqXY.
+    - unfold fresh, fresh_generic.
+      intro X.
+      generalize 0 as n.
+      induction X as [X IH] using (well_founded_ind collection_wf).
+      intro.
+      rewrite unfold; unfold fresh_generic_body at 1.
+      destruct decide as [case|case].
+      2: done.
+      specialize (IH _ (subset_difference_in case) (S n)).
+      rewrite not_elem_of_difference in IH.
+      destruct IH as [?|contra].
+      1: done.
+      clear case.
+      assert (∀ Y n, ∃ m, Fix collection_wf (const (nat → A))
+                              fresh_generic_body Y n = inject m ∧ n ≤ m)
+        as candidates.
+      { clear X n contra.
+        induction Y as [Y IH] using (well_founded_ind collection_wf).
+        intro.
+        setoid_rewrite unfold; unfold fresh_generic_body at 1.
+        destruct decide as [case|case].
+        { destruct (IH _ (subset_difference_in case) (S n)) as [m [eqx bound]].
+          exists m; split; auto with arith. }
+        { exists n; auto. } }
+      revert contra.
+      destruct (candidates (X ∖ {[ inject n ]}) (S n)) as [m [-> bound]].
+      rewrite elem_of_singleton; intro eqinj.
+      enough (n = m) by lia.
+      apply inject_injective; by rewrite eqinj.
+  Qed.
+End Fresh.
 End fin_collection.
