@@ -1,6 +1,6 @@
 (* Copyright (c) 2012-2017, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
-From stdpp Require Import pretty fin_collections.
+From stdpp Require Import pretty fin_collections relations prelude.
 
 (** The class [Infinite] axiomatizes types with infinitely many elements
 by giving an injection from the natural numbers into the type. It is mostly
@@ -25,7 +25,7 @@ Qed.
 
 (** * Fresh elements *)
 Section Fresh.
-  Context `{Infinite A, ∀ (x: A) (s: C), Decision (x ∈ s)}.
+  Context `{FinCollection A C} `{Infinite A, !RelDecision (@elem_of A C _)}.
 
   Lemma subset_difference_in {x: A} {s: C} (inx: x ∈ s): s ∖ {[ x ]} ⊂ s.
   Proof. set_solver. Qed.
@@ -47,36 +47,35 @@ Section Fresh.
     apply relfg.
   Qed.
 
-  Definition fresh_generic_fix := Fix collection_wf (const (nat → A)) fresh_generic_body.
+  Definition fresh_generic_fix u :=
+    Fix (wf_guard u collection_wf) (const (nat → A)) fresh_generic_body.
 
-  Lemma fresh_generic_fixpoint_unfold s n:
-    fresh_generic_fix s n = fresh_generic_body s (λ s' _ n, fresh_generic_fix s' n) n.
+  Lemma fresh_generic_fixpoint_unfold u s n:
+    fresh_generic_fix u s n = fresh_generic_body s (λ s' _ n, fresh_generic_fix u s' n) n.
   Proof.
-    apply (Fix_unfold_rel collection_wf (const (nat → A)) (const (pointwise_relation nat (=)))
+    apply (Fix_unfold_rel (wf_guard u collection_wf)
+                          (const (nat → A)) (const (pointwise_relation nat (=)))
                           fresh_generic_body fresh_generic_body_proper s n).
   Qed.
 
-  Lemma fresh_generic_fixpoint_spec s n:
-    ∃ m, n ≤ m ∧ fresh_generic_fix s n = inject m ∧ inject m ∉ s ∧ ∀ i, n ≤ i < m → inject i ∈ s.
+  Lemma fresh_generic_fixpoint_spec u s n:
+    ∃ m, n ≤ m ∧ fresh_generic_fix u s n = inject m ∧ inject m ∉ s ∧ ∀ i, n ≤ i < m → inject i ∈ s.
   Proof.
     revert n.
     induction s as [s IH] using (well_founded_ind collection_wf); intro.
     setoid_rewrite fresh_generic_fixpoint_unfold; unfold fresh_generic_body.
-    destruct decide as [case|case].
-    - destruct (IH _ (subset_difference_in case) (S n)) as [m [mbound [eqfix [notin inbelow]]]].
-      exists m; repeat split; auto.
-      + omega.
-      + rewrite not_elem_of_difference, elem_of_singleton in notin.
-        destruct notin as [?|?%inject_injective]; auto; omega.
-      + intros i ibound.
-        destruct (decide (i = n)) as [<-|neq]; auto.
-        enough (inject i ∈ s ∖ {[inject n]}) by set_solver.
-        apply inbelow; omega.
-    - exists n; repeat split; auto.
-      intros; omega.
+    destruct decide as [case|case]; eauto with omega.
+    destruct (IH _ (subset_difference_in case) (S n)) as [m [mbound [eqfix [notin inbelow]]]].
+    exists m; repeat split; auto with omega.
+    - rewrite not_elem_of_difference, elem_of_singleton in notin.
+      destruct notin as [?|?%inject_injective]; auto with omega.
+    - intros i ibound.
+      destruct (decide (i = n)) as [<-|neq]; auto.
+      enough (inject i ∈ s ∖ {[inject n]}) by set_solver.
+      apply inbelow; omega.
   Qed.
 
-  Instance fresh_generic: Fresh A C | 20 := λ s, fresh_generic_fix s 0.
+  Instance fresh_generic: Fresh A C | 20 := λ s, fresh_generic_fix (1 + Nat.log2 (size s)) s 0.
 
   Instance fresh_generic_spec: FreshSpec A C.
   Proof.
@@ -84,20 +83,23 @@ Section Fresh.
     - apply _.
     - intros * eqXY.
       unfold fresh, fresh_generic.
-      destruct (fresh_generic_fixpoint_spec X 0) as [mX [_ [-> [notinX belowinX]]]].
-      destruct (fresh_generic_fixpoint_spec Y 0) as [mY [_ [-> [notinY belowinY]]]].
+      destruct (fresh_generic_fixpoint_spec (1 + Nat.log2 (size X)) X 0)
+        as [mX [_ [-> [notinX belowinX]]]].
+      destruct (fresh_generic_fixpoint_spec (1 + Nat.log2 (size Y)) Y 0)
+        as [mY [_ [-> [notinY belowinY]]]].
       destruct (Nat.lt_trichotomy mX mY) as [case|[->|case]]; auto.
       + contradict notinX; rewrite eqXY; apply belowinY; omega.
       + contradict notinY; rewrite <- eqXY; apply belowinX; omega.
     - intro.
       unfold fresh, fresh_generic.
-      destruct (fresh_generic_fixpoint_spec X 0) as [m [_ [-> [notinX belowinX]]]]; auto.
+      destruct (fresh_generic_fixpoint_spec (1 + Nat.log2 (size X)) X 0)
+        as [m [_ [-> [notinX belowinX]]]]; auto.
   Qed.
 End Fresh.
 
 (** Derive fresh instances. *)
 Section StringFresh.
-  Context `{FinCollection string C, ∀ (x: string) (s: C), Decision (x ∈ s)}.
+  Context `{FinCollection string C, !RelDecision elem_of}.
   Global Instance string_fresh: Fresh string C := fresh_generic.
-  Global Instance string_fresh_spec: FreshSpec string C := _.
+  Global Instance string_fresh_spec: FreshSpec string C := fresh_generic_spec.
 End StringFresh.
