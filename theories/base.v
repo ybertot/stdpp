@@ -1125,6 +1125,13 @@ Class FreshSpec A C `{ElemOf A C,
   is_fresh (X : C) : fresh X ∉ X
 }.
 
+(** The class [Infinite] axiomatizes types with infinitely many elements
+by giving an injection from the natural numbers into the type. It is mostly
+used to provide a generic [fresh] algorithm. *)
+Class Infinite A :=
+  { inject: nat → A;
+    inject_injective:> Inj (=) (=) inject }.
+
 (** * Miscellaneous *)
 Class Half A := half: A → A.
 Hint Mode Half ! : typeclass_instances.
