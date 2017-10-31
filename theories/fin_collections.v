@@ -308,64 +308,51 @@ Section Fresh.
     apply relfg.
   Qed.
 
-  Global Instance fresh_generic: Fresh A C | 20 :=
-    λ s, Fix collection_wf (const (nat → A)) fresh_generic_body s 0.
+  Definition fresh_generic_fix := Fix collection_wf (const (nat → A)) fresh_generic_body.
+
+  Lemma fresh_generic_fixpoint_unfold s n:
+    fresh_generic_fix s n = fresh_generic_body s (λ s' _ n, fresh_generic_fix s' n) n.
+  Proof.
+    apply (Fix_unfold_rel collection_wf (const (nat → A)) (const (pointwise_relation nat (=)))
+                          fresh_generic_body fresh_generic_body_proper s n).
+  Qed.
+
+  Lemma fresh_generic_fixpoint_spec s n:
+    ∃ m, n ≤ m ∧ fresh_generic_fix s n = inject m ∧ inject m ∉ s ∧ ∀ i, n ≤ i < m → inject i ∈ s.
+  Proof.
+    revert n.
+    induction s as [s IH] using (well_founded_ind collection_wf); intro.
+    setoid_rewrite fresh_generic_fixpoint_unfold; unfold fresh_generic_body.
+    destruct decide as [case|case].
+    - destruct (IH _ (subset_difference_in case) (S n)) as [m [mbound [eqfix [notin inbelow]]]].
+      exists m; repeat split; auto.
+      + omega.
+      + rewrite not_elem_of_difference, elem_of_singleton in notin.
+        destruct notin as [?|?%inject_injective]; auto; omega.
+      + intros i ibound.
+        destruct (decide (i = n)) as [<-|neq]; auto.
+        enough (inject i ∈ s ∖ {[inject n]}) by set_solver.
+        apply inbelow; omega.
+    - exists n; repeat split; auto.
+      intros; omega.
+  Qed.
+
+  Global Instance fresh_generic: Fresh A C | 20 := λ s, fresh_generic_fix s 0.
 
   Global Instance fresh_generic_spec: FreshSpec A C.
   Proof.
-    assert (unfold: ∀ s n,
-               Fix collection_wf (const (nat → A)) fresh_generic_body s n =
-                   fresh_generic_body s
-                   (λ s' _ n, Fix collection_wf (const (nat → A)) fresh_generic_body s' n)
-                   n).
-    { intros.
-      apply (Fix_unfold_rel collection_wf (const (nat → A)) (const (pointwise_relation nat (=)))
-                            fresh_generic_body fresh_generic_body_proper s n). }
     split.
     - apply _.
-    - unfold fresh, fresh_generic.
-      intro X.
-      generalize 0 as n.
-      induction X as [X IH] using (well_founded_ind collection_wf).
-      intros n Y eqXY.
-      rewrite (unfold X n), (unfold Y n).
-      unfold fresh_generic_body at 1 3.
-      destruct decide as [case|case], decide as [case'|case'].
-      2,3: specialize (eqXY (inject n)); tauto.
-      2: done.
-      erewrite (IH (X ∖ {[inject n]})).
-      + done.
-      + by apply subset_difference_in.
-      + by intro; rewrite !elem_of_difference, eqXY.
-    - unfold fresh, fresh_generic.
-      intro X.
-      generalize 0 as n.
-      induction X as [X IH] using (well_founded_ind collection_wf).
-      intro.
-      rewrite unfold; unfold fresh_generic_body at 1.
-      destruct decide as [case|case].
-      2: done.
-      specialize (IH _ (subset_difference_in case) (S n)).
-      rewrite not_elem_of_difference in IH.
-      destruct IH as [?|contra].
-      1: done.
-      clear case.
-      assert (∀ Y n, ∃ m, Fix collection_wf (const (nat → A))
-                              fresh_generic_body Y n = inject m ∧ n ≤ m)
-        as candidates.
-      { clear X n contra.
-        induction Y as [Y IH] using (well_founded_ind collection_wf).
-        intro.
-        setoid_rewrite unfold; unfold fresh_generic_body at 1.
-        destruct decide as [case|case].
-        { destruct (IH _ (subset_difference_in case) (S n)) as [m [eqx bound]].
-          exists m; split; auto with arith. }
-        { exists n; auto. } }
-      revert contra.
-      destruct (candidates (X ∖ {[ inject n ]}) (S n)) as [m [-> bound]].
-      rewrite elem_of_singleton; intro eqinj.
-      enough (n = m) by lia.
-      apply inject_injective; by rewrite eqinj.
+    - intros * eqXY.
+      unfold fresh, fresh_generic.
+      destruct (fresh_generic_fixpoint_spec X 0) as [mX [_ [-> [notinX belowinX]]]].
+      destruct (fresh_generic_fixpoint_spec Y 0) as [mY [_ [-> [notinY belowinY]]]].
+      destruct (Nat.lt_trichotomy mX mY) as [case|[->|case]]; auto.
+      + contradict notinX; rewrite eqXY; apply belowinY; omega.
+      + contradict notinY; rewrite <- eqXY; apply belowinX; omega.
+    - intro.
+      unfold fresh, fresh_generic.
+      destruct (fresh_generic_fixpoint_spec X 0) as [m [_ [-> [notinX belowinX]]]]; auto.
   Qed.
 End Fresh.
 End fin_collection.
