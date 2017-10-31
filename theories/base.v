@@ -964,7 +964,7 @@ Hint Mode Alter - - ! : typeclass_instances.
 Instance: Params (@alter) 5.
 Arguments alter {_ _ _ _} _ !_ !_ / : simpl nomatch, assert.
 
-(** The function [alter f k m] should update the value at key [k] using the
+(** The function [partial_alter f k m] should update the value at key [k] using the
 function [f], which is called with the original value at key [k] or [None]
 if [k] is not a member of [m]. The value at [k] should be deleted if [f] 
 yields [None]. *)
@@ -1092,7 +1092,7 @@ Hint Mode Size ! : typeclass_instances.
 Arguments size {_ _} !_ / : simpl nomatch, assert.
 Instance: Params (@size) 2.
 
-(** The class [Collection M] axiomatizes a type constructor [M] that can be
+(** The class [CollectionMonad M] axiomatizes a type constructor [M] that can be
 used to construct a collection [M A] with elements of type [A]. The advantage
 of this class, compared to [Collection], is that it also axiomatizes the
 the monadic operations. The disadvantage, is that not many inhabits are
