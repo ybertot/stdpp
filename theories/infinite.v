@@ -42,8 +42,7 @@ Section Fresh.
   Proof.
     intros relfg i.
     unfold fresh_generic_body.
-    destruct decide.
-    2: done.
+    destruct decide; auto.
     apply relfg.
   Qed.
 
