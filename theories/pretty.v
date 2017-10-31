@@ -70,3 +70,10 @@ Instance pretty_Z : Pretty Z := λ x,
   match x with
   | Z0 => "" | Zpos x => pretty (Npos x) | Zneg x => "-" +:+ pretty (Npos x)
   end%string.
+Instance pretty_nat : Pretty nat := λ x, pretty (N.of_nat x).
+Instance pretty_nat_inj : Inj (@eq nat) (=) pretty.
+Proof.
+  unfold pretty, pretty_nat.
+  apply compose_inj with (R2 := eq) (f := N.of_nat), _.
+  exact Nat2N.inj.
+Qed.
