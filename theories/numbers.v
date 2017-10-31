@@ -347,6 +347,14 @@ Proof.
 Qed.
 Close Scope Z_scope.
 
+(** * Injectivity of casts *)
+Instance N_of_nat_inj: Inj (=) (=) N.of_nat := Nat2N.inj.
+Instance nat_of_N_inj: Inj (=) (=) N.to_nat := N2Nat.inj.
+Instance nat_of_pos_inj: Inj (=) (=) Pos.to_nat := Pos2Nat.inj.
+Instance pos_of_Snat_inj: Inj (=) (=) Pos.of_succ_nat := SuccNat2Pos.inj.
+Instance Z_of_N_inj: Inj (=) (=) Z.of_N := N2Z.inj.
+(* Add others here. *)
+
 (** * Notations and properties of [Qc] *)
 Open Scope Qc_scope.
 Delimit Scope Qc_scope with Qc.
