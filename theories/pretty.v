@@ -1,7 +1,7 @@
 (* Copyright (c) 2012-2017, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
 From stdpp Require Export strings.
-From stdpp Require Import relations.
+From stdpp Require Import relations numbers.
 From Coq Require Import Ascii.
 Set Default Proof Using "Type".
 
@@ -70,3 +70,7 @@ Instance pretty_Z : Pretty Z := λ x,
   match x with
   | Z0 => "" | Zpos x => pretty (Npos x) | Zneg x => "-" +:+ pretty (Npos x)
   end%string.
+Instance pretty_nat : Pretty nat := λ x, pretty (N.of_nat x).
+Instance pretty_nat_inj : Inj (@eq nat) (=) pretty.
+Proof. apply _. Qed.
+
