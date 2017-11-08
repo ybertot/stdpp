@@ -202,7 +202,7 @@ Proof. by destruct mx. Qed.
 Lemma option_fmap_id {A} (mx : option A) : id <$> mx = mx.
 Proof. by destruct mx. Qed.
 Lemma option_fmap_compose {A B} (f : A → B) {C} (g : B → C) mx :
-  g ∘ f <$> mx = g <$> f <$> mx.
+  g ∘ f <$> mx = g <$> (f <$> mx).
 Proof. by destruct mx. Qed.
 Lemma option_fmap_ext {A B} (f g : A → B) mx :
   (∀ x, f x = g x) → f <$> mx = g <$> mx.

@@ -232,7 +232,7 @@ Section bijective_finite.
 End bijective_finite.
 
 Program Instance option_finite `{Finite A} : Finite (option A) :=
-  {| enum := None :: Some <$> enum A |}.
+  {| enum := None :: (Some <$> enum A) |}.
 Next Obligation.
   constructor.
   - rewrite elem_of_list_fmap. by intros (?&?&?).
@@ -343,7 +343,7 @@ Proof.
 Qed.
 
 Fixpoint fin_enum (n : nat) : list (fin n) :=
-  match n with 0 => [] | S n => 0%fin :: FS <$> fin_enum n end.
+  match n with 0 => [] | S n => 0%fin :: (FS <$> fin_enum n) end.
 Program Instance fin_finite n : Finite (fin n) := {| enum := fin_enum n |}.
 Next Obligation.
   intros n. induction n; simpl; constructor.
