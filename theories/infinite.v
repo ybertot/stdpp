@@ -27,13 +27,10 @@ Qed.
 Section Fresh.
   Context `{FinCollection A C} `{Infinite A, !RelDecision (@elem_of A C _)}.
 
-  Lemma subset_difference_in {x: A} {s: C} (inx: x ∈ s): s ∖ {[ x ]} ⊂ s.
-  Proof. set_solver. Qed.
-
   Definition fresh_generic_body (s: C) (rec: ∀ s', s' ⊂ s → nat → A) (n: nat) :=
     let cand := inject n in
     match decide (cand ∈ s) with
-    | left H => rec _ (subset_difference_in H) (S n)
+    | left H => rec _ (subset_difference_elem_of H) (S n)
     | right _ => cand
     end.
   Lemma fresh_generic_body_proper s (f g: ∀ y, y ⊂ s → nat → A):
@@ -64,7 +61,7 @@ Section Fresh.
     induction s as [s IH] using (well_founded_ind collection_wf); intro.
     setoid_rewrite fresh_generic_fixpoint_unfold; unfold fresh_generic_body.
     destruct decide as [case|case]; eauto with omega.
-    destruct (IH _ (subset_difference_in case) (S n)) as [m [mbound [eqfix [notin inbelow]]]].
+    destruct (IH _ (subset_difference_elem_of case) (S n)) as [m [mbound [eqfix [notin inbelow]]]].
     exists m; repeat split; auto with omega.
     - rewrite not_elem_of_difference, elem_of_singleton in notin.
       destruct notin as [?|?%inject_injective]; auto with omega.
