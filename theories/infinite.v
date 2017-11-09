@@ -1,6 +1,6 @@
 (* Copyright (c) 2012-2017, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
-From stdpp Require Import pretty fin_collections relations prelude.
+From stdpp Require Import pretty fin_collections relations prelude gmap.
 
 (** The class [Infinite] axiomatizes types with infinitely many elements
 by giving an injection from the natural numbers into the type. It is mostly
@@ -95,10 +95,3 @@ Section Fresh.
         as [m [_ [-> [notinX belowinX]]]]; auto.
   Qed.
 End Fresh.
-
-(** Derive fresh instances. *)
-Section StringFresh.
-  Context `{FinCollection string C, !RelDecision elem_of}.
-  Global Instance string_fresh: Fresh string C := fresh_generic.
-  Global Instance string_fresh_spec: FreshSpec string C := fresh_generic_spec.
-End StringFresh.
