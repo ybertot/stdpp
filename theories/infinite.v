@@ -71,7 +71,7 @@ Section Fresh.
       apply inbelow; omega.
   Qed.
 
-  Instance fresh_generic: Fresh A C | 20 := λ s, fresh_generic_fix (1 + Nat.log2 (size s)) s 0.
+  Instance fresh_generic: Fresh A C := λ s, fresh_generic_fix s 0.
 
   Instance fresh_generic_spec: FreshSpec A C.
   Proof.
