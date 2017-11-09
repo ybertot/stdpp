@@ -13,7 +13,7 @@ Notation length := List.length.
 (** * Fix scopes *)
 Open Scope string_scope.
 Open Scope list_scope.
-Infix "+:+" := String.append (at level 60, right associativity) : C_scope.
+Infix "+:+" := String.append (at level 60, right associativity) : stdpp_scope.
 Arguments String.append : simpl never.
 
 (** * Decision of equality *)

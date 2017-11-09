@@ -9,7 +9,7 @@ Add Printing Constructor set.
 Arguments mkSet {_} _ : assert.
 Arguments set_car {_} _ _ : assert.
 Notation "{[ x | P ]}" := (mkSet (λ x, P))
-  (at level 1, format "{[  x  |  P  ]}") : C_scope.
+  (at level 1, format "{[  x  |  P  ]}") : stdpp_scope.
 
 Instance set_elem_of {A} : ElemOf A (set A) := λ x X, set_car X x.
 

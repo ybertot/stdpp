@@ -91,10 +91,10 @@ Existing Class TCForall.
 Existing Instance TCForall_nil.
 Existing Instance TCForall_cons.
 
-(** Throughout this development we use [C_scope] for all general purpose
+(** Throughout this development we use [stdpp_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
-Delimit Scope C_scope with C.
-Global Open Scope C_scope.
+Delimit Scope stdpp_scope with stdpp.
+Global Open Scope stdpp_scope.
 
 (** Change [True] and [False] into notations in order to enable overloading.
 We will use this to give [True] and [False] a different interpretation for
@@ -105,12 +105,12 @@ Notation "'False'" := False : type_scope.
 
 (** * Equality *)
 (** Introduce some Haskell style like notations. *)
-Notation "(=)" := eq (only parsing) : C_scope.
-Notation "( x =)" := (eq x) (only parsing) : C_scope.
-Notation "(= x )" := (λ y, eq y x) (only parsing) : C_scope.
-Notation "(≠)" := (λ x y, x ≠ y) (only parsing) : C_scope.
-Notation "( x ≠)" := (λ y, x ≠ y) (only parsing) : C_scope.
-Notation "(≠ x )" := (λ y, y ≠ x) (only parsing) : C_scope.
+Notation "(=)" := eq (only parsing) : stdpp_scope.
+Notation "( x =)" := (eq x) (only parsing) : stdpp_scope.
+Notation "(= x )" := (λ y, eq y x) (only parsing) : stdpp_scope.
+Notation "(≠)" := (λ x y, x ≠ y) (only parsing) : stdpp_scope.
+Notation "( x ≠)" := (λ y, x ≠ y) (only parsing) : stdpp_scope.
+Notation "(≠ x )" := (λ y, y ≠ x) (only parsing) : stdpp_scope.
 
 Hint Extern 0 (_ = _) => reflexivity.
 Hint Extern 100 (_ ≠ _) => discriminate.
@@ -125,14 +125,14 @@ Class Equiv A := equiv: relation A.
 (* No Hint Mode set because of Coq bug #5735
 Hint Mode Equiv ! : typeclass_instances. *)
 
-Infix "≡" := equiv (at level 70, no associativity) : C_scope.
-Notation "(≡)" := equiv (only parsing) : C_scope.
-Notation "( X ≡)" := (equiv X) (only parsing) : C_scope.
-Notation "(≡ X )" := (λ Y, Y ≡ X) (only parsing) : C_scope.
-Notation "(≢)" := (λ X Y, ¬X ≡ Y) (only parsing) : C_scope.
-Notation "X ≢ Y":= (¬X ≡ Y) (at level 70, no associativity) : C_scope.
-Notation "( X ≢)" := (λ Y, X ≢ Y) (only parsing) : C_scope.
-Notation "(≢ X )" := (λ Y, Y ≢ X) (only parsing) : C_scope.
+Infix "≡" := equiv (at level 70, no associativity) : stdpp_scope.
+Notation "(≡)" := equiv (only parsing) : stdpp_scope.
+Notation "( X ≡)" := (equiv X) (only parsing) : stdpp_scope.
+Notation "(≡ X )" := (λ Y, Y ≡ X) (only parsing) : stdpp_scope.
+Notation "(≢)" := (λ X Y, ¬X ≡ Y) (only parsing) : stdpp_scope.
+Notation "X ≢ Y":= (¬X ≡ Y) (at level 70, no associativity) : stdpp_scope.
+Notation "( X ≢)" := (λ Y, X ≢ Y) (only parsing) : stdpp_scope.
+Notation "(≢ X )" := (λ Y, Y ≢ X) (only parsing) : stdpp_scope.
 
 (** The type class [LeibnizEquiv] collects setoid equalities that coincide
 with Leibniz equality. We provide the tactic [fold_leibniz] to transform such
@@ -331,17 +331,17 @@ Class TotalOrder {A} (R : relation A) : Prop := {
 }.
 
 (** * Logic *)
-Notation "(∧)" := and (only parsing) : C_scope.
-Notation "( A ∧)" := (and A) (only parsing) : C_scope.
-Notation "(∧ B )" := (λ A, A ∧ B) (only parsing) : C_scope.
+Notation "(∧)" := and (only parsing) : stdpp_scope.
+Notation "( A ∧)" := (and A) (only parsing) : stdpp_scope.
+Notation "(∧ B )" := (λ A, A ∧ B) (only parsing) : stdpp_scope.
 
-Notation "(∨)" := or (only parsing) : C_scope.
-Notation "( A ∨)" := (or A) (only parsing) : C_scope.
-Notation "(∨ B )" := (λ A, A ∨ B) (only parsing) : C_scope.
+Notation "(∨)" := or (only parsing) : stdpp_scope.
+Notation "( A ∨)" := (or A) (only parsing) : stdpp_scope.
+Notation "(∨ B )" := (λ A, A ∨ B) (only parsing) : stdpp_scope.
 
-Notation "(↔)" := iff (only parsing) : C_scope.
-Notation "( A ↔)" := (iff A) (only parsing) : C_scope.
-Notation "(↔ B )" := (λ A, A ↔ B) (only parsing) : C_scope.
+Notation "(↔)" := iff (only parsing) : stdpp_scope.
+Notation "( A ↔)" := (iff A) (only parsing) : stdpp_scope.
+Notation "(↔ B )" := (λ A, A ↔ B) (only parsing) : stdpp_scope.
 
 Hint Extern 0 (_ ↔ _) => reflexivity.
 Hint Extern 0 (_ ↔ _) => symmetry; assumption.
@@ -405,19 +405,19 @@ Proof. unfold impl. red; intuition. Qed.
 
 (** * Common data types *)
 (** ** Functions *)
-Notation "(→)" := (λ A B, A → B) (only parsing) : C_scope.
-Notation "( A →)" := (λ B, A → B) (only parsing) : C_scope.
-Notation "(→ B )" := (λ A, A → B) (only parsing) : C_scope.
+Notation "(→)" := (λ A B, A → B) (only parsing) : stdpp_scope.
+Notation "( A →)" := (λ B, A → B) (only parsing) : stdpp_scope.
+Notation "(→ B )" := (λ A, A → B) (only parsing) : stdpp_scope.
 
 Notation "t $ r" := (t r)
-  (at level 65, right associativity, only parsing) : C_scope.
-Notation "($)" := (λ f x, f x) (only parsing) : C_scope.
-Notation "($ x )" := (λ f, f x) (only parsing) : C_scope.
+  (at level 65, right associativity, only parsing) : stdpp_scope.
+Notation "($)" := (λ f x, f x) (only parsing) : stdpp_scope.
+Notation "($ x )" := (λ f, f x) (only parsing) : stdpp_scope.
 
-Infix "∘" := compose : C_scope.
-Notation "(∘)" := compose (only parsing) : C_scope.
-Notation "( f ∘)" := (compose f) (only parsing) : C_scope.
-Notation "(∘ f )" := (λ g, compose g f) (only parsing) : C_scope.
+Infix "∘" := compose : stdpp_scope.
+Notation "(∘)" := compose (only parsing) : stdpp_scope.
+Notation "( f ∘)" := (compose f) (only parsing) : stdpp_scope.
+Notation "(∘ f )" := (λ g, compose g f) (only parsing) : stdpp_scope.
 
 Instance impl_inhabited {A} `{Inhabited B} : Inhabited (A → B) :=
   populate (λ _, inhabitant).
@@ -510,8 +510,8 @@ Proof. intros [] []; reflexivity. Qed.
 Instance unit_inhabited: Inhabited unit := populate ().
 
 (** ** Products *)
-Notation "( x ,)" := (pair x) (only parsing) : C_scope.
-Notation "(, y )" := (λ x, (x,y)) (only parsing) : C_scope.
+Notation "( x ,)" := (pair x) (only parsing) : stdpp_scope.
+Notation "(, y )" := (λ x, (x,y)) (only parsing) : stdpp_scope.
 
 Notation "p .1" := (fst p) (at level 10, format "p .1").
 Notation "p .2" := (snd p) (at level 10, format "p .2").
@@ -657,8 +657,8 @@ Arguments projT2 {_ _} _ : assert.
 Arguments exist {_} _ _ _ : assert.
 Arguments proj1_sig {_ _} _ : assert.
 Arguments proj2_sig {_ _} _ : assert.
-Notation "x ↾ p" := (exist _ x p) (at level 20) : C_scope.
-Notation "` x" := (proj1_sig x) (at level 10, format "` x") : C_scope.
+Notation "x ↾ p" := (exist _ x p) (at level 20) : stdpp_scope.
+Notation "` x" := (proj1_sig x) (at level 10, format "` x") : stdpp_scope.
 
 Lemma proj1_sig_inj {A} (P : A → Prop) x (Px : P x) y (Py : P y) :
   x↾Px = y↾Py → x = y.
@@ -684,102 +684,102 @@ intersection [(∩)], and difference [(∖)], the singleton [{[_]}], the subset
 [(⊆)] and element of [(∈)] relation, and disjointess [(##)]. *)
 Class Empty A := empty: A.
 Hint Mode Empty ! : typeclass_instances.
-Notation "∅" := empty : C_scope.
+Notation "∅" := empty : stdpp_scope.
 
 Instance empty_inhabited `(Empty A) : Inhabited A := populate ∅.
 
 Class Top A := top : A.
 Hint Mode Top ! : typeclass_instances.
-Notation "⊤" := top : C_scope.
+Notation "⊤" := top : stdpp_scope.
 
 Class Union A := union: A → A → A.
 Hint Mode Union ! : typeclass_instances.
 Instance: Params (@union) 2.
-Infix "∪" := union (at level 50, left associativity) : C_scope.
-Notation "(∪)" := union (only parsing) : C_scope.
-Notation "( x ∪)" := (union x) (only parsing) : C_scope.
-Notation "(∪ x )" := (λ y, union y x) (only parsing) : C_scope.
-Infix "∪*" := (zip_with (∪)) (at level 50, left associativity) : C_scope.
-Notation "(∪*)" := (zip_with (∪)) (only parsing) : C_scope.
+Infix "∪" := union (at level 50, left associativity) : stdpp_scope.
+Notation "(∪)" := union (only parsing) : stdpp_scope.
+Notation "( x ∪)" := (union x) (only parsing) : stdpp_scope.
+Notation "(∪ x )" := (λ y, union y x) (only parsing) : stdpp_scope.
+Infix "∪*" := (zip_with (∪)) (at level 50, left associativity) : stdpp_scope.
+Notation "(∪*)" := (zip_with (∪)) (only parsing) : stdpp_scope.
 Infix "∪**" := (zip_with (zip_with (∪)))
-  (at level 50, left associativity) : C_scope.
+  (at level 50, left associativity) : stdpp_scope.
 Infix "∪*∪**" := (zip_with (prod_zip (∪) (∪*)))
-  (at level 50, left associativity) : C_scope.
+  (at level 50, left associativity) : stdpp_scope.
 
 Definition union_list `{Empty A} `{Union A} : list A → A := fold_right (∪) ∅.
 Arguments union_list _ _ _ !_ / : assert.
-Notation "⋃ l" := (union_list l) (at level 20, format "⋃  l") : C_scope.
+Notation "⋃ l" := (union_list l) (at level 20, format "⋃  l") : stdpp_scope.
 
 Class Intersection A := intersection: A → A → A.
 Hint Mode Intersection ! : typeclass_instances.
 Instance: Params (@intersection) 2.
-Infix "∩" := intersection (at level 40) : C_scope.
-Notation "(∩)" := intersection (only parsing) : C_scope.
-Notation "( x ∩)" := (intersection x) (only parsing) : C_scope.
-Notation "(∩ x )" := (λ y, intersection y x) (only parsing) : C_scope.
+Infix "∩" := intersection (at level 40) : stdpp_scope.
+Notation "(∩)" := intersection (only parsing) : stdpp_scope.
+Notation "( x ∩)" := (intersection x) (only parsing) : stdpp_scope.
+Notation "(∩ x )" := (λ y, intersection y x) (only parsing) : stdpp_scope.
 
 Class Difference A := difference: A → A → A.
 Hint Mode Difference ! : typeclass_instances.
 Instance: Params (@difference) 2.
-Infix "∖" := difference (at level 40, left associativity) : C_scope.
-Notation "(∖)" := difference (only parsing) : C_scope.
-Notation "( x ∖)" := (difference x) (only parsing) : C_scope.
-Notation "(∖ x )" := (λ y, difference y x) (only parsing) : C_scope.
-Infix "∖*" := (zip_with (∖)) (at level 40, left associativity) : C_scope.
-Notation "(∖*)" := (zip_with (∖)) (only parsing) : C_scope.
+Infix "∖" := difference (at level 40, left associativity) : stdpp_scope.
+Notation "(∖)" := difference (only parsing) : stdpp_scope.
+Notation "( x ∖)" := (difference x) (only parsing) : stdpp_scope.
+Notation "(∖ x )" := (λ y, difference y x) (only parsing) : stdpp_scope.
+Infix "∖*" := (zip_with (∖)) (at level 40, left associativity) : stdpp_scope.
+Notation "(∖*)" := (zip_with (∖)) (only parsing) : stdpp_scope.
 Infix "∖**" := (zip_with (zip_with (∖)))
-  (at level 40, left associativity) : C_scope.
+  (at level 40, left associativity) : stdpp_scope.
 Infix "∖*∖**" := (zip_with (prod_zip (∖) (∖*)))
-  (at level 50, left associativity) : C_scope.
+  (at level 50, left associativity) : stdpp_scope.
 
 Class Singleton A B := singleton: A → B.
 Hint Mode Singleton - ! : typeclass_instances.
 Instance: Params (@singleton) 3.
-Notation "{[ x ]}" := (singleton x) (at level 1) : C_scope.
+Notation "{[ x ]}" := (singleton x) (at level 1) : stdpp_scope.
 Notation "{[ x ; y ; .. ; z ]}" :=
   (union .. (union (singleton x) (singleton y)) .. (singleton z))
-  (at level 1) : C_scope.
+  (at level 1) : stdpp_scope.
 Notation "{[ x , y ]}" := (singleton (x,y))
-  (at level 1, y at next level) : C_scope.
+  (at level 1, y at next level) : stdpp_scope.
 Notation "{[ x , y , z ]}" := (singleton (x,y,z))
-  (at level 1, y at next level, z at next level) : C_scope.
+  (at level 1, y at next level, z at next level) : stdpp_scope.
 
 Class SubsetEq A := subseteq: relation A.
 Hint Mode SubsetEq ! : typeclass_instances.
 Instance: Params (@subseteq) 2.
-Infix "⊆" := subseteq (at level 70) : C_scope.
-Notation "(⊆)" := subseteq (only parsing) : C_scope.
-Notation "( X ⊆)" := (subseteq X) (only parsing) : C_scope.
-Notation "(⊆ X )" := (λ Y, Y ⊆ X) (only parsing) : C_scope.
-Notation "X ⊈ Y" := (¬X ⊆ Y) (at level 70) : C_scope.
-Notation "(⊈)" := (λ X Y, X ⊈ Y) (only parsing) : C_scope.
-Notation "( X ⊈)" := (λ Y, X ⊈ Y) (only parsing) : C_scope.
-Notation "(⊈ X )" := (λ Y, Y ⊈ X) (only parsing) : C_scope.
-Infix "⊆*" := (Forall2 (⊆)) (at level 70) : C_scope.
-Notation "(⊆*)" := (Forall2 (⊆)) (only parsing) : C_scope.
-Infix "⊆**" := (Forall2 (⊆*)) (at level 70) : C_scope.
-Infix "⊆1*" := (Forall2 (λ p q, p.1 ⊆ q.1)) (at level 70) : C_scope.
-Infix "⊆2*" := (Forall2 (λ p q, p.2 ⊆ q.2)) (at level 70) : C_scope.
-Infix "⊆1**" := (Forall2 (λ p q, p.1 ⊆* q.1)) (at level 70) : C_scope.
-Infix "⊆2**" := (Forall2 (λ p q, p.2 ⊆* q.2)) (at level 70) : C_scope.
+Infix "⊆" := subseteq (at level 70) : stdpp_scope.
+Notation "(⊆)" := subseteq (only parsing) : stdpp_scope.
+Notation "( X ⊆)" := (subseteq X) (only parsing) : stdpp_scope.
+Notation "(⊆ X )" := (λ Y, Y ⊆ X) (only parsing) : stdpp_scope.
+Notation "X ⊈ Y" := (¬X ⊆ Y) (at level 70) : stdpp_scope.
+Notation "(⊈)" := (λ X Y, X ⊈ Y) (only parsing) : stdpp_scope.
+Notation "( X ⊈)" := (λ Y, X ⊈ Y) (only parsing) : stdpp_scope.
+Notation "(⊈ X )" := (λ Y, Y ⊈ X) (only parsing) : stdpp_scope.
+Infix "⊆*" := (Forall2 (⊆)) (at level 70) : stdpp_scope.
+Notation "(⊆*)" := (Forall2 (⊆)) (only parsing) : stdpp_scope.
+Infix "⊆**" := (Forall2 (⊆*)) (at level 70) : stdpp_scope.
+Infix "⊆1*" := (Forall2 (λ p q, p.1 ⊆ q.1)) (at level 70) : stdpp_scope.
+Infix "⊆2*" := (Forall2 (λ p q, p.2 ⊆ q.2)) (at level 70) : stdpp_scope.
+Infix "⊆1**" := (Forall2 (λ p q, p.1 ⊆* q.1)) (at level 70) : stdpp_scope.
+Infix "⊆2**" := (Forall2 (λ p q, p.2 ⊆* q.2)) (at level 70) : stdpp_scope.
 
 Hint Extern 0 (_ ⊆ _) => reflexivity.
 Hint Extern 0 (_ ⊆* _) => reflexivity.
 Hint Extern 0 (_ ⊆** _) => reflexivity.
 
-Infix "⊂" := (strict (⊆)) (at level 70) : C_scope.
-Notation "(⊂)" := (strict (⊆)) (only parsing) : C_scope.
-Notation "( X ⊂)" := (strict (⊆) X) (only parsing) : C_scope.
-Notation "(⊂ X )" := (λ Y, Y ⊂ X) (only parsing) : C_scope.
-Notation "X ⊄ Y" := (¬X ⊂ Y) (at level 70) : C_scope.
-Notation "(⊄)" := (λ X Y, X ⊄ Y) (only parsing) : C_scope.
-Notation "( X ⊄)" := (λ Y, X ⊄ Y) (only parsing) : C_scope.
-Notation "(⊄ X )" := (λ Y, Y ⊄ X) (only parsing) : C_scope.
+Infix "⊂" := (strict (⊆)) (at level 70) : stdpp_scope.
+Notation "(⊂)" := (strict (⊆)) (only parsing) : stdpp_scope.
+Notation "( X ⊂)" := (strict (⊆) X) (only parsing) : stdpp_scope.
+Notation "(⊂ X )" := (λ Y, Y ⊂ X) (only parsing) : stdpp_scope.
+Notation "X ⊄ Y" := (¬X ⊂ Y) (at level 70) : stdpp_scope.
+Notation "(⊄)" := (λ X Y, X ⊄ Y) (only parsing) : stdpp_scope.
+Notation "( X ⊄)" := (λ Y, X ⊄ Y) (only parsing) : stdpp_scope.
+Notation "(⊄ X )" := (λ Y, Y ⊄ X) (only parsing) : stdpp_scope.
 
-Notation "X ⊆ Y ⊆ Z" := (X ⊆ Y ∧ Y ⊆ Z) (at level 70, Y at next level) : C_scope.
-Notation "X ⊆ Y ⊂ Z" := (X ⊆ Y ∧ Y ⊂ Z) (at level 70, Y at next level) : C_scope.
-Notation "X ⊂ Y ⊆ Z" := (X ⊂ Y ∧ Y ⊆ Z) (at level 70, Y at next level) : C_scope.
-Notation "X ⊂ Y ⊂ Z" := (X ⊂ Y ∧ Y ⊂ Z) (at level 70, Y at next level) : C_scope.
+Notation "X ⊆ Y ⊆ Z" := (X ⊆ Y ∧ Y ⊆ Z) (at level 70, Y at next level) : stdpp_scope.
+Notation "X ⊆ Y ⊂ Z" := (X ⊆ Y ∧ Y ⊂ Z) (at level 70, Y at next level) : stdpp_scope.
+Notation "X ⊂ Y ⊆ Z" := (X ⊂ Y ∧ Y ⊆ Z) (at level 70, Y at next level) : stdpp_scope.
+Notation "X ⊂ Y ⊂ Z" := (X ⊂ Y ∧ Y ⊂ Z) (at level 70, Y at next level) : stdpp_scope.
 
 (** The class [Lexico A] is used for the lexicographic order on [A]. This order
 is used to create finite maps, finite sets, etc, and is typically different from
@@ -790,29 +790,29 @@ Hint Mode Lexico ! : typeclass_instances.
 Class ElemOf A B := elem_of: A → B → Prop.
 Hint Mode ElemOf - ! : typeclass_instances.
 Instance: Params (@elem_of) 3.
-Infix "∈" := elem_of (at level 70) : C_scope.
-Notation "(∈)" := elem_of (only parsing) : C_scope.
-Notation "( x ∈)" := (elem_of x) (only parsing) : C_scope.
-Notation "(∈ X )" := (λ x, elem_of x X) (only parsing) : C_scope.
-Notation "x ∉ X" := (¬x ∈ X) (at level 80) : C_scope.
-Notation "(∉)" := (λ x X, x ∉ X) (only parsing) : C_scope.
-Notation "( x ∉)" := (λ X, x ∉ X) (only parsing) : C_scope.
-Notation "(∉ X )" := (λ x, x ∉ X) (only parsing) : C_scope.
+Infix "∈" := elem_of (at level 70) : stdpp_scope.
+Notation "(∈)" := elem_of (only parsing) : stdpp_scope.
+Notation "( x ∈)" := (elem_of x) (only parsing) : stdpp_scope.
+Notation "(∈ X )" := (λ x, elem_of x X) (only parsing) : stdpp_scope.
+Notation "x ∉ X" := (¬x ∈ X) (at level 80) : stdpp_scope.
+Notation "(∉)" := (λ x X, x ∉ X) (only parsing) : stdpp_scope.
+Notation "( x ∉)" := (λ X, x ∉ X) (only parsing) : stdpp_scope.
+Notation "(∉ X )" := (λ x, x ∉ X) (only parsing) : stdpp_scope.
 
 Class Disjoint A := disjoint : A → A → Prop.
  Hint Mode Disjoint ! : typeclass_instances.
 Instance: Params (@disjoint) 2.
-Infix "##" := disjoint (at level 70) : C_scope.
-Notation "(##)" := disjoint (only parsing) : C_scope.
-Notation "( X ##.)" := (disjoint X) (only parsing) : C_scope.
-Notation "(.## X )" := (λ Y, Y ## X) (only parsing) : C_scope.
-Infix "##*" := (Forall2 (##)) (at level 70) : C_scope.
-Notation "(##*)" := (Forall2 (##)) (only parsing) : C_scope.
-Infix "##**" := (Forall2 (##*)) (at level 70) : C_scope.
-Infix "##1*" := (Forall2 (λ p q, p.1 ## q.1)) (at level 70) : C_scope.
-Infix "##2*" := (Forall2 (λ p q, p.2 ## q.2)) (at level 70) : C_scope.
-Infix "##1**" := (Forall2 (λ p q, p.1 ##* q.1)) (at level 70) : C_scope.
-Infix "##2**" := (Forall2 (λ p q, p.2 ##* q.2)) (at level 70) : C_scope.
+Infix "##" := disjoint (at level 70) : stdpp_scope.
+Notation "(##)" := disjoint (only parsing) : stdpp_scope.
+Notation "( X ##.)" := (disjoint X) (only parsing) : stdpp_scope.
+Notation "(.## X )" := (λ Y, Y ## X) (only parsing) : stdpp_scope.
+Infix "##*" := (Forall2 (##)) (at level 70) : stdpp_scope.
+Notation "(##*)" := (Forall2 (##)) (only parsing) : stdpp_scope.
+Infix "##**" := (Forall2 (##*)) (at level 70) : stdpp_scope.
+Infix "##1*" := (Forall2 (λ p q, p.1 ## q.1)) (at level 70) : stdpp_scope.
+Infix "##2*" := (Forall2 (λ p q, p.2 ## q.2)) (at level 70) : stdpp_scope.
+Infix "##1**" := (Forall2 (λ p q, p.1 ##* q.1)) (at level 70) : stdpp_scope.
+Infix "##2**" := (Forall2 (λ p q, p.2 ##* q.2)) (at level 70) : stdpp_scope.
 Hint Extern 0 (_ ## _) => symmetry; eassumption.
 Hint Extern 0 (_ ##* _) => symmetry; eassumption.
 
@@ -820,23 +820,23 @@ Class DisjointE E A := disjointE : E → A → A → Prop.
 Hint Mode DisjointE - ! : typeclass_instances.
 Instance: Params (@disjointE) 4.
 Notation "X ##{ Γ } Y" := (disjointE Γ X Y)
-  (at level 70, format "X  ##{ Γ }  Y") : C_scope.
-Notation "(##{ Γ } )" := (disjointE Γ) (only parsing, Γ at level 1) : C_scope.
+  (at level 70, format "X  ##{ Γ }  Y") : stdpp_scope.
+Notation "(##{ Γ } )" := (disjointE Γ) (only parsing, Γ at level 1) : stdpp_scope.
 Notation "Xs ##{ Γ }* Ys" := (Forall2 (##{Γ}) Xs Ys)
-  (at level 70, format "Xs  ##{ Γ }*  Ys") : C_scope.
+  (at level 70, format "Xs  ##{ Γ }*  Ys") : stdpp_scope.
 Notation "(##{ Γ }* )" := (Forall2 (##{Γ}))
-  (only parsing, Γ at level 1) : C_scope.
+  (only parsing, Γ at level 1) : stdpp_scope.
 Notation "X ##{ Γ1 , Γ2 , .. , Γ3 } Y" := (disjoint (pair .. (Γ1, Γ2) .. Γ3) X Y)
-  (at level 70, format "X  ##{ Γ1 , Γ2 , .. , Γ3 }  Y") : C_scope.
+  (at level 70, format "X  ##{ Γ1 , Γ2 , .. , Γ3 }  Y") : stdpp_scope.
 Notation "Xs ##{ Γ1 , Γ2 , .. , Γ3 }* Ys" :=
   (Forall2 (disjoint (pair .. (Γ1, Γ2) .. Γ3)) Xs Ys)
-  (at level 70, format "Xs  ##{ Γ1 ,  Γ2 , .. , Γ3 }*  Ys") : C_scope.
+  (at level 70, format "Xs  ##{ Γ1 ,  Γ2 , .. , Γ3 }*  Ys") : stdpp_scope.
 Hint Extern 0 (_ ##{_} _) => symmetry; eassumption.
 
 Class DisjointList A := disjoint_list : list A → Prop.
 Hint Mode DisjointList ! : typeclass_instances.
 Instance: Params (@disjoint_list) 2.
-Notation "## Xs" := (disjoint_list Xs) (at level 20, format "##  Xs") : C_scope.
+Notation "## Xs" := (disjoint_list Xs) (at level 20, format "##  Xs") : stdpp_scope.
 
 Section disjoint_list.
   Context `{Disjoint A, Union A, Empty A}.
@@ -881,32 +881,32 @@ Class OMap (M : Type → Type) := omap: ∀ {A B}, (A → option B) → M A → 
 Arguments omap {_ _ _ _} _ !_ / : assert.
 Instance: Params (@omap) 4.
 
-Notation "m ≫= f" := (mbind f m) (at level 60, right associativity) : C_scope.
-Notation "( m ≫=)" := (λ f, mbind f m) (only parsing) : C_scope.
-Notation "(≫= f )" := (mbind f) (only parsing) : C_scope.
-Notation "(≫=)" := (λ m f, mbind f m) (only parsing) : C_scope.
+Notation "m ≫= f" := (mbind f m) (at level 60, right associativity) : stdpp_scope.
+Notation "( m ≫=)" := (λ f, mbind f m) (only parsing) : stdpp_scope.
+Notation "(≫= f )" := (mbind f) (only parsing) : stdpp_scope.
+Notation "(≫=)" := (λ m f, mbind f m) (only parsing) : stdpp_scope.
 
 Notation "x ← y ; z" := (y ≫= (λ x : _, z))
-  (at level 100, only parsing, right associativity) : C_scope.
+  (at level 100, only parsing, right associativity) : stdpp_scope.
 
-Infix "<$>" := fmap (at level 60, right associativity) : C_scope.
+Infix "<$>" := fmap (at level 60, right associativity) : stdpp_scope.
 Notation "' ( x1 , x2 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1, x2) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
 Notation "' ( x1 , x2 , x3 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
 Notation "' ( x1 , x2 , x3  , x4 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3,x4) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
 Notation "' ( x1 , x2 , x3  , x4 , x5 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3,x4,x5) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
 Notation "' ( x1 , x2 , x3  , x4 , x5 , x6 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1,x2,x3,x4,x5,x6) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
 Notation "x ;; z" := (x ≫= λ _, z)
-  (at level 100, z at level 200, only parsing, right associativity): C_scope.
+  (at level 100, z at level 200, only parsing, right associativity): stdpp_scope.
 
 Notation "ps .*1" := (fmap (M:=list) fst ps)
   (at level 10, format "ps .*1").
@@ -917,9 +917,9 @@ Class MGuard (M : Type → Type) :=
   mguard: ∀ P {dec : Decision P} {A}, (P → M A) → M A.
 Arguments mguard _ _ _ !_ _ _ / : assert.
 Notation "'guard' P ; z" := (mguard P (λ _, z))
-  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
 Notation "'guard' P 'as' H ; z" := (mguard P (λ H, z))
-  (at level 100, z at level 200, only parsing, right associativity) : C_scope.
+  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
 
 (** * Operations on maps *)
 (** In this section we define operational type classes for the operations
@@ -928,17 +928,17 @@ The function look up [m !! k] should yield the element at key [k] in [m]. *)
 Class Lookup (K A M : Type) := lookup: K → M → option A.
 Hint Mode Lookup - - ! : typeclass_instances.
 Instance: Params (@lookup) 4.
-Notation "m !! i" := (lookup i m) (at level 20) : C_scope.
-Notation "(!!)" := lookup (only parsing) : C_scope.
-Notation "( m !!)" := (λ i, m !! i) (only parsing) : C_scope.
-Notation "(!! i )" := (lookup i) (only parsing) : C_scope.
+Notation "m !! i" := (lookup i m) (at level 20) : stdpp_scope.
+Notation "(!!)" := lookup (only parsing) : stdpp_scope.
+Notation "( m !!)" := (λ i, m !! i) (only parsing) : stdpp_scope.
+Notation "(!! i )" := (lookup i) (only parsing) : stdpp_scope.
 Arguments lookup _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The singleton map *)
 Class SingletonM K A M := singletonM: K → A → M.
 Hint Mode SingletonM - - ! : typeclass_instances.
 Instance: Params (@singletonM) 5.
-Notation "{[ k := a ]}" := (singletonM k a) (at level 1) : C_scope.
+Notation "{[ k := a ]}" := (singletonM k a) (at level 1) : stdpp_scope.
 
 (** The function insert [<[k:=a]>m] should update the element at key [k] with
 value [a] in [m]. *)
@@ -946,7 +946,7 @@ Class Insert (K A M : Type) := insert: K → A → M → M.
 Hint Mode Insert - - ! : typeclass_instances.
 Instance: Params (@insert) 5.
 Notation "<[ k := a ]>" := (insert k a)
-  (at level 5, right associativity, format "<[ k := a ]>") : C_scope.
+  (at level 5, right associativity, format "<[ k := a ]>") : stdpp_scope.
 Arguments insert _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 
 (** The function delete [delete k m] should delete the value at key [k] in
@@ -1020,15 +1020,15 @@ Class LookupE (E K A M : Type) := lookupE: E → K → M → option A.
 Hint Mode LookupE - - - ! : typeclass_instances.
 Instance: Params (@lookupE) 6.
 Notation "m !!{ Γ } i" := (lookupE Γ i m)
-  (at level 20, format "m  !!{ Γ }  i") : C_scope.
-Notation "(!!{ Γ } )" := (lookupE Γ) (only parsing, Γ at level 1) : C_scope.
+  (at level 20, format "m  !!{ Γ }  i") : stdpp_scope.
+Notation "(!!{ Γ } )" := (lookupE Γ) (only parsing, Γ at level 1) : stdpp_scope.
 Arguments lookupE _ _ _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 Class InsertE (E K A M : Type) := insertE: E → K → A → M → M.
 Hint Mode InsertE - - - ! : typeclass_instances.
 Instance: Params (@insertE) 6.
 Notation "<[ k := a ]{ Γ }>" := (insertE Γ k a)
-  (at level 5, right associativity, format "<[ k := a ]{ Γ }>") : C_scope.
+  (at level 5, right associativity, format "<[ k := a ]{ Γ }>") : stdpp_scope.
 Arguments insertE _ _ _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 
 
@@ -1128,5 +1128,5 @@ Class FreshSpec A C `{ElemOf A C,
 (** * Miscellaneous *)
 Class Half A := half: A → A.
 Hint Mode Half ! : typeclass_instances.
-Notation "½" := half : C_scope.
-Notation "½*" := (fmap (M:=list) half) : C_scope.
+Notation "½" := half : stdpp_scope.
+Notation "½*" := (fmap (M:=list) half) : stdpp_scope.

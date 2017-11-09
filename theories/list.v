@@ -30,21 +30,21 @@ Arguments Permutation {_} _ _ : assert.
 Arguments Forall_cons {_} _ _ _ _ _ : assert.
 Remove Hints Permutation_cons : typeclass_instances.
 
-Notation "(::)" := cons (only parsing) : C_scope.
-Notation "( x ::)" := (cons x) (only parsing) : C_scope.
-Notation "(:: l )" := (λ x, cons x l) (only parsing) : C_scope.
-Notation "(++)" := app (only parsing) : C_scope.
-Notation "( l ++)" := (app l) (only parsing) : C_scope.
-Notation "(++ k )" := (λ l, app l k) (only parsing) : C_scope.
+Notation "(::)" := cons (only parsing) : stdpp_scope.
+Notation "( x ::)" := (cons x) (only parsing) : stdpp_scope.
+Notation "(:: l )" := (λ x, cons x l) (only parsing) : stdpp_scope.
+Notation "(++)" := app (only parsing) : stdpp_scope.
+Notation "( l ++)" := (app l) (only parsing) : stdpp_scope.
+Notation "(++ k )" := (λ l, app l k) (only parsing) : stdpp_scope.
 
-Infix "≡ₚ" := Permutation (at level 70, no associativity) : C_scope.
-Notation "(≡ₚ)" := Permutation (only parsing) : C_scope.
-Notation "( x ≡ₚ)" := (Permutation x) (only parsing) : C_scope.
-Notation "(≡ₚ x )" := (λ y, y ≡ₚ x) (only parsing) : C_scope.
-Notation "(≢ₚ)" := (λ x y, ¬x ≡ₚ y) (only parsing) : C_scope.
-Notation "x ≢ₚ y":= (¬x ≡ₚ y) (at level 70, no associativity) : C_scope.
-Notation "( x ≢ₚ)" := (λ y, x ≢ₚ y) (only parsing) : C_scope.
-Notation "(≢ₚ x )" := (λ y, y ≢ₚ x) (only parsing) : C_scope.
+Infix "≡ₚ" := Permutation (at level 70, no associativity) : stdpp_scope.
+Notation "(≡ₚ)" := Permutation (only parsing) : stdpp_scope.
+Notation "( x ≡ₚ)" := (Permutation x) (only parsing) : stdpp_scope.
+Notation "(≡ₚ x )" := (λ y, y ≡ₚ x) (only parsing) : stdpp_scope.
+Notation "(≢ₚ)" := (λ x y, ¬x ≡ₚ y) (only parsing) : stdpp_scope.
+Notation "x ≢ₚ y":= (¬x ≡ₚ y) (at level 70, no associativity) : stdpp_scope.
+Notation "( x ≢ₚ)" := (λ y, x ≢ₚ y) (only parsing) : stdpp_scope.
+Notation "(≢ₚ x )" := (λ y, y ≢ₚ x) (only parsing) : stdpp_scope.
 
 Instance maybe_cons {A} : Maybe2 (@cons A) := λ l,
   match l with x :: l => Some (x,l) | _ => None end.
@@ -240,8 +240,8 @@ Fixpoint permutations {A} (l : list A) : list (list A) :=
 The predicate [prefix] holds if the first list is a prefix of the second. *)
 Definition suffix {A} : relation (list A) := λ l1 l2, ∃ k, l2 = k ++ l1.
 Definition prefix {A} : relation (list A) := λ l1 l2, ∃ k, l2 = l1 ++ k.
-Infix "`suffix_of`" := suffix (at level 70) : C_scope.
-Infix "`prefix_of`" := prefix (at level 70) : C_scope.
+Infix "`suffix_of`" := suffix (at level 70) : stdpp_scope.
+Infix "`prefix_of`" := prefix (at level 70) : stdpp_scope.
 Hint Extern 0 (_ `prefix_of` _) => reflexivity.
 Hint Extern 0 (_ `suffix_of` _) => reflexivity.
 
@@ -271,7 +271,7 @@ Inductive sublist {A} : relation (list A) :=
   | sublist_nil : sublist [] []
   | sublist_skip x l1 l2 : sublist l1 l2 → sublist (x :: l1) (x :: l2)
   | sublist_cons x l1 l2 : sublist l1 l2 → sublist l1 (x :: l2).
-Infix "`sublist_of`" := sublist (at level 70) : C_scope.
+Infix "`sublist_of`" := sublist (at level 70) : stdpp_scope.
 Hint Extern 0 (_ `sublist_of` _) => reflexivity.
 
 (** A list [l2] submseteq a list [l1] if [l2] is obtained by removing elements
@@ -282,7 +282,7 @@ Inductive submseteq {A} : relation (list A) :=
   | submseteq_swap x y l : submseteq (y :: x :: l) (x :: y :: l)
   | submseteq_cons x l1 l2 : submseteq l1 l2 → submseteq l1 (x :: l2)
   | submseteq_trans l1 l2 l3 : submseteq l1 l2 → submseteq l2 l3 → submseteq l1 l3.
-Infix "⊆+" := submseteq (at level 70) : C_scope.
+Infix "⊆+" := submseteq (at level 70) : stdpp_scope.
 Hint Extern 0 (_ ⊆+ _) => reflexivity.
 
 (** Removes [x] from the list [l]. The function returns a [Some] when the
