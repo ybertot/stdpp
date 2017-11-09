@@ -194,39 +194,25 @@ End subrel.
 
 (** * Theorems on well founded relations *)
 Notation wf := well_founded.
-
-Section wf.
-  Context `{R : relation A}.
-
-  Lemma Acc_def x : Acc R x ↔ (∀ y : A, R y x → Acc R y).
-  Proof. split. by destruct 1. by constructor. Qed.
-
-  (** A trick by Thomas Braibant to compute with well-founded recursions:
-  it lazily adds [2^n] [Acc_intro] constructors in front of a well foundedness
-  proof, so that the actual proof is never reached in practise. *)
-  Fixpoint wf_guard (n : nat) (wfR : wf R) : wf R :=
-    match n with
-    | 0 => wfR
-    | S n => λ x, Acc_intro x (λ y _, wf_guard n (wf_guard n wfR) y)
-    end.
-
-  Lemma wf_projected `(R2 : relation B) (f : A → B) :
-    (∀ x y, R x y → R2 (f x) (f y)) →
-    wf R2 → wf R.
-  Proof.
-    intros Hf Hwf.
-    cut (∀ y, Acc R2 y → ∀ x, y = f x → Acc R x).
-    { intros aux x. apply (aux (f x)); auto. }
-    induction 1 as [y _ IH]. intros x ?. subst.
-    constructor. intros. apply (IH (f y)); auto.
-  Qed.
-End wf.
+Definition wf_guard `{R : relation A} (n : nat) (wfR : wf R) : wf R :=
+  Acc_intro_generator n wfR.
 
 (* Generally we do not want [wf_guard] to be expanded (neither by tactics,
 nor by conversion tests in the kernel), but in some cases we do need it for
 computation (that is, we cannot make it opaque). We use the [Strategy]
 command to make its expanding behavior less eager. *)
 Strategy 100 [wf_guard].
+
+Lemma wf_projected `{R1 : relation A} `(R2 : relation B) (f : A → B) :
+  (∀ x y, R1 x y → R2 (f x) (f y)) →
+  wf R2 → wf R1.
+Proof.
+  intros Hf Hwf.
+  cut (∀ y, Acc R2 y → ∀ x, y = f x → Acc R1 x).
+  { intros aux x. apply (aux (f x)); auto. }
+  induction 1 as [y _ IH]. intros x ?. subst.
+  constructor. intros. apply (IH (f y)); auto.
+Qed.
 
 Lemma Fix_F_proper `{R : relation A} (B : A → Type) (E : ∀ x, relation (B x))
     (F : ∀ x, (∀ y, R y x → B y) → B x)
