@@ -71,7 +71,7 @@ Section Fresh.
       apply inbelow; omega.
   Qed.
 
-  Instance fresh_generic: Fresh A C := λ s, fresh_generic_fix s 0.
+  Instance fresh_generic: Fresh A C := λ s, fresh_generic_fix 20 s 0.
 
   Instance fresh_generic_spec: FreshSpec A C.
   Proof.
@@ -79,16 +79,16 @@ Section Fresh.
     - apply _.
     - intros * eqXY.
       unfold fresh, fresh_generic.
-      destruct (fresh_generic_fixpoint_spec (1 + Nat.log2 (size X)) X 0)
+      destruct (fresh_generic_fixpoint_spec 20 X 0)
         as [mX [_ [-> [notinX belowinX]]]].
-      destruct (fresh_generic_fixpoint_spec (1 + Nat.log2 (size Y)) Y 0)
+      destruct (fresh_generic_fixpoint_spec 20 Y 0)
         as [mY [_ [-> [notinY belowinY]]]].
       destruct (Nat.lt_trichotomy mX mY) as [case|[->|case]]; auto.
       + contradict notinX; rewrite eqXY; apply belowinY; omega.
       + contradict notinY; rewrite <- eqXY; apply belowinX; omega.
     - intro.
       unfold fresh, fresh_generic.
-      destruct (fresh_generic_fixpoint_spec (1 + Nat.log2 (size X)) X 0)
+      destruct (fresh_generic_fixpoint_spec 20 X 0)
         as [m [_ [-> [notinX belowinX]]]]; auto.
   Qed.
 End Fresh.
