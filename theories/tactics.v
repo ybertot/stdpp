@@ -319,6 +319,7 @@ Ltac f_equiv :=
   | H : pointwise_relation _ ?R ?f ?g |- ?R (?f ?x) (?g ?x) => simple apply H
   end;
   try simple apply reflexivity.
+Tactic Notation "f_equiv" "/=" := csimpl in *; f_equiv.
 
 (* The tactic [solve_proper_unfold] unfolds the first head symbol, so that
 we proceed by repeatedly using [f_equiv]. *)
