@@ -284,3 +284,4 @@ Proof.
    by rewrite set_Exists_elements.
 Defined.
 End fin_collection.
+

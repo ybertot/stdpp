@@ -620,6 +620,9 @@ Section collection.
   Proof. set_solver. Qed.
   Lemma difference_disjoint X Y : X ## Y → X ∖ Y ≡ X.
   Proof. set_solver. Qed.
+  Lemma subset_difference_elem_of {x: A} {s: C} (inx: x ∈ s): s ∖ {[ x ]} ⊂ s.
+  Proof. set_solver. Qed.
+
 
   Lemma difference_mono X1 X2 Y1 Y2 :
     X1 ⊆ X2 → Y2 ⊆ Y1 → X1 ∖ Y1 ⊆ X2 ∖ Y2.

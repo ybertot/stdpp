@@ -39,4 +39,5 @@ theories/list.v
 theories/functions.v
 theories/hlist.v
 theories/sorting.v
+theories/infinite.v
 
