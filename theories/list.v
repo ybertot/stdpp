@@ -2882,7 +2882,7 @@ Section fmap.
   Context {A B : Type} (f : A → B).
   Implicit Types l : list A.
 
-  Lemma list_fmap_compose {C} (g : B → C) l : g ∘ f <$> l = g <$> f <$> l.
+  Lemma list_fmap_compose {C} (g : B → C) l : g ∘ f <$> l = g <$> (f <$> l).
   Proof. induction l; f_equal/=; auto. Qed.
   Lemma list_fmap_ext (g : A → B) (l1 l2 : list A) :
     (∀ x, f x = g x) → l1 = l2 → fmap f l1 = fmap g l2.
@@ -2898,7 +2898,7 @@ Section fmap.
   Qed.
 
   Definition fmap_nil : f <$> [] = [] := eq_refl.
-  Definition fmap_cons x l : f <$> x :: l = f x :: f <$> l := eq_refl.
+  Definition fmap_cons x l : f <$> x :: l = f x :: (f <$> l) := eq_refl.
 
   Lemma fmap_app l1 l2 : f <$> l1 ++ l2 = (f <$> l1) ++ (f <$> l2).
   Proof. by induction l1; f_equal/=. Qed.

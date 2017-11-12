@@ -889,7 +889,8 @@ Notation "(≫=)" := (λ m f, mbind f m) (only parsing) : stdpp_scope.
 Notation "x ← y ; z" := (y ≫= (λ x : _, z))
   (at level 100, only parsing, right associativity) : stdpp_scope.
 
-Infix "<$>" := fmap (at level 60, right associativity) : stdpp_scope.
+Infix "<$>" := fmap (at level 61, left associativity) : stdpp_scope.
+
 Notation "' ( x1 , x2 ) ← y ; z" :=
   (y ≫= (λ x : _, let ' (x1, x2) := x in z))
   (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
