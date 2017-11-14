@@ -27,7 +27,7 @@ Section definitions.
     multiplicity x X ≤ multiplicity x Y.
 
   Global Instance gmultiset_elements : Elements A (gmultiset A) := λ X,
-    let (X) := X in '(x,n) ← map_to_list X; replicate (S n) x.
+    let (X) := X in ''(x,n) ← map_to_list X; replicate (S n) x.
   Global Instance gmultiset_size : Size (gmultiset A) := length ∘ elements.
 
   Global Instance gmultiset_empty : Empty (gmultiset A) := GMultiSet ∅.
