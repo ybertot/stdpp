@@ -335,11 +335,10 @@ Ltac solve_proper_unfold :=
   | |- ?R (?f _ _) (?f _ _) => unfold f
   | |- ?R (?f _) (?f _) => unfold f
   end.
-
-(** The tactic [solve_proper_core tac] solves goals of the form "Proper (R1 ==> R2)", for
-any number of relations. The actual work is done by repeatedly applying
-[tac]. *)
-Ltac solve_proper_core tac :=
+(* [solve_proper_prepare] does some preparation work before the main
+   [solve_proper] loop.  Having this as a separate tactic is useful for
+   debugging [solve_proper] failure. *)
+Ltac solve_proper_prepare :=
   (* Introduce everything *)
   intros;
   repeat lazymatch goal with
@@ -348,10 +347,18 @@ Ltac solve_proper_core tac :=
   | |- pointwise_relation _ _ _ _ => intros ?
   | |- ?R ?f _ => try let f' := constr:(λ x, f x) in intros ?
   end; simplify_eq;
-  (* Now do the job. We try with and without unfolding. We have to backtrack on
+  (* We try with and without unfolding. We have to backtrack on
      that because unfolding may succeed, but then the proof may fail. *)
-  (solve_proper_unfold + idtac); simpl;
+  (solve_proper_unfold + idtac); simpl.
+(** The tactic [solve_proper_core tac] solves goals of the form "Proper (R1 ==> R2)", for
+any number of relations. The actual work is done by repeatedly applying
+[tac]. *)
+Ltac solve_proper_core tac :=
+  solve_proper_prepare;
+  (* Now do the job. *)
   solve [repeat first [eassumption | tac ()] ].
+
+(** Finally, [solve_proper] tries to apply [f_equiv] in a loop. *)
 Ltac solve_proper := solve_proper_core ltac:(fun _ => f_equiv).
 
 (** The tactic [intros_revert tac] introduces all foralls/arrows, performs tac,
