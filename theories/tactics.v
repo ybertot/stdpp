@@ -304,18 +304,18 @@ Ltac f_equiv :=
   | |- (?R _) (?f _ _ _ _) _ => simple apply (_ : Proper (R _ ==> R _ ==> R _ ==> R _ ==> _) f)
   | |- (?R _ _) (?f _ _ _ _) _ => simple apply (_ : Proper (R _ _ ==> R _ _ ==> R _ _ ==> R _ _ ==> _) f)
   | |- (?R _ _ _) (?f _ _ _ _) _ => simple apply (_ : Proper (R _ _ _ ==> R _ _ _ R _ _ _ ==> R _ _ _ ==> _) f)
-  (* Next, try to infer the relation. Unfortunately, there is an instance
-     of Proper for (eq ==> _), which will always be matched. *)
+  (* Next, try to infer the relation. Unfortunately, very often, it will turn
+     the goal into a Leibniz equality so we get stuck. *)
   (* TODO: Can we exclude that instance? *)
-  (* TODO: If some of the arguments are the same, we could also
-     query for "pointwise_relation"'s. But that leads to a combinatorial
-     explosion about which arguments are and which are not the same. *)
   | |- ?R (?f _) _ => simple apply (_ : Proper (_ ==> R) f)
   | |- ?R (?f _ _) _ => simple apply (_ : Proper (_ ==> _ ==> R) f)
   | |- ?R (?f _ _ _) _ => simple apply (_ : Proper (_ ==> _ ==> _ ==> R) f)
   | |- ?R (?f _ _ _ _) _ => simple apply (_ : Proper (_ ==> _ ==> _ ==> _ ==> R) f)
-   (* In case the function symbol differs, but the arguments are the same,
-      maybe we have a pointwise_relation in our context. *)
+  (* In case the function symbol differs, but the arguments are the same,
+     maybe we have a pointwise_relation in our context. *)
+  (* TODO: If only some of the arguments are the same, we could also
+     query for "pointwise_relation"'s. But that leads to a combinatorial
+     explosion about which arguments are and which are not the same. *)
   | H : pointwise_relation _ ?R ?f ?g |- ?R (?f ?x) (?g ?x) => simple apply H
   end;
   try simple apply reflexivity.
@@ -335,23 +335,30 @@ Ltac solve_proper_unfold :=
   | |- ?R (?f _ _) (?f _ _) => unfold f
   | |- ?R (?f _) (?f _) => unfold f
   end.
-
-(** The tactic [solve_proper_core tac] solves goals of the form "Proper (R1 ==> R2)", for
-any number of relations. The actual work is done by repeatedly applying
-[tac]. *)
-Ltac solve_proper_core tac :=
+(* [solve_proper_prepare] does some preparation work before the main
+   [solve_proper] loop.  Having this as a separate tactic is useful for
+   debugging [solve_proper] failure. *)
+Ltac solve_proper_prepare :=
   (* Introduce everything *)
   intros;
   repeat lazymatch goal with
   | |- Proper _ _ => intros ???
   | |- (_ ==> _)%signature _ _ => intros ???
   | |- pointwise_relation _ _ _ _ => intros ?
-  | |- ?R ?f _ => try let f' := constr:(λ x, f x) in intros ?
+  | |- ?R ?f _ => let f' := constr:(λ x, f x) in intros ?
   end; simplify_eq;
-  (* Now do the job. We try with and without unfolding. We have to backtrack on
+  (* We try with and without unfolding. We have to backtrack on
      that because unfolding may succeed, but then the proof may fail. *)
-  (solve_proper_unfold + idtac); simpl;
+  (solve_proper_unfold + idtac); simpl.
+(** The tactic [solve_proper_core tac] solves goals of the form "Proper (R1 ==> R2)", for
+any number of relations. The actual work is done by repeatedly applying
+[tac]. *)
+Ltac solve_proper_core tac :=
+  solve_proper_prepare;
+  (* Now do the job. *)
   solve [repeat first [eassumption | tac ()] ].
+
+(** Finally, [solve_proper] tries to apply [f_equiv] in a loop. *)
 Ltac solve_proper := solve_proper_core ltac:(fun _ => f_equiv).
 
 (** The tactic [intros_revert tac] introduces all foralls/arrows, performs tac,
