@@ -345,7 +345,7 @@ Ltac solve_proper_prepare :=
   | |- Proper _ _ => intros ???
   | |- (_ ==> _)%signature _ _ => intros ???
   | |- pointwise_relation _ _ _ _ => intros ?
-  | |- ?R ?f _ => try let f' := constr:(λ x, f x) in intros ?
+  | |- ?R ?f _ => let f' := constr:(λ x, f x) in intros ?
   end; simplify_eq;
   (* We try with and without unfolding. We have to backtrack on
      that because unfolding may succeed, but then the proof may fail. *)
