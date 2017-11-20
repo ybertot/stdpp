@@ -876,6 +876,8 @@ Fixpoint fresh_list `{Fresh A C, Union C, Singleton A C}
   | 0 => []
   | S n => let x := fresh X in x :: fresh_list n ({[ x ]} ∪ X)
   end.
+Instance: Params (@fresh_list) 6.
+
 Inductive Forall_fresh `{ElemOf A C} (X : C) : list A → Prop :=
   | Forall_fresh_nil : Forall_fresh X []
   | Forall_fresh_cons x xs :
@@ -887,12 +889,9 @@ Section fresh.
 
   Global Instance fresh_proper: Proper ((≡) ==> (=)) (fresh (C:=C)).
   Proof. intros ???. by apply fresh_proper_alt, elem_of_equiv. Qed.
-  Global Instance fresh_list_proper:
-    Proper ((=) ==> (≡) ==> (=)) (fresh_list (C:=C)).
-  Proof.
-    intros ? n ->. induction n as [|n IH]; intros ?? E; f_equal/=; [by rewrite E|].
-    apply IH. by rewrite E.
-  Qed.
+  Global Instance fresh_list_proper n:
+    Proper ((≡) ==> (=)) (fresh_list (C:=C) n).
+  Proof. induction n as [|n IH]; intros ?? E; by setoid_subst. Qed.
 
   Lemma exist_fresh X : ∃ x, x ∉ X.
   Proof. exists (fresh X). apply is_fresh. Qed.
