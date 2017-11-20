@@ -71,10 +71,10 @@ Section setoids_monad.
     by rewrite HX, Hf.
   Qed.
   Global Instance collection_bind_proper {A B} :
-    Proper (((=) ==> (≡)) ==> (≡) ==> (≡)) (@mbind M _ A B).
+    Proper (pointwise_relation _ (≡) ==> (≡) ==> (≡)) (@mbind M _ A B).
   Proof.
     intros f1 f2 Hf X1 X2 HX x. rewrite !elem_of_bind. f_equiv; intros z.
-    by rewrite HX, (Hf z z).
+    by rewrite HX, (Hf z).
   Qed.
   Global Instance collection_join_proper {A} :
     Proper ((≡) ==> (≡)) (@mjoin M _ A).
@@ -940,8 +940,8 @@ Section collection_monad.
     Proper (pointwise_relation _ (=) ==> (⊆) ==> (⊆)) (@fmap M _ A B).
   Proof. intros f g ? X Y ?; set_solver by eauto. Qed.
   Global Instance collection_bind_mono {A B} :
-    Proper (((=) ==> (⊆)) ==> (⊆) ==> (⊆)) (@mbind M _ A B).
-  Proof. unfold respectful; intros f g Hfg X Y ?; set_solver. Qed.
+    Proper (pointwise_relation _ (⊆) ==> (⊆) ==> (⊆)) (@mbind M _ A B).
+  Proof. unfold respectful, pointwise_relation; intros f g Hfg X Y ?. set_solver. Qed.
   Global Instance collection_join_mono {A} :
     Proper ((⊆) ==> (⊆)) (@mjoin M _ A).
   Proof. intros X Y ?; set_solver. Qed.
