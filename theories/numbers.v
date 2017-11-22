@@ -534,11 +534,12 @@ Definition Qp_minus (x y : Qp) : option Qp :=
   match decide (0 < z)%Qc with left Hz => Some (mk_Qp z Hz) | _ => None end.
 Program Definition Qp_mult (x y : Qp) : Qp := mk_Qp (x * y) _.
 Next Obligation. intros x y. apply Qcmult_pos_pos; apply Qp_prf. Qed.
-Program Definition Qp_div (x : Qp) (y : positive) : Qp := mk_Qp (x / ('y)%Z) _.  
+
+Program Definition Qp_div (x : Qp) (y : positive) : Qp := mk_Qp (x / Zpos y) _.
 Next Obligation.
-  intros x y. assert (0 < ('y)%Z)%Qc.
-  { apply (Z2Qc_inj_lt 0%Z (' y)), Pos2Z.is_pos. }
-  by rewrite (Qcmult_lt_mono_pos_r _ _ ('y)%Z), Qcmult_0_l,
+  intros x y. assert (0 < Zpos y)%Qc.
+  { apply (Z2Qc_inj_lt 0%Z (Zpos y)), Pos2Z.is_pos. }
+  by rewrite (Qcmult_lt_mono_pos_r _ _ (Zpos y)%Z), Qcmult_0_l,
     <-Qcmult_assoc, Qcmult_inv_l, Qcmult_1_r.
 Qed.
 

@@ -887,25 +887,14 @@ Notation "(≫= f )" := (mbind f) (only parsing) : stdpp_scope.
 Notation "(≫=)" := (λ m f, mbind f m) (only parsing) : stdpp_scope.
 
 Notation "x ← y ; z" := (y ≫= (λ x : _, z))
-  (at level 100, only parsing, right associativity) : stdpp_scope.
+  (at level 20, y at level 100, z at level 200, only parsing) : stdpp_scope.
+
+Notation "' x1 .. xn ← y ; z" := (y ≫= (λ x1, .. (λ xn, z) .. ))
+  (at level 20, x1 binder, xn binder, y at level 100, z at level 200,
+   only parsing, right associativity) : stdpp_scope.
 
 Infix "<$>" := fmap (at level 61, left associativity) : stdpp_scope.
 
-Notation "' ( x1 , x2 ) ← y ; z" :=
-  (y ≫= (λ x : _, let ' (x1, x2) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
-Notation "' ( x1 , x2 , x3 ) ← y ; z" :=
-  (y ≫= (λ x : _, let ' (x1,x2,x3) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
-Notation "' ( x1 , x2 , x3  , x4 ) ← y ; z" :=
-  (y ≫= (λ x : _, let ' (x1,x2,x3,x4) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
-Notation "' ( x1 , x2 , x3  , x4 , x5 ) ← y ; z" :=
-  (y ≫= (λ x : _, let ' (x1,x2,x3,x4,x5) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
-Notation "' ( x1 , x2 , x3  , x4 , x5 , x6 ) ← y ; z" :=
-  (y ≫= (λ x : _, let ' (x1,x2,x3,x4,x5,x6) := x in z))
-  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
 Notation "x ;; z" := (x ≫= λ _, z)
   (at level 100, z at level 200, only parsing, right associativity): stdpp_scope.
 
@@ -918,9 +907,9 @@ Class MGuard (M : Type → Type) :=
   mguard: ∀ P {dec : Decision P} {A}, (P → M A) → M A.
 Arguments mguard _ _ _ !_ _ _ / : assert.
 Notation "'guard' P ; z" := (mguard P (λ _, z))
-  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
+  (at level 20, z at level 200, only parsing, right associativity) : stdpp_scope.
 Notation "'guard' P 'as' H ; z" := (mguard P (λ H, z))
-  (at level 100, z at level 200, only parsing, right associativity) : stdpp_scope.
+  (at level 20, z at level 200, only parsing, right associativity) : stdpp_scope.
 
 (** * Operations on maps *)
 (** In this section we define operational type classes for the operations
