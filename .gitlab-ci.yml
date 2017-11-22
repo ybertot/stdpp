@@ -3,6 +3,7 @@ image: ralfjung/opam-ci:latest
 stages:
   - build
   - deploy
+  - build_more
 
 variables:
   CPU_CORES: "9"
@@ -42,6 +43,7 @@ opam:
 
 build-coq.8.7.dev:
   <<: *template
+  stage: build_more
   variables:
     OPAM_PINS: "coq version 8.7.dev"
   except:
@@ -68,6 +70,7 @@ build-coq.8.6.1:
 
 build-coq.8.6:
   <<: *template
+  stage: build_more
   variables:
     OPAM_PINS: "coq version 8.6"
   except:
