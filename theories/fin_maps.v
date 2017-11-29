@@ -181,7 +181,8 @@ Section setoid.
     intros ?? Hf; apply partial_alter_proper.
     by destruct 1; constructor; apply Hf.
   Qed.
-  Lemma merge_ext f g `{!DiagNone f, !DiagNone g} :
+  Lemma merge_ext `{Equiv B, Equiv C} (f g : option A → option B → option C)
+      `{!DiagNone f, !DiagNone g} :
     ((≡) ==> (≡) ==> (≡))%signature f g →
     ((≡) ==> (≡) ==> (≡))%signature (merge (M:=M) f) (merge g).
   Proof.
