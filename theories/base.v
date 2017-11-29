@@ -513,8 +513,8 @@ Instance unit_inhabited: Inhabited unit := populate ().
 Notation "( x ,)" := (pair x) (only parsing) : stdpp_scope.
 Notation "(, y )" := (λ x, (x,y)) (only parsing) : stdpp_scope.
 
-Notation "p .1" := (fst p) (at level 10, format "p .1").
-Notation "p .2" := (snd p) (at level 10, format "p .2").
+Notation "p .1" := (fst p) (at level 2, left associativity, format "p .1").
+Notation "p .2" := (snd p) (at level 2, left associativity, format "p .2").
 
 Instance: Params (@pair) 2.
 Instance: Params (@fst) 2.
@@ -899,9 +899,9 @@ Notation "x ;; z" := (x ≫= λ _, z)
   (at level 100, z at level 200, only parsing, right associativity): stdpp_scope.
 
 Notation "ps .*1" := (fmap (M:=list) fst ps)
-  (at level 10, format "ps .*1").
+  (at level 2, left associativity, format "ps .*1").
 Notation "ps .*2" := (fmap (M:=list) snd ps)
-  (at level 10, format "ps .*2").
+  (at level 2, left associativity, format "ps .*2").
 
 Class MGuard (M : Type → Type) :=
   mguard: ∀ P {dec : Decision P} {A}, (P → M A) → M A.
