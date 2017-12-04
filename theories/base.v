@@ -688,10 +688,6 @@ Notation "∅" := empty : stdpp_scope.
 
 Instance empty_inhabited `(Empty A) : Inhabited A := populate ∅.
 
-Class Top A := top : A.
-Hint Mode Top ! : typeclass_instances.
-Notation "⊤" := top : stdpp_scope.
-
 Class Union A := union: A → A → A.
 Hint Mode Union ! : typeclass_instances.
 Instance: Params (@union) 2.
@@ -1120,3 +1116,36 @@ Class Half A := half: A → A.
 Hint Mode Half ! : typeclass_instances.
 Notation "½" := half : stdpp_scope.
 Notation "½*" := (fmap (M:=list) half) : stdpp_scope.
+
+(** * Notations for lattices. *)
+Class SqSubsetEq A := sqsubseteq: relation A.
+Hint Mode SqSubsetEq ! : typeclass_instances.
+Instance: Params (@sqsubseteq) 2.
+Infix "⊑" := sqsubseteq (at level 70) : stdpp_scope.
+Notation "(⊑)" := sqsubseteq (only parsing) : stdpp_scope.
+Notation "( x ⊑)" := (sqsubseteq x) (only parsing) : stdpp_scope.
+Notation "(⊑ y )" := (λ x, sqsubseteq x y) (only parsing) : stdpp_scope.
+
+Class Meet A := meet: A → A → A.
+Hint Mode Meet ! : typeclass_instances.
+Instance: Params (@meet) 2.
+Infix "⊓" := meet (at level 40) : stdpp_scope.
+Notation "(⊓)" := meet (only parsing) : stdpp_scope.
+Notation "( x ⊓)" := (meet x) (only parsing) : stdpp_scope.
+Notation "(⊓ y )" := (λ x, meet x y) (only parsing) : stdpp_scope.
+
+Class Join A := join: A → A → A.
+Hint Mode Join ! : typeclass_instances.
+Instance: Params (@join) 2.
+Infix "⊔" := join (at level 50) : stdpp_scope.
+Notation "(⊔)" := join (only parsing) : stdpp_scope.
+Notation "( x ⊔)" := (join x) (only parsing) : stdpp_scope.
+Notation "(⊔ y )" := (λ x, join x y) (only parsing) : stdpp_scope.
+
+Class Top A := top : A.
+Hint Mode Top ! : typeclass_instances.
+Notation "⊤" := top : stdpp_scope.
+
+Class Bottom A := bottom : A.
+Hint Mode Bottom ! : typeclass_instances.
+Notation "⊥" := bottom : stdpp_scope.
