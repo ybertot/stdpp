@@ -119,8 +119,9 @@ Instance: @PreOrder A (=).
 Proof. split; repeat intro; congruence. Qed.
 
 (** ** Setoid equality *)
-(** We define an operational type class for setoid equality. This is based on
-(Spitters/van der Weegen, 2011). *)
+(** We define an operational type class for setoid equality, i.e., the
+"canonical" equivalence for a type. The typeclass is tied to the \equiv
+symbol. This is based on (Spitters/van der Weegen, 2011). *)
 Class Equiv A := equiv: relation A.
 (* No Hint Mode set because of Coq bug #5735
 Hint Mode Equiv ! : typeclass_instances. *)
@@ -1118,6 +1119,8 @@ Notation "½" := half : stdpp_scope.
 Notation "½*" := (fmap (M:=list) half) : stdpp_scope.
 
 (** * Notations for lattices. *)
+(** SqSubsetEq registers the "canonical" partial order for a type, and is used
+for the \sqsubseteq symbol. *)
 Class SqSubsetEq A := sqsubseteq: relation A.
 Hint Mode SqSubsetEq ! : typeclass_instances.
 Instance: Params (@sqsubseteq) 2.
