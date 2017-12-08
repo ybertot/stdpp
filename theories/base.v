@@ -91,6 +91,14 @@ Existing Class TCForall.
 Existing Instance TCForall_nil.
 Existing Instance TCForall_cons.
 
+Inductive TCForall2 {A B} (P : A → B → Prop) : list A → list B → Prop :=
+  | TCForall2_nil : TCForall2 P [] []
+  | TCForall2_cons x y xs ys :
+     P x y → TCForall2 P xs ys → TCForall2 P (x :: xs) (y :: ys).
+Existing Class TCForall2.
+Existing Instance TCForall2_nil.
+Existing Instance TCForall2_cons.
+
 (** Throughout this development we use [stdpp_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
 Delimit Scope stdpp_scope with stdpp.
