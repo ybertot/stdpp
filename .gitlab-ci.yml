@@ -74,7 +74,7 @@ build-coq.8.6.1:
   except:
   - triggers
 
-build-coq.8.6:
+build-coq.8.6.0:
   <<: *template
   stage: build_more
   variables:

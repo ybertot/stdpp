@@ -46,7 +46,7 @@ developed by Robbert Krebbers, Ralf Jung, and Jacques Henri-Jourdan.
 
 This version is known to compile with:
 
- - Coq version 8.6 / 8.6.1 / 8.7.0
+ - Coq version 8.6.0 / 8.6.1 / 8.7.0 / 8.7.1
 
 ## Building Instructions
 
