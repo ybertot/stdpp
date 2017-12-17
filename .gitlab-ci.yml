@@ -48,8 +48,16 @@ build-coq.8.7.dev:
   except:
   - triggers
 
+build-coq.8.7.1:
+  <<: *template
+  variables:
+    OPAM_PINS: "coq version 8.7.0"
+  except:
+  - triggers
+
 build-coq.8.7.0:
   <<: *template
+  stage: build_more
   variables:
     OPAM_PINS: "coq version 8.7.0"
   except:
