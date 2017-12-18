@@ -42,8 +42,8 @@ This version is known to compile with:
 
 ## Installing via opam
 
-To obtain the latest stable release via opam, you have to add the Coq opam
-repository:
+To obtain the latest stable release via opam (1.2.2 or newer), you have to add
+the Coq opam repository:
 
     opam repo add coq-released https://coq.inria.fr/opam/released
 
