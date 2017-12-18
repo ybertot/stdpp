@@ -45,9 +45,13 @@ This version is known to compile with:
 To obtain the latest stable release via opam, you have to add the Coq opam
 repository:
 
-  opam repo add coq-released https://coq.inria.fr/opam/released
+    opam repo add coq-released https://coq.inria.fr/opam/released
 
 Then you can do `opam install coq-stdpp`.
+
+To obtain a development version, add the Iris opam repository:
+
+    opam repo add iris-dev https://gitlab.mpi-sws.org/FP/opam-dev.git
 
 ## Building from source
 
