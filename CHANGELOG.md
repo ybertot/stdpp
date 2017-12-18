@@ -6,11 +6,11 @@ API-breaking change is listed.
 New features:
 
 - Many new lemmas about lists, vectors, sets, maps.
-- Equivalence proofs between coq++ functions that have a different definition in
-  the Coq standard library, e.g. `List.nth`, `List.NoDop`.
-- Type versions of the logical connectives and list predicates:
+- Equivalence proofs between std++ functions and their alternative in the the
+  Coq standard library, e.g. `List.nth`, `List.NoDop`.
+- Typeclass versions of the logical connectives and list predicates:
   `TCOr`, `TCAnd`, `TCTrue`, `TCForall`, `TCForall2`.
-- A connective `tc_opaque` to make definitions type class opaque.
+- A function `tc_opaque` to make definitions type class opaque.
 - A type class `Infinite` for infinite types.
 - A generic implementation to obtain fresh elements of infinite types.
 - More theory about curry and uncurry functions on `gmap`.
@@ -35,13 +35,12 @@ Changes to notations:
 - Operational type classes for lattice notations: `⊑`,`⊓`, `⊔`, `⊤` `⊥`.
 - Replace `⊥` for disjointness with `##`, so that `⊥` can be used for the
   bottom lattice element.
-- All notations are now in `stdpp_scope` with scope `stdpp`
+- All notations are now in `stdpp_scope` with scope key `stdpp`
   (formerly `C_scope` and `C`).
-- Stronger binding for `.1` and `.2` that is compatible with ssreflect.
-- Various changes to monadic notation to improve compatibility with Mtac2:
+- Higher precedence for `.1` and `.2` that is compatible with ssreflect.
+- Various changes to monadic notations to improve compatibility with Mtac2:
   + Pattern matching notation for monadic bind `'pat ← x; y` where `pat` can
     be any Coq pattern.
   + Change the level of the do-notation.
   + `<$>` is left associative.
   + Notation `x ;; y` for `_ ← x; y`.
-- 
