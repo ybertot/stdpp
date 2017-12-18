@@ -3,6 +3,9 @@ API-breaking change is listed.
 
 ## std++ 1.1.0 (unfinished)
 
+Coq 8.5 is no longer supported by this release of std++.  Use std++ 1.0 if you
+have to use Coq 8.5.
+
 New features:
 
 - Many new lemmas about lists, vectors, sets, maps.
@@ -20,6 +23,8 @@ New features:
 Changes:
 
 - Get rid of `Automatic Coercions Import`, it is deprecated.
+  Also get rid of `Set Asymmetric Patterns`.
+- Various changes and improvements to `f_equiv` and `solve_proper`.
 - `Hint Mode` is now set for all operational type classes to make instance
   search less likely to diverge.
 - New type class `RelDecision` for decidable relations, and `EqDecision` is
