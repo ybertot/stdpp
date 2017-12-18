@@ -44,3 +44,11 @@ Changes to notations:
   + Change the level of the do-notation.
   + `<$>` is left associative.
   + Notation `x ;; y` for `_ ← x; y`.
+
+## History
+
+Coq-std++ has originally been developed by Robbert Krebbers as part of his
+formalization of the C programming language in his PhD thesis, called
+[CH2O](http://robbertkrebbers.nl/thesis.html). After that, Coq-std++ has been
+part of the [Iris project](http://iris-project.org), and has continued to be
+developed by Robbert Krebbers, Ralf Jung, and Jacques Henri-Jourdan.

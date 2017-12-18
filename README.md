@@ -34,20 +34,22 @@ Notably:
   `Obligation Tactic := idtac`, `Add Search Blacklist "_obligation_"`.  See
   [`base.v`](theories/base.v) for further details.
 
-## History
-
-Coq-std++ has originally been developed by Robbert Krebbers as part of his
-formalization of the C programming language in his PhD thesis, called
-[CH2O](http://robbertkrebbers.nl/thesis.html). After that, Coq-std++ has been
-part of the [Iris project](http://iris-project.org), and has continued to be
-developed by Robbert Krebbers, Ralf Jung, and Jacques Henri-Jourdan.
-
 ## Prerequisites
 
 This version is known to compile with:
 
  - Coq version 8.6.0 / 8.6.1 / 8.7.0 / 8.7.1
 
-## Building Instructions
+## Installing via opam
 
-Run `make` to build the full development.  Run `make install` to install the library.
+To obtain the latest stable release via opam, you have to add the Coq opam
+repository:
+
+  opam repo add coq-released https://coq.inria.fr/opam/released
+
+Then you can do `opam install coq-stdpp`.
+
+## Building from source
+
+Run `make -jN` in this directory to build the library, where `N` is the number
+of your CPU cores.  Then run `make install` to install the library.
