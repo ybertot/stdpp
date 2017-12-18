@@ -1,4 +1,4 @@
-This file lists "large-ish" changes to the std++ Coq development, but not every
+This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
 ## std++ 1.1.0 (unfinished)
