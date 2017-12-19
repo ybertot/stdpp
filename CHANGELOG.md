@@ -1,7 +1,7 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## std++ 1.1.0 (unfinished)
+## std++ 1.1.0 (released 2017-12-19)
 
 Coq 8.5 is no longer supported by this release of std++.  Use std++ 1.0 if you
 have to use Coq 8.5.
