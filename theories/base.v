@@ -1138,6 +1138,8 @@ Notation "( x ⊑)" := (sqsubseteq x) (only parsing) : stdpp_scope.
 Notation "(⊑ y )" := (λ x, sqsubseteq x y) (only parsing) : stdpp_scope.
 Instance sqsubseteq_rewrite `{SqSubsetEq A} : RewriteRelation (⊑).
 
+Hint Extern 0 (_ ⊑ _) => reflexivity.
+
 Class Meet A := meet: A → A → A.
 Hint Mode Meet ! : typeclass_instances.
 Instance: Params (@meet) 2.
