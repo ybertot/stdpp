@@ -54,6 +54,9 @@ Section definitions.
     | ex_loop_do_step x y : R x y → ex_loop y → ex_loop x.
 End definitions.
 
+(* Strongly normalizing elements *)
+Notation sn R := (Acc (flip R)).
+
 Hint Unfold nf red.
 
 (** * General theorems *)
