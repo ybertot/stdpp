@@ -2175,7 +2175,7 @@ Section Forall_Exists.
     intros [??]; auto using Forall_app_2.
   Qed.
   Lemma Forall_true l : (∀ x, P x) → Forall P l.
-  Proof. induction l; auto. Qed.
+  Proof. intros ?. induction l; auto. Defined.
   Lemma Forall_impl (Q : A → Prop) l :
     Forall P l → (∀ x, P x → Q x) → Forall Q l.
   Proof. intros H ?. induction H; auto. Defined.
