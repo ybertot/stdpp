@@ -2331,6 +2331,11 @@ Section Forall_Exists.
     end.
 End Forall_Exists.
 
+Lemma forallb_True (f : A → bool) xs : forallb f xs ↔ Forall f xs.
+Proof. split. induction xs; naive_solver. induction 1; naive_solver. Qed.
+Lemma existb_True (f : A → bool) xs : existsb f xs ↔ Exists f xs.
+Proof. split. induction xs; naive_solver. induction 1; naive_solver. Qed.
+
 Lemma replicate_as_Forall (x : A) n l :
   replicate n x = l ↔ length l = n ∧ Forall (x =) l.
 Proof. rewrite replicate_as_elem_of, Forall_forall. naive_solver. Qed.
