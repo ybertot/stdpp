@@ -3181,15 +3181,20 @@ Section mapM.
   Qed.
   Lemma mapM_is_Some l : is_Some (mapM f l) ↔ Forall (is_Some ∘ f) l.
   Proof. split; auto using mapM_is_Some_1, mapM_is_Some_2. Qed.
+
+  Lemma mapM_fmap_Forall_Some (g : B → A) (l : list B) :
+    Forall (λ x, f (g x) = Some x) l → mapM f (g <$> l) = Some l.
+  Proof. by induction 1; simpl; simplify_option_eq. Qed.
   Lemma mapM_fmap_Some (g : B → A) (l : list B) :
     (∀ x, f (g x) = Some x) → mapM f (g <$> l) = Some l.
-  Proof. intros. by induction l; simpl; simplify_option_eq. Qed.
-  Lemma mapM_fmap_Some_inv (g : B → A) (l : list B) (k : list A) :
-    (∀ x y, f y = Some x → y = g x) → mapM f k = Some l → k = g <$> l.
-  Proof.
-    intros Hgf. revert l; induction k as [|??]; intros [|??] ?;
-      simplify_option_eq; try f_equiv; eauto.
-  Qed.
+  Proof. intros. by apply mapM_fmap_Forall_Some, Forall_true. Qed.
+
+  Lemma mapM_fmap_Forall2_Some_inv (g : B → A) (l : list A) (k : list B) :
+    mapM f l = Some k → Forall2 (λ x y, f x = Some y → g y = x) l k → g <$> k = l.
+  Proof. induction 2; simplify_option_eq; naive_solver. Qed.
+  Lemma mapM_fmap_Some_inv (g : B → A) (l : list A) (k : list B) :
+    mapM f l = Some k → (∀ x y, f x = Some y → g y = x) → g <$> k = l.
+  Proof. eauto using mapM_fmap_Forall2_Some_inv, Forall2_true, mapM_length. Qed.
 End mapM.
 
 (** ** Properties of the [permutations] function *)
