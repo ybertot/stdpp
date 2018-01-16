@@ -517,6 +517,8 @@ Tactic Notation "naive_solver" tactic(tac) :=
   | |- Is_true (_ && _) => apply andb_True; split
   | H : _ ∨ _ |- _ =>
      let H1 := fresh in destruct H as [H1|H1]; try clear H
+  | H : Is_true (_ || _) |- _ =>
+     apply orb_True in H; let H1 := fresh in destruct H as [H1|H1]; try clear H
   (**i solve the goal using the user supplied tactic *)
   | |- _ => solve [tac]
   end;
@@ -525,6 +527,7 @@ Tactic Notation "naive_solver" tactic(tac) :=
   (**i instantiation of the conclusion *)
   | |- ∃ x, _ => no_new_unsolved_evars ltac:(eexists; go n)
   | |- _ ∨ _ => first [left; go n | right; go n]
+  | |- Is_true (_ || _) => apply orb_True; first [left; go n | right; go n]
   | _ =>
     (**i instantiations of assumptions. *)
     lazymatch n with
