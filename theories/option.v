@@ -183,6 +183,11 @@ Proof. unfold is_Some; destruct mx; naive_solver. Qed.
 Lemma fmap_Some {A B} (f : A → B) mx y :
   f <$> mx = Some y ↔ ∃ x, mx = Some x ∧ y = f x.
 Proof. destruct mx; naive_solver. Qed.
+Lemma fmap_Some_1 {A B} (f : A → B) mx y :
+  f <$> mx = Some y → ∃ x, mx = Some x ∧ y = f x.
+Proof. apply fmap_Some. Qed.
+Lemma fmap_Some_2 {A B} (f : A → B) mx x : mx = Some x → f <$> mx = Some (f x).
+Proof. intros. apply fmap_Some; eauto. Qed.
 Lemma fmap_Some_equiv {A B} `{Equiv B} `{!Equivalence ((≡) : relation B)}
       (f : A → B) mx y :
   f <$> mx ≡ Some y ↔ ∃ x, mx = Some x ∧ y ≡ f x.
