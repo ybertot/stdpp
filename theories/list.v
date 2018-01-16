@@ -2409,6 +2409,13 @@ Section Forall2.
     intros H. revert k2. induction H; inversion_clear 1; intros; f_equal; eauto.
   Qed.
 
+  Lemma Forall_Forall2_l l k :
+    length l = length k → Forall (λ x, ∀ y, P x y) l → Forall2 P l k.
+  Proof. rewrite <-Forall2_same_length. induction 1; inversion 1; auto. Qed.
+  Lemma Forall_Forall2_r l k :
+    length l = length k → Forall (λ y, ∀ x, P x y) k → Forall2 P l k.
+  Proof. rewrite <-Forall2_same_length. induction 1; inversion 1; auto. Qed.
+
   Lemma Forall2_Forall_l (Q : A → Prop) l k :
     Forall2 P l k → Forall (λ y, ∀ x, P x y → Q x) k → Forall Q l.
   Proof. induction 1; inversion_clear 1; eauto. Qed.
