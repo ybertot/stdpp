@@ -3,7 +3,7 @@
 # This reads the following environment variables:
 # - DOCDIR: The directory to upload the documentation to
 set -e
-echo "Publishing documentation from branch $CI_BUILD_REF to $DOCDIR"
+echo "Publishing documentation from branch $CI_COMMIT_REF_NAME to $DOCDIR"
 
 # We need a custom wrapper around SSH to use our settings, and ssh-agent for the key
 eval $(ssh-agent -s)
@@ -12,3 +12,9 @@ export GIT_SSH=$(readlink -e "$(dirname "$0")/ssh")
 
 # Enable tracing mode *after* we did the secret key stuff above
 set -x
+
+# Generate documentation
+make html
+
+# Upload documentation
+rsync -a -e "$GIT_SSH" html/ "$DOCDIR/"
