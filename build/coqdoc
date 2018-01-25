@@ -17,4 +17,4 @@ set -x
 make html
 
 # Upload documentation
-rsync -a -e "$GIT_SSH" html/ "$DOCDIR/"
+rsync -a --delete -e "$GIT_SSH" html/ "$DOCDIR/"
