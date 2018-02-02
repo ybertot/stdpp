@@ -99,6 +99,10 @@ Existing Class TCForall2.
 Existing Instance TCForall2_nil.
 Existing Instance TCForall2_cons.
 
+Inductive TCEq {A} (x : A) : A → Prop := TCEq_refl : TCEq x x.
+Existing Class TCEq.
+Existing Instance TCEq_refl.
+
 (** Throughout this development we use [stdpp_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
 Delimit Scope stdpp_scope with stdpp.
