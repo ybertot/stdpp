@@ -1,6 +1,6 @@
 From stdpp Require Import numbers.
 
-(* The class [NatCancel m n m' n'] is a simple canceler for natural numbers
+(** The class [NatCancel m n m' n'] is a simple canceler for natural numbers
 implemented using type classes.
 
 Input: [m], [n]; output: [m'], [n'].
@@ -71,7 +71,7 @@ Global Instance nat_cancel_leaf_S_else m n m' n' :
   NatCancelLeaf m n m' n' → NatCancelLeaf m (S n) m' (S n') | 4.
 Proof. unfold NatCancelLeaf, NatCancel. omega. Qed.
 
-(* The instance [nat_cancel_S_both] is redundant, but may reduce proof search
+(** The instance [nat_cancel_S_both] is redundant, but may reduce proof search
 quite a bit, e.g. when canceling constants in constants. *)
 Global Instance nat_cancel_S_both m n m' n' :
   NatCancel m n m' n' → NatCancel (S m) (S n) m' n' | 1.
