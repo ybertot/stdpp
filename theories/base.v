@@ -46,6 +46,22 @@ End seal.
 Arguments unseal {_ _} _ : assert.
 Arguments seal_eq {_ _} _ : assert.
 
+(** * Non-backtracking type classes *)
+(** The type class [NoBackTrack P] can be used to establish [P] without ever
+backtracking on the instance of [P] that has been found. Backtracking may
+normally happen when [P] contains evars that could be instanciated in different
+ways depending on which instance is picked, and type class search somewhere else
+depends on this evar.
+
+The proper way of handling this would be by setting Coq's option
+`Typeclasses Unique Instances`. However, this option seems to be broken, see Coq
+issue #6714.
+
+See https://gitlab.mpi-sws.org/FP/iris-coq/merge_requests/112 for a rationale
+of this type class. *)
+Class NoBackTrack (P : Prop) := { no_backtrack : P }.
+Hint Extern 0 (NoBackTrack _) => constructor; apply _ : typeclass_instances.
+
 (** * Typeclass opaque definitions *)
 (* The constant [tc_opaque] is used to make definitions opaque for just type
 class search. Note that [simpl] is set up to always unfold [tc_opaque]. *)
