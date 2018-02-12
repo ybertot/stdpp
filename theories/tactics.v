@@ -35,11 +35,10 @@ is rather efficient when having big hint databases, or expensive [Hint Extern]
 declarations as the ones above. *)
 Tactic Notation "intuition" := intuition auto.
 
-(* [done] can get slow as it calls "trivial". [fast_done] can solve way less
-   goals, but it will also always finish quickly.
-   We do 'reflexivity' last because for goals of the form ?x = y, if
-   we have x = y in the context, we will typically want to use the
-   assumption and not reflexivity *)
+(** [done] can get slow as it calls "trivial". [fast_done] can solve way less
+goals, but it will also always finish quickly.  We do 'reflexivity' last because
+for goals of the form ?x = y, if we have x = y in the context, we will typically
+want to use the assumption and not reflexivity *)
 Ltac fast_done :=
   solve
     [ eassumption
@@ -321,7 +320,7 @@ Ltac f_equiv :=
   try simple apply reflexivity.
 Tactic Notation "f_equiv" "/=" := csimpl in *; f_equiv.
 
-(* The tactic [solve_proper_unfold] unfolds the first head symbol, so that
+(** The tactic [solve_proper_unfold] unfolds the first head symbol, so that
 we proceed by repeatedly using [f_equiv]. *)
 Ltac solve_proper_unfold :=
   (* Try unfolding the head symbol, which is the one we are proving a new property about *)
@@ -335,9 +334,9 @@ Ltac solve_proper_unfold :=
   | |- ?R (?f _ _) (?f _ _) => unfold f
   | |- ?R (?f _) (?f _) => unfold f
   end.
-(* [solve_proper_prepare] does some preparation work before the main
-   [solve_proper] loop.  Having this as a separate tactic is useful for
-   debugging [solve_proper] failure. *)
+(** [solve_proper_prepare] does some preparation work before the main
+[solve_proper] loop.  Having this as a separate tactic is useful for debugging
+[solve_proper] failure. *)
 Ltac solve_proper_prepare :=
   (* Introduce everything *)
   intros;

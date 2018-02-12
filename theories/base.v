@@ -10,8 +10,8 @@ Set Default Proof Using "Type".
 Export ListNotations.
 From Coq.Program Require Export Basics Syntax.
 
-(** Enable implicit generalization. *)
-(* This option enables implicit generalization in arguments of the form
+(** * Enable implicit generalization. *)
+(** This option enables implicit generalization in arguments of the form
    `{...} (i.e., anonymous arguments).  Unfortunately, it also enables
    implicit generalization in `Instance`.  We think that the fact taht both
    behaviors are coupled together is a [bug in
@@ -63,13 +63,13 @@ Class NoBackTrack (P : Prop) := { no_backtrack : P }.
 Hint Extern 0 (NoBackTrack _) => constructor; apply _ : typeclass_instances.
 
 (** * Typeclass opaque definitions *)
-(* The constant [tc_opaque] is used to make definitions opaque for just type
+(** The constant [tc_opaque] is used to make definitions opaque for just type
 class search. Note that [simpl] is set up to always unfold [tc_opaque]. *)
 Definition tc_opaque {A} (x : A) : A := x.
 Typeclasses Opaque tc_opaque.
 Arguments tc_opaque {_} _ /.
 
-(* Below we define type class versions of the common logical operators. It is
+(** Below we define type class versions of the common logical operators. It is
 important to note that we duplicate the definitions, and do not declare the
 existing logical operators as type classes. That is, we do not say:
 
