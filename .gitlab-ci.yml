@@ -11,7 +11,7 @@ variables:
 .template: &template
   stage: build
   tags:
-  - fp-timing
+  - fp
   script:
   # prepare
   - . build/opam-ci.sh $OPAM_PINS
@@ -55,6 +55,12 @@ build-coq.8.7.1:
   variables:
     OPAM_PINS: "coq version 8.7.1"
     DOCDIR: "coqdoc@center.mpi-sws.org:/stdpp"
+  tags:
+  - fp-timing
+  artifacts:
+    paths:
+    - build-time.txt
+    - build-env.txt
   except:
   - triggers
 
@@ -70,10 +76,6 @@ build-coq.8.6.1:
   <<: *template
   variables:
     OPAM_PINS: "coq version 8.6.1"
-  artifacts:
-    paths:
-    - build-time.txt
-    - build-env.txt
   except:
   - triggers
 
