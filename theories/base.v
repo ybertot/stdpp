@@ -66,7 +66,7 @@ Hint Extern 0 (NoBackTrack _) => constructor; apply _ : typeclass_instances.
 as [TCOr (TCAnd P Q) R]: the latter will backtrack to [R] if it fails to
 establish [R], i.e. does not have the behavior of a conditional. Furthermore,
 note that [TCOr (TCAnd P Q) (TCAnd (TCNot P) R)] would not work; we generally
-would not be able to proof the negation of [P]. *)
+would not be able to prove the negation of [P]. *)
 Inductive TCIf (P Q R : Prop) :=
   | TCIf_true : P → Q → TCIf P Q R
   | TCIf_false : R → TCIf P Q R.
