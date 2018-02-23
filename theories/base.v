@@ -133,6 +133,11 @@ Inductive TCEq {A} (x : A) : A → Prop := TCEq_refl : TCEq x x.
 Existing Class TCEq.
 Existing Instance TCEq_refl.
 
+Inductive TCDiag {A} (C : A → Prop) : A → A → Prop :=
+  | TCDiag_diag x : C x → TCDiag C x x.
+Existing Class TCDiag.
+Existing Instance TCDiag_diag.
+
 (** Throughout this development we use [stdpp_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
 Delimit Scope stdpp_scope with stdpp.
