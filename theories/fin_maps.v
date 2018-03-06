@@ -261,6 +261,11 @@ Proof.
 Qed.
 Lemma map_fmap_empty {A B} (f : A → B) : f <$> (∅ : M A) = ∅.
 Proof. by apply map_eq; intros i; rewrite lookup_fmap, !lookup_empty. Qed.
+Lemma map_fmap_empty_inv {A B} (f : A → B) m : f <$> m = ∅ → m = ∅.
+Proof.
+  intros Hm. apply map_eq; intros i. generalize (f_equal (lookup i) Hm).
+  by rewrite lookup_fmap, !lookup_empty, fmap_None.
+Qed.
 
 Lemma map_subset_alt {A} (m1 m2 : M A) :
   m1 ⊂ m2 ↔ m1 ⊆ m2 ∧ ∃ i, m1 !! i = None ∧ is_Some (m2 !! i).
