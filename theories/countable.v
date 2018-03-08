@@ -37,9 +37,9 @@ Section choice.
   Context `{Countable A} (P : A → Prop).
 
   Inductive choose_step: relation positive :=
-    | choose_step_None {p} : decode (A:=A) p = None → choose_step (Psucc p) p
+    | choose_step_None {p} : decode (A:=A) p = None → choose_step (Pos.succ p) p
     | choose_step_Some {p} {x : A} :
-       decode p = Some x → ¬P x → choose_step (Psucc p) p.
+       decode p = Some x → ¬P x → choose_step (Pos.succ p) p.
   Lemma choose_step_acc : (∃ x, P x) → Acc choose_step 1%positive.
   Proof.
     intros [x Hx]. cut (∀ i p,

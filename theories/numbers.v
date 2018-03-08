@@ -223,10 +223,10 @@ Proof. by injection 1. Qed.
 
 Instance N_eq_dec: EqDecision N := N.eq_dec.
 Program Instance N_le_dec : RelDecision N.le := λ x y,
-  match Ncompare x y with Gt => right _ | _ => left _ end.
+  match N.compare x y with Gt => right _ | _ => left _ end.
 Solve Obligations with naive_solver.
 Program Instance N_lt_dec : RelDecision N.lt := λ x y,
-  match Ncompare x y with Lt => left _ | _ => right _ end.
+  match N.compare x y with Lt => left _ | _ => right _ end.
 Solve Obligations with naive_solver.
 Instance N_inhabited: Inhabited N := populate 1%N.
 Instance N_le_po: PartialOrder (≤)%N.
