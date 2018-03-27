@@ -64,6 +64,8 @@ Instance map_singleton `{PartialAlter K A M, Empty M} :
 Definition map_of_list `{Insert K A M, Empty M} : list (K * A) → M :=
   fold_right (λ p, <[p.1:=p.2]>) ∅.
 
+Instance map_size `{FinMapToList K A M} : Size M := λ m, length (map_to_list m).
+
 Definition map_to_collection `{FinMapToList K A M,
     Singleton B C, Empty C, Union C} (f : K → A → B) (m : M) : C :=
   of_list (curry f <$> map_to_list m).
@@ -868,6 +870,26 @@ Proof.
     rewrite elem_of_list_omap in Hi'; destruct Hi' as ([j y]&Hj&?).
     rewrite elem_of_map_to_list in Hj; simplify_option_eq.
 Qed.
+
+(** ** Properties of the size operation *)
+Lemma map_size_empty {A} : size (∅ : M A) = 0.
+Proof. unfold size, map_size. by rewrite map_to_list_empty. Qed.
+Lemma map_size_empty_inv {A} (m : M A) : size m = 0 → m = ∅.
+Proof.
+  unfold size, map_size. by rewrite length_zero_iff_nil, map_to_list_empty'.
+Qed.
+Lemma map_size_empty_iff {A} (m : M A) : size m = 0 ↔ m = ∅.
+Proof. split. apply map_size_empty_inv. by intros ->; rewrite map_size_empty. Qed.
+Lemma map_size_non_empty_iff {A} (m : M A) : size m ≠ 0 ↔ m ≠ ∅.
+Proof. by rewrite map_size_empty_iff. Qed.
+
+Lemma map_size_singleton {A} i (x : A) : size ({[ i := x ]} : M A) = 1.
+Proof. unfold size, map_size. by rewrite map_to_list_singleton. Qed.
+Lemma map_size_insert {A} i x (m : M A) :
+  m !! i = None → size (<[i:=x]> m) = S (size m).
+Proof. intros. unfold size, map_size. by rewrite map_to_list_insert. Qed.
+Lemma map_size_fmap {A B} (f : A -> B) (m : M A) : size (f <$> m) = size m.
+Proof. intros. unfold size, map_size. by rewrite map_to_list_fmap, fmap_length. Qed.
 
 (** ** Properties of conversion from collections *)
 Section map_of_to_collection.
