@@ -1,3 +1,0 @@
-#!/bin/bash
-_DIR=$(readlink -e "$(dirname "$0")")
-exec ssh -o StrictHostKeyChecking=yes -o UserKnownHostsFile="${_DIR}/ssh_host_keys" "$@"
