@@ -1204,6 +1204,10 @@ Infix "⊑" := sqsubseteq (at level 70) : stdpp_scope.
 Notation "(⊑)" := sqsubseteq (only parsing) : stdpp_scope.
 Notation "( x ⊑)" := (sqsubseteq x) (only parsing) : stdpp_scope.
 Notation "(⊑ y )" := (λ x, sqsubseteq x y) (only parsing) : stdpp_scope.
+
+Infix "⊑@{ A }" := (@sqsubseteq A _) (at level 70, only parsing) : stdpp_scope.
+Notation "(⊑@{ A } )" := (@sqsubseteq A _) (only parsing) : stdpp_scope.
+
 Instance sqsubseteq_rewrite `{SqSubsetEq A} : RewriteRelation (⊑).
 
 Hint Extern 0 (_ ⊑ _) => reflexivity.
