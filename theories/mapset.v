@@ -85,7 +85,7 @@ Section deciders.
    refine (λ X1 X2, cast_if (decide (X1 ∩ X2 = ∅)));
     abstract (by rewrite disjoint_intersection_L).
   Defined.
-  Global Instance mapset_subseteq_dec : RelDecision (@subseteq (mapset M) _).
+  Global Instance mapset_subseteq_dec : RelDecision (⊆@{mapset M}).
   Proof.
    refine (λ X1 X2, cast_if (decide (X1 ∪ X2 = X2)));
     abstract (by rewrite subseteq_union_L).

@@ -315,10 +315,10 @@ Section simple_collection.
   Proof. set_solver. Qed.
 
   (** Subset relation *)
-  Global Instance collection_subseteq_antisymm: AntiSymm (≡) ((⊆) : relation C).
+  Global Instance collection_subseteq_antisymm: AntiSymm (≡) (⊆@{C}).
   Proof. intros ??. set_solver. Qed.
 
-  Global Instance collection_subseteq_preorder: PreOrder ((⊆) : relation C).
+  Global Instance collection_subseteq_preorder: PreOrder (⊆@{C}).
   Proof. split. by intros ??. intros ???; set_solver. Qed.
 
   Lemma subseteq_union X Y : X ⊆ Y ↔ X ∪ Y ≡ Y.
@@ -467,8 +467,7 @@ Section simple_collection.
     Proof. unfold_leibniz. apply collection_equiv_spec. Qed.
 
     (** Subset relation *)
-    Global Instance collection_subseteq_partialorder :
-      PartialOrder ((⊆) : relation C).
+    Global Instance collection_subseteq_partialorder : PartialOrder (⊆@{C}).
     Proof. split. apply _. intros ??. unfold_leibniz. apply (anti_symm _). Qed.
 
     Lemma subseteq_union_L X Y : X ⊆ Y ↔ X ∪ Y = Y.

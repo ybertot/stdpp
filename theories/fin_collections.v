@@ -149,7 +149,7 @@ Proof.
 Qed.
 
 (** * Induction principles *)
-Lemma collection_wf : wf (strict (@subseteq C _)).
+Lemma collection_wf : wf (⊂@{C}).
 Proof. apply (wf_projected (<) size); auto using subset_size, lt_wf. Qed.
 Lemma collection_ind (P : C → Prop) :
   Proper ((≡) ==> iff) P →

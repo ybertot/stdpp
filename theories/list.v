@@ -2124,7 +2124,7 @@ Section submseteq_dec.
 End submseteq_dec.
 
 (** ** Properties of [included] *)
-Global Instance list_subseteq_po : PreOrder (@subseteq (list A) _).
+Global Instance list_subseteq_po : PreOrder (⊆@{list A}).
 Proof. split; firstorder. Qed.
 Lemma list_subseteq_nil l : [] ⊆ l.
 Proof. intros x. by rewrite elem_of_nil. Qed.

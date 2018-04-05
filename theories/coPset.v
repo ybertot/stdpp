@@ -199,7 +199,7 @@ Proof.
  refine (λ X Y, cast_if (decide (X ∩ Y = ∅)));
   abstract (by rewrite disjoint_intersection_L).
 Defined.
-Instance mapset_subseteq_dec : RelDecision (@subseteq coPset _).
+Instance mapset_subseteq_dec : RelDecision (⊆@{coPset}).
 Proof.
  refine (λ X Y, cast_if (decide (X ∪ Y = Y))); abstract (by rewrite subseteq_union_L).
 Defined.

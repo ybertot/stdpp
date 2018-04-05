@@ -224,7 +224,7 @@ Proof.
   destruct (m1 !! i), (m2 !! i), (m3 !! i); simplify_eq/=;
     done || etrans; eauto.
 Qed.
-Global Instance map_subseteq_po : PartialOrder ((⊆) : relation (M A)).
+Global Instance map_subseteq_po : PartialOrder (⊆@{M A}).
 Proof.
   split; [apply _|].
   intros m1 m2; rewrite !map_subseteq_spec.
@@ -965,7 +965,7 @@ Proof.
   destruct (insert_subset_inv m m2 i x) as (m2'&?&?&?); auto; subst.
   rewrite !map_to_list_insert; simpl; auto with arith.
 Qed.
-Lemma map_wf {A} : wf (strict (@subseteq (M A) _)).
+Lemma map_wf {A} : wf (⊂@{M A}).
 Proof.
   apply (wf_projected (<) (length ∘ map_to_list)).
   - by apply map_to_list_length.
@@ -1596,13 +1596,13 @@ Lemma map_union_cancel_l {A} (m1 m2 m3 : M A) :
   m1 ##ₘ m3 → m2 ##ₘ m3 → m3 ∪ m1 = m3 ∪ m2 → m1 = m2.
 Proof.
   intros. apply (anti_symm (⊆)); apply map_union_reflecting_l with m3;
-    auto using (reflexive_eq (R:=@subseteq (M A) _)).
+    auto using (reflexive_eq (R:=(⊆@{M A}))).
 Qed.
 Lemma map_union_cancel_r {A} (m1 m2 m3 : M A) :
   m1 ##ₘ m3 → m2 ##ₘ m3 → m1 ∪ m3 = m2 ∪ m3 → m1 = m2.
 Proof.
   intros. apply (anti_symm (⊆)); apply map_union_reflecting_r with m3;
-    auto using (reflexive_eq (R:=@subseteq (M A) _)).
+    auto using (reflexive_eq (R:=(⊆@{M A}))).
 Qed.
 Lemma map_disjoint_union_l {A} (m1 m2 m3 : M A) :
   m1 ∪ m2 ##ₘ m3 ↔ m1 ##ₘ m3 ∧ m2 ##ₘ m3.

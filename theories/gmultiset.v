@@ -231,7 +231,7 @@ Proof.
 Qed.
 
 (* Order stuff *)
-Global Instance gmultiset_po : PartialOrder (@subseteq (gmultiset A) _).
+Global Instance gmultiset_po : PartialOrder (⊆@{gmultiset A}).
 Proof.
   split; [split|].
   - by intros X x.
@@ -246,7 +246,7 @@ Proof.
   apply forall_proper; intros x. unfold multiplicity.
   destruct (gmultiset_car X !! x), (gmultiset_car Y !! x); naive_solver omega.
 Qed.
-Global Instance gmultiset_subseteq_dec : RelDecision (@subseteq (gmultiset A) _).
+Global Instance gmultiset_subseteq_dec : RelDecision (⊆@{gmultiset A}).
 Proof.
  refine (λ X Y, cast_if (decide (map_relation (≤)
    (λ _, False) (λ _, True) (gmultiset_car X) (gmultiset_car Y))));
@@ -342,7 +342,7 @@ Proof.
 Qed.
 
 (* Well-foundedness *)
-Lemma gmultiset_wf : wf (strict (@subseteq (gmultiset A) _)).
+Lemma gmultiset_wf : wf (⊂@{gmultiset A}).
 Proof.
   apply (wf_projected (<) size); auto using gmultiset_subset_size, lt_wf.
 Qed.

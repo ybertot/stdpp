@@ -812,6 +812,10 @@ Notation "X ⊈ Y" := (¬X ⊆ Y) (at level 70) : stdpp_scope.
 Notation "(⊈)" := (λ X Y, X ⊈ Y) (only parsing) : stdpp_scope.
 Notation "( X ⊈)" := (λ Y, X ⊈ Y) (only parsing) : stdpp_scope.
 Notation "(⊈ X )" := (λ Y, Y ⊈ X) (only parsing) : stdpp_scope.
+
+Infix "⊆@{ A }" := (@subseteq A _) (at level 70, only parsing) : stdpp_scope.
+Notation "(⊆@{ A } )" := (@subseteq A _) (only parsing) : stdpp_scope.
+
 Infix "⊆*" := (Forall2 (⊆)) (at level 70) : stdpp_scope.
 Notation "(⊆*)" := (Forall2 (⊆)) (only parsing) : stdpp_scope.
 Infix "⊆**" := (Forall2 (⊆*)) (at level 70) : stdpp_scope.
@@ -832,6 +836,9 @@ Notation "X ⊄ Y" := (¬X ⊂ Y) (at level 70) : stdpp_scope.
 Notation "(⊄)" := (λ X Y, X ⊄ Y) (only parsing) : stdpp_scope.
 Notation "( X ⊄)" := (λ Y, X ⊄ Y) (only parsing) : stdpp_scope.
 Notation "(⊄ X )" := (λ Y, Y ⊄ X) (only parsing) : stdpp_scope.
+
+Infix "⊂@{ A }" := (strict (⊆@{A})) (at level 70, only parsing) : stdpp_scope.
+Notation "(⊂@{ A } )" := (strict (⊆@{A})) (only parsing) : stdpp_scope.
 
 Notation "X ⊆ Y ⊆ Z" := (X ⊆ Y ∧ Y ⊆ Z) (at level 70, Y at next level) : stdpp_scope.
 Notation "X ⊆ Y ⊂ Z" := (X ⊆ Y ∧ Y ⊂ Z) (at level 70, Y at next level) : stdpp_scope.
