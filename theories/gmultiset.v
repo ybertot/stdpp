@@ -102,20 +102,20 @@ Global Instance gmultiset_elem_of_dec : RelDecision (@elem_of _ (gmultiset A) _)
 Proof. refine (λ x X, cast_if (decide (0 < multiplicity x X))); done. Defined.
 
 (* Algebraic laws *)
-Global Instance gmultiset_comm : Comm (@eq (gmultiset A)) (∪).
+Global Instance gmultiset_comm : Comm (=@{gmultiset A}) (∪).
 Proof.
   intros X Y. apply gmultiset_eq; intros x. rewrite !multiplicity_union; omega.
 Qed.
-Global Instance gmultiset_assoc : Assoc (@eq (gmultiset A)) (∪).
+Global Instance gmultiset_assoc : Assoc (=@{gmultiset A}) (∪).
 Proof.
   intros X Y Z. apply gmultiset_eq; intros x. rewrite !multiplicity_union; omega.
 Qed.
-Global Instance gmultiset_left_id : LeftId (@eq (gmultiset A)) ∅ (∪).
+Global Instance gmultiset_left_id : LeftId (=@{gmultiset A}) ∅ (∪).
 Proof.
   intros X. apply gmultiset_eq; intros x.
   by rewrite multiplicity_union, multiplicity_empty.
 Qed.
-Global Instance gmultiset_right_id : RightId (@eq (gmultiset A)) ∅ (∪).
+Global Instance gmultiset_right_id : RightId (=@{gmultiset A}) ∅ (∪).
 Proof. intros X. by rewrite (comm_L (∪)), (left_id_L _ _). Qed.
 
 Global Instance gmultiset_union_inj_1 X : Inj (=) (=) (X ∪).
@@ -126,7 +126,7 @@ Qed.
 Global Instance gmultiset_union_inj_2 X : Inj (=) (=) (∪ X).
 Proof. intros Y1 Y2. rewrite <-!(comm_L _ X). apply (inj _). Qed.
 
-Lemma gmultiset_non_empty_singleton x : {[ x ]} ≠ (∅ : gmultiset A).
+Lemma gmultiset_non_empty_singleton x : {[ x ]} ≠@{gmultiset A} ∅.
 Proof.
   rewrite gmultiset_eq. intros Hx; generalize (Hx x).
   by rewrite multiplicity_singleton, multiplicity_empty.

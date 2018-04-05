@@ -122,11 +122,11 @@ Section setoids.
   Proof. done. Qed.
 
   Global Instance option_equivalence :
-    Equivalence ((≡) : relation A) → Equivalence ((≡) : relation (option A)).
+    Equivalence (≡@{A}) → Equivalence (≡@{option A}).
   Proof. apply _. Qed.
-  Global Instance Some_proper : Proper ((≡) ==> (≡)) (@Some A).
+  Global Instance Some_proper : Proper ((≡) ==> (≡@{option A})) Some.
   Proof. by constructor. Qed.
-  Global Instance Some_equiv_inj : Inj (≡) (≡) (@Some A).
+  Global Instance Some_equiv_inj : Inj (≡) (≡@{option A}) Some.
   Proof. by inversion_clear 1. Qed.
   Global Instance option_leibniz `{!LeibnizEquiv A} : LeibnizEquiv (option A).
   Proof. intros x y; destruct 1; f_equal; by apply leibniz_equiv. Qed.
@@ -141,11 +141,11 @@ Section setoids.
   Proof. destruct 1; naive_solver. Qed.
   Lemma equiv_Some_inv_l' my x : Some x ≡ my → ∃ x', Some x' = my ∧ x ≡ x'.
   Proof. intros ?%(equiv_Some_inv_l _ _ x); naive_solver. Qed.
-  Lemma equiv_Some_inv_r' `{!Equivalence ((≡) : relation A)} mx y :
+  Lemma equiv_Some_inv_r' `{!Equivalence (≡@{A})} mx y :
     mx ≡ Some y → ∃ y', mx = Some y' ∧ y ≡ y'.
   Proof. intros ?%(equiv_Some_inv_r _ _ y); naive_solver. Qed.
 
-  Global Instance is_Some_proper : Proper ((≡) ==> iff) (@is_Some A).
+  Global Instance is_Some_proper : Proper ((≡@{option A}) ==> iff) is_Some.
   Proof. inversion_clear 1; split; eauto. Qed.
   Global Instance from_option_proper {B} (R : relation B) (f : A → B) :
     Proper ((≡) ==> R) f → Proper (R ==> (≡) ==> R) (from_option f).
@@ -188,8 +188,7 @@ Lemma fmap_Some_1 {A B} (f : A → B) mx y :
 Proof. apply fmap_Some. Qed.
 Lemma fmap_Some_2 {A B} (f : A → B) mx x : mx = Some x → f <$> mx = Some (f x).
 Proof. intros. apply fmap_Some; eauto. Qed.
-Lemma fmap_Some_equiv {A B} `{Equiv B} `{!Equivalence ((≡) : relation B)}
-      (f : A → B) mx y :
+Lemma fmap_Some_equiv {A B} `{Equiv B} `{!Equivalence (≡@{B})} (f : A → B) mx y :
   f <$> mx ≡ Some y ↔ ∃ x, mx = Some x ∧ y ≡ f x.
 Proof.
   destruct mx; simpl; split.
@@ -198,8 +197,7 @@ Proof.
   - intros ?%symmetry%equiv_None. done.
   - intros (? & ? & ?). done.
 Qed.
-Lemma fmap_Some_equiv_1 {A B} `{Equiv B} `{!Equivalence ((≡) : relation B)}
-      (f : A → B) mx y :
+Lemma fmap_Some_equiv_1 {A B} `{Equiv B} `{!Equivalence (≡@{B})} (f : A → B) mx y :
   f <$> mx ≡ Some y → ∃ x, mx = Some x ∧ y ≡ f x.
 Proof. by rewrite fmap_Some_equiv. Qed.
 Lemma fmap_None {A B} (f : A → B) mx : f <$> mx = None ↔ mx = None.
@@ -237,13 +235,13 @@ Lemma bind_with_Some {A} (mx : option A) : mx ≫= Some = mx.
 Proof. by destruct mx. Qed.
 
 Instance option_fmap_proper `{Equiv A, Equiv B} :
-  Proper (((≡) ==> (≡)) ==> (≡) ==> (≡)) (fmap (M:=option) (A:=A) (B:=B)).
+  Proper (((≡) ==> (≡)) ==> (≡@{option A}) ==> (≡@{option B})) fmap.
 Proof. destruct 2; constructor; auto. Qed.
 Instance option_mbind_proper `{Equiv A, Equiv B} :
-  Proper (((≡) ==> (≡)) ==> (≡) ==> (≡)) (mbind (M:=option) (A:=A) (B:=B)).
+  Proper (((≡) ==> (≡)) ==> (≡@{option A}) ==> (≡@{option B})) mbind.
 Proof. destruct 2; simpl; try constructor; auto. Qed.
 Instance option_mjoin_proper `{Equiv A} :
-  Proper ((≡) ==> (≡)) (mjoin (M:=option) (A:=A)).
+  Proper ((≡) ==> (≡@{option (option A)})) mjoin.
 Proof. destruct 1 as [?? []|]; simpl; by constructor. Qed.
 
 (** ** Inverses of constructors *)
@@ -312,14 +310,14 @@ Section union_intersection_difference.
   Global Instance union_with_right_id : RightId (=) None (union_with f).
   Proof. by intros [?|]. Qed.
   Global Instance union_with_comm :
-    Comm (=) f → Comm (=) (union_with (M:=option A) f).
+    Comm (=) f → Comm (=@{option A}) (union_with f).
   Proof. by intros ? [?|] [?|]; compute; rewrite 1?(comm f). Qed.
   Global Instance intersection_with_left_ab : LeftAbsorb (=) None (intersection_with f).
   Proof. by intros [?|]. Qed.
   Global Instance intersection_with_right_ab : RightAbsorb (=) None (intersection_with f).
   Proof. by intros [?|]. Qed.
   Global Instance difference_with_comm :
-    Comm (=) f → Comm (=) (intersection_with (M:=option A) f).
+    Comm (=) f → Comm (=@{option A}) (intersection_with f).
   Proof. by intros ? [?|] [?|]; compute; rewrite 1?(comm f). Qed.
   Global Instance difference_with_right_id : RightId (=) None (difference_with f).
   Proof. by intros [?|]. Qed.

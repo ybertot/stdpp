@@ -147,38 +147,34 @@ Section setoid.
     m1 ≡ m2 → m1 !! i = Some x → ∃ y, m2 !! i = Some y ∧ x ≡ y.
   Proof. generalize (equiv_Some_inv_l (m1 !! i) (m2 !! i) x); naive_solver. Qed.
 
-  Global Instance map_equivalence :
-    Equivalence ((≡) : relation A) → Equivalence ((≡) : relation (M A)).
+  Global Instance map_equivalence : Equivalence (≡@{A}) → Equivalence (≡@{M A}).
   Proof.
     split.
     - by intros m i.
     - by intros m1 m2 ? i.
     - by intros m1 m2 m3 ?? i; trans (m2 !! i).
   Qed.
-  Global Instance lookup_proper (i : K) :
-    Proper ((≡) ==> (≡)) (lookup (M:=M A) i).
+  Global Instance lookup_proper (i : K) : Proper ((≡@{M A}) ==> (≡)) (lookup i).
   Proof. by intros m1 m2 Hm. Qed.
   Global Instance partial_alter_proper :
-    Proper (((≡) ==> (≡)) ==> (=) ==> (≡) ==> (≡)) (partial_alter (M:=M A)).
+    Proper (((≡) ==> (≡)) ==> (=) ==> (≡) ==> (≡@{M A})) partial_alter.
   Proof.
     by intros f1 f2 Hf i ? <- m1 m2 Hm j; destruct (decide (i = j)) as [->|];
       rewrite ?lookup_partial_alter, ?lookup_partial_alter_ne by done;
       try apply Hf; apply lookup_proper.
   Qed.
   Global Instance insert_proper (i : K) :
-    Proper ((≡) ==> (≡) ==> (≡)) (insert (M:=M A) i).
+    Proper ((≡) ==> (≡) ==> (≡@{M A})) (insert i).
   Proof. by intros ???; apply partial_alter_proper; [constructor|]. Qed.
-  Global Instance singleton_proper k :
-    Proper ((≡) ==> (≡)) (singletonM k : A → M A).
+  Global Instance singleton_proper k : Proper ((≡) ==> (≡@{M A})) (singletonM k).
   Proof.
     intros ???; apply insert_proper; [done|].
     intros ?. rewrite lookup_empty; constructor.
   Qed.
-  Global Instance delete_proper (i : K) :
-    Proper ((≡) ==> (≡)) (delete (M:=M A) i).
+  Global Instance delete_proper (i : K) : Proper ((≡) ==> (≡@{M A})) (delete i).
   Proof. by apply partial_alter_proper; [constructor|]. Qed.
   Global Instance alter_proper :
-    Proper (((≡) ==> (≡)) ==> (=) ==> (≡) ==> (≡)) (alter (A:=A) (M:=M A)).
+    Proper (((≡) ==> (≡)) ==> (=) ==> (≡) ==> (≡@{M A})) alter.
   Proof.
     intros ?? Hf; apply partial_alter_proper.
     by destruct 1; constructor; apply Hf.
@@ -186,12 +182,12 @@ Section setoid.
   Lemma merge_ext `{Equiv B, Equiv C} (f g : option A → option B → option C)
       `{!DiagNone f, !DiagNone g} :
     ((≡) ==> (≡) ==> (≡))%signature f g →
-    ((≡) ==> (≡) ==> (≡))%signature (merge (M:=M) f) (merge g).
+    ((≡) ==> (≡) ==> (≡@{M _}))%signature (merge f) (merge g).
   Proof.
     by intros Hf ?? Hm1 ?? Hm2 i; rewrite !lookup_merge by done; apply Hf.
   Qed.
   Global Instance union_with_proper :
-    Proper (((≡) ==> (≡) ==> (≡)) ==> (≡) ==> (≡) ==>(≡)) (union_with (M:=M A)).
+    Proper (((≡) ==> (≡) ==> (≡)) ==> (≡) ==> (≡) ==>(≡@{M A})) union_with.
   Proof.
     intros ?? Hf ?? Hm1 ?? Hm2 i; apply (merge_ext _ _); auto.
     by do 2 destruct 1; first [apply Hf | constructor].
@@ -205,7 +201,7 @@ Section setoid.
     - intros ?. rewrite lookup_empty; constructor.
   Qed.
   Global Instance map_fmap_proper `{Equiv B} (f : A → B) :
-    Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡)) (fmap (M:=M) f).
+    Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡@{M _})) (fmap f).
   Proof.
     intros ? m m' ? k; rewrite !lookup_fmap. by apply option_fmap_proper.
   Qed.
@@ -921,13 +917,13 @@ Section map_of_to_collection.
   Proof. unfold map_to_collection; simpl. by rewrite map_to_list_empty. Qed.
   Lemma map_to_collection_insert (f : K → A → B)(m : M A) i x :
     m !! i = None →
-    map_to_collection (C:=C) f (<[i:=x]>m) ≡ {[f i x]} ∪ map_to_collection f m.
+    map_to_collection f (<[i:=x]>m) ≡@{C} {[f i x]} ∪ map_to_collection f m.
   Proof.
     intros. unfold map_to_collection; simpl. by rewrite map_to_list_insert.
   Qed.
   Lemma map_to_collection_insert_L `{!LeibnizEquiv C} (f : K → A → B) (m : M A) i x :
     m !! i = None →
-    map_to_collection (C:=C) f (<[i:=x]>m) = {[f i x]} ∪ map_to_collection f m.
+    map_to_collection f (<[i:=x]>m) =@{C} {[f i x]} ∪ map_to_collection f m.
   Proof. unfold_leibniz. apply map_to_collection_insert. Qed.
 End map_of_to_collection.
 
@@ -1166,19 +1162,19 @@ Lemma merge_comm m1 m2 :
   (∀ i, f (m1 !! i) (m2 !! i) = f (m2 !! i) (m1 !! i)) →
   merge f m1 m2 = merge f m2 m1.
 Proof. intros. apply map_eq. intros. by rewrite !(lookup_merge f). Qed.
-Global Instance merge_comm' : Comm (=) f → Comm (=) (merge (M:=M) f).
+Global Instance merge_comm' : Comm (=) f → Comm (=@{M _}) (merge f).
 Proof. intros ???. apply merge_comm. intros. by apply (comm f). Qed.
 Lemma merge_assoc m1 m2 m3 :
   (∀ i, f (m1 !! i) (f (m2 !! i) (m3 !! i)) =
         f (f (m1 !! i) (m2 !! i)) (m3 !! i)) →
   merge f m1 (merge f m2 m3) = merge f (merge f m1 m2) m3.
 Proof. intros. apply map_eq. intros. by rewrite !(lookup_merge f). Qed.
-Global Instance merge_assoc' : Assoc (=) f → Assoc (=) (merge (M:=M) f).
+Global Instance merge_assoc' : Assoc (=) f → Assoc (=@{M _}) (merge f).
 Proof. intros ????. apply merge_assoc. intros. by apply (assoc_L f). Qed.
 Lemma merge_idemp m1 :
   (∀ i, f (m1 !! i) (m1 !! i) = m1 !! i) → merge f m1 m1 = m1.
 Proof. intros. apply map_eq. intros. by rewrite !(lookup_merge f). Qed.
-Global Instance merge_idemp' : IdemP (=) f → IdemP (=) (merge (M:=M) f).
+Global Instance merge_idemp' : IdemP (=) f → IdemP (=@{M _}) (merge f).
 Proof. intros ??. apply merge_idemp. intros. by apply (idemp f). Qed.
 End merge.
 
@@ -1433,9 +1429,9 @@ Proof.
   rewrite lookup_union_with.
   destruct (m1 !! i), (m2 !! i); compute; naive_solver.
 Qed.
-Global Instance: LeftId (@eq (M A)) ∅ (union_with f).
+Global Instance: LeftId (=@{M A}) ∅ (union_with f).
 Proof. unfold union_with, map_union_with. apply _. Qed.
-Global Instance: RightId (@eq (M A)) ∅ (union_with f).
+Global Instance: RightId (=@{M A}) ∅ (union_with f).
 Proof. unfold union_with, map_union_with. apply _. Qed.
 Lemma union_with_comm m1 m2 :
   (∀ i x y, m1 !! i = Some x → m2 !! i = Some y → f x y = f y x) →
@@ -1444,7 +1440,7 @@ Proof.
   intros. apply (merge_comm _). intros i.
   destruct (m1 !! i) eqn:?, (m2 !! i) eqn:?; simpl; eauto.
 Qed.
-Global Instance: Comm (=) f → Comm (@eq (M A)) (union_with f).
+Global Instance: Comm (=) f → Comm (=@{M A}) (union_with f).
 Proof. intros ???. apply union_with_comm. eauto. Qed.
 Lemma union_with_idemp m :
   (∀ i x, m !! i = Some x → f x x = Some x) → union_with f m m = m.
@@ -1502,15 +1498,15 @@ Qed.
 End union_with.
 
 (** ** Properties of the [union] operation *)
-Global Instance: LeftId (@eq (M A)) ∅ (∪) := _.
-Global Instance: RightId (@eq (M A)) ∅ (∪) := _.
-Global Instance: Assoc (@eq (M A)) (∪).
+Global Instance: LeftId (=@{M A}) ∅ (∪) := _.
+Global Instance: RightId (=@{M A}) ∅ (∪) := _.
+Global Instance: Assoc (=@{M A}) (∪).
 Proof.
   intros A m1 m2 m3. unfold union, map_union, union_with, map_union_with.
   apply (merge_assoc _). intros i.
   by destruct (m1 !! i), (m2 !! i), (m3 !! i).
 Qed.
-Global Instance: IdemP (@eq (M A)) (∪).
+Global Instance: IdemP (=@{M A}) (∪).
 Proof. intros A ?. by apply union_with_idemp. Qed.
 Lemma lookup_union_Some_raw {A} (m1 m2 : M A) i x :
   (m1 ∪ m2) !! i = Some x ↔
@@ -1766,9 +1762,9 @@ Proof. intro. by rewrite map_disjoint_of_list_zip_r. Qed.
 Section intersection_with.
 Context {A} (f : A → A → option A).
 Implicit Type (m: M A).
-Global Instance : LeftAbsorb (@eq (M A)) ∅ (intersection_with f).
+Global Instance : LeftAbsorb (=@{M A}) ∅ (intersection_with f).
 Proof. unfold intersection_with, map_intersection_with. apply _. Qed.
-Global Instance: RightAbsorb (@eq (M A)) ∅ (intersection_with f).
+Global Instance: RightAbsorb (=@{M A}) ∅ (intersection_with f).
 Proof. unfold intersection_with, map_intersection_with. apply _. Qed.
 Lemma lookup_intersection_with m1 m2 i :
   intersection_with f m1 m2 !! i = intersection_with f (m1 !! i) (m2 !! i).
@@ -1787,7 +1783,7 @@ Proof.
   intros. apply (merge_comm _). intros i.
   destruct (m1 !! i) eqn:?, (m2 !! i) eqn:?; simpl; eauto.
 Qed.
-Global Instance: Comm (=) f → Comm (@eq (M A)) (intersection_with f).
+Global Instance: Comm (=) f → Comm (=@{M A}) (intersection_with f).
 Proof. intros ???. apply intersection_with_comm. eauto. Qed.
 Lemma intersection_with_idemp m :
   (∀ i x, m !! i = Some x → f x x = Some x) → intersection_with f m m = m.
@@ -1817,16 +1813,16 @@ Proof. by intros; apply (partial_alter_merge _). Qed.
 End intersection_with.
 
 (** ** Properties of the [intersection] operation *)
-Global Instance: LeftAbsorb (@eq (M A)) ∅ (∩) := _.
-Global Instance: RightAbsorb (@eq (M A)) ∅ (∩) := _.
-Global Instance: Assoc (@eq (M A)) (∩).
+Global Instance: LeftAbsorb (=@{M A}) ∅ (∩) := _.
+Global Instance: RightAbsorb (=@{M A}) ∅ (∩) := _.
+Global Instance: Assoc (=@{M A}) (∩).
 Proof.
   intros A m1 m2 m3.
   unfold intersection, map_intersection, intersection_with, map_intersection_with.
   apply (merge_assoc _). intros i.
   by destruct (m1 !! i), (m2 !! i), (m3 !! i).
 Qed.
-Global Instance: IdemP (@eq (M A)) (∩).
+Global Instance: IdemP (=@{M A}) (∩).
 Proof. intros A ?. by apply intersection_with_idemp. Qed.
 
 Lemma lookup_intersection_Some {A} (m1 m2 : M A) i x :

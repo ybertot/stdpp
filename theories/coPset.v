@@ -192,7 +192,7 @@ Qed.
 
 Instance coPset_elem_of_dec : RelDecision (@elem_of _ coPset _).
 Proof. solve_decision. Defined.
-Instance coPset_equiv_dec : RelDecision (@equiv coPset _).
+Instance coPset_equiv_dec : RelDecision (≡@{coPset}).
 Proof. refine (λ X Y, cast_if (decide (X = Y))); abstract (by fold_leibniz). Defined.
 Instance mapset_disjoint_dec : RelDecision (@disjoint coPset _).
 Proof.

@@ -13,8 +13,8 @@ From stdpp Require Export fin_maps.
 Set Default Proof Using "Type".
 
 Local Open Scope positive_scope.
-Local Hint Extern 0 (@eq positive _ _) => congruence.
-Local Hint Extern 0 (¬@eq positive _ _) => congruence.
+Local Hint Extern 0 (_ =@{positive} _) => congruence.
+Local Hint Extern 0 (_ ≠@{positive} _) => congruence.
 
 (** * The tree data structure *)
 (** The data type [Pmap_raw] specifies radix-2 search trees. These trees do

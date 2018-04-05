@@ -358,7 +358,7 @@ Tactic Notation "discriminate_list" hyp(H) :=
   apply (f_equal length) in H;
   repeat (csimpl in H || rewrite app_length in H); exfalso; lia.
 Tactic Notation "discriminate_list" :=
-  match goal with H : @eq (list _) _ _ |- _ => discriminate_list H end.
+  match goal with H : _ =@{list _} _ |- _ => discriminate_list H end.
 
 (** The tactic [simplify_list_eq] simplifies hypotheses involving
 equalities on lists using injectivity of [(::)] and [(++)]. Also, it simplifies
@@ -830,7 +830,7 @@ Section find.
 End find.
 
 (** ** Properties of the [reverse] function *)
-Lemma reverse_nil : reverse [] = @nil A.
+Lemma reverse_nil : reverse [] =@{list A} [].
 Proof. done. Qed.
 Lemma reverse_singleton x : reverse [x] = [x].
 Proof. done. Qed.
@@ -883,7 +883,7 @@ Lemma take_drop_middle l i x :
 Proof.
   revert i x. induction l; intros [|?] ??; simplify_eq/=; f_equal; auto.
 Qed.
-Lemma take_nil n : take n (@nil A) = [].
+Lemma take_nil n : take n [] =@{list A} [].
 Proof. by destruct n. Qed.
 Lemma take_app l k : take (length l) (l ++ k) = l.
 Proof. induction l; f_equal/=; auto. Qed.
@@ -935,7 +935,7 @@ Qed.
 (** ** Properties of the [drop] function *)
 Lemma drop_0 l : drop 0 l = l.
 Proof. done. Qed.
-Lemma drop_nil n : drop n (@nil A) = [].
+Lemma drop_nil n : drop n [] =@{list A} [].
 Proof. by destruct n. Qed.
 Lemma drop_length l n : length (drop n l) = length l - n.
 Proof. revert n. by induction l; intros [|i]; f_equal/=. Qed.
@@ -1323,7 +1323,7 @@ Proof.
 Qed.
 
 (** ** Properties of the [mask] function *)
-Lemma mask_nil f βs : mask f βs (@nil A) = [].
+Lemma mask_nil f βs : mask f βs [] =@{list A} [].
 Proof. by destruct βs. Qed.
 Lemma mask_length f βs l : length (mask f βs l) = length l.
 Proof. revert βs. induction l; intros [|??]; f_equal/=; auto. Qed.
@@ -2826,7 +2826,7 @@ Section setoid.
   Qed.
 
   Global Instance list_equivalence :
-    Equivalence ((≡) : relation A) → Equivalence ((≡) : relation (list A)).
+    Equivalence (≡@{A}) → Equivalence (≡@{list A}).
   Proof.
     split.
     - intros l. by apply equiv_Forall2.
@@ -2836,51 +2836,50 @@ Section setoid.
   Global Instance list_leibniz `{!LeibnizEquiv A} : LeibnizEquiv (list A).
   Proof. induction 1; f_equal; fold_leibniz; auto. Qed.
 
-  Global Instance cons_proper : Proper ((≡) ==> (≡) ==> (≡)) (@cons A).
+  Global Instance cons_proper : Proper ((≡) ==> (≡) ==> (≡@{list A})) cons.
   Proof. by constructor. Qed.
-  Global Instance app_proper : Proper ((≡) ==> (≡) ==> (≡)) (@app A).
+  Global Instance app_proper : Proper ((≡) ==> (≡) ==> (≡@{list A})) app.
   Proof. induction 1; intros ???; simpl; try constructor; auto. Qed.
-  Global Instance length_proper : Proper ((≡) ==> (=)) (@length A).
+  Global Instance length_proper : Proper ((≡@{list A}) ==> (=)) length.
   Proof. induction 1; f_equal/=; auto. Qed.
-  Global Instance tail_proper : Proper ((≡) ==> (≡)) (@tail A).
+  Global Instance tail_proper : Proper ((≡@{list A}) ==> (≡)) tail.
   Proof. destruct 1; try constructor; auto. Qed.
-  Global Instance take_proper n : Proper ((≡) ==> (≡)) (@take A n).
+  Global Instance take_proper n : Proper ((≡@{list A}) ==> (≡)) (take n).
   Proof. induction n; destruct 1; constructor; auto. Qed.
-  Global Instance drop_proper n : Proper ((≡) ==> (≡)) (@drop A n).
+  Global Instance drop_proper n : Proper ((≡@{list A}) ==> (≡)) (drop n).
   Proof. induction n; destruct 1; simpl; try constructor; auto. Qed.
-  Global Instance list_lookup_proper i :
-    Proper ((≡) ==> (≡)) (lookup (M:=list A) i).
+  Global Instance list_lookup_proper i : Proper ((≡@{list A}) ==> (≡)) (lookup i).
   Proof. induction i; destruct 1; simpl; try constructor; auto. Qed.
   Global Instance list_alter_proper f i :
-    Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡)) (alter (M:=list A) f i).
+    Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡@{list A})) (alter f i).
   Proof. intros. induction i; destruct 1; constructor; eauto. Qed.
   Global Instance list_insert_proper i :
-    Proper ((≡) ==> (≡) ==> (≡)) (insert (M:=list A) i).
+    Proper ((≡) ==> (≡) ==> (≡@{list A})) (insert i).
   Proof. intros ???; induction i; destruct 1; constructor; eauto. Qed.
   Global Instance list_inserts_proper i :
-    Proper ((≡) ==> (≡) ==> (≡)) (@list_inserts A i).
+    Proper ((≡) ==> (≡) ==> (≡@{list A})) (list_inserts i).
   Proof.
     intros k1 k2 Hk; revert i.
     induction Hk; intros ????; simpl; try f_equiv; naive_solver.
   Qed.
   Global Instance list_delete_proper i :
-    Proper ((≡) ==> (≡)) (delete (M:=list A) i).
+    Proper ((≡) ==> (≡@{list A})) (delete i).
   Proof. induction i; destruct 1; try constructor; eauto. Qed.
-  Global Instance option_list_proper : Proper ((≡) ==> (≡)) (@option_list A).
+  Global Instance option_list_proper : Proper ((≡) ==> (≡@{list A})) option_list.
   Proof. destruct 1; repeat constructor; auto. Qed.
   Global Instance list_filter_proper P `{∀ x, Decision (P x)} :
-    Proper ((≡) ==> iff) P → Proper ((≡) ==> (≡)) (filter (B:=list A) P).
+    Proper ((≡) ==> iff) P → Proper ((≡) ==> (≡@{list A})) (filter P).
   Proof. intros ???. rewrite !equiv_Forall2. by apply Forall2_filter. Qed.
-  Global Instance replicate_proper n : Proper ((≡) ==> (≡)) (@replicate A n).
+  Global Instance replicate_proper n : Proper ((≡@{A}) ==> (≡)) (replicate n).
   Proof. induction n; constructor; auto. Qed.
-  Global Instance reverse_proper : Proper ((≡) ==> (≡)) (@reverse A).
+  Global Instance reverse_proper : Proper ((≡) ==> (≡@{list A})) reverse.
   Proof.
     induction 1; rewrite ?reverse_cons; simpl; [constructor|].
     apply app_proper; repeat constructor; auto.
   Qed.
   Global Instance last_proper : Proper ((≡) ==> (≡)) (@last A).
   Proof. induction 1 as [|????? []]; simpl; repeat constructor; auto. Qed.
-  Global Instance resize_proper n : Proper ((≡) ==> (≡) ==> (≡)) (@resize A n).
+  Global Instance resize_proper n : Proper ((≡) ==> (≡) ==> (≡@{list A})) (resize n).
   Proof.
     induction n; destruct 2; simpl; repeat (constructor || f_equiv); auto.
   Qed.
@@ -3646,7 +3645,7 @@ Ltac solve_length :=
   simplify_eq/=;
   repeat (rewrite fmap_length || rewrite app_length);
   repeat match goal with
-  | H : @eq (list _) _ _ |- _ => apply (f_equal length) in H
+  | H : _ =@{list _} _ |- _ => apply (f_equal length) in H
   | H : Forall2 _ _ _ |- _ => apply Forall2_length in H
   | H : context[length (_ <$> _)] |- _ => rewrite fmap_length in H
   end; done || congruence.
