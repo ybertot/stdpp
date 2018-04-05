@@ -418,19 +418,17 @@ Lemma Qcplus_lt_mono_l (x y z : Qc) : x < y ↔ z + x < z + y.
 Proof. by rewrite !Qclt_nge, <-Qcplus_le_mono_l. Qed.
 Lemma Qcplus_lt_mono_r (x y z : Qc) : x < y ↔ x + z < y + z.
 Proof. by rewrite !Qclt_nge, <-Qcplus_le_mono_r. Qed.
-Instance: Inj (=) (=) Qcopp.
+Instance Qcopp_inj : Inj (=) (=) Qcopp.
 Proof.
   intros x y H. by rewrite <-(Qcopp_involutive x), H, Qcopp_involutive.
 Qed.
-Instance: ∀ z, Inj (=) (=) (Qcplus z).
+Instance Qcplus_inj_r z : Inj (=) (=) (Qcplus z).
 Proof.
-  intros z x y H. by apply (anti_symm (≤));
-    rewrite (Qcplus_le_mono_l _ _ z), H.
+  intros x y H. by apply (anti_symm (≤));rewrite (Qcplus_le_mono_l _ _ z), H.
 Qed.
-Instance: ∀ z, Inj (=) (=) (λ x, x + z).
+Instance Qcplus_inj_l z : Inj (=) (=) (λ x, x + z).
 Proof.
-  intros z x y H. by apply (anti_symm (≤));
-    rewrite (Qcplus_le_mono_r _ _ z), H.
+  intros x y H. by apply (anti_symm (≤)); rewrite (Qcplus_le_mono_r _ _ z), H.
 Qed.
 Lemma Qcplus_pos_nonneg (x y : Qc) : 0 < x → 0 ≤ y → 0 < x + y.
 Proof.
@@ -565,6 +563,10 @@ Instance Qp_plus_assoc : Assoc (=) Qp_plus.
 Proof. intros x y z; apply Qp_eq, Qcplus_assoc. Qed.
 Instance Qp_plus_comm : Comm (=) Qp_plus.
 Proof. intros x y; apply Qp_eq, Qcplus_comm. Qed.
+Instance Qp_plus_inj_r p : Inj (=) (=) (Qp_plus p).
+Proof. intros q1 q2. rewrite !Qp_eq; simpl. apply (inj _). Qed.
+Instance Qp_plus_inj_l p : Inj (=) (=) (λ q, q + p)%Qp.
+Proof. intros q1 q2. rewrite !Qp_eq; simpl. apply (inj (λ q, q + p)%Qc). Qed.
 
 Lemma Qp_minus_diag x : (x - x)%Qp = None.
 Proof. unfold Qp_minus. by rewrite Qcplus_opp_r. Qed.
