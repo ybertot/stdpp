@@ -46,6 +46,10 @@ Notation "x ≢ₚ y":= (¬x ≡ₚ y) (at level 70, no associativity) : stdpp_s
 Notation "( x ≢ₚ)" := (λ y, x ≢ₚ y) (only parsing) : stdpp_scope.
 Notation "(≢ₚ x )" := (λ y, y ≢ₚ x) (only parsing) : stdpp_scope.
 
+Infix "≡ₚ@{ A }" :=
+  (@Permutation A) (at level 70, no associativity, only parsing) : stdpp_scope.
+Notation "(≡ₚ@{ A } )" := (@Permutation A) (only parsing) : stdpp_scope.
+
 Instance maybe_cons {A} : Maybe2 (@cons A) := λ l,
   match l with x :: l => Some (x,l) | _ => None end.
 
@@ -2115,7 +2119,7 @@ Section submseteq_dec.
    refine (λ l1 l2, cast_if (decide (is_Some (list_remove_list l1 l2))));
     abstract (rewrite list_remove_list_submseteq; tauto).
   Defined.
-  Global Instance Permutation_dec : RelDecision (Permutation : relation (list A)).
+  Global Instance Permutation_dec : RelDecision (≡ₚ@{A}).
   Proof.
    refine (λ l1 l2, cast_if_and
     (decide (length l1 = length l2)) (decide (l1 ⊆+ l2)));
@@ -3110,8 +3114,7 @@ Section ret_join.
 
   Lemma list_join_bind (ls : list (list A)) : mjoin ls = ls ≫= id.
   Proof. by induction ls; f_equal/=. Qed.
-  Global Instance mjoin_Permutation:
-    Proper (@Permutation (list A) ==> (≡ₚ)) mjoin.
+  Global Instance mjoin_Permutation : Proper ((≡ₚ@{list A}) ==> (≡ₚ)) mjoin.
   Proof. intros ?? E. by rewrite !list_join_bind, E. Qed.
   Lemma elem_of_list_ret (x y : A) : x ∈ @mret list _ A y ↔ x = y.
   Proof. apply elem_of_list_singleton. Qed.
