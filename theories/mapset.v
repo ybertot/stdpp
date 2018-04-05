@@ -80,7 +80,7 @@ Section deciders.
   Proof. refine (λ X1 X2, cast_if (decide (X1 = X2))); abstract (by fold_leibniz). Defined.
   Global Instance mapset_elem_of_dec : RelDecision (∈@{mapset M}) | 1.
   Proof. refine (λ x X, cast_if (decide (mapset_car X !! x = Some ()))); done. Defined.
-  Global Instance mapset_disjoint_dec : RelDecision (@disjoint (mapset M) _).
+  Global Instance mapset_disjoint_dec : RelDecision (##@{mapset M}).
   Proof.
    refine (λ X1 X2, cast_if (decide (X1 ∩ X2 = ∅)));
     abstract (by rewrite disjoint_intersection_L).

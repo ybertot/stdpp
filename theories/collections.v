@@ -30,7 +30,7 @@ Section setoids_simple.
   Proof. apply _. Qed.
   Global Instance elem_of_proper : Proper ((=) ==> (≡) ==> iff) (∈@{C}) | 5.
   Proof. by intros x ? <- X Y. Qed.
-  Global Instance disjoint_proper: Proper ((≡) ==> (≡) ==> iff) (@disjoint C _).
+  Global Instance disjoint_proper: Proper ((≡) ==> (≡) ==> iff) (##@{C}).
   Proof.
     intros X1 X2 HX Y1 Y2 HY; apply forall_proper; intros x. by rewrite HX, HY.
   Qed.
@@ -407,7 +407,7 @@ Section simple_collection.
   Lemma elem_of_disjoint X Y : X ## Y ↔ ∀ x, x ∈ X → x ∈ Y → False.
   Proof. done. Qed.
 
-  Global Instance disjoint_sym : Symmetric (@disjoint C _).
+  Global Instance disjoint_sym : Symmetric (##@{C}).
   Proof. intros X Y. set_solver. Qed.
   Lemma disjoint_empty_l Y : ∅ ## Y.
   Proof. set_solver. Qed.

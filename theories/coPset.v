@@ -194,7 +194,7 @@ Instance coPset_elem_of_dec : RelDecision (∈@{coPset}).
 Proof. solve_decision. Defined.
 Instance coPset_equiv_dec : RelDecision (≡@{coPset}).
 Proof. refine (λ X Y, cast_if (decide (X = Y))); abstract (by fold_leibniz). Defined.
-Instance mapset_disjoint_dec : RelDecision (@disjoint coPset _).
+Instance mapset_disjoint_dec : RelDecision (##@{coPset}).
 Proof.
  refine (λ X Y, cast_if (decide (X ∩ Y = ∅)));
   abstract (by rewrite disjoint_intersection_L).

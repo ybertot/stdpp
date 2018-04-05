@@ -866,6 +866,10 @@ Infix "##" := disjoint (at level 70) : stdpp_scope.
 Notation "(##)" := disjoint (only parsing) : stdpp_scope.
 Notation "( X ##.)" := (disjoint X) (only parsing) : stdpp_scope.
 Notation "(.## X )" := (λ Y, Y ## X) (only parsing) : stdpp_scope.
+
+Infix "##@{ A }" := (@disjoint A _) (at level 70, only parsing) : stdpp_scope.
+Notation "(##@{ A } )" := (@disjoint A _) (only parsing) : stdpp_scope.
+
 Infix "##*" := (Forall2 (##)) (at level 70) : stdpp_scope.
 Notation "(##*)" := (Forall2 (##)) (only parsing) : stdpp_scope.
 Infix "##**" := (Forall2 (##*)) (at level 70) : stdpp_scope.
@@ -897,17 +901,19 @@ Class DisjointList A := disjoint_list : list A → Prop.
 Hint Mode DisjointList ! : typeclass_instances.
 Instance: Params (@disjoint_list) 2.
 Notation "## Xs" := (disjoint_list Xs) (at level 20, format "##  Xs") : stdpp_scope.
+Notation "##@{ A } Xs" :=
+  (@disjoint_list A _ Xs) (at level 20, only parsing) : stdpp_scope.
 
 Section disjoint_list.
   Context `{Disjoint A, Union A, Empty A}.
   Implicit Types X : A.
 
   Inductive disjoint_list_default : DisjointList A :=
-    | disjoint_nil_2 : ## (@nil A)
+    | disjoint_nil_2 : ##@{A} []
     | disjoint_cons_2 (X : A) (Xs : list A) : X ## ⋃ Xs → ## Xs → ## (X :: Xs).
   Global Existing Instance disjoint_list_default.
 
-  Lemma disjoint_list_nil  : ## @nil A ↔ True.
+  Lemma disjoint_list_nil  : ##@{A} [] ↔ True.
   Proof. split; constructor. Qed.
   Lemma disjoint_list_cons X Xs : ## (X :: Xs) ↔ X ## ⋃ Xs ∧ ## Xs.
   Proof. split. inversion_clear 1; auto. intros [??]. constructor; auto. Qed.
