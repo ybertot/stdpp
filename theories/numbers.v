@@ -631,6 +631,26 @@ Proof.
   apply Qp_eq; simpl. ring.
 Qed.
 
+Lemma Qp_cross_split p a b c d :
+  (a + b = p → c + d = p →
+  ∃ ac ad bc bd, ac + ad = a ∧ bc + bd = b ∧ ac + bc = c ∧ ad + bd = d)%Qp.
+Proof.
+  intros H <-. revert a b c d H. cut (∀ a b c d : Qp,
+    (a < c)%Qc → a + b = c + d →
+    ∃ ac ad bc bd, ac + ad = a ∧ bc + bd = b ∧ ac + bc = c ∧ ad + bd = d)%Qp.
+  { intros help a b c d ?.
+    destruct (Qclt_le_dec a c) as [?|[?| ->%Qp_eq]%Qcle_lt_or_eq].
+    - auto.
+    - destruct (help c d a b); [done..|]. naive_solver.
+    - apply (inj _) in H as ->. destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).
+      eauto 10 using (comm_L Qp_plus). }
+  intros a b c d [e ->]%Qp_lt_sum. rewrite <-(assoc_L _). intros ->%(inj _).
+  destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).
+  eexists a', q, (q + e)%Qp, d'; split_and?; auto using (comm_L Qp_plus).
+  - by rewrite (assoc_L _), (comm_L Qp_plus e).
+  - by rewrite (assoc_L _), (comm_L Qp_plus a').
+Qed.
+
 Lemma Qp_not_plus_q_ge_1 (q: Qp): ¬ ((1 + q)%Qp ≤ 1%Qp)%Qc.
 Proof.
   intros Hle.
