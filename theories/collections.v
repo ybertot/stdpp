@@ -28,8 +28,7 @@ Section setoids_simple.
   Qed.
   Global Instance singleton_proper : Proper ((=) ==> (≡@{C})) singleton.
   Proof. apply _. Qed.
-  Global Instance elem_of_proper :
-    Proper ((=) ==> (≡) ==> iff) (@elem_of A C _) | 5.
+  Global Instance elem_of_proper : Proper ((=) ==> (≡) ==> iff) (∈@{C}) | 5.
   Proof. by intros x ? <- X Y. Qed.
   Global Instance disjoint_proper: Proper ((≡) ==> (≡) ==> iff) (@disjoint C _).
   Proof.
@@ -695,7 +694,7 @@ Section collection.
   End leibniz.
 
   Section dec.
-    Context `{!RelDecision (@elem_of A C _)}.
+    Context `{!RelDecision (∈@{C})}.
     Lemma not_elem_of_intersection x X Y : x ∉ X ∩ Y ↔ x ∉ X ∨ x ∉ Y.
     Proof. rewrite elem_of_intersection. destruct (decide (x ∈ X)); tauto. Qed.
     Lemma not_elem_of_difference x X Y : x ∉ X ∖ Y ↔ x ∉ X ∨ x ∈ Y.

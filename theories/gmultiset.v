@@ -98,7 +98,7 @@ Proof.
       by split; auto with lia.
   - intros X Y x. rewrite !elem_of_multiplicity, multiplicity_union. omega.
 Qed.
-Global Instance gmultiset_elem_of_dec : RelDecision (@elem_of _ (gmultiset A) _).
+Global Instance gmultiset_elem_of_dec : RelDecision (∈@{gmultiset A}).
 Proof. refine (λ x X, cast_if (decide (0 < multiplicity x X))); done. Defined.
 
 (* Algebraic laws *)

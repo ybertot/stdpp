@@ -26,7 +26,7 @@ Qed.
 
 (** * Fresh elements *)
 Section Fresh.
-  Context `{FinCollection A C, Infinite A, !RelDecision (@elem_of A C _)}.
+  Context `{FinCollection A C, Infinite A, !RelDecision (∈@{C})}.
 
   Definition fresh_generic_body (s : C) (rec : ∀ s', s' ⊂ s → nat → A) (n : nat) : A :=
     let cand := inject n in

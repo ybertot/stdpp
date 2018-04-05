@@ -856,6 +856,9 @@ Notation "(∉)" := (λ x X, x ∉ X) (only parsing) : stdpp_scope.
 Notation "( x ∉)" := (λ X, x ∉ X) (only parsing) : stdpp_scope.
 Notation "(∉ X )" := (λ x, x ∉ X) (only parsing) : stdpp_scope.
 
+Infix "∈@{ B }" := (@elem_of _ B _) (at level 70, only parsing) : stdpp_scope.
+Notation "(∈@{ B } )" := (@elem_of _ B _) (only parsing) : stdpp_scope.
+
 Class Disjoint A := disjoint : A → A → Prop.
  Hint Mode Disjoint ! : typeclass_instances.
 Instance: Params (@disjoint) 2.

@@ -190,7 +190,7 @@ Proof.
   intros p; apply eq_bool_prop_intro, (HXY p).
 Qed.
 
-Instance coPset_elem_of_dec : RelDecision (@elem_of _ coPset _).
+Instance coPset_elem_of_dec : RelDecision (∈@{coPset}).
 Proof. solve_decision. Defined.
 Instance coPset_equiv_dec : RelDecision (≡@{coPset}).
 Proof. refine (λ X Y, cast_if (decide (X = Y))); abstract (by fold_leibniz). Defined.

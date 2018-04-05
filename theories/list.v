@@ -311,7 +311,7 @@ Instance list_subseteq {A} : SubsetEq (list A) := λ l1 l2, ∀ x, x ∈ l1 → 
 
 Section list_set.
   Context `{dec : EqDecision A}.
-  Global Instance elem_of_list_dec : RelDecision (@elem_of A (list A) _).
+  Global Instance elem_of_list_dec : RelDecision (∈@{list A}).
   Proof.
    refine (
     fix go x l :=
