@@ -76,16 +76,16 @@ Section deciders.
     match X1, X2 with Mapset m1, Mapset m2 => cast_if (decide (m1 = m2)) end);
     abstract congruence.
   Defined.
-  Global Instance mapset_equiv_dec : RelDecision (@equiv (mapset M)_) | 1.
+  Global Instance mapset_equiv_dec : RelDecision (≡@{mapset M}) | 1.
   Proof. refine (λ X1 X2, cast_if (decide (X1 = X2))); abstract (by fold_leibniz). Defined.
-  Global Instance mapset_elem_of_dec : RelDecision (@elem_of _ (mapset M) _) | 1.
+  Global Instance mapset_elem_of_dec : RelDecision (∈@{mapset M}) | 1.
   Proof. refine (λ x X, cast_if (decide (mapset_car X !! x = Some ()))); done. Defined.
-  Global Instance mapset_disjoint_dec : RelDecision (@disjoint (mapset M) _).
+  Global Instance mapset_disjoint_dec : RelDecision (##@{mapset M}).
   Proof.
    refine (λ X1 X2, cast_if (decide (X1 ∩ X2 = ∅)));
     abstract (by rewrite disjoint_intersection_L).
   Defined.
-  Global Instance mapset_subseteq_dec : RelDecision (@subseteq (mapset M) _).
+  Global Instance mapset_subseteq_dec : RelDecision (⊆@{mapset M}).
   Proof.
    refine (λ X1 X2, cast_if (decide (X1 ∪ X2 = X2)));
     abstract (by rewrite subseteq_union_L).

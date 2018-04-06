@@ -40,7 +40,7 @@ Qed.
 Instance pretty_N : Pretty N := λ x, pretty_N_go x ""%string.
 Lemma pretty_N_unfold x : pretty x = pretty_N_go x "".
 Proof. done. Qed.
-Instance pretty_N_inj : Inj (@eq N) (=) pretty.
+Instance pretty_N_inj : Inj (=@{N}) (=) pretty.
 Proof.
   assert (∀ x y, x < 10 → y < 10 →
     pretty_N_char x =  pretty_N_char y → x = y)%N.
@@ -71,6 +71,6 @@ Instance pretty_Z : Pretty Z := λ x,
   | Z0 => "" | Zpos x => pretty (Npos x) | Zneg x => "-" +:+ pretty (Npos x)
   end%string.
 Instance pretty_nat : Pretty nat := λ x, pretty (N.of_nat x).
-Instance pretty_nat_inj : Inj (@eq nat) (=) pretty.
+Instance pretty_nat_inj : Inj (=@{nat}) (=) pretty.
 Proof. apply _. Qed.
 

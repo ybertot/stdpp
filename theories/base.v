@@ -159,10 +159,16 @@ Notation "(≠)" := (λ x y, x ≠ y) (only parsing) : stdpp_scope.
 Notation "( x ≠)" := (λ y, x ≠ y) (only parsing) : stdpp_scope.
 Notation "(≠ x )" := (λ y, y ≠ x) (only parsing) : stdpp_scope.
 
+Infix "=@{ A }" := (@eq A)
+  (at level 70, only parsing, no associativity) : stdpp_scope.
+Notation "(=@{ A } )" := (@eq A) (only parsing) : stdpp_scope.
+Notation "(≠@{ A } )" := (λ X Y, ¬X =@{A} Y) (only parsing) : stdpp_scope.
+Notation "X ≠@{ A } Y":= (¬X =@{ A } Y) (at level 70, no associativity) : stdpp_scope.
+
 Hint Extern 0 (_ = _) => reflexivity.
 Hint Extern 100 (_ ≠ _) => discriminate.
 
-Instance: @PreOrder A (=).
+Instance: ∀ A, PreOrder (=@{A}).
 Proof. split; repeat intro; congruence. Qed.
 
 (** ** Setoid equality *)
@@ -174,6 +180,9 @@ Class Equiv A := equiv: relation A.
 Hint Mode Equiv ! : typeclass_instances. *)
 
 Infix "≡" := equiv (at level 70, no associativity) : stdpp_scope.
+Infix "≡@{ A }" := (@equiv A _)
+  (at level 70, only parsing, no associativity) : stdpp_scope.
+
 Notation "(≡)" := equiv (only parsing) : stdpp_scope.
 Notation "( X ≡)" := (equiv X) (only parsing) : stdpp_scope.
 Notation "(≡ X )" := (λ Y, Y ≡ X) (only parsing) : stdpp_scope.
@@ -182,6 +191,10 @@ Notation "X ≢ Y":= (¬X ≡ Y) (at level 70, no associativity) : stdpp_scope.
 Notation "( X ≢)" := (λ Y, X ≢ Y) (only parsing) : stdpp_scope.
 Notation "(≢ X )" := (λ Y, Y ≢ X) (only parsing) : stdpp_scope.
 
+Notation "(≡@{ A } )" := (@equiv A _) (only parsing) : stdpp_scope.
+Notation "(≢@{ A } )" := (λ X Y, ¬X ≡@{A} Y) (only parsing) : stdpp_scope.
+Notation "X ≢@{ A } Y":= (¬X ≡@{ A } Y) (at level 70, no associativity) : stdpp_scope.
+
 (** The type class [LeibnizEquiv] collects setoid equalities that coincide
 with Leibniz equality. We provide the tactic [fold_leibniz] to transform such
 setoid equalities into Leibniz equalities, and [unfold_leibniz] for the
@@ -189,22 +202,22 @@ reverse. *)
 Class LeibnizEquiv A `{Equiv A} := leibniz_equiv x y : x ≡ y → x = y.
 Hint Mode LeibnizEquiv ! - : typeclass_instances.
 
-Lemma leibniz_equiv_iff `{LeibnizEquiv A, !Reflexive (@equiv A _)} (x y : A) :
+Lemma leibniz_equiv_iff `{LeibnizEquiv A, !Reflexive (≡@{A})} (x y : A) :
   x ≡ y ↔ x = y.
 Proof. split. apply leibniz_equiv. intros ->; reflexivity. Qed.
 
 Ltac fold_leibniz := repeat
   match goal with
-  | H : context [ @equiv ?A _ _ _ ] |- _ =>
+  | H : context [ _ ≡@{?A} _ ] |- _ =>
     setoid_rewrite (leibniz_equiv_iff (A:=A)) in H
-  | |- context [ @equiv ?A _ _ _ ] =>
+  | |- context [ _ ≡@{?A} _ ] =>
     setoid_rewrite (leibniz_equiv_iff (A:=A))
   end.
 Ltac unfold_leibniz := repeat
   match goal with
-  | H : context [ @eq ?A _ _ ] |- _ =>
+  | H : context [ _ =@{?A} _ ] |- _ =>
     setoid_rewrite <-(leibniz_equiv_iff (A:=A)) in H
-  | |- context [ @eq ?A _ _ ] =>
+  | |- context [ _ =@{?A} _ ] =>
     setoid_rewrite <-(leibniz_equiv_iff (A:=A))
   end.
 
@@ -249,7 +262,7 @@ Class RelDecision {A B} (R : A → B → Prop) :=
   decide_rel x y :> Decision (R x y).
 Hint Mode RelDecision ! ! ! : typeclass_instances.
 Arguments decide_rel {_ _} _ {_} _ _ : simpl never, assert.
-Notation EqDecision A := (RelDecision (@eq A)).
+Notation EqDecision A := (RelDecision (=@{A})).
 
 (** ** Inhabited types *)
 (** This type class collects types that are inhabited. *)
@@ -411,9 +424,9 @@ Lemma exist_proper {A} (P Q : A → Prop) :
   (∀ x, P x ↔ Q x) → (∃ x, P x) ↔ (∃ x, Q x).
 Proof. firstorder. Qed.
 
-Instance: Comm (↔) (@eq A).
+Instance: Comm (↔) (=@{A}).
 Proof. red; intuition. Qed.
-Instance: Comm (↔) (λ x y, @eq A y x).
+Instance: Comm (↔) (λ x y, y =@{A} x).
 Proof. red; intuition. Qed.
 Instance: Comm (↔) (↔).
 Proof. red; intuition. Qed.
@@ -551,7 +564,7 @@ Proof. now intros -> ?. Qed.
 
 (** ** Unit *)
 Instance unit_equiv : Equiv unit := λ _ _, True.
-Instance unit_equivalence : Equivalence (@equiv unit _).
+Instance unit_equivalence : Equivalence (≡@{unit}).
 Proof. repeat split. Qed.
 Instance unit_leibniz : LeibnizEquiv unit.
 Proof. intros [] []; reflexivity. Qed.
@@ -799,6 +812,10 @@ Notation "X ⊈ Y" := (¬X ⊆ Y) (at level 70) : stdpp_scope.
 Notation "(⊈)" := (λ X Y, X ⊈ Y) (only parsing) : stdpp_scope.
 Notation "( X ⊈)" := (λ Y, X ⊈ Y) (only parsing) : stdpp_scope.
 Notation "(⊈ X )" := (λ Y, Y ⊈ X) (only parsing) : stdpp_scope.
+
+Infix "⊆@{ A }" := (@subseteq A _) (at level 70, only parsing) : stdpp_scope.
+Notation "(⊆@{ A } )" := (@subseteq A _) (only parsing) : stdpp_scope.
+
 Infix "⊆*" := (Forall2 (⊆)) (at level 70) : stdpp_scope.
 Notation "(⊆*)" := (Forall2 (⊆)) (only parsing) : stdpp_scope.
 Infix "⊆**" := (Forall2 (⊆*)) (at level 70) : stdpp_scope.
@@ -819,6 +836,9 @@ Notation "X ⊄ Y" := (¬X ⊂ Y) (at level 70) : stdpp_scope.
 Notation "(⊄)" := (λ X Y, X ⊄ Y) (only parsing) : stdpp_scope.
 Notation "( X ⊄)" := (λ Y, X ⊄ Y) (only parsing) : stdpp_scope.
 Notation "(⊄ X )" := (λ Y, Y ⊄ X) (only parsing) : stdpp_scope.
+
+Infix "⊂@{ A }" := (strict (⊆@{A})) (at level 70, only parsing) : stdpp_scope.
+Notation "(⊂@{ A } )" := (strict (⊆@{A})) (only parsing) : stdpp_scope.
 
 Notation "X ⊆ Y ⊆ Z" := (X ⊆ Y ∧ Y ⊆ Z) (at level 70, Y at next level) : stdpp_scope.
 Notation "X ⊆ Y ⊂ Z" := (X ⊆ Y ∧ Y ⊂ Z) (at level 70, Y at next level) : stdpp_scope.
@@ -843,6 +863,9 @@ Notation "(∉)" := (λ x X, x ∉ X) (only parsing) : stdpp_scope.
 Notation "( x ∉)" := (λ X, x ∉ X) (only parsing) : stdpp_scope.
 Notation "(∉ X )" := (λ x, x ∉ X) (only parsing) : stdpp_scope.
 
+Infix "∈@{ B }" := (@elem_of _ B _) (at level 70, only parsing) : stdpp_scope.
+Notation "(∈@{ B } )" := (@elem_of _ B _) (only parsing) : stdpp_scope.
+
 Class Disjoint A := disjoint : A → A → Prop.
  Hint Mode Disjoint ! : typeclass_instances.
 Instance: Params (@disjoint) 2.
@@ -850,6 +873,10 @@ Infix "##" := disjoint (at level 70) : stdpp_scope.
 Notation "(##)" := disjoint (only parsing) : stdpp_scope.
 Notation "( X ##.)" := (disjoint X) (only parsing) : stdpp_scope.
 Notation "(.## X )" := (λ Y, Y ## X) (only parsing) : stdpp_scope.
+
+Infix "##@{ A }" := (@disjoint A _) (at level 70, only parsing) : stdpp_scope.
+Notation "(##@{ A } )" := (@disjoint A _) (only parsing) : stdpp_scope.
+
 Infix "##*" := (Forall2 (##)) (at level 70) : stdpp_scope.
 Notation "(##*)" := (Forall2 (##)) (only parsing) : stdpp_scope.
 Infix "##**" := (Forall2 (##*)) (at level 70) : stdpp_scope.
@@ -881,17 +908,19 @@ Class DisjointList A := disjoint_list : list A → Prop.
 Hint Mode DisjointList ! : typeclass_instances.
 Instance: Params (@disjoint_list) 2.
 Notation "## Xs" := (disjoint_list Xs) (at level 20, format "##  Xs") : stdpp_scope.
+Notation "##@{ A } Xs" :=
+  (@disjoint_list A _ Xs) (at level 20, only parsing) : stdpp_scope.
 
 Section disjoint_list.
   Context `{Disjoint A, Union A, Empty A}.
   Implicit Types X : A.
 
   Inductive disjoint_list_default : DisjointList A :=
-    | disjoint_nil_2 : ## (@nil A)
+    | disjoint_nil_2 : ##@{A} []
     | disjoint_cons_2 (X : A) (Xs : list A) : X ## ⋃ Xs → ## Xs → ## (X :: Xs).
   Global Existing Instance disjoint_list_default.
 
-  Lemma disjoint_list_nil  : ## @nil A ↔ True.
+  Lemma disjoint_list_nil  : ##@{A} [] ↔ True.
   Proof. split; constructor. Qed.
   Lemma disjoint_list_cons X Xs : ## (X :: Xs) ↔ X ## ⋃ Xs ∧ ## Xs.
   Proof. split. inversion_clear 1; auto. intros [??]. constructor; auto. Qed.
@@ -1175,6 +1204,10 @@ Infix "⊑" := sqsubseteq (at level 70) : stdpp_scope.
 Notation "(⊑)" := sqsubseteq (only parsing) : stdpp_scope.
 Notation "( x ⊑)" := (sqsubseteq x) (only parsing) : stdpp_scope.
 Notation "(⊑ y )" := (λ x, sqsubseteq x y) (only parsing) : stdpp_scope.
+
+Infix "⊑@{ A }" := (@sqsubseteq A _) (at level 70, only parsing) : stdpp_scope.
+Notation "(⊑@{ A } )" := (@sqsubseteq A _) (only parsing) : stdpp_scope.
+
 Instance sqsubseteq_rewrite `{SqSubsetEq A} : RewriteRelation (⊑).
 
 Hint Extern 0 (_ ⊑ _) => reflexivity.

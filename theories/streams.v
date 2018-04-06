@@ -38,7 +38,7 @@ Implicit Types s t : stream A.
 
 Lemma scons_equiv s1 s2 : shead s1 = shead s2 → stail s1 ≡ stail s2 → s1 ≡ s2.
 Proof. by constructor. Qed.
-Global Instance equal_equivalence : Equivalence (@equiv (stream A) _).
+Global Instance equal_equivalence : Equivalence (≡@{stream A}).
 Proof.
   split.
   - now cofix; intros [??]; constructor.
@@ -47,10 +47,10 @@ Proof.
 Qed.
 Global Instance scons_proper x : Proper ((≡) ==> (≡)) (scons x).
 Proof. by constructor. Qed.
-Global Instance shead_proper : Proper ((≡) ==> (=)) (@shead A).
+Global Instance shead_proper : Proper ((≡) ==> (=@{A})) shead.
 Proof. by intros ?? [??]. Qed.
-Global Instance stail_proper : Proper ((≡) ==> (≡)) (@stail A).
+Global Instance stail_proper : Proper ((≡) ==> (≡@{stream A})) stail.
 Proof. by intros ?? [??]. Qed.
-Global Instance slookup_proper : Proper ((≡) ==> eq) (@slookup A i).
+Global Instance slookup_proper : Proper ((≡@{stream A}) ==> (=)) (slookup i).
 Proof. by induction i as [|i IH]; intros s1 s2 Hs; simpl; rewrite Hs. Qed.
 End stream_properties.
