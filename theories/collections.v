@@ -7,11 +7,13 @@ From stdpp Require Export orders list.
 (* FIXME: This file needs a 'Proof Using' hint, but the default we use
    everywhere makes for lots of extra ssumptions. *)
 
-Instance collection_equiv `{ElemOf A C} : Equiv C := λ X Y,
+(* Higher precedence to make sure these instances are not used for other types
+with an [ElemOf] instance, such as lists. *)
+Instance collection_equiv `{ElemOf A C} : Equiv C | 20 := λ X Y,
   ∀ x, x ∈ X ↔ x ∈ Y.
-Instance collection_subseteq `{ElemOf A C} : SubsetEq C := λ X Y,
+Instance collection_subseteq `{ElemOf A C} : SubsetEq C | 20 := λ X Y,
   ∀ x, x ∈ X → x ∈ Y.
-Instance collection_disjoint `{ElemOf A C} : Disjoint C := λ X Y,
+Instance collection_disjoint `{ElemOf A C} : Disjoint C | 20 := λ X Y,
   ∀ x, x ∈ X → x ∈ Y → False.
 Typeclasses Opaque collection_equiv collection_subseteq collection_disjoint.
 

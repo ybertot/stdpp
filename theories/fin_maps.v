@@ -80,7 +80,9 @@ Instance map_intersection_with `{Merge M} {A} : IntersectionWith A (M A) :=
 Instance map_difference_with `{Merge M} {A} : DifferenceWith A (M A) :=
   λ f, merge (difference_with f).
 
-Instance map_equiv `{∀ A, Lookup K A (M A), Equiv A} : Equiv (M A) | 18 :=
+(** Higher precedence to make sure it's not used for other types with a [Lookup]
+instance, such as lists. *)
+Instance map_equiv `{∀ A, Lookup K A (M A), Equiv A} : Equiv (M A) | 20 :=
   λ m1 m2, ∀ i, m1 !! i ≡ m2 !! i.
 
 (** The relation [intersection_forall R] on finite maps describes that the
