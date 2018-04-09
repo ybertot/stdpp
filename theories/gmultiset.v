@@ -25,6 +25,8 @@ Section definitions.
     0 < multiplicity x X.
   Global Instance gmultiset_subseteq : SubsetEq (gmultiset A) := λ X Y, ∀ x,
     multiplicity x X ≤ multiplicity x Y.
+  Global Instance gmultiset_equiv : Equiv (gmultiset A) := λ X Y, ∀ x,
+    multiplicity x X = multiplicity x Y.
 
   Global Instance gmultiset_elements : Elements A (gmultiset A) := λ X,
     let (X) := X in ''(x,n) ← map_to_list X; replicate (S n) x.
@@ -62,6 +64,8 @@ Proof.
   specialize (HXY x); unfold multiplicity in *; simpl in *.
   repeat case_match; naive_solver.
 Qed.
+Global Instance gmultiset_leibniz : LeibnizEquiv (gmultiset A).
+Proof. intros X Y. by rewrite gmultiset_eq. Qed.
 
 (* Multiplicity *)
 Lemma multiplicity_empty x : multiplicity x ∅ = 0.
