@@ -1052,6 +1052,10 @@ Section seq_set.
     - rewrite elem_of_union, elem_of_singleton, IH. omega.
   Qed.
 
+  Lemma seq_set_start_disjoint start len :
+    {[ start ]} ## seq_set (C:=C) (S start) len.
+  Proof. intros x. rewrite elem_of_singleton, elem_of_seq_set. omega. Qed.
+
   Lemma seq_set_S_disjoint start len :
     {[ start + len ]} ## seq_set (C:=C) start len.
   Proof. intros x. rewrite elem_of_singleton, elem_of_seq_set. omega. Qed.
