@@ -326,6 +326,8 @@ we proceed by repeatedly using [f_equiv]. *)
 Ltac solve_proper_unfold :=
   (* Try unfolding the head symbol, which is the one we are proving a new property about *)
   lazymatch goal with
+  | |- ?R (?f _ _ _ _ _ _ _ _ _ _) (?f _ _ _ _ _ _ _ _ _ _) => unfold f
+  | |- ?R (?f _ _ _ _ _ _ _ _ _) (?f _ _ _ _ _ _ _ _ _) => unfold f
   | |- ?R (?f _ _ _ _ _ _ _ _) (?f _ _ _ _ _ _ _ _) => unfold f
   | |- ?R (?f _ _ _ _ _ _ _) (?f _ _ _ _ _ _ _) => unfold f
   | |- ?R (?f _ _ _ _ _ _) (?f _ _ _ _ _ _) => unfold f
