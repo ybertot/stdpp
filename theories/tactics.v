@@ -316,6 +316,7 @@ Ltac f_equiv :=
      query for "pointwise_relation"'s. But that leads to a combinatorial
      explosion about which arguments are and which are not the same. *)
   | H : pointwise_relation _ ?R ?f ?g |- ?R (?f ?x) (?g ?x) => simple apply H
+  | H : pointwise_relation _ (pointwise_relation _ ?R) ?f ?g |- ?R (?f ?x ?y) (?g ?x ?y) => simple apply H
   end;
   try simple apply reflexivity.
 Tactic Notation "f_equiv" "/=" := csimpl in *; f_equiv.
