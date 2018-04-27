@@ -48,11 +48,11 @@ Instance nat_le_pi: ∀ x y : nat, ProofIrrel (x ≤ y).
 Proof.
   assert (∀ x y (p : x ≤ y) y' (q : x ≤ y'),
     y = y' → eq_dep nat (le x) y p y' q) as aux.
-  { fix 3. intros x ? [|y p] ? [|y' q].
+  { fix FIX 3. intros x ? [|y p] ? [|y' q].
     - done.
-    - clear nat_le_pi. intros; exfalso; auto with lia.
-    - clear nat_le_pi. intros; exfalso; auto with lia.
-    - injection 1. intros Hy. by case (nat_le_pi x y p y' q Hy). }
+    - clear FIX. intros; exfalso; auto with lia.
+    - clear FIX. intros; exfalso; auto with lia.
+    - injection 1. intros Hy. by case (FIX x y p y' q Hy). }
   intros x y p q.
   by apply (Eqdep_dec.eq_dep_eq_dec (λ x y, decide (x = y))), aux.
 Qed.

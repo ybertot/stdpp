@@ -348,11 +348,11 @@ Fixpoint gen_tree_of_list {T}
 Lemma gen_tree_of_to_list {T} k l (t : gen_tree T) :
   gen_tree_of_list k (gen_tree_to_list t ++ l) = gen_tree_of_list (t :: k) l.
 Proof.
-  revert t k l; fix 1; intros [|n ts] k l; simpl; auto.
+  revert t k l; fix FIX 1; intros [|n ts] k l; simpl; auto.
   trans (gen_tree_of_list (reverse ts ++ k) ([inl (length ts, n)] ++ l)).
   - rewrite <-(assoc_L _). revert k. generalize ([inl (length ts, n)] ++ l).
     induction ts as [|t ts'' IH]; intros k ts'''; csimpl; auto.
-    rewrite reverse_cons, <-!(assoc_L _), gen_tree_of_to_list; simpl; auto.
+    rewrite reverse_cons, <-!(assoc_L _), FIX; simpl; auto.
   - simpl. by rewrite take_app_alt, drop_app_alt, reverse_involutive
       by (by rewrite reverse_length).
 Qed.

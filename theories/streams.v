@@ -41,9 +41,9 @@ Proof. by constructor. Qed.
 Global Instance equal_equivalence : Equivalence (≡@{stream A}).
 Proof.
   split.
-  - now cofix; intros [??]; constructor.
-  - now cofix; intros ?? [??]; constructor.
-  - cofix; intros ??? [??] [??]; constructor; etrans; eauto.
+  - now cofix FIX; intros [??]; constructor.
+  - now cofix FIX; intros ?? [??]; constructor.
+  - cofix FIX; intros ??? [??] [??]; constructor; etrans; eauto.
 Qed.
 Global Instance scons_proper x : Proper ((≡) ==> (≡)) (scons x).
 Proof. by constructor. Qed.
