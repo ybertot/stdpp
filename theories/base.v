@@ -163,7 +163,8 @@ Infix "=@{ A }" := (@eq A)
   (at level 70, only parsing, no associativity) : stdpp_scope.
 Notation "(=@{ A } )" := (@eq A) (only parsing) : stdpp_scope.
 Notation "(≠@{ A } )" := (λ X Y, ¬X =@{A} Y) (only parsing) : stdpp_scope.
-Notation "X ≠@{ A } Y":= (¬X =@{ A } Y) (at level 70, no associativity) : stdpp_scope.
+Notation "X ≠@{ A } Y":= (¬X =@{ A } Y)
+  (at level 70, only parsing, no associativity) : stdpp_scope.
 
 Hint Extern 0 (_ = _) => reflexivity.
 Hint Extern 100 (_ ≠ _) => discriminate.
@@ -193,7 +194,8 @@ Notation "(≢ X )" := (λ Y, Y ≢ X) (only parsing) : stdpp_scope.
 
 Notation "(≡@{ A } )" := (@equiv A _) (only parsing) : stdpp_scope.
 Notation "(≢@{ A } )" := (λ X Y, ¬X ≡@{A} Y) (only parsing) : stdpp_scope.
-Notation "X ≢@{ A } Y":= (¬X ≡@{ A } Y) (at level 70, no associativity) : stdpp_scope.
+Notation "X ≢@{ A } Y":= (¬X ≡@{ A } Y)
+  (at level 70, only parsing, no associativity) : stdpp_scope.
 
 (** The type class [LeibnizEquiv] collects setoid equalities that coincide
 with Leibniz equality. We provide the tactic [fold_leibniz] to transform such
