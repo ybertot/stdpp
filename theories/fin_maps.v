@@ -1884,6 +1884,11 @@ Proof.
   destruct (m1 !! i) as [x'|], (m2 !! i);
     try specialize (Hm1m2 x'); compute; intuition congruence.
 Qed.
+Lemma map_difference_diag {A} (m : M A) : m ∖ m = ∅.
+Proof.
+  apply map_empty; intros i. rewrite lookup_difference_None.
+  destruct (m !! i); eauto.
+Qed.
 End theorems.
 
 (** * Tactics *)
