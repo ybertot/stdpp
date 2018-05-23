@@ -541,11 +541,14 @@ Next Obligation.
     <-Qcmult_assoc, Qcmult_inv_l, Qcmult_1_r.
 Qed.
 
-Notation "1" := Qp_one : Qp_scope.
 Infix "+" := Qp_plus : Qp_scope.
 Infix "-" := Qp_minus : Qp_scope.
 Infix "*" := Qp_mult : Qp_scope.
 Infix "/" := Qp_div : Qp_scope.
+Notation "1" := Qp_one : Qp_scope.
+Notation "2" := (1 + 1)%Qp : Qp_scope.
+Notation "3" := (1 + 2)%Qp : Qp_scope.
+Notation "4" := (1 + 3)%Qp : Qp_scope.
 
 Lemma Qp_eq x y : x = y ↔ Qp_car x = Qp_car y.
 Proof.
