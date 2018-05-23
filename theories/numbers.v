@@ -608,6 +608,12 @@ Lemma Qp_div_2 x : (x / 2 + x / 2 = x)%Qp.
 Proof.
   change 2%positive with (2 * 1)%positive. by rewrite Qp_div_S, Qp_div_1.
 Qed.
+Lemma Qp_half_half : (1 / 2 + 1 / 2 = 1)%Qp.
+Proof. apply (bool_decide_unpack _); by compute. Qed.
+Lemma Qp_quarter_three_quarter : (1 / 4 + 3 / 4 = 1)%Qp.
+Proof. apply (bool_decide_unpack _); by compute. Qed.
+Lemma Qp_three_quarter_quarter : (3 / 4 + 1 / 4 = 1)%Qp.
+Proof. apply (bool_decide_unpack _); by compute. Qed.
 
 Lemma Qp_lt_sum (x y : Qp) : (x < y)%Qc ↔ ∃ z, y = (x + z)%Qp.
 Proof.
