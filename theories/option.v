@@ -26,10 +26,6 @@ Definition from_option {A B} (f : A → B) (y : B) (mx : option A) : B :=
 Instance: Params (@from_option) 3.
 Arguments from_option {_ _} _ _ !_ / : assert.
 
-(* The eliminator again, but with the arguments in different order, which is
-sometimes more convenient. *)
-Notation default y mx f := (from_option f y mx) (only parsing).
-
 (** An alternative, but equivalent, definition of equality on the option
 data type. This theorem is useful to prove that two options are the same. *)
 Lemma option_eq {A} (mx my: option A): mx = my ↔ ∀ x, mx = Some x ↔ my = Some x.
