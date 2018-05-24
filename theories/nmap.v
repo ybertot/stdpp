@@ -35,7 +35,7 @@ Instance Npartial_alter {A} : PartialAlter N A (Nmap A) := λ f i t,
 Instance Nto_list {A} : FinMapToList N A (Nmap A) := λ t,
   match t with
   | NMap o t =>
-     default [] o (λ x, [(0,x)]) ++ (prod_map Npos id <$> map_to_list t)
+     from_option (λ x, [(0,x)]) [] o ++ (prod_map Npos id <$> map_to_list t)
   end.
 Instance Nomap: OMap Nmap := λ A B f t,
   match t with NMap o t => NMap (o ≫= f) (omap f t) end.

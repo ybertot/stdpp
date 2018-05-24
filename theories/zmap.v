@@ -35,7 +35,7 @@ Instance Zpartial_alter {A} : PartialAlter Z A (Zmap A) := λ f i t,
   end.
 Instance Zto_list {A} : FinMapToList Z A (Zmap A) := λ t,
   match t with
-  | ZMap o t t' => default [] o (λ x, [(0,x)]) ++
+  | ZMap o t t' => from_option (λ x, [(0,x)]) [] o ++
      (prod_map Zpos id <$> map_to_list t) ++
      (prod_map Zneg id <$> map_to_list t')
   end.

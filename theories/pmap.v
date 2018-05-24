@@ -86,7 +86,7 @@ Fixpoint Pto_list_raw {A} (j : positive) (t : Pmap_raw A)
     (acc : list (positive * A)) : list (positive * A) :=
   match t with
   | PLeaf => acc
-  | PNode o l r => default [] o (λ x, [(Preverse j, x)]) ++
+  | PNode o l r => from_option (λ x, [(Preverse j, x)]) [] o ++
      Pto_list_raw (j~0) l (Pto_list_raw (j~1) r acc)
   end%list.
 Fixpoint Pomap_raw {A B} (f : A → option B) (t : Pmap_raw A) : Pmap_raw B :=

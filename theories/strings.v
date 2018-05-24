@@ -57,7 +57,7 @@ Fixpoint words_go (cur : option string) (s : string) : list string :=
   | "" => option_list (string_rev <$> cur)
   | String a s =>
      if is_space a then option_list (string_rev <$> cur) ++ words_go None s
-     else words_go (Some (default (String a "") cur (String a))) s
+     else words_go (Some (from_option (String a) (String a "") cur)) s
   end.
 Definition words : string → list string := words_go None.
 
