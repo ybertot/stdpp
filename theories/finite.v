@@ -17,7 +17,7 @@ Definition card A `{Finite A} := length (enum A).
 
 Program Definition finite_countable `{Finite A} : Countable A := {|
   encode := λ x,
-    Pos.of_nat $ S $ from_option id 0 $ fst <$> list_find (x =) (enum A);
+    Pos.of_nat $ S $ default 0 $ fst <$> list_find (x =) (enum A);
   decode := λ p, enum A !! pred (Pos.to_nat p)
 |}.
 Arguments Pos.of_nat : simpl never.
@@ -134,7 +134,7 @@ Lemma finite_surj A `{Finite A} B `{Finite B} :
   0 < card A ≤ card B → ∃ g : B → A, Surj (=) g.
 Proof.
   intros [??]. destruct (finite_inhabited A) as [x']; auto with lia.
-  exists (λ y : B, from_option id x' (decode_nat (encode_nat y))).
+  exists (λ y : B, default x' (decode_nat (encode_nat y))).
   intros x. destruct (encode_decode B (encode_nat x)) as (y&Hy1&Hy2).
   { pose proof (encode_lt_card x); lia. }
   exists y. by rewrite Hy2, decode_encode_nat.
