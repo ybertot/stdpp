@@ -26,7 +26,7 @@ Definition from_option {A B} (f : A → B) (y : B) (mx : option A) : B :=
 Instance: Params (@from_option) 3.
 Arguments from_option {_ _} _ _ !_ / : assert.
 
-(* The eliminator with the identity function. *)
+(** The eliminator with the identity function. *)
 Notation default := (from_option id).
 
 (** An alternative, but equivalent, definition of equality on the option
