@@ -484,7 +484,7 @@ Lemma list_lookup_middle l1 l2 x n :
   n = length l1 → (l1 ++ x :: l2) !! n = Some x.
 Proof. intros ->. by induction l1. Qed.
 
-Lemma nth_lookup l i d : nth i l d = from_option id d (l !! i).
+Lemma nth_lookup l i d : nth i l d = default d (l !! i).
 Proof. revert i. induction l as [|x l IH]; intros [|i]; simpl; auto. Qed.
 Lemma nth_lookup_Some l i d x : l !! i = Some x → nth i l d = x.
 Proof. rewrite nth_lookup. by intros ->. Qed.
@@ -3561,7 +3561,7 @@ Definition eval {A} (E : env A) : rlist nat → list A :=
   fix go t :=
   match t with
   | rnil => []
-  | rnode i => from_option id [] (E !! i)
+  | rnode i => default [] (E !! i)
   | rapp t1 t2 => go t1 ++ go t2
   end.
 
@@ -3595,7 +3595,7 @@ End quote.
 Section eval.
   Context {A} (E : env A).
 
-  Lemma eval_alt t : eval E t = to_list t ≫= from_option id [] ∘ (E !!).
+  Lemma eval_alt t : eval E t = to_list t ≫= default [] ∘ (E !!).
   Proof.
     induction t; csimpl.
     - done.
