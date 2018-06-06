@@ -85,17 +85,6 @@ Lemma tele_fmap_app {T U} {TT : tele} (F : T → U) (t : TT -t> T) (x : TT) :
   (F <$> t) x = F (t x).
 Proof. apply tele_map_app. Qed.
 
-Global Instance tele_fmap2 {TT1 TT2 : tele} : FMap (tele_fun TT1 ∘ tele_fun TT2) :=
-  λ T U, tele_map ∘ tele_map.
-
-Lemma tele_fmap2_app {T U} {TT1 TT2 : tele} (F : T → U) (t : TT1 -t> TT2 -t> T)
-      (x : TT1) (y : TT2) :
-  (F <$> t) x y = F (t x y).
-Proof.
-  unfold fmap, tele_fmap2. simpl.
-  rewrite !tele_map_app. done.
-Qed.
-
 (** Operate below [tele_fun]s with argument telescope [TT]. *)
 Fixpoint tele_bind {U} {TT : tele} : (TT → U) → TT -t> U :=
   match TT as TT return (TT → U) → TT -t> U with
@@ -105,8 +94,22 @@ Fixpoint tele_bind {U} {TT : tele} : (TT → U) → TT -t> U :=
   end.
 Arguments tele_bind {_ !_} _ /.
 
-(** A function that looks funny. *)
-Definition tele_arg_id (TT : tele) : TT -t> TT := tele_bind id.
+(* Show that tele_app ∘ tele_bind is the identity. *)
+Lemma tele_app_bind {U} {TT : tele} (f : TT → U) x :
+  (tele_app $ tele_bind f) x = f x.
+Proof.
+  induction TT as [|X b IH]; simpl in *.
+  - rewrite (tele_arg_O_inv x). done.
+  - destruct (tele_arg_S_inv x) as [x' [a' ->]]. simpl.
+    rewrite IH. done.
+Qed.
+
+(** We can define the identity function of the [-t>] function space. *)
+Definition tele_id {TT : tele} : TT -t> TT := tele_bind id.
+
+Lemma tele_id_eq {TT : tele} (x : TT) :
+  tele_id x = x.
+Proof. unfold tele_id. rewrite tele_app_bind. done. Qed.
 
 (** Notation *)
 Notation "'[tele' x .. z ]" :=
@@ -122,6 +125,9 @@ Notation "'[tele_arg' ]" := (TargO)
   (format "[tele_arg ]").
 
 (** Notation-compatible telescope mapping *)
+(* This adds (tele_app ∘ tele_bind), which is an identity function, around every
+   binder so that, after simplifying, this matches the way we typically write
+   notations involving telescopes. *)
 Notation "'λ..' x .. y , e" :=
   (tele_app $ tele_bind (λ x, .. (tele_app $ tele_bind (λ y, e)) .. ))
   (at level 200, x binder, y binder, right associativity,
