@@ -104,12 +104,21 @@ Proof.
     rewrite IH. done.
 Qed.
 
-(** We can define the identity function of the [-t>] function space. *)
+(** We can define the identity function and composition of the [-t>] function
+space. *)
 Definition tele_id {TT : tele} : TT -t> TT := tele_bind id.
 
 Lemma tele_id_eq {TT : tele} (x : TT) :
   tele_id x = x.
 Proof. unfold tele_id. rewrite tele_app_bind. done. Qed.
+
+Definition tele_compose {TT1 TT2 TT3 : tele} :
+  (TT2 -t> TT3) → (TT1 -t> TT2) → (TT1 -t> TT3) :=
+  λ t1 t2, tele_bind (compose (tele_app t1) (tele_app t2)).
+
+Lemma tele_compose_eq {TT1 TT2 TT3 : tele} (f : TT2 -t> TT3) (g : TT1 -t> TT2) x :
+  tele_compose f g $ x = (f ∘ g) x.
+Proof. unfold tele_compose. rewrite tele_app_bind. done. Qed.
 
 (** Notation *)
 Notation "'[tele' x .. z ]" :=
