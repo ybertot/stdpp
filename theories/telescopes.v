@@ -141,3 +141,45 @@ Notation "'λ..' x .. y , e" :=
   (tele_app $ tele_bind (λ x, .. (tele_app $ tele_bind (λ y, e)) .. ))
   (at level 200, x binder, y binder, right associativity,
    format "'[  ' 'λ..'  x  ..  y ']' ,  e").
+
+(** Telescopic quantifiers *)
+Definition tforall {TT : tele} (Ψ : TT → Prop) : Prop :=
+  tele_fold (λ (T : Type) (b : T → Prop), ∀ x : T, b x) (λ x, x) (tele_bind Ψ).
+Arguments tforall {!_} _ /.
+Definition texist {TT : tele} (Ψ : TT → Prop) : Prop :=
+  tele_fold ex (λ x, x) (tele_bind Ψ).
+Arguments texist {!_} _ /.
+
+Notation "'∀..' x .. y , P" := (tforall (λ x, .. (tforall (λ y, P)) .. ))
+  (at level 200, x binder, y binder, right associativity,
+  format "∀..  x  ..  y ,  P") : stdpp_scope.
+Notation "'∃..' x .. y , P" := (texist (λ x, .. (texist (λ y, P)) .. ))
+  (at level 200, x binder, y binder, right associativity,
+  format "∃..  x  ..  y ,  P") : stdpp_scope.
+
+Lemma tforall_forall {TT : tele} (Ψ : TT → Prop) :
+  (tforall Ψ) ↔ (∀ x, Ψ x).
+Proof.
+  symmetry. unfold tforall. induction TT as [|X ft IH].
+  - simpl. split.
+    + done.
+    + intros ? p. rewrite (tele_arg_O_inv p). done.
+  - simpl. split; intros Hx a.
+    + rewrite <-IH. done.
+    + destruct (tele_arg_S_inv a) as [x [pf ->]].
+      revert pf. setoid_rewrite IH. done.
+Qed.
+
+Lemma texist_exist {TT : tele} (Ψ : TT → Prop) :
+  (texist Ψ) ↔ (ex Ψ).
+Proof.
+  symmetry. induction TT as [|X ft IH].
+  - simpl. split.
+    + intros [p Hp]. rewrite (tele_arg_O_inv p) in Hp. done.
+    + intros. by exists TargO.
+  - simpl. split; intros [p Hp]; revert Hp.
+    + destruct (tele_arg_S_inv p) as [x [pf ->]]. intros ?.
+      exists x. rewrite <-(IH x (λ a, Ψ (TargS x a))). eauto.
+    + rewrite <-(IH p (λ a, Ψ (TargS p a))).
+      intros [??]. eauto.
+Qed.
