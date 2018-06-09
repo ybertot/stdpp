@@ -1,6 +1,8 @@
 From stdpp Require Import base tactics.
 Set Default Proof Using "Type".
 
+Local Set Universe Polymorphism.
+
 (** Telescopes *)
 Inductive tele : Type :=
   | TeleO : tele
