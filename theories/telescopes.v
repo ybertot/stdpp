@@ -185,3 +185,10 @@ Proof.
     + rewrite <-(IH p (λ a, Ψ (TargS p a))).
       intros [??]. eauto.
 Qed.
+
+(* Teach typeclass resolution how to make progress on these binders *)
+Typeclasses Opaque tforall texist.
+Hint Extern 1 (tforall _) =>
+  progress cbn [tforall tele_fold tele_bind tele_app] : typeclass_instances.
+Hint Extern 1 (texist _) =>
+  progress cbn [texist tele_fold tele_bind tele_app] : typeclass_instances.
