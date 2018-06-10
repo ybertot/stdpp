@@ -146,8 +146,8 @@ Global Open Scope stdpp_scope.
 (** Change [True] and [False] into notations in order to enable overloading.
 We will use this to give [True] and [False] a different interpretation for
 embedded logics. *)
-Notation "'True'" := True : type_scope.
-Notation "'False'" := False : type_scope.
+Notation "'True'" := True (format "True") : type_scope.
+Notation "'False'" := False (format "False") : type_scope.
 
 
 (** * Equality *)
@@ -747,7 +747,7 @@ intersection [(∩)], and difference [(∖)], the singleton [{[_]}], the subset
 [(⊆)] and element of [(∈)] relation, and disjointess [(##)]. *)
 Class Empty A := empty: A.
 Hint Mode Empty ! : typeclass_instances.
-Notation "∅" := empty : stdpp_scope.
+Notation "∅" := empty (format "∅") : stdpp_scope.
 
 Instance empty_inhabited `(Empty A) : Inhabited A := populate ∅.
 
@@ -1193,7 +1193,7 @@ Class FreshSpec A C `{ElemOf A C,
 (** * Miscellaneous *)
 Class Half A := half: A → A.
 Hint Mode Half ! : typeclass_instances.
-Notation "½" := half : stdpp_scope.
+Notation "½" := half (format "½") : stdpp_scope.
 Notation "½*" := (fmap (M:=list) half) : stdpp_scope.
 
 (** * Notations for lattices. *)
@@ -1232,8 +1232,8 @@ Notation "(⊔ y )" := (λ x, join x y) (only parsing) : stdpp_scope.
 
 Class Top A := top : A.
 Hint Mode Top ! : typeclass_instances.
-Notation "⊤" := top : stdpp_scope.
+Notation "⊤" := top (format "⊤") : stdpp_scope.
 
 Class Bottom A := bottom : A.
 Hint Mode Bottom ! : typeclass_instances.
-Notation "⊥" := bottom : stdpp_scope.
+Notation "⊥" := bottom (format "⊥") : stdpp_scope.
