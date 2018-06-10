@@ -660,6 +660,21 @@ Proof.
   - by rewrite (assoc_L _), (comm_L Qp_plus a').
 Qed.
 
+Lemma Qp_bounded_split (p r : Qp) : ∃ q1 q2 : Qp, (q1 ≤ r)%Qc ∧ p = (q1 + q2)%Qp.
+Proof.
+  destruct (Qclt_le_dec r p) as [?|?].
+  - assert (0 < p - r)%Qc as Hpos.
+    { apply (Qcplus_lt_mono_r _ _ r). rewrite <-Qcplus_assoc, (Qcplus_comm (-r)).
+      by rewrite Qcplus_opp_r, Qcplus_0_l, Qcplus_0_r. }
+    exists r, (mk_Qp _ Hpos); simpl; split; [done|].
+    apply Qp_eq; simpl. rewrite Qcplus_comm, <-Qcplus_assoc, (Qcplus_comm (-r)).
+    by rewrite Qcplus_opp_r, Qcplus_0_r.
+  - exists (p / 2)%Qp, (p / 2)%Qp; split.
+    + trans p; [|done]. apply Qclt_le_weak, Qp_lt_sum.
+      exists (p / 2)%Qp. by rewrite Qp_div_2.
+    + by rewrite Qp_div_2.
+Qed.
+
 Lemma Qp_not_plus_q_ge_1 (q: Qp): ¬ ((1 + q)%Qp ≤ 1%Qp)%Qc.
 Proof.
   intros Hle.
