@@ -101,5 +101,5 @@ Ltac solve_ndisj :=
   repeat match goal with
   | H : _ ∪ _ ⊆ _ |- _ => apply union_subseteq in H as [??]
   end;
-  solve [eauto with ndisj].
+  solve [eauto 10 with ndisj].
 Hint Extern 1000 => solve_ndisj : solve_ndisj.
