@@ -622,7 +622,8 @@ Section collection.
   Proof. set_solver. Qed.
   Lemma subset_difference_elem_of {x: A} {s: C} (inx: x ∈ s): s ∖ {[ x ]} ⊂ s.
   Proof. set_solver. Qed.
-
+  Lemma difference_difference X Y Z : (X ∖ Y) ∖ Z ≡ X ∖ (Y ∪ Z).
+  Proof. set_solver. Qed.
 
   Lemma difference_mono X1 X2 Y1 Y2 :
     X1 ⊆ X2 → Y2 ⊆ Y1 → X1 ∖ Y1 ⊆ X2 ∖ Y2.
@@ -688,6 +689,8 @@ Section collection.
     Proof. unfold_leibniz. apply difference_intersection_distr_l. Qed.
     Lemma difference_disjoint_L X Y : X ## Y → X ∖ Y = X.
     Proof. unfold_leibniz. apply difference_disjoint. Qed.
+    Lemma difference_difference_L X Y Z : (X ∖ Y) ∖ Z = X ∖ (Y ∪ Z).
+    Proof. unfold_leibniz. apply difference_difference. Qed.
 
     (** Disjointness *)
     Lemma disjoint_intersection_L X Y : X ## Y ↔ X ∩ Y = ∅.
