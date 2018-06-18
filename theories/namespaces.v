@@ -73,7 +73,8 @@ Section namespace.
   Lemma ndot_preserve_disjoint_r N E x : E ## ↑N → E ## ↑N.@x.
   Proof. intros. by apply symmetry, ndot_preserve_disjoint_l. Qed.
 
-  Lemma ndisj_subseteq_difference N E F : E ## ↑N → E ⊆ F → E ⊆ F ∖ ↑N.
+  Lemma namespace_subseteq_difference E1 E2 E3 :
+    E1 ## E3 → E1 ⊆ E2 → E1 ⊆ E2 ∖ E3.
   Proof. set_solver. Qed.
 
   Lemma namespace_subseteq_difference_l E1 E2 E3 : E1 ⊆ E3 → E1 ∖ E2 ⊆ E3.
@@ -89,7 +90,7 @@ of the forms:
 - [↑N1 ⊆ E ∖ ↑N2 ∖ .. ∖ ↑Nn]
 - [E1 ∖ ↑N1 ⊆ E2 ∖ ↑N2 ∖ .. ∖ ↑Nn] *)
 Create HintDb ndisj.
-Hint Resolve ndisj_subseteq_difference : ndisj.
+Hint Resolve namespace_subseteq_difference : ndisj.
 Hint Extern 0 (_ ## _) => apply ndot_ne_disjoint; congruence : ndisj.
 Hint Resolve ndot_preserve_disjoint_l ndot_preserve_disjoint_r : ndisj.
 Hint Resolve nclose_subseteq' ndisj_difference_l : ndisj.
