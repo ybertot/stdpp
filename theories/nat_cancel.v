@@ -78,25 +78,25 @@ Module nat_cancel.
   Instance nat_cancel_leaf_plus m m' m'' n1 n2 n1' n2' n1'n2' :
     NatCancelR m n1 m' n1' → NatCancelR m' n2 m'' n2' →
     MakeNatPlus n1' n2' n1'n2' → NatCancelR m (n1 + n2) m'' n1'n2' | 2.
-  Proof. unfold NatCancelR, NatCancelL, MakeNatPlus. omega. Qed.
+  Proof. unfold NatCancelR, NatCancelL, MakeNatPlus. lia. Qed.
   Instance nat_cancel_leaf_S_here m n m' n' :
     NatCancelR m n m' n' → NatCancelR (S m) (S n) m' n' | 3.
-  Proof. unfold NatCancelR, NatCancelL. omega. Qed.
+  Proof. unfold NatCancelR, NatCancelL. lia. Qed.
   Instance nat_cancel_leaf_S_else m n m' n' :
     NatCancelR m n m' n' → NatCancelR m (S n) m' (S n') | 4.
-  Proof. unfold NatCancelR, NatCancelL. omega. Qed.
+  Proof. unfold NatCancelR, NatCancelL. lia. Qed.
 
   (** The instance [nat_cancel_S_both] is redundant, but may reduce proof search
   quite a bit, e.g. when canceling constants in constants. *)
   Instance nat_cancel_S_both m n m' n' :
     NatCancelL m n m' n' → NatCancelL (S m) (S n) m' n' | 1.
-  Proof. unfold NatCancelL. omega. Qed.
+  Proof. unfold NatCancelL. lia. Qed.
   Instance nat_cancel_plus m1 m2 m1' m2' m1'm2' n n' n'' :
     NatCancelL m1 n m1' n' → NatCancelL m2 n' m2' n'' →
     MakeNatPlus m1' m2' m1'm2' → NatCancelL (m1 + m2) n m1'm2' n'' | 2.
-  Proof. unfold NatCancelL, MakeNatPlus. omega. Qed.
+  Proof. unfold NatCancelL, MakeNatPlus. lia. Qed.
   Instance nat_cancel_S m m' m'' Sm' n n' n'' :
     NatCancelL m n m' n' → NatCancelR 1 n' m'' n'' →
     MakeNatS m'' m' Sm' → NatCancelL (S m) n Sm' n'' | 3.
-  Proof. unfold NatCancelR, NatCancelL, MakeNatS. omega. Qed.
+  Proof. unfold NatCancelR, NatCancelL, MakeNatS. lia. Qed.
 End nat_cancel.

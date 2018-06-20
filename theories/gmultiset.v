@@ -80,14 +80,14 @@ Lemma multiplicity_union X Y x :
   multiplicity x (X ∪ Y) = multiplicity x X + multiplicity x Y.
 Proof.
   destruct X as [X], Y as [Y]; unfold multiplicity; simpl.
-  rewrite lookup_union_with. destruct (X !! _), (Y !! _); simpl; omega.
+  rewrite lookup_union_with. destruct (X !! _), (Y !! _); simpl; lia.
 Qed.
 Lemma multiplicity_difference X Y x :
   multiplicity x (X ∖ Y) = multiplicity x X - multiplicity x Y.
 Proof.
   destruct X as [X], Y as [Y]; unfold multiplicity; simpl.
   rewrite lookup_difference_with.
-  destruct (X !! _), (Y !! _); simplify_option_eq; omega.
+  destruct (X !! _), (Y !! _); simplify_option_eq; lia.
 Qed.
 
 (* Collection *)
@@ -97,12 +97,12 @@ Proof. done. Qed.
 Global Instance gmultiset_simple_collection : SimpleCollection A (gmultiset A).
 Proof.
   split.
-  - intros x. rewrite elem_of_multiplicity, multiplicity_empty. omega.
+  - intros x. rewrite elem_of_multiplicity, multiplicity_empty. lia.
   - intros x y. destruct (decide (x = y)) as [->|].
     + rewrite elem_of_multiplicity, multiplicity_singleton. split; auto with lia.
     + rewrite elem_of_multiplicity, multiplicity_singleton_ne by done.
       by split; auto with lia.
-  - intros X Y x. rewrite !elem_of_multiplicity, multiplicity_union. omega.
+  - intros X Y x. rewrite !elem_of_multiplicity, multiplicity_union. lia.
 Qed.
 Global Instance gmultiset_elem_of_dec : RelDecision (∈@{gmultiset A}).
 Proof. refine (λ x X, cast_if (decide (0 < multiplicity x X))); done. Defined.
@@ -110,11 +110,11 @@ Proof. refine (λ x X, cast_if (decide (0 < multiplicity x X))); done. Defined.
 (* Algebraic laws *)
 Global Instance gmultiset_comm : Comm (=@{gmultiset A}) (∪).
 Proof.
-  intros X Y. apply gmultiset_eq; intros x. rewrite !multiplicity_union; omega.
+  intros X Y. apply gmultiset_eq; intros x. rewrite !multiplicity_union; lia.
 Qed.
 Global Instance gmultiset_assoc : Assoc (=@{gmultiset A}) (∪).
 Proof.
-  intros X Y Z. apply gmultiset_eq; intros x. rewrite !multiplicity_union; omega.
+  intros X Y Z. apply gmultiset_eq; intros x. rewrite !multiplicity_union; lia.
 Qed.
 Global Instance gmultiset_left_id : LeftId (=@{gmultiset A}) ∅ (∪).
 Proof.
@@ -127,7 +127,7 @@ Proof. intros X. by rewrite (comm_L (∪)), (left_id_L _ _). Qed.
 Global Instance gmultiset_union_inj_1 X : Inj (=) (=) (X ∪).
 Proof.
   intros Y1 Y2. rewrite !gmultiset_eq. intros HX x; generalize (HX x).
-  rewrite !multiplicity_union. omega.
+  rewrite !multiplicity_union. lia.
 Qed.
 Global Instance gmultiset_union_inj_2 X : Inj (=) (=) (∪ X).
 Proof. intros Y1 Y2. rewrite <-!(comm_L _ X). apply (inj _). Qed.
@@ -185,15 +185,15 @@ Proof.
   unfold elem_of at 2, gmultiset_elem_of, multiplicity; simpl.
   rewrite elem_of_list_bind. split.
   - intros [[??] [[<- ?]%elem_of_replicate ->%elem_of_map_to_list]]; lia.
-  - intros. destruct (X !! x) as [n|] eqn:Hx; [|omega].
+  - intros. destruct (X !! x) as [n|] eqn:Hx; [|lia].
     exists (x,n); split; [|by apply elem_of_map_to_list].
-    apply elem_of_replicate; auto with omega.
+    apply elem_of_replicate; auto with lia.
 Qed.
 Lemma gmultiset_elem_of_dom x X : x ∈ dom (gset A) X ↔ x ∈ X.
 Proof.
   unfold dom, gmultiset_dom, elem_of at 2, gmultiset_elem_of, multiplicity.
   destruct X as [X]; simpl; rewrite elem_of_dom, <-not_eq_None_Some.
-  destruct (X !! x); naive_solver omega.
+  destruct (X !! x); naive_solver lia.
 Qed.
 
 (* Properties of the size operation *)
@@ -250,7 +250,7 @@ Lemma gmultiset_subseteq_alt X Y :
   map_relation (≤) (λ _, False) (λ _, True) (gmultiset_car X) (gmultiset_car Y).
 Proof.
   apply forall_proper; intros x. unfold multiplicity.
-  destruct (gmultiset_car X !! x), (gmultiset_car Y !! x); naive_solver omega.
+  destruct (gmultiset_car X !! x), (gmultiset_car Y !! x); naive_solver lia.
 Qed.
 Global Instance gmultiset_subseteq_dec : RelDecision (⊆@{gmultiset A}).
 Proof.
@@ -264,12 +264,12 @@ Proof. apply strict_include. Qed.
 Hint Resolve gmultiset_subset_subseteq.
 
 Lemma gmultiset_empty_subseteq X : ∅ ⊆ X.
-Proof. intros x. rewrite multiplicity_empty. omega. Qed.
+Proof. intros x. rewrite multiplicity_empty. lia. Qed.
 
 Lemma gmultiset_union_subseteq_l X Y : X ⊆ X ∪ Y.
-Proof. intros x. rewrite multiplicity_union. omega. Qed.
+Proof. intros x. rewrite multiplicity_union. lia. Qed.
 Lemma gmultiset_union_subseteq_r X Y : Y ⊆ X ∪ Y.
-Proof. intros x. rewrite multiplicity_union. omega. Qed.
+Proof. intros x. rewrite multiplicity_union. lia. Qed.
 Lemma gmultiset_union_mono X1 X2 Y1 Y2 : X1 ⊆ X2 → Y1 ⊆ Y2 → X1 ∪ Y1 ⊆ X2 ∪ Y2.
 Proof. intros ?? x. rewrite !multiplicity_union. by apply Nat.add_le_mono. Qed.
 Lemma gmultiset_union_mono_l X Y1 Y2 : Y1 ⊆ Y2 → X ∪ Y1 ⊆ X ∪ Y2.
@@ -278,12 +278,12 @@ Lemma gmultiset_union_mono_r X1 X2 Y : X1 ⊆ X2 → X1 ∪ Y ⊆ X2 ∪ Y.
 Proof. intros. by apply gmultiset_union_mono. Qed.
 
 Lemma gmultiset_subset X Y : X ⊆ Y → size X < size Y → X ⊂ Y.
-Proof. intros. apply strict_spec_alt; split; naive_solver auto with omega. Qed.
+Proof. intros. apply strict_spec_alt; split; naive_solver auto with lia. Qed.
 Lemma gmultiset_union_subset_l X Y : Y ≠ ∅ → X ⊂ X ∪ Y.
 Proof.
   intros HY%gmultiset_size_non_empty_iff.
   apply gmultiset_subset; auto using gmultiset_union_subseteq_l.
-  rewrite gmultiset_size_union; omega.
+  rewrite gmultiset_size_union; lia.
 Qed.
 Lemma gmultiset_union_subset_r X Y : X ≠ ∅ → Y ⊂ X ∪ Y.
 Proof. rewrite (comm_L (∪)). apply gmultiset_union_subset_l. Qed.
@@ -292,9 +292,9 @@ Lemma gmultiset_elem_of_singleton_subseteq x X : x ∈ X ↔ {[ x ]} ⊆ X.
 Proof.
   rewrite elem_of_multiplicity. split.
   - intros Hx y; destruct (decide (x = y)) as [->|].
-    + rewrite multiplicity_singleton; omega.
-    + rewrite multiplicity_singleton_ne by done; omega.
-  - intros Hx. generalize (Hx x). rewrite multiplicity_singleton. omega.
+    + rewrite multiplicity_singleton; lia.
+    + rewrite multiplicity_singleton_ne by done; lia.
+  - intros Hx. generalize (Hx x). rewrite multiplicity_singleton. lia.
 Qed.
 
 Lemma gmultiset_elem_of_subseteq X1 X2 x : x ∈ X1 → X1 ⊆ X2 → x ∈ X2.
@@ -303,7 +303,7 @@ Proof. rewrite !gmultiset_elem_of_singleton_subseteq. by intros ->. Qed.
 Lemma gmultiset_union_difference X Y : X ⊆ Y → Y = X ∪ Y ∖ X.
 Proof.
   intros HXY. apply gmultiset_eq; intros x; specialize (HXY x).
-  rewrite multiplicity_union, multiplicity_difference; omega.
+  rewrite multiplicity_union, multiplicity_difference; lia.
 Qed.
 Lemma gmultiset_union_difference' x Y : x ∈ Y → Y = {[ x ]} ∪ Y ∖ {[ x ]}.
 Proof.
@@ -314,14 +314,14 @@ Qed.
 Lemma gmultiset_size_difference X Y : Y ⊆ X → size (X ∖ Y) = size X - size Y.
 Proof.
   intros HX%gmultiset_union_difference.
-  rewrite HX at 2; rewrite gmultiset_size_union. omega.
+  rewrite HX at 2; rewrite gmultiset_size_union. lia.
 Qed.
 
 Lemma gmultiset_non_empty_difference X Y : X ⊂ Y → Y ∖ X ≠ ∅.
 Proof.
   intros [_ HXY2] Hdiff; destruct HXY2; intros x.
   generalize (f_equal (multiplicity x) Hdiff).
-  rewrite multiplicity_difference, multiplicity_empty; omega.
+  rewrite multiplicity_difference, multiplicity_empty; lia.
 Qed.
 
 Lemma gmultiset_difference_subset X Y : X ≠ ∅ → X ⊆ Y → Y ∖ X ⊂ Y.

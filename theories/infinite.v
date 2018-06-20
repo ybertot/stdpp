@@ -52,15 +52,15 @@ Section Fresh.
     revert n.
     induction s as [s IH] using (well_founded_ind collection_wf); intros n.
     setoid_rewrite fresh_generic_fixpoint_unfold; unfold fresh_generic_body.
-    destruct decide as [Hcase|Hcase]; [|by eauto with omega].
+    destruct decide as [Hcase|Hcase]; [|by eauto with lia].
     destruct (IH _ (subset_difference_elem_of Hcase) (S n))
       as (m & Hmbound & Heqfix & Hnotin & Hinbelow).
-    exists m; repeat split; auto with omega.
+    exists m; repeat split; auto with lia.
     - rewrite not_elem_of_difference, elem_of_singleton in Hnotin.
-      destruct Hnotin as [?|?%inject_injective]; auto with omega.
+      destruct Hnotin as [?|?%inject_injective]; auto with lia.
     - intros i Hibound.
       destruct (decide (i = n)) as [<-|Hneq]; [by auto|].
-      assert (inject i ∈ s ∖ {[inject n]}) by auto with omega.
+      assert (inject i ∈ s ∖ {[inject n]}) by auto with lia.
       set_solver.
   Qed.
 
@@ -76,8 +76,8 @@ Section Fresh.
       destruct (fresh_generic_fixpoint_spec Y 0)
         as (mY & _ & -> & HnotinY & HbelowinY).
       destruct (Nat.lt_trichotomy mX mY) as [case|[->|case]]; auto.
-      + contradict HnotinX. rewrite HeqXY. apply HbelowinY; omega.
-      + contradict HnotinY. rewrite <-HeqXY. apply HbelowinX; omega.
+      + contradict HnotinX. rewrite HeqXY. apply HbelowinY; lia.
+      + contradict HnotinY. rewrite <-HeqXY. apply HbelowinX; lia.
     - intros X. unfold fresh, fresh_generic.
       destruct (fresh_generic_fixpoint_spec X 0)
         as (m & _ & -> & HnotinX & HbelowinX); auto.
