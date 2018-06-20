@@ -1484,7 +1484,7 @@ Proof.
     eapply Permutation_cons, (IH _ g).
     + rewrite length_delete by (rewrite <-Hl; eauto); simpl in *; lia.
     + unfold g. intros i j Hg.
-      repeat destruct (lt_eq_lt_dec _ _) as [[?|?]|?]; simplify_eq/=; try omega.
+      repeat destruct (lt_eq_lt_dec _ _) as [[?|?]|?]; simplify_eq/=; try lia.
       apply (inj S), (inj f); lia.
     + intros i. unfold g. destruct (lt_eq_lt_dec _ _) as [[?|?]|?].
       * by rewrite lookup_delete_lt, <-Hl.

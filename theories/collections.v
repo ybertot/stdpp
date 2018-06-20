@@ -1051,22 +1051,22 @@ Section seq_set.
     x ∈ seq_set (C:=C) start len ↔ start ≤ x < start + len.
   Proof.
     revert start. induction len as [|len IH]; intros start; simpl.
-    - rewrite elem_of_empty. omega.
-    - rewrite elem_of_union, elem_of_singleton, IH. omega.
+    - rewrite elem_of_empty. lia.
+    - rewrite elem_of_union, elem_of_singleton, IH. lia.
   Qed.
 
   Lemma seq_set_start_disjoint start len :
     {[ start ]} ## seq_set (C:=C) (S start) len.
-  Proof. intros x. rewrite elem_of_singleton, elem_of_seq_set. omega. Qed.
+  Proof. intros x. rewrite elem_of_singleton, elem_of_seq_set. lia. Qed.
 
   Lemma seq_set_S_disjoint start len :
     {[ start + len ]} ## seq_set (C:=C) start len.
-  Proof. intros x. rewrite elem_of_singleton, elem_of_seq_set. omega. Qed.
+  Proof. intros x. rewrite elem_of_singleton, elem_of_seq_set. lia. Qed.
 
   Lemma seq_set_S_union start len :
     seq_set start (S len) ≡@{C} {[ start + len ]} ∪ seq_set start len.
   Proof.
-    intros x. rewrite elem_of_union, elem_of_singleton, !elem_of_seq_set. omega.
+    intros x. rewrite elem_of_union, elem_of_singleton, !elem_of_seq_set. lia.
   Qed.
 
   Lemma seq_set_S_union_L `{!LeibnizEquiv C} start len :
