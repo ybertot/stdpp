@@ -160,7 +160,7 @@ Notation "'∃..' x .. y , P" := (texist (λ x, .. (texist (λ y, P)) .. ))
   format "∃..  x  ..  y ,  P") : stdpp_scope.
 
 Lemma tforall_forall {TT : tele} (Ψ : TT → Prop) :
-  (tforall Ψ) ↔ (∀ x, Ψ x).
+  tforall Ψ ↔ (∀ x, Ψ x).
 Proof.
   symmetry. unfold tforall. induction TT as [|X ft IH].
   - simpl. split.
@@ -173,7 +173,7 @@ Proof.
 Qed.
 
 Lemma texist_exist {TT : tele} (Ψ : TT → Prop) :
-  (texist Ψ) ↔ (ex Ψ).
+  texist Ψ ↔ ex Ψ.
 Proof.
   symmetry. induction TT as [|X ft IH].
   - simpl. split.
