@@ -3,7 +3,7 @@
 (** This files gives an implementation of finite sets using finite maps with
 elements of the unit type. Since maps enjoy extensional equality, the
 constructed finite sets do so as well. *)
-From stdpp Require Export fin_map_dom.
+From stdpp Require Export countable fin_map_dom.
 (* FIXME: This file needs a 'Proof Using' hint. *)
 
 Record mapset (M : Type → Type) : Type :=
@@ -76,6 +76,9 @@ Section deciders.
     match X1, X2 with Mapset m1, Mapset m2 => cast_if (decide (m1 = m2)) end);
     abstract congruence.
   Defined.
+  Program Instance mapset_countable `{Countable (M ())} : Countable (mapset M) :=
+    inj_countable mapset_car (Some ∘ Mapset) _.
+  Next Obligation. by intros ? ? []. Qed.
   Global Instance mapset_equiv_dec : RelDecision (≡@{mapset M}) | 1.
   Proof. refine (λ X1 X2, cast_if (decide (X1 = X2))); abstract (by fold_leibniz). Defined.
   Global Instance mapset_elem_of_dec : RelDecision (∈@{mapset M}) | 1.
