@@ -2961,6 +2961,8 @@ Section fmap.
     intros Hi. rewrite list_lookup_fmap in Hi.
     destruct (l !! i) eqn:?; simplify_eq/=; eauto.
   Qed.
+  Lemma list_fmap_insert l i x: f <$> <[i:=x]>l = <[i:=f x]>(f <$> l).
+  Proof. revert i. by induction l; intros [|i]; f_equal/=. Qed.
   Lemma list_alter_fmap (g : A → A) (h : B → B) l i :
     Forall (λ x, f (g x) = h (f x)) l → f <$> alter g i l = alter h i (f <$> l).
   Proof. intros Hl. revert i. by induction Hl; intros [|i]; f_equal/=. Qed.
