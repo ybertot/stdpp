@@ -521,6 +521,9 @@ Qed.
 Lemma list_insert_commute l i j x y :
   i ≠ j → <[i:=x]>(<[j:=y]>l) = <[j:=y]>(<[i:=x]>l).
 Proof. revert i j. by induction l; intros [|?] [|?] ?; f_equal/=; auto. Qed.
+Lemma list_insert_id l i x : l !! i = Some x → <[i:=x]>l = l.
+Proof. revert i. induction l; intros [|i] [=]; f_equal/=; auto. Qed.
+
 Lemma list_lookup_other l i x :
   length l ≠ 1 → l !! i = Some x → ∃ j y, j ≠ i ∧ l !! j = Some y.
 Proof.
