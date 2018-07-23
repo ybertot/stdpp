@@ -23,7 +23,7 @@ $(TESTFILES:.v=.vo): %.vo: %.v $(if $(MAKE_REF),,%.ref)
 	$(SHOW)$(if $(MAKE_REF),COQTEST [ref],COQTEST) $<
 	$(HIDE)TEST="$$(basename -s .v $<)" && \
 	  TMPFILE="$$(mktemp)" && \
-	  $(TIMER) $(COQ_TEST) $(TIMING_ARG) $(COQFLAGS) $(COQLIBS) -load-vernac-source $< $(TIMING_EXTRA) > "$$TMPFILE" && \
+	  $(TIMER) $(COQ_TEST) $(COQFLAGS) $(COQLIBS) -load-vernac-source $< > "$$TMPFILE" && \
 	  ($(REF_FILTER) < "$$TMPFILE" > "$$TMPFILE.filtered" || true) && \
 	  $(if $(MAKE_REF), \
 	    mv "$$TMPFILE.filtered" "tests/$$TEST.ref", \
