@@ -16,6 +16,11 @@ Instance collection_filter
   of_list (filter P (elements X)).
 Typeclasses Opaque collection_filter.
 
+Definition collection_map `{Elements A C, Singleton B D, Empty D, Union D}
+    (f : A → B) (X : C) : D :=
+  of_list (f <$> elements X).
+Typeclasses Opaque collection_map.
+
 Section fin_collection.
 Context `{FinCollection A C}.
 Implicit Types X Y : C.
@@ -247,6 +252,39 @@ Section filter.
     Proof. set_solver. Qed.
   End leibniz_equiv.
 End filter.
+
+(** * Map *)
+Section map.
+  Context `{Collection B D}.
+
+  Lemma elem_of_map (f : A → B) (X : C) y :
+    y ∈ collection_map (D:=D) f X ↔ ∃ x, y = f x ∧ x ∈ X.
+  Proof.
+    unfold collection_map. rewrite elem_of_of_list, elem_of_list_fmap.
+    by setoid_rewrite elem_of_elements.
+  Qed.
+  Global Instance set_unfold_map (f : A → B) (X : C) (P : A → Prop) :
+    (∀ y, SetUnfold (y ∈ X) (P y)) →
+    SetUnfold (x ∈ collection_map (D:=D) f X) (∃ y, x = f y ∧ P y).
+  Proof. constructor. rewrite elem_of_map; naive_solver. Qed.
+
+  Global Instance collection_map_proper :
+    Proper (pointwise_relation _ (=) ==> (≡) ==> (≡)) (collection_map (C:=C) (D:=D)).
+  Proof. intros f g ? X Y. set_unfold; naive_solver. Qed.
+  Global Instance collection_map_mono :
+    Proper (pointwise_relation _ (=) ==> (⊆) ==> (⊆)) (collection_map (C:=C) (D:=D)).
+  Proof. intros f g ? X Y. set_unfold; naive_solver. Qed.
+
+  Lemma elem_of_map_1 (f : A → B) (X : C) (y : B) :
+    y ∈ collection_map (D:=D) f X → ∃ x, y = f x ∧ x ∈ X.
+  Proof. set_solver. Qed.
+  Lemma elem_of_map_2 (f : A → B) (X : C) (x : A) :
+    x ∈ X → f x ∈ collection_map (D:=D) f X.
+  Proof. set_solver. Qed.
+  Lemma elem_of_map_2_alt (f : A → B) (X : C) (x : A) (y : B) :
+    x ∈ X → y = f x → y ∈ collection_map (D:=D) f X.
+  Proof. set_solver. Qed.
+End map.
 
 (** * Decision procedures *)
 Lemma set_Forall_elements P X : set_Forall P X ↔ Forall P (elements X).
