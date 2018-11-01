@@ -1932,6 +1932,8 @@ Hint Extern 2 (_ ##ₘ {[ _ := _ ]}) =>
   apply map_disjoint_singleton_r_2 : map_disjoint.
 Hint Extern 2 (_ ∪ _ ##ₘ _) => apply map_disjoint_union_l_2 : map_disjoint.
 Hint Extern 2 (_ ##ₘ _ ∪ _) => apply map_disjoint_union_r_2 : map_disjoint.
+Hint Extern 2 ({[_:= _]} ##ₘ _) => apply map_disjoint_singleton_l : map_disjoint.
+Hint Extern 2 (_ ##ₘ {[_:= _]}) => apply map_disjoint_singleton_r : map_disjoint.
 Hint Extern 2 (<[_:=_]>_ ##ₘ _) => apply map_disjoint_insert_l_2 : map_disjoint.
 Hint Extern 2 (_ ##ₘ <[_:=_]>_) => apply map_disjoint_insert_r_2 : map_disjoint.
 Hint Extern 2 (delete _ _ ##ₘ _) => apply map_disjoint_delete_l : map_disjoint.
