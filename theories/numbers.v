@@ -283,17 +283,31 @@ Proof.
   split. apply Z.quot_pos; lia. trans x; auto. apply Z.quot_lt; lia.
 Qed.
 
-(* Note that we cannot disable simpl for [Z.of_nat] as that would break
-tactics as [lia]. *)
+Arguments Z.pred : simpl never.
+Arguments Z.succ : simpl never.
+Arguments Z.of_nat : simpl never.
 Arguments Z.to_nat : simpl never.
 Arguments Z.mul : simpl never.
 Arguments Z.add : simpl never.
+Arguments Z.sub : simpl never.
 Arguments Z.opp : simpl never.
 Arguments Z.pow : simpl never.
 Arguments Z.div : simpl never.
 Arguments Z.modulo : simpl never.
 Arguments Z.quot : simpl never.
 Arguments Z.rem : simpl never.
+Arguments Z.shiftl : simpl never.
+Arguments Z.shiftr : simpl never.
+Arguments Z.gcd : simpl never.
+Arguments Z.lcm : simpl never.
+Arguments Z.min : simpl never.
+Arguments Z.max : simpl never.
+Arguments Z.lor : simpl never.
+Arguments Z.land : simpl never.
+Arguments Z.lxor : simpl never.
+Arguments Z.lnot : simpl never.
+Arguments Z.square : simpl never.
+Arguments Z.abs : simpl never.
 
 Lemma Z_to_nat_neq_0_pos x : Z.to_nat x ≠ 0%nat → 0 < x.
 Proof. by destruct x. Qed.
