@@ -33,19 +33,19 @@ Notably:
 * The behavior of `Program` is tweaked: `Unset Transparent Obligations`,
   `Obligation Tactic := idtac`, `Add Search Blacklist "_obligation_"`.  See
   [`base.v`](theories/base.v) for further details.
-* It blocks `simpl` on all operations on integers `Z` (by setting
+* It blocks `simpl` on all operations involving integers `Z` (by setting
   `Arguments op : simpl never`). We do this because `simpl` tends to expose
-  their internals (e.g. try `simpl` on `Z.of_nat (S n) + y`).
+  the internals of said operations (e.g. try `simpl` on `Z.of_nat (S n) + y`).
   As a consequence of blocking `simpl`, due to
   [Coq bug #5039](https://github.com/coq/coq/issues/5039) the `omega` tactic
-  sometimes fails. We do not consider this an issue since we use `lia` (for
-  which the aforementioned Coq bug was fixed) instead of `omega` anywhere.
+  becomes unreliable. We do not consider this an issue since we use `lia` (for
+  which the aforementioned Coq bug was fixed) instead of `omega` everywhere.
 
 ## Prerequisites
 
 This version is known to compile with:
 
- - Coq version 8.6.0 / 8.6.1 / 8.7.0 / 8.7.1 / 8.7.2 / 8.8.0 / 8.8.1 / 8.8.2
+ - Coq version 8.7.0 / 8.7.1 / 8.7.2 / 8.8.0 / 8.8.1 / 8.8.2
 
 ## Installing via opam
 
