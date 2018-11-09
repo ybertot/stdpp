@@ -92,7 +92,11 @@ Proof. intros Hxy Hy ->. by apply Hy, Nat.divide_0_l. Qed.
 Lemma Nat_iter_S {A} n (f: A → A) x : Nat.iter (S n) f x = f (Nat.iter n f x).
 Proof. done. Qed.
 Lemma Nat_iter_S_r {A} n (f: A → A) x : Nat.iter (S n) f x = Nat.iter n f (f x).
-Proof. induction n; f_equal/=; auto. Qed.
+Proof. induction n; by f_equal/=. Qed.
+Lemma Nat_iter_add {A} n1 n2 (f : A → A) x :
+  Nat.iter (n1 + n2) f x = Nat.iter n1 f (Nat.iter n2 f x).
+Proof. induction n1; by f_equal/=. Qed.
+
 Lemma Nat_iter_ind {A} (P : A → Prop) f x k :
   P x → (∀ y, P y → P (f y)) → P (Nat.iter k f x).
 Proof. induction k; simpl; auto. Qed.
