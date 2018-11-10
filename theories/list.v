@@ -1526,6 +1526,9 @@ Lemma prefix_app_l l1 l2 l3 : l1 ++ l3 `prefix_of` l2 → l1 `prefix_of` l2.
 Proof. intros [k ->]. exists (l3 ++ k). by rewrite (assoc_L (++)). Qed.
 Lemma prefix_app_r l1 l2 l3 : l1 `prefix_of` l2 → l1 `prefix_of` l2 ++ l3.
 Proof. intros [k ->]. exists (k ++ l3). by rewrite (assoc_L (++)). Qed.
+Lemma prefix_lookup l1 l2 i x :
+  l1 !! i = Some x → l1 `prefix_of` l2 → l2 !! i = Some x.
+Proof. intros ? [k ->]. rewrite lookup_app_l; eauto using lookup_lt_Some. Qed.
 Lemma prefix_length l1 l2 : l1 `prefix_of` l2 → length l1 ≤ length l2.
 Proof. intros [? ->]. rewrite app_length. lia. Qed.
 Lemma prefix_snoc_not l x : ¬l ++ [x] `prefix_of` l.
