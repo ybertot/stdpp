@@ -1119,6 +1119,8 @@ Proof.
   naive_solver eauto using map_Forall_insert_11,
     map_Forall_insert_12, map_Forall_insert_2.
 Qed.
+Lemma map_Forall_delete m i : map_Forall P m → map_Forall P (delete i m).
+Proof. intros Hm j x; rewrite lookup_delete_Some. naive_solver. Qed.
 Lemma map_Forall_ind (Q : M A → Prop) :
   Q ∅ →
   (∀ m i x, m !! i = None → P i x → map_Forall P m → Q m → Q (<[i:=x]>m)) →
