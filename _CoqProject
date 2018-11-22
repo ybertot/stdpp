@@ -1,5 +1,7 @@
 -Q theories stdpp
 -arg -w -arg -notation-overridden,-redundant-canonical-projection,-several-object-files
+theories/base.v
+theories/tactics.v
 theories/option.v
 theories/fin_map_dom.v
 theories/bset.v
@@ -23,8 +25,6 @@ theories/listset.v
 theories/streams.v
 theories/gmap.v
 theories/gmultiset.v
-theories/base.v
-theories/tactics.v
 theories/prelude.v
 theories/listset_nodup.v
 theories/finite.v
