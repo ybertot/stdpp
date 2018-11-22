@@ -1,4 +1,4 @@
-# Coq-std++
+# Coq-std++ [[coqdoc]](https://plv.mpi-sws.org/coqdoc/stdpp/)
 
 This project contains an extended "Standard Library" for Coq called coq-std++.
 The key features of this library are as follows:
