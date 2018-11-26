@@ -647,6 +647,28 @@ Proof.
   induction 1 as [x l|x y l ? [l1 [l2 ->]]]; [by eexists [], l|].
   by exists (y :: l1), l2.
 Qed.
+Lemma elem_of_list_split_l `{EqDecision A} l x :
+  x ∈ l → ∃ l1 l2, l = l1 ++ x :: l2 ∧ x ∉ l1.
+Proof.
+  induction 1 as [x l|x y l ? IH].
+  { exists [], l. rewrite elem_of_nil. naive_solver. }
+  destruct (decide (x = y)) as [->|?].
+  - exists [], l. rewrite elem_of_nil. naive_solver.
+  - destruct IH as (l1 & l2 & -> & ?).
+    exists (y :: l1), l2. rewrite elem_of_cons. naive_solver.
+Qed.
+Lemma elem_of_list_split_r `{EqDecision A} l x :
+  x ∈ l → ∃ l1 l2, l = l1 ++ x :: l2 ∧ x ∉ l2.
+Proof.
+  induction l as [|y l IH] using rev_ind.
+  { by rewrite elem_of_nil. }
+  destruct (decide (x = y)) as [->|].
+  - exists l, []. rewrite elem_of_nil. naive_solver.
+  - rewrite elem_of_app, elem_of_list_singleton. intros [?| ->]; try done.
+    destruct IH as (l1 & l2 & -> & ?); auto.
+    exists l1, (l2 ++ [y]).
+    rewrite elem_of_app, elem_of_list_singleton, <-(assoc_L (++)). naive_solver.
+Qed.
 Lemma elem_of_list_lookup_1 l x : x ∈ l → ∃ i, l !! i = Some x.
 Proof.
   induction 1 as [|???? IH]; [by exists 0 |].
