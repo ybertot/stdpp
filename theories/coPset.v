@@ -36,7 +36,7 @@ Lemma coPNode_wf_l b l r : coPset_wf (coPNode b l r) → coPset_wf l.
 Proof. destruct b, l as [[]|],r as [[]|]; simpl; rewrite ?andb_True; tauto. Qed.
 Lemma coPNode_wf_r b l r : coPset_wf (coPNode b l r) → coPset_wf r.
 Proof. destruct b, l as [[]|],r as [[]|]; simpl; rewrite ?andb_True; tauto. Qed.
-Local Hint Immediate coPNode_wf_l coPNode_wf_r.
+Local Hint Immediate coPNode_wf_l coPNode_wf_r : core.
 
 Definition coPNode' (b : bool) (l r : coPset_raw) : coPset_raw :=
   match b, l, r with
@@ -47,7 +47,7 @@ Definition coPNode' (b : bool) (l r : coPset_raw) : coPset_raw :=
 Arguments coPNode' : simpl never.
 Lemma coPNode_wf b l r : coPset_wf l → coPset_wf r → coPset_wf (coPNode' b l r).
 Proof. destruct b, l as [[]|], r as [[]|]; simpl; auto. Qed.
-Hint Resolve coPNode_wf.
+Hint Resolve coPNode_wf : core.
 
 Fixpoint coPset_elem_of_raw (p : positive) (t : coPset_raw) {struct t} : bool :=
   match t, p with
@@ -207,7 +207,7 @@ Defined.
 (** * Top *)
 Lemma coPset_top_subseteq (X : coPset) : X ⊆ ⊤.
 Proof. done. Qed.
-Hint Resolve coPset_top_subseteq.
+Hint Resolve coPset_top_subseteq : core.
 
 (** * Finite sets *)
 Fixpoint coPset_finite (t : coPset_raw) : bool :=

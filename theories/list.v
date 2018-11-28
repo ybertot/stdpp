@@ -246,8 +246,8 @@ Definition suffix {A} : relation (list A) := λ l1 l2, ∃ k, l2 = k ++ l1.
 Definition prefix {A} : relation (list A) := λ l1 l2, ∃ k, l2 = l1 ++ k.
 Infix "`suffix_of`" := suffix (at level 70) : stdpp_scope.
 Infix "`prefix_of`" := prefix (at level 70) : stdpp_scope.
-Hint Extern 0 (_ `prefix_of` _) => reflexivity.
-Hint Extern 0 (_ `suffix_of` _) => reflexivity.
+Hint Extern 0 (_ `prefix_of` _) => reflexivity : core.
+Hint Extern 0 (_ `suffix_of` _) => reflexivity : core.
 
 Section prefix_suffix_ops.
   Context `{EqDecision A}.
@@ -276,7 +276,7 @@ Inductive sublist {A} : relation (list A) :=
   | sublist_skip x l1 l2 : sublist l1 l2 → sublist (x :: l1) (x :: l2)
   | sublist_cons x l1 l2 : sublist l1 l2 → sublist l1 (x :: l2).
 Infix "`sublist_of`" := sublist (at level 70) : stdpp_scope.
-Hint Extern 0 (_ `sublist_of` _) => reflexivity.
+Hint Extern 0 (_ `sublist_of` _) => reflexivity : core.
 
 (** A list [l2] submseteq a list [l1] if [l2] is obtained by removing elements
 from [l1] while possiblity changing the order. *)
@@ -287,7 +287,7 @@ Inductive submseteq {A} : relation (list A) :=
   | submseteq_cons x l1 l2 : submseteq l1 l2 → submseteq l1 (x :: l2)
   | submseteq_trans l1 l2 l3 : submseteq l1 l2 → submseteq l2 l3 → submseteq l1 l3.
 Infix "⊆+" := submseteq (at level 70) : stdpp_scope.
-Hint Extern 0 (_ ⊆+ _) => reflexivity.
+Hint Extern 0 (_ ⊆+ _) => reflexivity : core.
 
 (** Removes [x] from the list [l]. The function returns a [Some] when the
 +removal succeeds and [None] when [x] is not in [l]. *)
@@ -2760,7 +2760,7 @@ End Forall2_proper.
 
 Section Forall3.
   Context {A B C} (P : A → B → C → Prop).
-  Hint Extern 0 (Forall3 _ _ _ _) => constructor.
+  Hint Extern 0 (Forall3 _ _ _ _) => constructor : core.
 
   Lemma Forall3_app l1 l2 k1 k2 k1' k2' :
     Forall3 P l1 k1 k1' → Forall3 P l2 k2 k2' →

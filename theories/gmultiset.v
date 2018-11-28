@@ -261,7 +261,7 @@ Defined.
 
 Lemma gmultiset_subset_subseteq X Y : X ⊂ Y → X ⊆ Y.
 Proof. apply strict_include. Qed.
-Hint Resolve gmultiset_subset_subseteq.
+Hint Resolve gmultiset_subset_subseteq : core.
 
 Lemma gmultiset_empty_subseteq X : ∅ ⊆ X.
 Proof. intros x. rewrite multiplicity_empty. lia. Qed.
