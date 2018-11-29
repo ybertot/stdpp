@@ -137,6 +137,12 @@ Definition map_fold `{FinMapToList K A M} {B}
 Instance map_filter `{FinMapToList K A M, Insert K A M, Empty M} : Filter (K * A) M :=
   λ P _, map_fold (λ k v m, if decide (P (k,v)) then <[k := v]>m else m) ∅.
 
+Fixpoint map_seq `{Insert nat A M, Empty M} (start : nat) (xs : list A) : M :=
+  match xs with
+  | [] => ∅
+  | x :: xs => <[start:=x]> (map_seq (S start) xs)
+  end.
+
 (** * Theorems *)
 Section theorems.
 Context `{FinMap K M}.
@@ -1910,6 +1916,82 @@ Proof.
   destruct (m !! i); eauto.
 Qed.
 End theorems.
+
+(** ** The seq operation *)
+Section map_seq.
+  Context `{FinMap nat M} {A : Type}.
+  Implicit Types x : A.
+  Implicit Types xs : list A.
+
+  Lemma lookup_map_seq_Some_inv start xs i x :
+    xs !! i = Some x ↔ map_seq (M:=M A) start xs !! (start + i) = Some x.
+  Proof.
+    revert start i. induction xs as [|x' xs IH]; intros start i; simpl.
+    { by rewrite lookup_empty, lookup_nil. }
+    destruct i as [|i]; simpl.
+    { by rewrite Nat.add_0_r, lookup_insert. }
+    rewrite lookup_insert_ne by lia. by rewrite (IH (S start)), Nat.add_succ_r.
+  Qed.
+  Lemma lookup_map_seq_Some start xs i x :
+    map_seq (M:=M A) start xs !! i = Some x ↔ start ≤ i ∧ xs !! (i - start) = Some x.
+  Proof.
+    destruct (decide (start ≤ i)) as [|Hsi].
+    { rewrite (lookup_map_seq_Some_inv start).
+      replace (start + (i - start)) with i by lia. naive_solver. }
+    split; [|naive_solver]. intros Hi; destruct Hsi.
+    revert start i Hi. induction xs as [|x' xs IH]; intros start i; simpl.
+    { by rewrite lookup_empty. }
+    rewrite lookup_insert_Some; intros [[-> ->]|[? ?%IH]]; lia.
+  Qed.
+
+  Lemma lookup_map_seq_None start xs i :
+    map_seq (M:=M A) start xs !! i = None ↔ i < start ∨ start + length xs ≤ i.
+  Proof.
+    trans (¬start ≤ i ∨ ¬is_Some (xs !! (i - start))).
+    - rewrite eq_None_not_Some, <-not_and_l. unfold is_Some.
+      setoid_rewrite lookup_map_seq_Some. naive_solver.
+    - rewrite lookup_lt_is_Some. lia.
+  Qed.
+
+  Lemma lookup_map_seq_0 xs i : map_seq (M:=M A) 0 xs !! i = xs !! i.
+  Proof. apply option_eq; intros x. by rewrite (lookup_map_seq_Some_inv 0). Qed.
+
+  Lemma map_seq_singleton start x :
+    map_seq (M:=M A) start [x] = {[ start := x ]}.
+  Proof. done. Qed.
+
+  Lemma map_seq_app_disjoint start xs1 xs2 :
+    map_seq (M:=M A) start xs1 ##ₘ map_seq (start + length xs1) xs2.
+  Proof.
+    apply map_disjoint_spec; intros i x1 x2. rewrite !lookup_map_seq_Some.
+    intros [??%lookup_lt_Some] [??%lookup_lt_Some]; lia.
+  Qed.
+  Lemma map_seq_app start xs1 xs2 :
+    map_seq start (xs1 ++ xs2)
+    =@{M A} map_seq start xs1 ∪ map_seq (start + length xs1) xs2.
+  Proof.
+    revert start. induction xs1 as [|x1 xs1 IH]; intros start; simpl.
+    - by rewrite (left_id_L _ _), Nat.add_0_r.
+    - by rewrite IH, Nat.add_succ_r, !insert_union_singleton_l, (assoc_L _).
+  Qed.
+
+  Lemma map_seq_cons_disjoint start xs x :
+    map_seq (M:=M A) (S start) xs !! start = None.
+  Proof. rewrite lookup_map_seq_None. lia. Qed.
+  Lemma map_seq_cons start xs x :
+    map_seq start (x :: xs) =@{M A} <[start:=x]> (map_seq (S start) xs).
+  Proof. done. Qed.
+
+  Lemma map_seq_snoc_disjoint start xs x :
+    map_seq (M:=M A) start xs !! (start+length xs) = None.
+  Proof. rewrite lookup_map_seq_None. lia. Qed.
+  Lemma map_seq_snoc start xs x :
+    map_seq start (xs ++ [x]) =@{M A} <[start+length xs:=x]> (map_seq start xs).
+  Proof.
+    rewrite map_seq_app, map_seq_singleton.
+    by rewrite insert_union_singleton_r by (by rewrite map_seq_snoc_disjoint).
+  Qed.
+End map_seq.
 
 (** * Tactics *)
 (** The tactic [decompose_map_disjoint] simplifies occurrences of [disjoint]
