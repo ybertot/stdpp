@@ -129,6 +129,13 @@ Existing Class TCForall2.
 Existing Instance TCForall2_nil.
 Existing Instance TCForall2_cons.
 
+Inductive TCElemOf {A} (x : A) : list A → Prop :=
+  | TCElemOf_here xs : TCElemOf x (x :: xs)
+  | TCElemOf_further y xs : TCElemOf x xs → TCElemOf x (y :: xs).
+Existing Class TCElemOf.
+Existing Instance TCElemOf_here.
+Existing Instance TCElemOf_further.
+
 Inductive TCEq {A} (x : A) : A → Prop := TCEq_refl : TCEq x x.
 Existing Class TCEq.
 Existing Instance TCEq_refl.
