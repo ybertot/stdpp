@@ -1032,7 +1032,7 @@ Proof.
 Qed.
 
 (** ** The filter operation *)
-Section map_Filter.
+Section map_filter.
   Context {A} (P : K * A → Prop) `{!∀ x, Decision (P x)}.
   Implicit Types m : M A.
 
@@ -1085,7 +1085,7 @@ Section map_Filter.
 
   Lemma map_filter_empty : filter P (∅ : M A) = ∅.
   Proof. apply map_fold_empty. Qed.
-End map_Filter.
+End map_filter.
 
 (** ** Properties of the [map_Forall] predicate *)
 Section map_Forall.
@@ -1521,19 +1521,16 @@ Proof.
 Qed.
 Global Instance: IdemP (=@{M A}) (∪).
 Proof. intros A ?. by apply union_with_idemp. Qed.
+Lemma lookup_union {A} (m1 m2 : M A) i :
+  (m1 ∪ m2) !! i = union_with (λ x _, Some x) (m1 !! i) (m2 !! i).
+Proof. apply lookup_union_with. Qed.
 Lemma lookup_union_Some_raw {A} (m1 m2 : M A) i x :
   (m1 ∪ m2) !! i = Some x ↔
     m1 !! i = Some x ∨ (m1 !! i = None ∧ m2 !! i = Some x).
-Proof.
-  unfold union, map_union, union_with, map_union_with. rewrite (lookup_merge _).
-  destruct (m1 !! i), (m2 !! i); compute; intuition congruence.
-Qed.
+Proof. rewrite lookup_union. destruct (m1 !! i), (m2 !! i); naive_solver. Qed.
 Lemma lookup_union_None {A} (m1 m2 : M A) i :
   (m1 ∪ m2) !! i = None ↔ m1 !! i = None ∧ m2 !! i = None.
-Proof.
-  unfold union, map_union, union_with, map_union_with. rewrite (lookup_merge _).
-  destruct (m1 !! i), (m2 !! i); compute; intuition congruence.
-Qed.
+Proof. rewrite lookup_union.  destruct (m1 !! i), (m2 !! i); naive_solver. Qed.
 Lemma map_positive_l {A} (m1 m2 : M A) : m1 ∪ m2 = ∅ → m1 = ∅.
 Proof.
   intros Hm. apply map_empty. intros i. apply (f_equal (!! i)) in Hm.
