@@ -1090,6 +1090,11 @@ Section set_seq.
   Lemma list_to_set_seq start len :
     list_to_set (seq start len) =@{C} set_seq start len.
   Proof. revert start; induction len; intros; f_equal/=; auto. Qed.
+
+  Lemma set_seq_finite start len : set_finite (set_seq (C:=C) start len).
+  Proof.
+    exists (seq start len); intros x. rewrite <-list_to_set_seq. set_solver.
+  Qed.
 End set_seq.
 
 (** Mimimal elements *)
