@@ -171,6 +171,9 @@ Section rtc.
   Lemma tc_rtc x y : tc R x y → rtc R x y.
   Proof. induction 1; eauto. Qed.
 
+  Lemma acc_not_ex_loop x : Acc (flip R) x → ¬ex_loop R x.
+  Proof. unfold not. induction 1; destruct 1; eauto. Qed.
+
   Lemma all_loop_red x : all_loop R x → red R x.
   Proof. destruct 1; auto. Qed.
   Lemma all_loop_step x y : all_loop R x → R x y → all_loop R y.
