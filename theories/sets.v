@@ -1086,6 +1086,10 @@ Section set_seq.
   Lemma set_seq_S_end_union_L `{!LeibnizEquiv C} start len :
     set_seq start (S len) =@{C} {[ start + len ]} ∪ set_seq start len.
   Proof. unfold_leibniz. apply set_seq_S_end_union. Qed.
+
+  Lemma list_to_set_seq start len :
+    list_to_set (seq start len) =@{C} set_seq start len.
+  Proof. revert start; induction len; intros; f_equal/=; auto. Qed.
 End set_seq.
 
 (** Mimimal elements *)
