@@ -1054,14 +1054,17 @@ Section set_seq.
     - rewrite elem_of_empty. lia.
     - rewrite elem_of_union, elem_of_singleton, IH. lia.
   Qed.
+  Global Instance set_unfold_seq start len :
+    SetUnfold (x ∈ set_seq (C:=C) start len) (start ≤ x < start + len).
+  Proof. constructor; apply elem_of_set_seq. Qed.
 
   Lemma set_seq_plus_disjoint start len1 len2 :
     set_seq (C:=C) start len1 ## set_seq (start + len1) len2.
-  Proof. intros x. rewrite !elem_of_set_seq. lia. Qed.
+  Proof. set_solver by lia. Qed.
   Lemma set_seq_plus start len1 len2 :
     set_seq (C:=C) start (len1 + len2)
     ≡ set_seq start len1 ∪ set_seq (start + len1) len2.
-  Proof. intros x. rewrite elem_of_union, !elem_of_set_seq. lia. Qed.
+  Proof. set_solver by lia. Qed.
   Lemma set_seq_plus_L `{!LeibnizEquiv C} start len1 len2 :
     set_seq (C:=C) start (len1 + len2)
     = set_seq start len1 ∪ set_seq (start + len1) len2.
@@ -1069,19 +1072,17 @@ Section set_seq.
 
   Lemma set_seq_S_start_disjoint start len :
     {[ start ]} ## set_seq (C:=C) (S start) len.
-  Proof. intros x. rewrite elem_of_singleton, elem_of_set_seq. lia. Qed.
+  Proof. set_solver by lia. Qed.
   Lemma set_seq_S_start start len :
     set_seq (C:=C) start (S len) ≡ {[ start ]} ∪ set_seq (S start) len.
-  Proof. done. Qed.
+  Proof. set_solver by lia. Qed.
 
   Lemma set_seq_S_end_disjoint start len :
     {[ start + len ]} ## set_seq (C:=C) start len.
-  Proof. intros x. rewrite elem_of_singleton, elem_of_set_seq. lia. Qed.
+  Proof. set_solver by lia. Qed.
   Lemma set_seq_S_end_union start len :
     set_seq start (S len) ≡@{C} {[ start + len ]} ∪ set_seq start len.
-  Proof.
-    intros x. rewrite elem_of_union, elem_of_singleton, !elem_of_set_seq. lia.
-  Qed.
+  Proof. set_solver by lia. Qed.
   Lemma set_seq_S_end_union_L `{!LeibnizEquiv C} start len :
     set_seq start (S len) =@{C} {[ start + len ]} ∪ set_seq start len.
   Proof. unfold_leibniz. apply set_seq_S_end_union. Qed.
