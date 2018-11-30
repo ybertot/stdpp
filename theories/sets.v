@@ -1055,23 +1055,36 @@ Section set_seq.
     - rewrite elem_of_union, elem_of_singleton, IH. lia.
   Qed.
 
-  Lemma set_seq_start_disjoint start len :
+  Lemma set_seq_plus_disjoint start len1 len2 :
+    set_seq (C:=C) start len1 ## set_seq (start + len1) len2.
+  Proof. intros x. rewrite !elem_of_set_seq. lia. Qed.
+  Lemma set_seq_plus start len1 len2 :
+    set_seq (C:=C) start (len1 + len2)
+    ≡ set_seq start len1 ∪ set_seq (start + len1) len2.
+  Proof. intros x. rewrite elem_of_union, !elem_of_set_seq. lia. Qed.
+  Lemma set_seq_plus_L `{!LeibnizEquiv C} start len1 len2 :
+    set_seq (C:=C) start (len1 + len2)
+    = set_seq start len1 ∪ set_seq (start + len1) len2.
+  Proof. unfold_leibniz. apply set_seq_plus. Qed.
+
+  Lemma set_seq_S_start_disjoint start len :
     {[ start ]} ## set_seq (C:=C) (S start) len.
   Proof. intros x. rewrite elem_of_singleton, elem_of_set_seq. lia. Qed.
+  Lemma set_seq_S_start start len :
+    set_seq (C:=C) start (S len) ≡ {[ start ]} ∪ set_seq (S start) len.
+  Proof. done. Qed.
 
-  Lemma set_seq_S_disjoint start len :
+  Lemma set_seq_S_end_disjoint start len :
     {[ start + len ]} ## set_seq (C:=C) start len.
   Proof. intros x. rewrite elem_of_singleton, elem_of_set_seq. lia. Qed.
-
-  Lemma set_seq_S_union start len :
+  Lemma set_seq_S_end_union start len :
     set_seq start (S len) ≡@{C} {[ start + len ]} ∪ set_seq start len.
   Proof.
     intros x. rewrite elem_of_union, elem_of_singleton, !elem_of_set_seq. lia.
   Qed.
-
-  Lemma set_seq_S_union_L `{!LeibnizEquiv C} start len :
+  Lemma set_seq_S_end_union_L `{!LeibnizEquiv C} start len :
     set_seq start (S len) =@{C} {[ start + len ]} ∪ set_seq start len.
-  Proof. unfold_leibniz. apply set_seq_S_union. Qed.
+  Proof. unfold_leibniz. apply set_seq_S_end_union. Qed.
 End set_seq.
 
 (** Mimimal elements *)
