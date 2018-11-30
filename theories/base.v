@@ -166,8 +166,8 @@ Notation "(≠@{ A } )" := (λ X Y, ¬X =@{A} Y) (only parsing) : stdpp_scope.
 Notation "X ≠@{ A } Y":= (¬X =@{ A } Y)
   (at level 70, only parsing, no associativity) : stdpp_scope.
 
-Hint Extern 0 (_ = _) => reflexivity.
-Hint Extern 100 (_ ≠ _) => discriminate.
+Hint Extern 0 (_ = _) => reflexivity : core.
+Hint Extern 100 (_ ≠ _) => discriminate : core.
 
 Instance: ∀ A, PreOrder (=@{A}).
 Proof. split; repeat intro; congruence. Qed.
@@ -234,8 +234,8 @@ Instance: Params (@equiv) 2.
 (for types that have an [Equiv] instance) rather than the standard Leibniz
 equality. *)
 Instance equiv_default_relation `{Equiv A} : DefaultRelation (≡) | 3.
-Hint Extern 0 (_ ≡ _) => reflexivity.
-Hint Extern 0 (_ ≡ _) => symmetry; assumption.
+Hint Extern 0 (_ ≡ _) => reflexivity : core.
+Hint Extern 0 (_ ≡ _) => symmetry; assumption : core.
 
 
 (** * Type classes *)
@@ -406,8 +406,8 @@ Notation "(↔)" := iff (only parsing) : stdpp_scope.
 Notation "( A ↔)" := (iff A) (only parsing) : stdpp_scope.
 Notation "(↔ B )" := (λ A, A ↔ B) (only parsing) : stdpp_scope.
 
-Hint Extern 0 (_ ↔ _) => reflexivity.
-Hint Extern 0 (_ ↔ _) => symmetry; assumption.
+Hint Extern 0 (_ ↔ _) => reflexivity : core.
+Hint Extern 0 (_ ↔ _) => symmetry; assumption : core.
 
 Lemma or_l P Q : ¬Q → P ∨ Q ↔ P.
 Proof. tauto. Qed.
@@ -539,9 +539,9 @@ Notation zip := (zip_with pair).
 (** ** Booleans *)
 (** The following coercion allows us to use Booleans as propositions. *)
 Coercion Is_true : bool >-> Sortclass.
-Hint Unfold Is_true.
-Hint Immediate Is_true_eq_left.
-Hint Resolve orb_prop_intro andb_prop_intro.
+Hint Unfold Is_true : core.
+Hint Immediate Is_true_eq_left : core.
+Hint Resolve orb_prop_intro andb_prop_intro : core.
 Notation "(&&)" := andb (only parsing).
 Notation "(||)" := orb (only parsing).
 Infix "&&*" := (zip_with (&&)) (at level 40).
@@ -826,9 +826,9 @@ Infix "⊆2*" := (Forall2 (λ p q, p.2 ⊆ q.2)) (at level 70) : stdpp_scope.
 Infix "⊆1**" := (Forall2 (λ p q, p.1 ⊆* q.1)) (at level 70) : stdpp_scope.
 Infix "⊆2**" := (Forall2 (λ p q, p.2 ⊆* q.2)) (at level 70) : stdpp_scope.
 
-Hint Extern 0 (_ ⊆ _) => reflexivity.
-Hint Extern 0 (_ ⊆* _) => reflexivity.
-Hint Extern 0 (_ ⊆** _) => reflexivity.
+Hint Extern 0 (_ ⊆ _) => reflexivity : core.
+Hint Extern 0 (_ ⊆* _) => reflexivity : core.
+Hint Extern 0 (_ ⊆** _) => reflexivity : core.
 
 Infix "⊂" := (strict (⊆)) (at level 70) : stdpp_scope.
 Notation "(⊂)" := (strict (⊆)) (only parsing) : stdpp_scope.
@@ -886,8 +886,8 @@ Infix "##1*" := (Forall2 (λ p q, p.1 ## q.1)) (at level 70) : stdpp_scope.
 Infix "##2*" := (Forall2 (λ p q, p.2 ## q.2)) (at level 70) : stdpp_scope.
 Infix "##1**" := (Forall2 (λ p q, p.1 ##* q.1)) (at level 70) : stdpp_scope.
 Infix "##2**" := (Forall2 (λ p q, p.2 ##* q.2)) (at level 70) : stdpp_scope.
-Hint Extern 0 (_ ## _) => symmetry; eassumption.
-Hint Extern 0 (_ ##* _) => symmetry; eassumption.
+Hint Extern 0 (_ ## _) => symmetry; eassumption : core.
+Hint Extern 0 (_ ##* _) => symmetry; eassumption : core.
 
 Class DisjointE E A := disjointE : E → A → A → Prop.
 Hint Mode DisjointE - ! : typeclass_instances.
@@ -904,7 +904,7 @@ Notation "X ##{ Γ1 , Γ2 , .. , Γ3 } Y" := (disjoint (pair .. (Γ1, Γ2) .. Γ
 Notation "Xs ##{ Γ1 , Γ2 , .. , Γ3 }* Ys" :=
   (Forall2 (disjoint (pair .. (Γ1, Γ2) .. Γ3)) Xs Ys)
   (at level 70, format "Xs  ##{ Γ1 ,  Γ2 , .. , Γ3 }*  Ys") : stdpp_scope.
-Hint Extern 0 (_ ##{_} _) => symmetry; eassumption.
+Hint Extern 0 (_ ##{_} _) => symmetry; eassumption : core.
 
 Class DisjointList A := disjoint_list : list A → Prop.
 Hint Mode DisjointList ! : typeclass_instances.
@@ -1212,7 +1212,7 @@ Notation "(⊑@{ A } )" := (@sqsubseteq A _) (only parsing) : stdpp_scope.
 
 Instance sqsubseteq_rewrite `{SqSubsetEq A} : RewriteRelation (⊑).
 
-Hint Extern 0 (_ ⊑ _) => reflexivity.
+Hint Extern 0 (_ ⊑ _) => reflexivity : core.
 
 Class Meet A := meet: A → A → A.
 Hint Mode Meet ! : typeclass_instances.

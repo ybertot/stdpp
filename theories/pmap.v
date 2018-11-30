@@ -13,8 +13,8 @@ From stdpp Require Export fin_maps.
 Set Default Proof Using "Type".
 
 Local Open Scope positive_scope.
-Local Hint Extern 0 (_ =@{positive} _) => congruence.
-Local Hint Extern 0 (_ ≠@{positive} _) => congruence.
+Local Hint Extern 0 (_ =@{positive} _) => congruence : core.
+Local Hint Extern 0 (_ ≠@{positive} _) => congruence : core.
 
 (** * The tree data structure *)
 (** The data type [Pmap_raw] specifies radix-2 search trees. These trees do
@@ -41,14 +41,14 @@ Lemma Pmap_wf_l {A} o (l r : Pmap_raw A) : Pmap_wf (PNode o l r) → Pmap_wf l.
 Proof. destruct o, l, r; simpl; rewrite ?andb_True; tauto. Qed.
 Lemma Pmap_wf_r {A} o (l r : Pmap_raw A) : Pmap_wf (PNode o l r) → Pmap_wf r.
 Proof. destruct o, l, r; simpl; rewrite ?andb_True; tauto. Qed.
-Local Hint Immediate Pmap_wf_l Pmap_wf_r.
+Local Hint Immediate Pmap_wf_l Pmap_wf_r : core.
 Definition PNode' {A} (o : option A) (l r : Pmap_raw A) :=
   match l, o, r with PLeaf, None, PLeaf => PLeaf | _, _, _ => PNode o l r end.
 Arguments PNode' : simpl never.
 Lemma PNode_wf {A} o (l r : Pmap_raw A) :
   Pmap_wf l → Pmap_wf r → Pmap_wf (PNode' o l r).
 Proof. destruct o, l, r; simpl; auto. Qed.
-Local Hint Resolve PNode_wf.
+Local Hint Resolve PNode_wf : core.
 
 (** Operations *)
 Instance Pempty_raw {A} : Empty (Pmap_raw A) := PLeaf.

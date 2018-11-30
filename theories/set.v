@@ -32,7 +32,7 @@ Lemma not_elem_of_mkSet {A} (P : A → Prop) x : x ∉ {[ x | P x ]} ↔ ¬P x.
 Proof. done. Qed.
 Lemma top_subseteq {A} (X : set A) : X ⊆ ⊤.
 Proof. done. Qed.
-Hint Resolve top_subseteq.
+Hint Resolve top_subseteq : core.
 
 Instance set_ret : MRet set := λ A (x : A), {[ x ]}.
 Instance set_bind : MBind set := λ A B (f : A → set B) (X : set A),

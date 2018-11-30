@@ -85,7 +85,7 @@ Instance: PartialOrder divide.
 Proof.
   repeat split; try apply _. intros ??. apply Nat.divide_antisym_nonneg; lia.
 Qed.
-Hint Extern 0 (_ | _) => reflexivity.
+Hint Extern 0 (_ | _) => reflexivity : core.
 Lemma Nat_divide_ne_0 x y : (x | y) → y ≠ 0 → x ≠ 0.
 Proof. intros Hxy Hy ->. by apply Hy, Nat.divide_0_l. Qed.
 
@@ -237,7 +237,7 @@ Instance N_le_po: PartialOrder (≤)%N.
 Proof.
   repeat split; red. apply N.le_refl. apply N.le_trans. apply N.le_antisymm.
 Qed.
-Hint Extern 0 (_ ≤ _)%N => reflexivity.
+Hint Extern 0 (_ ≤ _)%N => reflexivity : core.
 
 (** * Notations and properties of [Z] *)
 Open Scope Z_scope.
@@ -391,7 +391,7 @@ Notation "x ≤ y ≤ z ≤ z'" := (x ≤ y ∧ y ≤ z ∧ z ≤ z') : Qc_scope
 Notation "(≤)" := Qcle (only parsing) : Qc_scope.
 Notation "(<)" := Qclt (only parsing) : Qc_scope.
 
-Hint Extern 1 (_ ≤ _) => reflexivity || discriminate.
+Hint Extern 1 (_ ≤ _) => reflexivity || discriminate : core.
 Arguments Qred : simpl never.
 
 Instance Qc_eq_dec: EqDecision Qc := Qc_eq_dec.
@@ -537,7 +537,7 @@ Close Scope Qc_scope.
 (** The theory of positive rationals is very incomplete. We merely provide
 some operations and theorems that are relevant for fractional permissions. *)
 Record Qp := mk_Qp { Qp_car :> Qc ; Qp_prf : (0 < Qp_car)%Qc }.
-Hint Resolve Qp_prf.
+Hint Resolve Qp_prf : core.
 Delimit Scope Qp_scope with Qp.
 Bind Scope Qp_scope with Qp.
 Arguments Qp_car _%Qp : assert.

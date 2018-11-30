@@ -48,10 +48,10 @@ Proof. unfold is_Some. destruct mx; naive_solver. Qed.
 
 Lemma mk_is_Some {A} (mx : option A) x : mx = Some x → is_Some mx.
 Proof. intros; red; subst; eauto. Qed.
-Hint Resolve mk_is_Some.
+Hint Resolve mk_is_Some : core.
 Lemma is_Some_None {A} : ¬is_Some (@None A).
 Proof. by destruct 1. Qed.
-Hint Resolve is_Some_None.
+Hint Resolve is_Some_None : core.
 
 Lemma eq_None_not_Some {A} (mx : option A) : mx = None ↔ ¬is_Some mx.
 Proof. rewrite is_Some_alt; destruct mx; naive_solver. Qed.

@@ -57,13 +57,13 @@ End definitions.
 (* Strongly normalizing elements *)
 Notation sn R := (Acc (flip R)).
 
-Hint Unfold nf red.
+Hint Unfold nf red : core.
 
 (** * General theorems *)
 Section rtc.
   Context `{R : relation A}.
 
-  Hint Constructors rtc nsteps bsteps tc.
+  Hint Constructors rtc nsteps bsteps tc : core.
 
   (* We give this instance a lower-than-usual priority because [setoid_rewrite]
      queries for [@Reflexive Prop ?r] in the hope of [iff_reflexive] getting

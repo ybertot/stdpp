@@ -97,7 +97,7 @@ Definition map_included `{∀ A, Lookup K A (M A)} {A}
 Definition map_disjoint `{∀ A, Lookup K A (M A)} {A} : relation (M A) :=
   map_relation (λ _ _, False) (λ _, True) (λ _, True).
 Infix "##ₘ" := map_disjoint (at level 70) : stdpp_scope.
-Hint Extern 0 (_ ##ₘ _) => symmetry; eassumption.
+Hint Extern 0 (_ ##ₘ _) => symmetry; eassumption : core.
 Notation "( m ##ₘ.)" := (map_disjoint m) (only parsing) : stdpp_scope.
 Notation "(.##ₘ m )" := (λ m2, m2 ##ₘ m) (only parsing) : stdpp_scope.
 Instance map_subseteq `{∀ A, Lookup K A (M A)} {A} : SubsetEq (M A) :=
