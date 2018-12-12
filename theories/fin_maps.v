@@ -1259,13 +1259,9 @@ Lemma map_zip_with_empty {A B C} (f : A → B → C) :
   map_zip_with f (∅ : M A) (∅ : M B) = ∅.
 Proof. unfold map_zip_with. by rewrite merge_empty by done. Qed.
 
-Lemma map_insert_zip_with {A B C} (f : A → B → C) (m1 : M A) (m2 : M B) i x y z :
-  f y z = x →
-  <[i:=x]>(map_zip_with f m1 m2) = map_zip_with f (<[i:=y]>m1) (<[i:=z]>m2).
-Proof.
-  intros Hf. unfold map_zip_with.
-  erewrite insert_merge; [ auto | by compute | by rewrite Hf ].
-Qed.
+Lemma map_insert_zip_with {A B C} (f : A → B → C) (m1 : M A) (m2 : M B) i y z :
+  <[i:=f y z]>(map_zip_with f m1 m2) = map_zip_with f (<[i:=y]>m1) (<[i:=z]>m2).
+Proof. unfold map_zip_with. by erewrite insert_merge by done. Qed.
 
 Lemma map_zip_with_fmap {A' A B' B C} (f : A → B → C)
     (g1 : A' → A) (g2 : B' → B) (m1 : M A') (m2 : M B') :
