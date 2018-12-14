@@ -1074,6 +1074,13 @@ Section map_filter.
       naive_solver.
   Qed.
 
+  Lemma map_filter_insert_not m i x :
+    (∀ y, ¬ P (i, y)) → filter P (<[i:=x]> m) = filter P m.
+  Proof.
+    intros HP. apply map_filter_lookup_eq. intros j y Hy.
+    by rewrite lookup_insert_ne by naive_solver.
+  Qed.
+
   Lemma map_filter_delete m i : filter P (delete i m) = delete i (filter P m).
   Proof.
     apply map_eq. intros j. apply option_eq; intros y.
@@ -1081,6 +1088,13 @@ Section map_filter.
     - rewrite map_filter_lookup_Some, !lookup_delete. naive_solver.
     - rewrite lookup_delete_ne, !map_filter_lookup_Some, lookup_delete_ne by done.
       naive_solver.
+  Qed.
+
+  Lemma map_filter_delete_not m i:
+    (∀ y, ¬ P (i, y)) → filter P (delete i m) = filter P m.
+  Proof.
+    intros HP. apply map_filter_lookup_eq; intros j y Hy.
+    by rewrite lookup_delete_ne by naive_solver.
   Qed.
 
   Lemma map_filter_empty : filter P (∅ : M A) = ∅.
