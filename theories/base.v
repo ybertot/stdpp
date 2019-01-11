@@ -145,6 +145,12 @@ Inductive TCDiag {A} (C : A → Prop) : A → A → Prop :=
 Existing Class TCDiag.
 Existing Instance TCDiag_diag.
 
+(** Given a proposition [P] that is a type class, [tc_to_bool P] will return
+[true] iff there is an instance of [P]. It is often useful in Ltac programming,
+where one can do [lazymatch tc_to_bool P with true => .. | false => .. end]. *)
+Definition tc_to_bool (P : Prop)
+  {p : bool} `{TCIf P (TCEq p true) (TCEq p false)} : bool := p.
+
 (** Throughout this development we use [stdpp_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
 Delimit Scope stdpp_scope with stdpp.
