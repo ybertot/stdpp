@@ -380,6 +380,8 @@ Notation "1" := (Q2Qc 1) : Qc_scope.
 Notation "2" := (1+1) : Qc_scope.
 Notation "- 1" := (Qcopp 1) : Qc_scope.
 Notation "- 2" := (Qcopp 2) : Qc_scope.
+(* The following two already exist in Coq's stdlib, but we overwrite them with a
+different definition. *)
 Notation "x - y" := (x + -y) : Qc_scope.
 Notation "x / y" := (x * /y) : Qc_scope.
 Infix "≤" := Qcle : Qc_scope.
