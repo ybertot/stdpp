@@ -10,9 +10,9 @@ Arguments length {_} _ : assert.
 Arguments cons {_} _ _ : assert.
 Arguments app {_} _ _ : assert.
 
-Instance: Params (@length) 1.
-Instance: Params (@cons) 1.
-Instance: Params (@app) 1.
+Instance: Params (@length) 1 := {}.
+Instance: Params (@cons) 1 := {}.
+Instance: Params (@app) 1 := {}.
 
 Notation tail := tl.
 Notation take := firstn.
@@ -22,9 +22,9 @@ Arguments tail {_} _ : assert.
 Arguments take {_} !_ !_ / : assert.
 Arguments drop {_} !_ !_ / : assert.
 
-Instance: Params (@tail) 1.
-Instance: Params (@take) 1.
-Instance: Params (@drop) 1.
+Instance: Params (@tail) 1 := {}.
+Instance: Params (@take) 1 := {}.
+Instance: Params (@drop) 1 := {}.
 
 Arguments Permutation {_} _ _ : assert.
 Arguments Forall_cons {_} _ _ _ _ _ : assert.
@@ -90,7 +90,7 @@ Fixpoint list_inserts {A} (i : nat) (k l : list A) : list A :=
   | [] => l
   | y :: k => <[i:=y]>(list_inserts (S i) k l)
   end.
-Instance: Params (@list_inserts) 1.
+Instance: Params (@list_inserts) 1 := {}.
 
 (** The operation [delete i l] removes the [i]th element of [l] and moves
 all consecutive elements one position ahead. In case [i] is out of bounds,
@@ -105,7 +105,7 @@ Instance list_delete {A} : Delete nat (list A) :=
 (** The function [option_list o] converts an element [Some x] into the
 singleton list [[x]], and [None] into the empty list [[]]. *)
 Definition option_list {A} : option A → list A := option_rect _ (λ x, [x]) [].
-Instance: Params (@option_list) 1.
+Instance: Params (@option_list) 1 := {}.
 Instance maybe_list_singleton {A} : Maybe (λ x : A, [x]) := λ l,
   match l with [x] => Some x | _ => None end.
 
@@ -126,23 +126,23 @@ Definition list_find {A} P `{∀ x, Decision (P x)} : list A → option (nat * A
   | [] => None
   | x :: l => if decide (P x) then Some (0,x) else prod_map S id <$> go l
   end.
-Instance: Params (@list_find) 3.
+Instance: Params (@list_find) 3 := {}.
 
 (** The function [replicate n x] generates a list with length [n] of elements
 with value [x]. *)
 Fixpoint replicate {A} (n : nat) (x : A) : list A :=
   match n with 0 => [] | S n => x :: replicate n x end.
-Instance: Params (@replicate) 2.
+Instance: Params (@replicate) 2 := {}.
 
 (** The function [reverse l] returns the elements of [l] in reverse order. *)
 Definition reverse {A} (l : list A) : list A := rev_append l [].
-Instance: Params (@reverse) 1.
+Instance: Params (@reverse) 1 := {}.
 
 (** The function [last l] returns the last element of the list [l], or [None]
 if the list [l] is empty. *)
 Fixpoint last {A} (l : list A) : option A :=
   match l with [] => None | [x] => Some x | _ :: l => last l end.
-Instance: Params (@last) 1.
+Instance: Params (@last) 1 := {}.
 
 (** The function [resize n y l] takes the first [n] elements of [l] in case
 [length l ≤ n], and otherwise appends elements with value [x] to [l] to obtain
@@ -153,7 +153,7 @@ Fixpoint resize {A} (n : nat) (y : A) (l : list A) : list A :=
   | x :: l => match n with 0 => [] | S n => x :: resize n y l end
   end.
 Arguments resize {_} !_ _ !_ : assert.
-Instance: Params (@resize) 2.
+Instance: Params (@resize) 2 := {}.
 
 (** The function [reshape k l] transforms [l] into a list of lists whose sizes
 are specified by [k]. In case [l] is too short, the resulting list will be
@@ -162,7 +162,7 @@ Fixpoint reshape {A} (szs : list nat) (l : list A) : list (list A) :=
   match szs with
   | [] => [] | sz :: szs => take sz l :: reshape szs (drop sz l)
   end.
-Instance: Params (@reshape) 2.
+Instance: Params (@reshape) 2 := {}.
 
 Definition sublist_lookup {A} (i n : nat) (l : list A) : option (list A) :=
   guard (i + n ≤ length l); Some (take n (drop i l)).
@@ -3603,23 +3603,23 @@ with a binding [i] for [x]. *)
 Section quote_lookup.
   Context {A : Type}.
   Class QuoteLookup (E1 E2 : list A) (x : A) (i : nat) := {}.
-  Global Instance quote_lookup_here E x : QuoteLookup (x :: E) (x :: E) x 0.
-  Global Instance quote_lookup_end x : QuoteLookup [] [x] x 0.
+  Global Instance quote_lookup_here E x : QuoteLookup (x :: E) (x :: E) x 0 := {}.
+  Global Instance quote_lookup_end x : QuoteLookup [] [x] x 0 := {}.
   Global Instance quote_lookup_further E1 E2 x i y :
-    QuoteLookup E1 E2 x i → QuoteLookup (y :: E1) (y :: E2) x (S i) | 1000.
+    QuoteLookup E1 E2 x i → QuoteLookup (y :: E1) (y :: E2) x (S i) | 1000 := {}.
 End quote_lookup.
 
 Section quote.
   Context {A : Type}.
   Class Quote (E1 E2 : env A) (l : list A) (t : rlist nat) := {}.
-  Global Instance quote_nil: Quote E1 E1 [] rnil.
+  Global Instance quote_nil: Quote E1 E1 [] rnil := {}.
   Global Instance quote_node E1 E2 l i:
-    QuoteLookup E1 E2 l i → Quote E1 E2 l (rnode i) | 1000.
+    QuoteLookup E1 E2 l i → Quote E1 E2 l (rnode i) | 1000 := {}.
   Global Instance quote_cons E1 E2 E3 x l i t :
     QuoteLookup E1 E2 [x] i →
-    Quote E2 E3 l t → Quote E1 E3 (x :: l) (rapp (rnode i) t).
+    Quote E2 E3 l t → Quote E1 E3 (x :: l) (rapp (rnode i) t) := {}.
   Global Instance quote_app E1 E2 E3 l1 l2 t1 t2 :
-    Quote E1 E2 l1 t1 → Quote E2 E3 l2 t2 → Quote E1 E3 (l1 ++ l2) (rapp t1 t2).
+    Quote E1 E2 l1 t1 → Quote E2 E3 l2 t2 → Quote E1 E3 (l1 ++ l2) (rapp t1 t2) := {}.
 End quote.
 
 Section eval.
