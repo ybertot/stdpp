@@ -28,7 +28,7 @@ $(TESTFILES:.v=.vo): %.vo: %.v $(if $(MAKE_REF),,%.ref)
 	  else \
 	    REF="tests/$$TEST.ref"; \
 	  fi && \
-	  echo $(if $(MAKE_REF),"COQTEST [ref] `basename "$$REF"`","COQTEST$(if $(COQ_OLD), [ignored],) `basename "$$REF"`") && \
+	  echo $(if $(MAKE_REF),"COQTEST [make ref] `basename "$$REF"`","COQTEST$(if $(COQ_OLD), [ignored],) `basename "$$REF"`") && \
 	  TMPFILE="$$(mktemp)" && \
 	  $(TIMER) $(COQ_TEST) $(COQFLAGS) $(COQLIBS) -load-vernac-source $< > "$$TMPFILE" && \
 	  ($(REF_FILTER) < "$$TMPFILE" > "$$TMPFILE.filtered" || true) && \
