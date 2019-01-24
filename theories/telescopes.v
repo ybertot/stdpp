@@ -48,7 +48,8 @@ Definition tele_app {TT : tele} {T} (f : TT -t> T) : tele_arg TT → T :=
 Arguments tele_app {!_ _} _ !_ /.
 
 Coercion tele_arg : tele >-> Sortclass.
-Coercion tele_app : tele_fun >-> Funclass.
+(* This is a local coercion because otherwise, the "λ.." notation stops working. *)
+Local Coercion tele_app : tele_fun >-> Funclass.
 
 (** Inversion lemma for [tele_arg] *)
 Lemma tele_arg_inv {TT : tele} (a : TT) :
@@ -140,9 +141,9 @@ Notation "'[tele_arg' ]" := (TargO)
    binder so that, after simplifying, this matches the way we typically write
    notations involving telescopes. *)
 Notation "'λ..' x .. y , e" :=
-  (tele_app $ tele_bind (λ x, .. (tele_app $ tele_bind (λ y, e)) .. ))
+  (tele_app (tele_bind (λ x, .. (tele_app (tele_bind (λ y, e))) .. )))
   (at level 200, x binder, y binder, right associativity,
-   format "'[  ' 'λ..'  x  ..  y ']' ,  e").
+   format "'[  ' 'λ..'  x  ..  y ']' ,  e") : stdpp_scope.
 
 (** Telescopic quantifiers *)
 Definition tforall {TT : tele} (Ψ : TT → Prop) : Prop :=
