@@ -879,7 +879,7 @@ Fixpoint fresh_list `{Fresh A C, Union C, Singleton A C}
   | 0 => []
   | S n => let x := fresh X in x :: fresh_list n ({[ x ]} ∪ X)
   end.
-Instance: Params (@fresh_list) 6.
+Instance: Params (@fresh_list) 6 := {}.
 
 Inductive Forall_fresh `{ElemOf A C} (X : C) : list A → Prop :=
   | Forall_fresh_nil : Forall_fresh X []
@@ -1077,7 +1077,7 @@ End seq_set.
 (** Mimimal elements *)
 Definition minimal `{ElemOf A C} (R : relation A) (x : A) (X : C) : Prop :=
   ∀ y, y ∈ X → R y x → R x y.
-Instance: Params (@minimal) 5.
+Instance: Params (@minimal) 5 := {}.
 Typeclasses Opaque minimal.
 
 Section minimal.
