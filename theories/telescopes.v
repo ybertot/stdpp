@@ -143,7 +143,7 @@ Notation "'[tele_arg' ]" := (TargO)
 Notation "'λ..' x .. y , e" :=
   (tele_app (tele_bind (λ x, .. (tele_app (tele_bind (λ y, e))) .. )))
   (at level 200, x binder, y binder, right associativity,
-   format "'[  ' 'λ..'  x  ..  y ']' ,  e").
+   format "'[  ' 'λ..'  x  ..  y ']' ,  e") : stdpp_scope.
 
 (** Telescopic quantifiers *)
 Definition tforall {TT : tele} (Ψ : TT → Prop) : Prop :=
