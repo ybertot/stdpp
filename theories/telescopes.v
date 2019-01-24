@@ -125,7 +125,7 @@ Proof. unfold tele_fun_compose. rewrite tele_app_bind. done. Qed.
 (** Notation *)
 Notation "'[tele' x .. z ]" :=
   (TeleS (fun x => .. (TeleS (fun z => TeleO)) ..))
-  (x binder, z binder, format "[tele  '[hv' x .. z ']' ]").
+  (x binder, z binder, format "[tele  '[hv' x  ..  z ']' ]").
 Notation "'[tele' ]" := (TeleO)
   (format "[tele ]").
 
