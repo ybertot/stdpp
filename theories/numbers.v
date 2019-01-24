@@ -380,10 +380,6 @@ Notation "1" := (Q2Qc 1) : Qc_scope.
 Notation "2" := (1+1) : Qc_scope.
 Notation "- 1" := (Qcopp 1) : Qc_scope.
 Notation "- 2" := (Qcopp 2) : Qc_scope.
-(* The following two already exist in Coq's stdlib, but we overwrite them with a
-different definition. *)
-Notation "x - y" := (x + -y) : Qc_scope.
-Notation "x / y" := (x * /y) : Qc_scope.
 Infix "≤" := Qcle : Qc_scope.
 Notation "x ≤ y ≤ z" := (x ≤ y ∧ y ≤ z) : Qc_scope.
 Notation "x ≤ y < z" := (x ≤ y ∧ y < z) : Qc_scope.
@@ -555,7 +551,7 @@ Next Obligation. intros x y. apply Qcmult_pos_pos; apply Qp_prf. Qed.
 
 Program Definition Qp_div (x : Qp) (y : positive) : Qp := mk_Qp (x / Zpos y) _.
 Next Obligation.
-  intros x y. assert (0 < Zpos y)%Qc.
+  intros x y. unfold Qcdiv. assert (0 < Zpos y)%Qc.
   { apply (Z2Qc_inj_lt 0%Z (Zpos y)), Pos2Z.is_pos. }
   by rewrite (Qcmult_lt_mono_pos_r _ _ (Zpos y)%Z), Qcmult_0_l,
     <-Qcmult_assoc, Qcmult_inv_l, Qcmult_1_r.
@@ -592,10 +588,10 @@ Instance Qp_plus_inj_l p : Inj (=) (=) (λ q, q + p)%Qp.
 Proof. intros q1 q2. rewrite !Qp_eq; simpl. apply (inj (λ q, q + p)%Qc). Qed.
 
 Lemma Qp_minus_diag x : (x - x)%Qp = None.
-Proof. unfold Qp_minus. by rewrite Qcplus_opp_r. Qed.
+Proof. unfold Qp_minus, Qcminus. by rewrite Qcplus_opp_r. Qed.
 Lemma Qp_op_minus x y : ((x + y) - x)%Qp = Some y.
 Proof.
-  unfold Qp_minus; simpl.
+  unfold Qp_minus, Qcminus; simpl.
   rewrite (Qcplus_comm x), <- Qcplus_assoc, Qcplus_opp_r, Qcplus_0_r.
   destruct (decide _) as [|[]]; auto. by f_equal; apply Qp_eq.
 Qed.
@@ -620,7 +616,7 @@ Proof.
 Qed.
 Lemma Qp_div_S x y : (x / (2 * y) + x / (2 * y) = x / y)%Qp.
 Proof.
-  apply Qp_eq; simpl.
+  apply Qp_eq; simpl. unfold Qcdiv.
   rewrite <-Qcmult_plus_distr_l, Pos2Z.inj_mul, Z2Qc_inj_mul, Z2Qc_inj_2.
   rewrite Qcplus_diag. by field_simplify.
 Qed.
@@ -639,7 +635,7 @@ Lemma Qp_lt_sum (x y : Qp) : (x < y)%Qc ↔ ∃ z, y = (x + z)%Qp.
 Proof.
   split.
   - intros Hlt%Qclt_minus_iff. exists (mk_Qp (y - x) Hlt). apply Qp_eq; simpl.
-    by rewrite (Qcplus_comm y), Qcplus_assoc, Qcplus_opp_r, Qcplus_0_l.
+    unfold Qcminus. by rewrite (Qcplus_comm y), Qcplus_assoc, Qcplus_opp_r, Qcplus_0_l.
   - intros [z ->]; simpl.
     rewrite <-(Qcplus_0_r x) at 1. apply Qcplus_lt_mono_l, Qp_prf.
 Qed.
@@ -652,12 +648,12 @@ Proof.
     destruct (Qc_le_dec q1 q2) as [LE|LE%Qclt_nge%Qclt_le_weak]; [by eauto|].
     destruct (help q2 q1) as (q&q1'&q2'&?&?); eauto. }
   intros q1 q2 Hq. exists (q1 / 2)%Qp, (q1 / 2)%Qp.
-  assert (0 < q2 - q1 / 2)%Qc as Hq2'.
+  assert (0 < q2 +- q1 */ 2)%Qc as Hq2'.
   { eapply Qclt_le_trans; [|by apply Qcplus_le_mono_r, Hq].
-    replace (q1 - q1 / 2)%Qc with (q1 * (1 - 1/2))%Qc by ring.
-    replace 0%Qc with (0 * (1-1/2))%Qc by ring. by apply Qcmult_lt_compat_r. }
-  exists (mk_Qp (q2 - q1 / 2%Z) Hq2'). split; [by rewrite Qp_div_2|].
-  apply Qp_eq; simpl. ring.
+    replace (q1 +- q1 */ 2)%Qc with (q1 * (1 +- 1*/2))%Qc by ring.
+    replace 0%Qc with (0 * (1+-1*/2))%Qc by ring. by apply Qcmult_lt_compat_r. }
+  exists (mk_Qp (q2 +- q1 */ 2%Z) Hq2'). split; [by rewrite Qp_div_2|].
+  apply Qp_eq; simpl. unfold Qcdiv. ring.
 Qed.
 
 Lemma Qp_cross_split p a b c d :
@@ -683,7 +679,7 @@ Qed.
 Lemma Qp_bounded_split (p r : Qp) : ∃ q1 q2 : Qp, (q1 ≤ r)%Qc ∧ p = (q1 + q2)%Qp.
 Proof.
   destruct (Qclt_le_dec r p) as [?|?].
-  - assert (0 < p - r)%Qc as Hpos.
+  - assert (0 < p +- r)%Qc as Hpos.
     { apply (Qcplus_lt_mono_r _ _ r). rewrite <-Qcplus_assoc, (Qcplus_comm (-r)).
       by rewrite Qcplus_opp_r, Qcplus_0_l, Qcplus_0_r. }
     exists r, (mk_Qp _ Hpos); simpl; split; [done|].

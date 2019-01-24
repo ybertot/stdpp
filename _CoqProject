@@ -1,5 +1,4 @@
 -Q theories stdpp
--arg -w -arg -notation-overridden
 theories/base.v
 theories/tactics.v
 theories/option.v
