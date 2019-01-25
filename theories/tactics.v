@@ -347,7 +347,18 @@ Ltac solve_proper_prepare :=
   | |- Proper _ _ => intros ???
   | |- (_ ==> _)%signature _ _ => intros ???
   | |- pointwise_relation _ _ _ _ => intros ?
-  | |- ?R ?f _ => let f' := constr:(λ x, f x) in intros ?
+  | |- ?R ?f _ =>
+     (* Deal with other cases where we have an equivalence relation on functions
+     (e.g. a [pointwise_relation] that is hidden in some form in [R]). We do
+     this by checking if the arguments of the relation are actually functions,
+     and then forcefully introduce one ∀ and introduce the remaining ∀s that
+     show up in the goal. To check that we actually have an equivalence relation
+     on functions, we try to eta expand [f], which will only succeed if [f] is
+     actually a function. *)
+     let f' := constr:(λ x y, f x y) in
+     (* Now forcefully introduce the first ∀ and other ∀s that show up in the
+     goal afterwards. *)
+     intros ?; intros
   end; simplify_eq;
   (* We try with and without unfolding. We have to backtrack on
      that because unfolding may succeed, but then the proof may fail. *)
