@@ -1,4 +1,4 @@
-(* Copyright (c) 2012-2017, Coq-std++ developers. *)
+(* Copyright (c) 2012-2019, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
 (** This files implements the type [coPset] of efficient finite/cofinite sets
 of positive binary naturals [positive]. These sets are:

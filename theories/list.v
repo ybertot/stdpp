@@ -1,4 +1,4 @@
-(* Copyright (c) 2012-2017, Coq-std++ developers. *)
+(* Copyright (c) 2012-2019, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
 (** This file collects general purpose definitions and theorems on lists that
 are not in the Coq standard library. *)
