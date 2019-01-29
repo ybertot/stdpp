@@ -2,8 +2,7 @@
 (* This file is distributed under the terms of the BSD license. *)
 (** This file collects definitions and theorems on abstract rewriting systems.
 These are particularly useful as we define the operational semantics as a
-small step semantics. This file defines a hint database [ars] containing
-some theorems on abstract rewriting systems. *)
+small step semantics. *)
 From Coq Require Import Wf_nat.
 From stdpp Require Export tactics base.
 Set Default Proof Using "Type".
@@ -189,10 +188,6 @@ Section rtc.
     cofix FIX. constructor; eauto using rtc_r.
   Qed.
 End rtc.
-
-Hint Constructors rtc nsteps bsteps tc : ars.
-Hint Resolve rtc_once rtc_r tc_r rtc_transitive tc_rtc_l tc_rtc_r
-  tc_rtc bsteps_once bsteps_r bsteps_refl bsteps_trans : ars.
 
 (** * Theorems on sub relations *)
 Section subrel.
