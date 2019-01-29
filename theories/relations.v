@@ -65,19 +65,20 @@ Section rtc.
 
   Hint Constructors rtc nsteps bsteps tc : core.
 
+  Lemma rtc_transitive x y z : rtc R x y → rtc R y z → rtc R x z.
+  Proof. induction 1; eauto. Qed.
+
   (* We give this instance a lower-than-usual priority because [setoid_rewrite]
      queries for [@Reflexive Prop ?r] in the hope of [iff_reflexive] getting
      picked as the instance.  [rtc_reflexive] overlaps with that, leading to
      backtracking.  We cannot set [Hint Mode] because that query must not fail,
      but we can at least avoid picking [rtc_reflexive].
 
-     See Coq bug https://github.com/coq/coq/issues/7916.  *)
-  Global Instance rtc_reflexive: Reflexive (rtc R) | 10.
-  Proof. exact (@rtc_refl A R). Qed.
-  Lemma rtc_transitive x y z : rtc R x y → rtc R y z → rtc R x z.
-  Proof. induction 1; eauto. Qed.
-  Global Instance: Transitive (rtc R).
-  Proof. exact rtc_transitive. Qed.
+     See Coq bug https://github.com/coq/coq/issues/7916 and the test
+     [tests.typeclasses.test_setoid_rewrite]. *)
+  Global Instance rtc_po : PreOrder (rtc R) | 10.
+  Proof. split. exact (@rtc_refl A R). exact rtc_transitive. Qed.
+
   Lemma rtc_once x y : R x y → rtc R x y.
   Proof. eauto. Qed.
   Lemma rtc_r x y z : rtc R x y → R y z → rtc R x z.
@@ -160,7 +161,7 @@ Section rtc.
 
   Lemma tc_transitive x y z : tc R x y → tc R y z → tc R x z.
   Proof. induction 1; eauto. Qed.
-  Global Instance: Transitive (tc R).
+  Global Instance tc_transitive' : Transitive (tc R).
   Proof. exact tc_transitive. Qed.
   Lemma tc_r x y z : tc R x y → R y z → tc R x z.
   Proof. intros. etrans; eauto. Qed.
