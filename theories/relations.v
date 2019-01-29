@@ -235,15 +235,15 @@ Lemma Fix_F_proper `{R : relation A} (B : A → Type) (E : ∀ x, relation (B x)
   E _ (Fix_F B F acc1) (Fix_F B F acc2).
 Proof. revert x acc1 acc2. fix FIX 2. intros x [acc1] [acc2]; simpl; auto. Qed.
 
-Lemma Fix_unfold_rel `{R: relation A} (wfR: wf R) (B: A → Type) (E: ∀ x, relation (B x))
-      (F: ∀ x, (∀ y, R y x → B y) → B x)
-      (HF: ∀ (x: A) (f g: ∀ y, R y x → B y),
-             (∀ y Hy Hy', E _ (f y Hy) (g y Hy')) → E _ (F x f) (F x g))
-      (x: A):
+Lemma Fix_unfold_rel `{R : relation A} (wfR : wf R) (B : A → Type) (E : ∀ x, relation (B x))
+    (F: ∀ x, (∀ y, R y x → B y) → B x)
+    (HF: ∀ (x: A) (f g: ∀ y, R y x → B y),
+           (∀ y Hy Hy', E _ (f y Hy) (g y Hy')) → E _ (F x f) (F x g))
+    (x: A) :
   E _ (Fix wfR B F x) (F x (λ y _, Fix wfR B F y)).
 Proof.
   unfold Fix.
-  destruct (wfR x); cbn.
+  destruct (wfR x); simpl.
   apply HF; intros.
   apply Fix_F_proper; auto.
 Qed.
