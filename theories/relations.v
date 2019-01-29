@@ -33,7 +33,7 @@ Section definitions.
     | nsteps_O x : nsteps 0 x x
     | nsteps_l n x y z : R x y → nsteps n y z → nsteps (S n) x z.
 
-  (** Reduction of at most [n] steps. *)
+  (** Reductions of at most [n] steps. *)
   Inductive bsteps : nat → relation A :=
     | bsteps_refl n x : bsteps n x x
     | bsteps_l n x y z : R x y → bsteps n y z → bsteps (S n) x z.
