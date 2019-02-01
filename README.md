@@ -58,7 +58,7 @@ Then you can do `opam install coq-stdpp`.
 
 To obtain a development version, add the Iris opam repository:
 
-    opam repo add iris-dev https://gitlab.mpi-sws.org/FP/opam-dev.git
+    opam repo add iris-dev https://gitlab.mpi-sws.org/iris/opam.git
 
 ## Building from source
 
