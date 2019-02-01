@@ -3,9 +3,9 @@ name: "coq-stdpp"
 maintainer: "Ralf Jung <jung@mpi-sws.org>"
 homepage: "https://gitlab.mpi-sws.org/robbertkrebbers/coq-stdpp"
 authors: "Robbert Krebbers, Jacques-Henri Jourdan, Ralf Jung"
-bug-reports: "https://gitlab.mpi-sws.org/robbertkrebbers/coq-stdpp/issues"
+bug-reports: "https://gitlab.mpi-sws.org/iris/stdpp/issues"
 license: "BSD"
-dev-repo: "https://gitlab.mpi-sws.org/robbertkrebbers/coq-stdpp.git"
+dev-repo: "https://gitlab.mpi-sws.org/iris/stdpp.git"
 build: [make "-j%{jobs}%"]
 install: [make "install"]
 remove: ["rm" "-rf" "%{lib}%/coq/user-contrib/stdpp"]
