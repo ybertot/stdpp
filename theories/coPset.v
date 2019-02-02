@@ -126,26 +126,26 @@ Lemma coPset_intersection_wf t1 t2 :
 Proof. revert t2; induction t1 as [[]|[]]; intros [[]|[] ??]; simpl; eauto. Qed.
 Lemma coPset_opp_wf t : coPset_wf (coPset_opp_raw t).
 Proof. induction t as [[]|[]]; simpl; eauto. Qed.
-Lemma elem_to_Pset_singleton p q : e_of p (coPset_singleton_raw q) ↔ p = q.
+Lemma coPset_elem_of_singleton p q : e_of p (coPset_singleton_raw q) ↔ p = q.
 Proof.
   split; [|by intros <-; induction p; simpl; rewrite ?coPset_elem_of_node].
   by revert q; induction p; intros [?|?|]; simpl;
     rewrite ?coPset_elem_of_node; intros; f_equal/=; auto.
 Qed.
-Lemma elem_to_Pset_union t1 t2 p : e_of p (t1 ∪ t2) = e_of p t1 || e_of p t2.
+Lemma coPset_elem_of_union t1 t2 p : e_of p (t1 ∪ t2) = e_of p t1 || e_of p t2.
 Proof.
   by revert t2 p; induction t1 as [[]|[]]; intros [[]|[] ??] [?|?|]; simpl;
     rewrite ?coPset_elem_of_node; simpl;
     rewrite ?orb_true_l, ?orb_false_l, ?orb_true_r, ?orb_false_r.
 Qed.
-Lemma elem_to_Pset_intersection t1 t2 p :
+Lemma coPset_elem_of_intersection t1 t2 p :
   e_of p (t1 ∩ t2) = e_of p t1 && e_of p t2.
 Proof.
   by revert t2 p; induction t1 as [[]|[]]; intros [[]|[] ??] [?|?|]; simpl;
     rewrite ?coPset_elem_of_node; simpl;
     rewrite ?andb_true_l, ?andb_false_l, ?andb_true_r, ?andb_false_r.
 Qed.
-Lemma elem_to_Pset_opp t p : e_of p (coPset_opp_raw t) = negb (e_of p t).
+Lemma coPset_elem_of_opp t p : e_of p (coPset_opp_raw t) = negb (e_of p t).
 Proof.
   by revert p; induction t as [[]|[]]; intros [?|?|]; simpl;
     rewrite ?coPset_elem_of_node; simpl.
@@ -173,14 +173,14 @@ Instance coPset_set : Set_ positive coPset.
 Proof.
   split; [split| |].
   - by intros ??.
-  - intros p q. apply elem_to_Pset_singleton.
+  - intros p q. apply coPset_elem_of_singleton.
   - intros [t] [t'] p; unfold elem_of, coPset_elem_of, coPset_union; simpl.
-    by rewrite elem_to_Pset_union, orb_True.
+    by rewrite coPset_elem_of_union, orb_True.
   - intros [t] [t'] p; unfold elem_of,coPset_elem_of,coPset_intersection; simpl.
-    by rewrite elem_to_Pset_intersection, andb_True.
+    by rewrite coPset_elem_of_intersection, andb_True.
   - intros [t] [t'] p; unfold elem_of, coPset_elem_of, coPset_difference; simpl.
-    by rewrite elem_to_Pset_intersection,
-      elem_to_Pset_opp, andb_True, negb_True.
+    by rewrite coPset_elem_of_intersection,
+      coPset_elem_of_opp, andb_True, negb_True.
 Qed.
 
 Instance coPset_leibniz : LeibnizEquiv coPset.
@@ -271,88 +271,88 @@ Proof.
 Qed.
 
 (** * Conversion to psets *)
-Fixpoint to_Pset_raw (t : coPset_raw) : Pmap_raw () :=
+Fixpoint coPset_to_Pset_raw (t : coPset_raw) : Pmap_raw () :=
   match t with
   | coPLeaf _ => PLeaf
-  | coPNode false l r => PNode' None (to_Pset_raw l) (to_Pset_raw r)
-  | coPNode true l r => PNode (Some ()) (to_Pset_raw l) (to_Pset_raw r)
+  | coPNode false l r => PNode' None (coPset_to_Pset_raw l) (coPset_to_Pset_raw r)
+  | coPNode true l r => PNode (Some ()) (coPset_to_Pset_raw l) (coPset_to_Pset_raw r)
   end.
-Lemma to_Pset_wf t : coPset_wf t → Pmap_wf (to_Pset_raw t).
+Lemma coPset_to_Pset_wf t : coPset_wf t → Pmap_wf (coPset_to_Pset_raw t).
 Proof. induction t as [|[]]; simpl; eauto using PNode_wf. Qed.
-Definition to_Pset (X : coPset) : Pset :=
-  let (t,Ht) := X in Mapset (PMap (to_Pset_raw t) (to_Pset_wf _ Ht)).
-Lemma elem_of_to_Pset X i : set_finite X → i ∈ to_Pset X ↔ i ∈ X.
+Definition coPset_to_Pset (X : coPset) : Pset :=
+  let (t,Ht) := X in Mapset (PMap (coPset_to_Pset_raw t) (coPset_to_Pset_wf _ Ht)).
+Lemma elem_of_coPset_to_Pset X i : set_finite X → i ∈ coPset_to_Pset X ↔ i ∈ X.
 Proof.
   rewrite coPset_finite_spec; destruct X as [t Ht].
-  change (coPset_finite t → to_Pset_raw t !! i = Some () ↔ e_of i t).
+  change (coPset_finite t → coPset_to_Pset_raw t !! i = Some () ↔ e_of i t).
   clear Ht; revert i; induction t as [[]|[] l IHl r IHr]; intros [i|i|];
     simpl; rewrite ?andb_True, ?PNode_lookup; naive_solver.
 Qed.
 
 (** * Conversion from psets *)
-Fixpoint of_Pset_raw (t : Pmap_raw ()) : coPset_raw :=
+Fixpoint Pset_to_coPset_raw (t : Pmap_raw ()) : coPset_raw :=
   match t with
   | PLeaf => coPLeaf false
-  | PNode None l r => coPNode false (of_Pset_raw l) (of_Pset_raw r)
-  | PNode (Some _) l r => coPNode true (of_Pset_raw l) (of_Pset_raw r)
+  | PNode None l r => coPNode false (Pset_to_coPset_raw l) (Pset_to_coPset_raw r)
+  | PNode (Some _) l r => coPNode true (Pset_to_coPset_raw l) (Pset_to_coPset_raw r)
   end.
-Lemma of_Pset_wf t : Pmap_wf t → coPset_wf (of_Pset_raw t).
+Lemma Pset_to_coPset_wf t : Pmap_wf t → coPset_wf (Pset_to_coPset_raw t).
 Proof.
   induction t as [|[] l IHl r IHr]; simpl; rewrite ?andb_True; auto.
   - intros [??]; destruct l as [|[]], r as [|[]]; simpl in *; auto.
   - destruct l as [|[]], r as [|[]]; simpl in *; rewrite ?andb_true_r;
       rewrite ?andb_True; rewrite ?andb_True in IHl, IHr; intuition.
 Qed.
-Lemma elem_of_of_Pset_raw i t : e_of i (of_Pset_raw t) ↔ t !! i = Some ().
+Lemma elem_of_Pset_to_coPset_raw i t : e_of i (Pset_to_coPset_raw t) ↔ t !! i = Some ().
 Proof. by revert i; induction t as [|[[]|]]; intros []; simpl; auto; split. Qed.
-Lemma of_Pset_raw_finite t : coPset_finite (of_Pset_raw t).
+Lemma Pset_to_coPset_raw_finite t : coPset_finite (Pset_to_coPset_raw t).
 Proof. induction t as [|[[]|]]; simpl; rewrite ?andb_True; auto. Qed.
 
-Definition of_Pset (X : Pset) : coPset :=
-  let 'Mapset (PMap t Ht) := X in of_Pset_raw t ↾ of_Pset_wf _ Ht.
-Lemma elem_of_of_Pset X i : i ∈ of_Pset X ↔ i ∈ X.
-Proof. destruct X as [[t ?]]; apply elem_of_of_Pset_raw. Qed.
-Lemma of_Pset_finite X : set_finite (of_Pset X).
+Definition Pset_to_coPset (X : Pset) : coPset :=
+  let 'Mapset (PMap t Ht) := X in Pset_to_coPset_raw t ↾ Pset_to_coPset_wf _ Ht.
+Lemma elem_of_Pset_to_coPset X i : i ∈ Pset_to_coPset X ↔ i ∈ X.
+Proof. destruct X as [[t ?]]; apply elem_of_Pset_to_coPset_raw. Qed.
+Lemma Pset_to_coPset_finite X : set_finite (Pset_to_coPset X).
 Proof.
-  apply coPset_finite_spec; destruct X as [[t ?]]; apply of_Pset_raw_finite.
+  apply coPset_finite_spec; destruct X as [[t ?]]; apply Pset_to_coPset_raw_finite.
 Qed.
 
 (** * Conversion to and from gsets of positives *)
-Lemma to_gset_wf (m : Pmap ()) : gmap_wf (K:=positive) m.
+Lemma coPset_to_gset_wf (m : Pmap ()) : gmap_wf (K:=positive) m.
 Proof. done. Qed.
-Definition to_gset (X : coPset) : gset positive :=
-  let 'Mapset m := to_Pset X in
-  Mapset (GMap m (bool_decide_pack _ (to_gset_wf m))).
+Definition coPset_to_gset (X : coPset) : gset positive :=
+  let 'Mapset m := coPset_to_Pset X in
+  Mapset (GMap m (bool_decide_pack _ (coPset_to_gset_wf m))).
 
-Definition of_gset (X : gset positive) : coPset :=
-  let 'Mapset (GMap (PMap t Ht) _) := X in of_Pset_raw t ↾ of_Pset_wf _ Ht.
+Definition gset_to_coPset (X : gset positive) : coPset :=
+  let 'Mapset (GMap (PMap t Ht) _) := X in Pset_to_coPset_raw t ↾ Pset_to_coPset_wf _ Ht.
 
-Lemma elem_of_to_gset X i : set_finite X → i ∈ to_gset X ↔ i ∈ X.
+Lemma elem_of_coPset_to_gset X i : set_finite X → i ∈ coPset_to_gset X ↔ i ∈ X.
 Proof.
-  intros ?. rewrite <-elem_of_to_Pset by done.
-  unfold to_gset. by destruct (to_Pset X).
+  intros ?. rewrite <-elem_of_coPset_to_Pset by done.
+  unfold coPset_to_gset. by destruct (coPset_to_Pset X).
 Qed.
 
-Lemma elem_of_of_gset X i : i ∈ of_gset X ↔ i ∈ X.
-Proof. destruct X as [[[t ?]]]; apply elem_of_of_Pset_raw. Qed.
-Lemma of_gset_finite X : set_finite (of_gset X).
+Lemma elem_of_gset_to_coPset X i : i ∈ gset_to_coPset X ↔ i ∈ X.
+Proof. destruct X as [[[t ?]]]; apply elem_of_Pset_to_coPset_raw. Qed.
+Lemma gset_to_coPset_finite X : set_finite (gset_to_coPset X).
 Proof.
-  apply coPset_finite_spec; destruct X as [[[t ?]]]; apply of_Pset_raw_finite.
+  apply coPset_finite_spec; destruct X as [[[t ?]]]; apply Pset_to_coPset_raw_finite.
 Qed.
 
 (** * Domain of finite maps *)
-Instance Pmap_dom_coPset {A} : Dom (Pmap A) coPset := λ m, of_Pset (dom _ m).
+Instance Pmap_dom_coPset {A} : Dom (Pmap A) coPset := λ m, Pset_to_coPset (dom _ m).
 Instance Pmap_dom_coPset_spec: FinMapDom positive Pmap coPset.
 Proof.
   split; try apply _; intros A m i; unfold dom, Pmap_dom_coPset.
-  by rewrite elem_of_of_Pset, elem_of_dom.
+  by rewrite elem_of_Pset_to_coPset, elem_of_dom.
 Qed.
 Instance gmap_dom_coPset {A} : Dom (gmap positive A) coPset := λ m,
-  of_gset (dom _ m).
+  gset_to_coPset (dom _ m).
 Instance gmap_dom_coPset_spec: FinMapDom positive (gmap positive) coPset.
 Proof.
   split; try apply _; intros A m i; unfold dom, gmap_dom_coPset.
-  by rewrite elem_of_of_gset, elem_of_dom.
+  by rewrite elem_of_gset_to_coPset, elem_of_dom.
 Qed.
 
 (** * Suffix sets *)
@@ -405,7 +405,7 @@ Definition coPset_r (X : coPset) : coPset :=
 Lemma coPset_lr_disjoint X : coPset_l X ∩ coPset_r X = ∅.
 Proof.
   apply elem_of_equiv_empty_L; intros p; apply Is_true_false.
-  destruct X as [t Ht]; simpl; clear Ht; rewrite elem_to_Pset_intersection.
+  destruct X as [t Ht]; simpl; clear Ht; rewrite coPset_elem_of_intersection.
   revert p; induction t as [[]|[]]; intros [?|?|]; simpl;
     rewrite ?coPset_elem_of_node; simpl;
     rewrite ?orb_true_l, ?orb_false_l, ?orb_true_r, ?orb_false_r; auto.
@@ -413,7 +413,7 @@ Qed.
 Lemma coPset_lr_union X : coPset_l X ∪ coPset_r X = X.
 Proof.
   apply elem_of_equiv_L; intros p; apply eq_bool_prop_elim.
-  destruct X as [t Ht]; simpl; clear Ht; rewrite elem_to_Pset_union.
+  destruct X as [t Ht]; simpl; clear Ht; rewrite coPset_elem_of_union.
   revert p; induction t as [[]|[]]; intros [?|?|]; simpl;
     rewrite ?coPset_elem_of_node; simpl;
     rewrite ?orb_true_l, ?orb_false_l, ?orb_true_r, ?orb_false_r; auto.

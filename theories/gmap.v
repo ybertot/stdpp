@@ -218,48 +218,48 @@ Instance gset_dom `{Countable K} {A} : Dom (gmap K A) (gset K) := mapset_dom.
 Instance gset_dom_spec `{Countable K} :
   FinMapDom K (gmap K) (gset K) := mapset_dom_spec.
 
-Definition of_gset `{Countable A} (X : gset A) : propset A :=
+Definition gset_to_propset `{Countable A} (X : gset A) : propset A :=
   {[ x | x ∈ X ]}.
-Lemma elem_of_of_gset `{Countable A} (X : gset A) x : x ∈ of_gset X ↔ x ∈ X.
+Lemma elem_of_gset_to_propset `{Countable A} (X : gset A) x : x ∈ gset_to_propset X ↔ x ∈ X.
 Proof. done. Qed.
 
-Definition to_gmap `{Countable K} {A} (x : A) (X : gset K) : gmap K A :=
+Definition gset_to_gmap `{Countable K} {A} (x : A) (X : gset K) : gmap K A :=
   (λ _, x) <$> mapset_car X.
 
-Lemma lookup_to_gmap `{Countable K} {A} (x : A) (X : gset K) i :
-  to_gmap x X !! i = guard (i ∈ X); Some x.
+Lemma lookup_gset_to_gmap `{Countable K} {A} (x : A) (X : gset K) i :
+  gset_to_gmap x X !! i = guard (i ∈ X); Some x.
 Proof.
-  destruct X as [X]; unfold to_gmap, elem_of, mapset_elem_of; simpl.
+  destruct X as [X]; unfold gset_to_gmap, elem_of, mapset_elem_of; simpl.
   rewrite lookup_fmap.
   case_option_guard; destruct (X !! i) as [[]|]; naive_solver.
 Qed.
-Lemma lookup_to_gmap_Some `{Countable K} {A} (x : A) (X : gset K) i y :
-  to_gmap x X !! i = Some y ↔ i ∈ X ∧ x = y.
-Proof. rewrite lookup_to_gmap. simplify_option_eq; naive_solver. Qed.
-Lemma lookup_to_gmap_None `{Countable K} {A} (x : A) (X : gset K) i :
-  to_gmap x X !! i = None ↔ i ∉ X.
-Proof. rewrite lookup_to_gmap. simplify_option_eq; naive_solver. Qed.
+Lemma lookup_gset_to_gmap_Some `{Countable K} {A} (x : A) (X : gset K) i y :
+  gset_to_gmap x X !! i = Some y ↔ i ∈ X ∧ x = y.
+Proof. rewrite lookup_gset_to_gmap. simplify_option_eq; naive_solver. Qed.
+Lemma lookup_gset_to_gmap_None `{Countable K} {A} (x : A) (X : gset K) i :
+  gset_to_gmap x X !! i = None ↔ i ∉ X.
+Proof. rewrite lookup_gset_to_gmap. simplify_option_eq; naive_solver. Qed.
 
-Lemma to_gmap_empty `{Countable K} {A} (x : A) : to_gmap x ∅ = ∅.
+Lemma gset_to_gmap_empty `{Countable K} {A} (x : A) : gset_to_gmap x ∅ = ∅.
 Proof. apply fmap_empty. Qed.
-Lemma to_gmap_union_singleton `{Countable K} {A} (x : A) i Y :
-  to_gmap x ({[ i ]} ∪ Y) = <[i:=x]>(to_gmap x Y).
+Lemma gset_to_gmap_union_singleton `{Countable K} {A} (x : A) i Y :
+  gset_to_gmap x ({[ i ]} ∪ Y) = <[i:=x]>(gset_to_gmap x Y).
 Proof.
   apply map_eq; intros j; apply option_eq; intros y.
-  rewrite lookup_insert_Some, !lookup_to_gmap_Some, elem_of_union,
+  rewrite lookup_insert_Some, !lookup_gset_to_gmap_Some, elem_of_union,
     elem_of_singleton; destruct (decide (i = j)); intuition.
 Qed.
 
-Lemma fmap_to_gmap `{Countable K} {A B} (f : A → B) (X : gset K) (x : A) :
-  f <$> to_gmap x X = to_gmap (f x) X.
+Lemma fmap_gset_to_gmap `{Countable K} {A B} (f : A → B) (X : gset K) (x : A) :
+  f <$> gset_to_gmap x X = gset_to_gmap (f x) X.
 Proof.
-  apply map_eq; intros j. rewrite lookup_fmap, !lookup_to_gmap.
+  apply map_eq; intros j. rewrite lookup_fmap, !lookup_gset_to_gmap.
   by simplify_option_eq.
 Qed.
-Lemma to_gmap_dom `{Countable K} {A B} (m : gmap K A) (y : B) :
-  to_gmap y (dom _ m) = const y <$> m.
+Lemma gset_to_gmap_dom `{Countable K} {A B} (m : gmap K A) (y : B) :
+  gset_to_gmap y (dom _ m) = const y <$> m.
 Proof.
-  apply map_eq; intros j. rewrite lookup_fmap, lookup_to_gmap.
+  apply map_eq; intros j. rewrite lookup_fmap, lookup_gset_to_gmap.
   destruct (m !! j) as [x|] eqn:?.
   - by rewrite option_guard_True by (rewrite elem_of_dom; eauto).
   - by rewrite option_guard_False by (rewrite not_elem_of_dom; eauto).
