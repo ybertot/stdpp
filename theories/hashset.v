@@ -61,7 +61,7 @@ Qed.
 Global Instance hashset_elements: Elements A (hashset hash) := λ m,
   map_to_list (hashset_car m) ≫= snd.
 
-Global Instance hashset_fin_collection : FinCollection A (hashset hash).
+Global Instance hashset_fin_set : FinSet A (hashset hash).
 Proof.
   split; [split; [split| |]| |].
   - intros ? (?&?&?); simplify_map_eq/=.

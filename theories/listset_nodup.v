@@ -3,7 +3,7 @@
 (** This file implements finite as unordered lists without duplicates.
 Although this implementation is slow, it is very useful as decidable equality
 is the only constraint on the carrier set. *)
-From stdpp Require Export collections list.
+From stdpp Require Export sets list.
 Set Default Proof Using "Type".
 
 Record listset_nodup A := ListsetNoDup {
@@ -13,7 +13,7 @@ Arguments ListsetNoDup {_} _ _ : assert.
 Arguments listset_nodup_car {_} _ : assert.
 Arguments listset_nodup_prf {_} _ : assert.
 
-Section list_collection.
+Section list_set.
 Context `{EqDecision A}.
 Notation C := (listset_nodup A).
 
@@ -31,7 +31,7 @@ Instance listset_nodup_difference: Difference C := λ l k,
   let (l',Hl) := l in let (k',Hk) := k
   in ListsetNoDup _ (NoDup_list_difference _ k' Hl).
 
-Instance: Collection A C.
+Instance: Set_ A C.
 Proof.
   split; [split | | ].
   - by apply not_elem_of_nil.
@@ -42,9 +42,9 @@ Proof.
 Qed.
 
 Global Instance listset_nodup_elems: Elements A C := listset_nodup_car.
-Global Instance: FinCollection A C.
+Global Instance: FinSet A C.
 Proof. split. apply _. done. by intros [??]. Qed.
-End list_collection.
+End list_set.
 
 Hint Extern 1 (ElemOf _ (listset_nodup _)) =>
   eapply @listset_nodup_elem_of : typeclass_instances.

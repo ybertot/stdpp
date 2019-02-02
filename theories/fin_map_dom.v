@@ -3,7 +3,7 @@
 (** This file provides an axiomatization of the domain function of finite
 maps. We provide such an axiomatization, instead of implementing the domain
 function in a generic way, to allow more efficient implementations. *)
-From stdpp Require Export collections fin_maps.
+From stdpp Require Export sets fin_maps.
 Set Default Proof Using "Type*".
 
 Class FinMapDom K M D `{∀ A, Dom (M A) D, FMap M,
@@ -12,7 +12,7 @@ Class FinMapDom K M D `{∀ A, Dom (M A) D, FMap M,
     ElemOf K D, Empty D, Singleton K D,
     Union D, Intersection D, Difference D} := {
   finmap_dom_map :>> FinMap K M;
-  finmap_dom_collection :>> Collection K D;
+  finmap_dom_set :>> Set_ K D;
   elem_of_dom {A} (m : M A) i : i ∈ dom D m ↔ is_Some (m !! i)
 }.
 

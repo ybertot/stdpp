@@ -11,7 +11,7 @@ membership, as well as extensional equality (i.e. [X = Y ↔ ∀ x, x ∈ X ↔ 
 
 Since [positive]s are bitstrings, we encode [coPset]s as trees that correspond
 to the decision function that map bitstrings to bools. *)
-From stdpp Require Export collections.
+From stdpp Require Export sets.
 From stdpp Require Import pmap gmap mapset.
 Set Default Proof Using "Type".
 Local Open Scope positive_scope.
@@ -169,7 +169,7 @@ Instance coPset_difference : Difference coPset := λ X Y,
   let (t1,Ht1) := X in let (t2,Ht2) := Y in
   (t1 ∩ coPset_opp_raw t2) ↾ coPset_intersection_wf _ _ Ht1 (coPset_opp_wf _).
 
-Instance coPset_collection : Collection positive coPset.
+Instance coPset_set : Set_ positive coPset.
 Proof.
   split; [split| |].
   - by intros ??.
@@ -223,7 +223,7 @@ Proof.
   unfold set_finite, elem_of at 1, coPset_elem_of; simpl; clear Ht; split.
   - induction t as [b|b l IHl r IHr]; simpl.
     { destruct b; simpl; [intros [l Hl]|done].
-      by apply (is_fresh (of_list l : Pset)), elem_of_of_list, Hl. }
+      by apply (is_fresh (list_to_set l : Pset)), elem_of_list_to_set, Hl. }
     intros [ll Hll]; rewrite andb_True; split.
     + apply IHl; exists (omap (maybe (~0)) ll); intros i.
       rewrite elem_of_list_omap; intros; exists (i~0); auto.

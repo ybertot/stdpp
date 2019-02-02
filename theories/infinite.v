@@ -1,6 +1,6 @@
 (* Copyright (c) 2012-2019, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
-From stdpp Require Export fin_collections.
+From stdpp Require Export fin_sets.
 From stdpp Require Import pretty relations.
 
 (** The class [Infinite] axiomatizes types with infinitely many elements
@@ -47,7 +47,7 @@ Since [fresh_generic] is too inefficient for all practical purposes, we seal
 off its definition. That way, Coq will not accidentally unfold it during
 unification or other tactics. *)
 Section fresh_generic.
-  Context `{FinCollection A C, Infinite A, !RelDecision (∈@{C})}.
+  Context `{FinSet A C, Infinite A, !RelDecision (∈@{C})}.
 
   Definition fresh_generic_body (s : C) (rec : ∀ s', s' ⊂ s → nat → A) (n : nat) : A :=
     let cand := inject n in
@@ -57,7 +57,7 @@ Section fresh_generic.
     end.
 
   Definition fresh_generic_fix_aux :
-    seal (Fix collection_wf (const (nat → A)) fresh_generic_body). by eexists. Qed.
+    seal (Fix set_wf (const (nat → A)) fresh_generic_body). by eexists. Qed.
   Definition fresh_generic_fix := fresh_generic_fix_aux.(unseal).
 
   Lemma fresh_generic_fixpoint_unfold s n:
@@ -73,7 +73,7 @@ Section fresh_generic.
          ∀ i, n ≤ i < m → inject i ∈ s.
   Proof.
     revert n.
-    induction s as [s IH] using (well_founded_ind collection_wf); intros n.
+    induction s as [s IH] using (well_founded_ind set_wf); intros n.
     setoid_rewrite fresh_generic_fixpoint_unfold; unfold fresh_generic_body.
     destruct decide as [Hcase|Hcase]; [|by eauto with lia].
     destruct (IH _ (subset_difference_elem_of Hcase) (S n))

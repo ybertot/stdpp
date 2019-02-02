@@ -2,7 +2,7 @@
 (* This file is distributed under the terms of the BSD license. *)
 (** This file implements finite set as unordered lists without duplicates
 removed. This implementation forms a monad. *)
-From stdpp Require Export collections list.
+From stdpp Require Export sets list.
 Set Default Proof Using "Type".
 
 Record listset A := Listset { listset_car: list A }.
@@ -19,7 +19,7 @@ Global Instance listset_union: Union (listset A) := λ l k,
   let (l') := l in let (k') := k in Listset (l' ++ k').
 Global Opaque listset_singleton listset_empty.
 
-Global Instance listset_simple_collection : SimpleCollection A (listset A).
+Global Instance listset_simple_set : SemiSet A (listset A).
 Proof.
   split.
   - by apply not_elem_of_nil.
@@ -50,7 +50,7 @@ Global Instance listset_intersection: Intersection (listset A) := λ l k,
 Global Instance listset_difference: Difference (listset A) := λ l k,
   let (l') := l in let (k') := k in Listset (list_difference l' k').
 
-Instance listset_collection: Collection A (listset A).
+Instance listset_set: Set_ A (listset A).
 Proof.
   split.
   - apply _.
@@ -59,7 +59,7 @@ Proof.
 Qed.
 Global Instance listset_elements: Elements A (listset A) :=
   remove_dups ∘ listset_car.
-Global Instance listset_fin_collection : FinCollection A (listset A).
+Global Instance listset_fin_set : FinSet A (listset A).
 Proof.
   split.
   - apply _.
@@ -75,7 +75,7 @@ Instance listset_bind: MBind listset := λ A B f l,
   let (l') := l in Listset (mbind (listset_car ∘ f) l').
 Instance listset_join: MJoin listset := λ A, mbind id.
 
-Instance listset_collection_monad : CollectionMonad listset.
+Instance listset_set_monad : MonadSet listset.
 Proof.
   split.
   - intros. apply _.

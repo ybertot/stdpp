@@ -3,13 +3,13 @@ theories/base.v
 theories/tactics.v
 theories/option.v
 theories/fin_map_dom.v
-theories/bset.v
+theories/boolset.v
 theories/fin_maps.v
 theories/fin.v
 theories/vector.v
 theories/pmap.v
 theories/stringmap.v
-theories/fin_collections.v
+theories/fin_sets.v
 theories/mapset.v
 theories/proof_irrel.v
 theories/hashset.v
@@ -19,7 +19,7 @@ theories/orders.v
 theories/natmap.v
 theories/strings.v
 theories/relations.v
-theories/collections.v
+theories/sets.v
 theories/listset.v
 theories/streams.v
 theories/gmap.v
@@ -32,7 +32,7 @@ theories/nmap.v
 theories/zmap.v
 theories/coPset.v
 theories/lexico.v
-theories/set.v
+theories/propset.v
 theories/decidable.v
 theories/list.v
 theories/functions.v

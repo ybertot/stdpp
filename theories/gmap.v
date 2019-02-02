@@ -3,8 +3,8 @@
 (** This file implements finite maps and finite sets with keys of any countable
 type. The implementation is based on [Pmap]s, radix-2 search trees. *)
 From stdpp Require Export countable infinite fin_maps fin_map_dom.
-From stdpp Require Import pmap mapset set.
-Set Default Proof Using "Type".
+From stdpp Require Import pmap mapset propset.
+(* Set Default Proof Using "Type". *)
 
 (** * The data structure *)
 (** We pack a [Pmap] together with a proof that ensures that all keys correspond
@@ -116,11 +116,11 @@ Qed.
 Program Instance gmap_countable
     `{Countable K, Countable A} : Countable (gmap K A) := {
   encode m := encode (map_to_list m : list (K * A));
-  decode p := map_of_list <$> decode p
+  decode p := list_to_map <$> decode p
 }.
 Next Obligation.
   intros K ?? A ?? m; simpl. rewrite decode_encode; simpl.
-  by rewrite map_of_to_list.
+  by rewrite list_to_map_to_list.
 Qed.
 
 (** * Curry and uncurry *)
@@ -218,7 +218,8 @@ Instance gset_dom `{Countable K} {A} : Dom (gmap K A) (gset K) := mapset_dom.
 Instance gset_dom_spec `{Countable K} :
   FinMapDom K (gmap K) (gset K) := mapset_dom_spec.
 
-Definition of_gset `{Countable A} (X : gset A) : set A := mkSet (λ x, x ∈ X).
+Definition of_gset `{Countable A} (X : gset A) : propset A :=
+  {[ x | x ∈ X ]}.
 Lemma elem_of_of_gset `{Countable A} (X : gset A) x : x ∈ of_gset X ↔ x ∈ X.
 Proof. done. Qed.
 

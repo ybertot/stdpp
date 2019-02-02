@@ -8,8 +8,8 @@ From stdpp Require Export
   vector
   numbers
   relations
-  collections
-  fin_collections
+  sets
+  fin_sets
   listset
   list
   lexico.
