@@ -62,6 +62,19 @@ Definition rtsc {A} (R : relation A) := rtc (sc R).
 (** Strongly normalizing elements. *)
 Notation sn R := (Acc (flip R)).
 
+(** The various kinds of "confluence" properties. Any relation that has the
+diamond property is confluent, and any confluent relation is locally confluent.
+The naming convention are taken from "Term Rewriting and All That" by Baader and
+Nipkow. *)
+Definition diamond {A} (R : relation A) :=
+  ∀ x y1 y2, R x y1 → R x y2 → ∃ z, R y1 z ∧ R y2 z.
+
+Definition confluent {A} (R : relation A) :=
+  diamond (rtc R).
+
+Definition locally_confluent {A} (R : relation A) :=
+  ∀ x y1 y2, R x y1 → R x y2 → ∃ z, rtc R y1 z ∧ rtc R y2 z.
+
 Hint Unfold nf red : core.
 
 (** * General theorems *)
@@ -234,7 +247,60 @@ Section properties.
     intros H. cut (∀ z, rtc R x z → all_loop R z); [eauto|].
     cofix FIX. constructor; eauto using rtc_r.
   Qed.
-End rtc.
+
+  (** An alternative definition of confluence; also known as the Church-Rosser
+  property. *)
+  Lemma confluent_alt :
+    confluent R ↔ (∀ x y, rtsc R x y → ∃ z, rtc R x z ∧ rtc R y z).
+  Proof.
+    split.
+    - intros Hcr. induction 1 as [x|x y1 y1' [Hy1|Hy1] Hy1' (z&IH1&IH2)]; eauto.
+      destruct (Hcr y1 x z) as (z'&?&?); eauto using rtc_transitive.
+    - intros Hcr x y1 y2 Hy1 Hy2.
+      apply Hcr; trans x; eauto using rtc_rtsc_rl, rtc_rtsc_lr.
+  Qed.
+
+  Lemma confluent_nf_r x y :
+    confluent R → rtsc R x y → nf R y → rtc R x y.
+  Proof.
+    rewrite confluent_alt. intros Hcr ??. destruct (Hcr x y) as (z&Hx&Hy); auto.
+    by apply rtc_nf in Hy as ->.
+  Qed.
+  Lemma confluent_nf_l x y :
+    confluent R → rtsc R x y → nf R x → rtc R y x.
+  Proof. intros. by apply (confluent_nf_r y x). Qed.
+
+  Lemma diamond_confluent :
+    diamond R → confluent R.
+  Proof.
+    intros Hdiam. assert (∀ x y1 y2,
+      rtc R x y1 → R x y2 → ∃ z, rtc R y1 z ∧ rtc R y2 z) as Hstrip.
+    { intros x y1 y2 Hy1; revert y2.
+      induction Hy1 as [x|x y1 y1' Hy1 Hy1' IH]; [by eauto|]; intros y2 Hy2.
+      destruct (Hdiam x y1 y2) as (z&Hy1z&Hy2z); auto.
+      destruct (IH z) as (z'&?&?); eauto. }
+    intros x y1 y2 Hy1; revert y2.
+    induction Hy1 as [x|x y1 y1' Hy1 Hy1' IH]; [by eauto|]; intros y2 Hy2.
+    destruct (Hstrip x y2 y1) as (z&?&?); eauto.
+    destruct (IH z) as (z'&?&?); eauto using rtc_transitive.
+  Qed.
+
+  Lemma confluent_locally_confluent :
+    confluent R → locally_confluent R.
+  Proof. unfold confluent, locally_confluent; eauto. Qed.
+
+  (** The following is also known as Newman's lemma *)
+  Lemma locally_confluent_confluent :
+    (∀ x, sn R x) → locally_confluent R → confluent R.
+  Proof.
+    intros Hsn Hcr x. induction (Hsn x) as [x _ IH].
+    intros y1 y2 Hy1 Hy2. destruct Hy1 as [x|x y1 y1' Hy1 Hy1']; [by eauto|].
+    destruct Hy2 as [x|x y2 y2' Hy2 Hy2']; [by eauto|].
+    destruct (Hcr x y1 y2) as (z&Hy1z&Hy2z); auto.
+    destruct (IH _ Hy1 y1' z) as (z1&?&?); auto.
+    destruct (IH _ Hy2 y2' z1) as (z2&?&?); eauto using rtc_transitive.
+  Qed.
+End properties.
 
 (** * Theorems on sub relations *)
 Section subrel.
