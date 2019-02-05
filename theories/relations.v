@@ -17,6 +17,9 @@ Section definitions.
   (** An element is in normal form if no further steps are possible. *)
   Definition nf (x : A) := ¬red x.
 
+  (** The symmetric closure. *)
+  Definition sc : relation A := λ x y, R x y ∨ R y x.
+
   (** The reflexive transitive closure. *)
   Inductive rtc : relation A :=
     | rtc_refl x : rtc x x
@@ -53,13 +56,16 @@ Section definitions.
     | ex_loop_do_step x y : R x y → ex_loop y → ex_loop x.
 End definitions.
 
-(* Strongly normalizing elements *)
+(** The reflexive transitive symmetric closure. *)
+Definition rtsc {A} (R : relation A) := rtc (sc R).
+
+(** Strongly normalizing elements. *)
 Notation sn R := (Acc (flip R)).
 
 Hint Unfold nf red : core.
 
 (** * General theorems *)
-Section rtc.
+Section closure.
   Context `{R : relation A}.
 
   Hint Constructors rtc nsteps bsteps tc : core.
@@ -77,6 +83,14 @@ Section rtc.
      [tests.typeclasses.test_setoid_rewrite]. *)
   Global Instance rtc_po : PreOrder (rtc R) | 10.
   Proof. split. exact (@rtc_refl A R). exact rtc_transitive. Qed.
+
+  (* Not an instance, related to the issue described above, this sometimes makes
+  [setoid_rewrite] queries loop. *)
+  Lemma rtc_equivalence : Symmetric R → Equivalence (rtc R).
+  Proof.
+    split; try apply _.
+    intros x y. induction 1 as [|x1 x2 x3]; [done|trans x2; eauto].
+  Qed.
 
   Lemma rtc_once x y : R x y → rtc R x y.
   Proof. eauto. Qed.
@@ -104,6 +118,9 @@ Section rtc.
   Qed.
   Lemma rtc_inv_r x z : rtc R x z → x = z ∨ ∃ y, rtc R x y ∧ R y z.
   Proof. revert z. apply rtc_ind_r; eauto. Qed.
+
+  Lemma rtc_nf x y : rtc R x y → nf R x → x = y.
+  Proof. destruct 1 as [x|x y1 y2]. done. intros []; eauto. Qed.
 
   Lemma nsteps_once x y : R x y → nsteps R 1 x y.
   Proof. eauto. Qed.
@@ -170,6 +187,36 @@ Section rtc.
   Proof. intros Hxy Hyz. revert x Hxy. induction Hyz; eauto using tc_r. Qed.
   Lemma tc_rtc x y : tc R x y → rtc R x y.
   Proof. induction 1; eauto. Qed.
+
+  Global Instance sc_symmetric : Symmetric (sc R).
+  Proof. unfold Symmetric, sc. naive_solver. Qed.
+
+  Lemma sc_lr x y : R x y → sc R x y.
+  Proof. by left. Qed.
+  Lemma sc_rl x y : R y x → sc R x y.
+  Proof. by right. Qed.
+End closure.
+
+Section more_closure.
+  Context `{R : relation A}.
+
+  Global Instance rtsc_equivalence : Equivalence (rtsc R) | 10.
+  Proof. apply rtc_equivalence, _. Qed.
+
+  Lemma rtsc_lr x y : R x y → rtsc R x y.
+  Proof. unfold rtsc. eauto using sc_lr, rtc_once. Qed.
+  Lemma rtsc_rl x y : R y x → rtsc R x y.
+  Proof. unfold rtsc. eauto using sc_rl, rtc_once. Qed.
+  Lemma rtc_rtsc_rl x y : rtc R x y → rtsc R x y.
+  Proof. induction 1; econstructor; eauto using sc_lr. Qed.
+  Lemma rtc_rtsc_lr x y : rtc R y x → rtsc R x y.
+  Proof. intros. symmetry. eauto using rtc_rtsc_rl. Qed.
+End more_closure.
+
+Section properties.
+  Context `{R : relation A}.
+
+  Hint Constructors rtc nsteps bsteps tc : core.
 
   Lemma acc_not_ex_loop x : Acc (flip R) x → ¬ex_loop R x.
   Proof. unfold not. induction 1; destruct 1; eauto. Qed.
