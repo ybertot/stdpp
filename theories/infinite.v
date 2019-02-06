@@ -1,6 +1,7 @@
 (* Copyright (c) 2012-2019, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
-From stdpp Require Import pretty fin_collections relations prelude gmap.
+From stdpp Require Export fin_collections.
+From stdpp Require Import pretty relations.
 
 (** The class [Infinite] axiomatizes types with infinitely many elements
 by giving an injection from the natural numbers into the type. It is mostly
