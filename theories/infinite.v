@@ -6,9 +6,10 @@ From stdpp Require Import pretty relations.
 (** The class [Infinite] axiomatizes types with infinitely many elements
 by giving an injection from the natural numbers into the type. It is mostly
 used to provide a generic [fresh] algorithm. *)
-Class Infinite A :=
-  { inject: nat → A;
-    inject_injective:> Inj (=) (=) inject }.
+Class Infinite A := {
+  inject: nat → A;
+  inject_injective :> Inj (=) (=) inject;
+}.
 
 Instance string_infinite: Infinite string := {| inject := λ x, "~" +:+ pretty x |}.
 Instance nat_infinite: Infinite nat := {| inject := id |}.
