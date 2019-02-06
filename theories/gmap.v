@@ -2,7 +2,7 @@
 (* This file is distributed under the terms of the BSD license. *)
 (** This file implements finite maps and finite sets with keys of any countable
 type. The implementation is based on [Pmap]s, radix-2 search trees. *)
-From stdpp Require Export countable fin_maps fin_map_dom.
+From stdpp Require Export countable infinite fin_maps fin_map_dom.
 From stdpp Require Import pmap mapset set.
 Set Default Proof Using "Type".
 
@@ -265,15 +265,7 @@ Proof.
 Qed.
 
 (** * Fresh elements *)
-(* This is pretty ad-hoc and just for the case of [gset positive]. We need a
-notion of countable non-finite types to generalize this. *)
-Instance gset_positive_fresh : Fresh positive (gset positive) := λ X,
-  let 'Mapset (GMap m _) := X in fresh (dom Pset m).
-Instance gset_positive_fresh_spec : FreshSpec positive (gset positive).
-Proof.
-  split.
-  - apply _.
-  - by intros X Y; rewrite <-elem_of_equiv_L; intros ->.
-  - intros [[m Hm]]; unfold fresh; simpl.
-    by intros ?; apply (is_fresh (dom Pset m)), elem_of_dom_2 with ().
-Qed.
+Instance gset_fresh `{Countable A, Infinite A} : Fresh A (gset A) :=
+  fresh_generic.
+Instance gset_fresh_spec `{Countable A, Infinite A} : FreshSpec A (gset A) :=
+  fresh_generic_spec.

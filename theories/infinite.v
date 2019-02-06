@@ -27,7 +27,12 @@ Proof.
 Qed.
 
 (** * Fresh elements *)
-Section Fresh.
+(** We do not make [fresh_generic] an instance because it leads to overlap. For
+various set implementations, e.g. [Pset] and [natset], we have an efficient
+implementation of [Fresh], which should always be used. Only for specific set
+implementations like [gset], which are not meant to be computationally
+efficient in the first place, we make [fresh_generic] an instance. *)
+Section fresh_generic.
   Context `{FinCollection A C, Infinite A, !RelDecision (∈@{C})}.
 
   Definition fresh_generic_body (s : C) (rec : ∀ s', s' ⊂ s → nat → A) (n : nat) : A :=
@@ -84,4 +89,4 @@ Section Fresh.
       destruct (fresh_generic_fixpoint_spec X 0)
         as (m & _ & -> & HnotinX & HbelowinX); auto.
   Qed.
-End Fresh.
+End fresh_generic.
