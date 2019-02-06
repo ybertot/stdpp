@@ -11,17 +11,27 @@ Class Infinite A := {
   inject_injective :> Inj (=) (=) inject;
 }.
 
+(** Instances *)
+Program Definition inj_infinite `{Infinite A} {B} (f : A → B) `{!Inj (=) (=) f} :
+  Infinite B := {| inject := f ∘ inject |}.
+
 Instance string_infinite: Infinite string := {| inject := λ x, "~" +:+ pretty x |}.
 Instance nat_infinite: Infinite nat := {| inject := id |}.
 Instance N_infinite: Infinite N := {| inject_injective := Nat2N.inj |}.
 Instance positive_infinite: Infinite positive := {| inject_injective := SuccNat2Pos.inj |}.
 Instance Z_infinite: Infinite Z := {| inject_injective := Nat2Z.inj |}.
 
-Instance option_infinite `{Infinite A}: Infinite (option A) := {| inject := Some ∘ inject |}.
+Instance option_infinite `{Infinite A} : Infinite (option A) := inj_infinite Some.
+Instance sum_infinite_l `{Infinite A} {B} : Infinite (A + B) := inj_infinite inl.
+Instance sum_infinite_r {A} `{Infinite B} : Infinite (A + B) := inj_infinite inr.
+Instance prod_infinite_l `{Infinite A, Inhabited B} : Infinite (A * B) :=
+  inj_infinite (,inhabitant).
+Instance prod_infinite_r `{Inhabited A, Infinite B} : Infinite (A * B) :=
+  inj_infinite (inhabitant,).
+
 Program Instance list_infinite `{Inhabited A}: Infinite (list A) :=
   {| inject := λ i, replicate i inhabitant |}.
 Next Obligation.
-Proof.
   intros A * i j Heqrep%(f_equal length).
   rewrite !replicate_length in Heqrep; done.
 Qed.
