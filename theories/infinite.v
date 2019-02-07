@@ -41,7 +41,11 @@ Qed.
 various set implementations, e.g. [Pset] and [natset], we have an efficient
 implementation of [Fresh], which should always be used. Only for specific set
 implementations like [gset], which are not meant to be computationally
-efficient in the first place, we make [fresh_generic] an instance. *)
+efficient in the first place, we make [fresh_generic] an instance.
+
+Since [fresh_generic] is too inefficient for all practical purposes, we seal
+off its definition. That way, Coq will not accidentally unfold it during
+unification or other tactics. *)
 Section fresh_generic.
   Context `{FinCollection A C, Infinite A, !RelDecision (∈@{C})}.
 
@@ -52,12 +56,14 @@ Section fresh_generic.
     | right _ => cand
     end.
 
-  Definition fresh_generic_fix : C → nat → A :=
-    Fix (wf_guard 20 collection_wf) (const (nat → A)) fresh_generic_body.
+  Definition fresh_generic_fix_aux :
+    seal (Fix collection_wf (const (nat → A)) fresh_generic_body). by eexists. Qed.
+  Definition fresh_generic_fix := fresh_generic_fix_aux.(unseal).
 
   Lemma fresh_generic_fixpoint_unfold s n:
     fresh_generic_fix s n = fresh_generic_body s (λ s' _, fresh_generic_fix s') n.
   Proof.
+    unfold fresh_generic_fix. rewrite fresh_generic_fix_aux.(seal_eq).
     refine (Fix_unfold_rel _ _ (const (pointwise_relation nat (=))) _ _ s n).
     intros s' f g Hfg i. unfold fresh_generic_body. case_decide; naive_solver.
   Qed.
