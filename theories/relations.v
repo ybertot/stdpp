@@ -2,8 +2,7 @@
 (* This file is distributed under the terms of the BSD license. *)
 (** This file collects definitions and theorems on abstract rewriting systems.
 These are particularly useful as we define the operational semantics as a
-small step semantics. This file defines a hint database [ars] containing
-some theorems on abstract rewriting systems. *)
+small step semantics. *)
 From Coq Require Import Wf_nat.
 From stdpp Require Export tactics base.
 Set Default Proof Using "Type".
@@ -17,6 +16,9 @@ Section definitions.
 
   (** An element is in normal form if no further steps are possible. *)
   Definition nf (x : A) := ¬red x.
+
+  (** The symmetric closure. *)
+  Definition sc : relation A := λ x y, R x y ∨ R y x.
 
   (** The reflexive transitive closure. *)
   Inductive rtc : relation A :=
@@ -54,13 +56,29 @@ Section definitions.
     | ex_loop_do_step x y : R x y → ex_loop y → ex_loop x.
 End definitions.
 
-(* Strongly normalizing elements *)
+(** The reflexive transitive symmetric closure. *)
+Definition rtsc {A} (R : relation A) := rtc (sc R).
+
+(** Strongly normalizing elements. *)
 Notation sn R := (Acc (flip R)).
+
+(** The various kinds of "confluence" properties. Any relation that has the
+diamond property is confluent, and any confluent relation is locally confluent.
+The naming convention are taken from "Term Rewriting and All That" by Baader and
+Nipkow. *)
+Definition diamond {A} (R : relation A) :=
+  ∀ x y1 y2, R x y1 → R x y2 → ∃ z, R y1 z ∧ R y2 z.
+
+Definition confluent {A} (R : relation A) :=
+  diamond (rtc R).
+
+Definition locally_confluent {A} (R : relation A) :=
+  ∀ x y1 y2, R x y1 → R x y2 → ∃ z, rtc R y1 z ∧ rtc R y2 z.
 
 Hint Unfold nf red : core.
 
 (** * General theorems *)
-Section rtc.
+Section closure.
   Context `{R : relation A}.
 
   Hint Constructors rtc nsteps bsteps tc : core.
@@ -78,6 +96,14 @@ Section rtc.
      [tests.typeclasses.test_setoid_rewrite]. *)
   Global Instance rtc_po : PreOrder (rtc R) | 10.
   Proof. split. exact (@rtc_refl A R). exact rtc_transitive. Qed.
+
+  (* Not an instance, related to the issue described above, this sometimes makes
+  [setoid_rewrite] queries loop. *)
+  Lemma rtc_equivalence : Symmetric R → Equivalence (rtc R).
+  Proof.
+    split; try apply _.
+    intros x y. induction 1 as [|x1 x2 x3]; [done|trans x2; eauto].
+  Qed.
 
   Lemma rtc_once x y : R x y → rtc R x y.
   Proof. eauto. Qed.
@@ -105,6 +131,9 @@ Section rtc.
   Qed.
   Lemma rtc_inv_r x z : rtc R x z → x = z ∨ ∃ y, rtc R x y ∧ R y z.
   Proof. revert z. apply rtc_ind_r; eauto. Qed.
+
+  Lemma rtc_nf x y : rtc R x y → nf R x → x = y.
+  Proof. destruct 1 as [x|x y1 y2]. done. intros []; eauto. Qed.
 
   Lemma nsteps_once x y : R x y → nsteps R 1 x y.
   Proof. eauto. Qed.
@@ -172,6 +201,36 @@ Section rtc.
   Lemma tc_rtc x y : tc R x y → rtc R x y.
   Proof. induction 1; eauto. Qed.
 
+  Global Instance sc_symmetric : Symmetric (sc R).
+  Proof. unfold Symmetric, sc. naive_solver. Qed.
+
+  Lemma sc_lr x y : R x y → sc R x y.
+  Proof. by left. Qed.
+  Lemma sc_rl x y : R y x → sc R x y.
+  Proof. by right. Qed.
+End closure.
+
+Section more_closure.
+  Context `{R : relation A}.
+
+  Global Instance rtsc_equivalence : Equivalence (rtsc R) | 10.
+  Proof. apply rtc_equivalence, _. Qed.
+
+  Lemma rtsc_lr x y : R x y → rtsc R x y.
+  Proof. unfold rtsc. eauto using sc_lr, rtc_once. Qed.
+  Lemma rtsc_rl x y : R y x → rtsc R x y.
+  Proof. unfold rtsc. eauto using sc_rl, rtc_once. Qed.
+  Lemma rtc_rtsc_rl x y : rtc R x y → rtsc R x y.
+  Proof. induction 1; econstructor; eauto using sc_lr. Qed.
+  Lemma rtc_rtsc_lr x y : rtc R y x → rtsc R x y.
+  Proof. intros. symmetry. eauto using rtc_rtsc_rl. Qed.
+End more_closure.
+
+Section properties.
+  Context `{R : relation A}.
+
+  Hint Constructors rtc nsteps bsteps tc : core.
+
   Lemma acc_not_ex_loop x : Acc (flip R) x → ¬ex_loop R x.
   Proof. unfold not. induction 1; destruct 1; eauto. Qed.
 
@@ -188,11 +247,60 @@ Section rtc.
     intros H. cut (∀ z, rtc R x z → all_loop R z); [eauto|].
     cofix FIX. constructor; eauto using rtc_r.
   Qed.
-End rtc.
 
-Hint Constructors rtc nsteps bsteps tc : ars.
-Hint Resolve rtc_once rtc_r tc_r rtc_transitive tc_rtc_l tc_rtc_r
-  tc_rtc bsteps_once bsteps_r bsteps_refl bsteps_trans : ars.
+  (** An alternative definition of confluence; also known as the Church-Rosser
+  property. *)
+  Lemma confluent_alt :
+    confluent R ↔ (∀ x y, rtsc R x y → ∃ z, rtc R x z ∧ rtc R y z).
+  Proof.
+    split.
+    - intros Hcr. induction 1 as [x|x y1 y1' [Hy1|Hy1] Hy1' (z&IH1&IH2)]; eauto.
+      destruct (Hcr y1 x z) as (z'&?&?); eauto using rtc_transitive.
+    - intros Hcr x y1 y2 Hy1 Hy2.
+      apply Hcr; trans x; eauto using rtc_rtsc_rl, rtc_rtsc_lr.
+  Qed.
+
+  Lemma confluent_nf_r x y :
+    confluent R → rtsc R x y → nf R y → rtc R x y.
+  Proof.
+    rewrite confluent_alt. intros Hcr ??. destruct (Hcr x y) as (z&Hx&Hy); auto.
+    by apply rtc_nf in Hy as ->.
+  Qed.
+  Lemma confluent_nf_l x y :
+    confluent R → rtsc R x y → nf R x → rtc R y x.
+  Proof. intros. by apply (confluent_nf_r y x). Qed.
+
+  Lemma diamond_confluent :
+    diamond R → confluent R.
+  Proof.
+    intros Hdiam. assert (∀ x y1 y2,
+      rtc R x y1 → R x y2 → ∃ z, rtc R y1 z ∧ rtc R y2 z) as Hstrip.
+    { intros x y1 y2 Hy1; revert y2.
+      induction Hy1 as [x|x y1 y1' Hy1 Hy1' IH]; [by eauto|]; intros y2 Hy2.
+      destruct (Hdiam x y1 y2) as (z&Hy1z&Hy2z); auto.
+      destruct (IH z) as (z'&?&?); eauto. }
+    intros x y1 y2 Hy1; revert y2.
+    induction Hy1 as [x|x y1 y1' Hy1 Hy1' IH]; [by eauto|]; intros y2 Hy2.
+    destruct (Hstrip x y2 y1) as (z&?&?); eauto.
+    destruct (IH z) as (z'&?&?); eauto using rtc_transitive.
+  Qed.
+
+  Lemma confluent_locally_confluent :
+    confluent R → locally_confluent R.
+  Proof. unfold confluent, locally_confluent; eauto. Qed.
+
+  (** The following is also known as Newman's lemma *)
+  Lemma locally_confluent_confluent :
+    (∀ x, sn R x) → locally_confluent R → confluent R.
+  Proof.
+    intros Hsn Hcr x. induction (Hsn x) as [x _ IH].
+    intros y1 y2 Hy1 Hy2. destruct Hy1 as [x|x y1 y1' Hy1 Hy1']; [by eauto|].
+    destruct Hy2 as [x|x y2 y2' Hy2 Hy2']; [by eauto|].
+    destruct (Hcr x y1 y2) as (z&Hy1z&Hy2z); auto.
+    destruct (IH _ Hy1 y1' z) as (z1&?&?); auto.
+    destruct (IH _ Hy2 y2' z1) as (z2&?&?); eauto using rtc_transitive.
+  Qed.
+End properties.
 
 (** * Theorems on sub relations *)
 Section subrel.
