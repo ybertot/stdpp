@@ -5,6 +5,7 @@ Set Default Proof Using "Type".
 
 Class Finite A `{EqDecision A} := {
   enum : list A;
+  (* [NoDup] makes it easy to define the cardinality of the type. *)
   NoDup_enum : NoDup enum;
   elem_of_enum x : x ∈ enum
 }.
