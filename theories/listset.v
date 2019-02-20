@@ -38,7 +38,12 @@ Proof.
   abstract (by rewrite listset_empty_alt).
 Defined.
 
-Context `{!EqDecision A}.
+Context `{Aeq : !EqDecision A}.
+
+Global Instance listset_elem_of_dec : RelDecision (∈@{listset A}).
+Proof using Aeq.
+  refine (λ x X, cast_if (decide (x ∈ listset_car X))); done.
+Defined.
 
 Global Instance listset_intersection: Intersection (listset A) := λ l k,
   let (l') := l in let (k') := k in Listset (list_intersection l' k').
