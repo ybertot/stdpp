@@ -1,6 +1,74 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
+## std++ master
+
+Numerous functions and theorems have been renamed.
+
+- Consistently use `set` instead of `collection`.
+- Rename the `Collection` type class into `Set_`. Likewise, `SimpleCollection`
+  is called `SemiSet`, and `FinCollection` is called `FinSet`, and
+  `CollectionMonad` is called `MonadSet`.
+- Rename `collections.v` and `fin_collections.v` into `sets.v` and `fin_sets.v`,
+  respectively.
+- Rename `set A := A → Prop` (`theories/set.v`) into `propset`, and likewise
+  `bset` into `boolset`.
+- Consistently prefer `X_to_Y` for conversion functions, e.g. `list_to_map`
+  instead of the former `map_of_list`.
+
+The following `sed` script should get you a long way:
+
+```
+sed '
+s/SimpleCollection/SemiSet/g;
+s/FinCollection/FinSet/g;
+s/CollectionMonad/MonadSet/g;
+s/Collection/Set\_/g;
+s/collection\_simple/set\_semi\_set/g;
+s/fin\_collection/fin\_set/g;
+s/collection\_monad\_simple/monad\_set\_semi\_set/g;
+s/collection\_equiv/set\_equiv/g;
+s/\bbset/boolset/g;
+s/mkBSet/BoolSet/g;
+s/mkSet/PropSet/g;
+s/set\_equivalence/set\_equiv\_equivalence/g;
+s/collection\_subseteq/set\_subseteq/g;
+s/collection\_disjoint/set\_disjoint/g;
+s/collection\_fold/set\_fold/g;
+s/collection\_map/set\_map/g;
+s/collection\_size/set\_size/g;
+s/collection\_filter/set\_filter/g;
+s/collection\_guard/set\_guard/g;
+s/collection\_choose/set\_choose/g;
+s/collection\_ind/set\_ind/g;
+s/collection\_wf/set\_wf/g;
+s/map\_to\_collection/map\_to\_set/g;
+s/map\_of\_collection/set\_to\_map/g;
+s/map\_of\_list/list\_to\_map/g;
+s/map\_of\_to_list/list\_to\_map\_to\_list/g;
+s/map\_to\_of\_list/map\_to\_list\_to\_map/g;
+s/\bof\_list/list\_to\_set/g;
+s/\bof\_option/option\_to\_set/g;
+s/elem\_of\_of\_list/elem\_of\_list\_to\_set/g;
+s/elem\_of\_of\_option/elem\_of\_option\_to\_set/g;
+s/collection\_not\_subset\_inv/set\_not\_subset\_inv/g;
+s/seq\_set/set\_seq/g;
+s/collections/sets/g;
+s/collection/set/g;
+s/to\_gmap/gset\_to\_gmap/g;
+s/of\_bools/bools\_to\_natset/g;
+s/to_bools/natset\_to\_bools/g;
+s/coPset\.of_gset/gset\_to\_coPset/g;
+s/coPset\.elem\_of\_of\_gset/elem\_of\_gset\_to\_coPset/g;
+s/of\_gset\_finite/gset\_to\_coPset\_finite/g;
+s/set\_seq\_S\_disjoint/set\_seq\_S\_end\_disjoint/g;
+s/set\_seq\_S\_union/set\_seq\_S\_end\_union/g;
+s/map\_to\_of\_list/map\_to\_list\_to\_map/g;
+s/of\_bools/bools\_to\_natset/g;
+s/to\_bools/natset\_to\_bools/g;
+' -i $(find -name "*.v")
+```
+
 ## std++ 1.1.0 (released 2017-12-19)
 
 Coq 8.5 is no longer supported by this release of std++.  Use std++ 1.0 if you
