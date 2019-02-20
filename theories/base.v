@@ -2,7 +2,7 @@
 (* This file is distributed under the terms of the BSD license. *)
 (** This file collects type class interfaces, notations, and general theorems
 that are used throughout the whole development. Most importantly it contains
-abstract interfaces for ordered structures, collections, and various other data
+abstract interfaces for ordered structures, sets, and various other data
 structures. *)
 
 From Coq Require Export Morphisms RelationClasses List Bool Utf8 Setoid.
@@ -753,9 +753,9 @@ End sig_map.
 Arguments sig_map _ _ _ _ _ _ !_ / : assert.
 
 
-(** * Operations on collections *)
+(** * Operations on sets *)
 (** We define operational type classes for the traditional operations and
-relations on collections: the empty collection [∅], the union [(∪)],
+relations on sets: the empty set [∅], the union [(∪)],
 intersection [(∩)], and difference [(∖)], the singleton [{[_]}], the subset
 [(⊆)] and element of [(∈)] relation, and disjointess [(##)]. *)
 Class Empty A := empty: A.
@@ -1053,7 +1053,7 @@ Instance: Params (@partial_alter) 4 := {}.
 Arguments partial_alter _ _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The function [dom C m] should yield the domain of [m]. That is a finite
-collection of type [C] that contains the keys that are a member of [m]. *)
+set of type [C] that contains the keys that are a member of [m]. *)
 Class Dom (M C : Type) := dom: M → C.
 Hint Mode Dom ! ! : typeclass_instances.
 Instance: Params (@dom) 3 := {}.
@@ -1110,23 +1110,28 @@ Notation "<[ k := a ]{ Γ }>" := (insertE Γ k a)
 Arguments insertE _ _ _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 
 
-(** * Axiomatization of collections *)
-(** The class [SimpleCollection A C] axiomatizes a collection of type [C] with
-elements of type [A]. *)
-Class SimpleCollection A C `{ElemOf A C,
+(** * Axiomatization of sets *)
+(** The classes [SemiSet A C] and [Set_ A C] axiomatize sset of type [C] with
+elements of type [A]. The first class, [SemiSet] does not include intersection
+and difference. It is useful for the case of lists, where decidable equality
+is needed to implement intersection and difference, but not union.
+
+Note that we cannot use the name [Set] since that is a reserved keyword. Hence
+we use [Set_]. *)
+Class SemiSet A C `{ElemOf A C,
     Empty C, Singleton A C, Union C} : Prop := {
   not_elem_of_empty (x : A) : x ∉ ∅;
   elem_of_singleton (x y : A) : x ∈ {[ y ]} ↔ x = y;
   elem_of_union X Y (x : A) : x ∈ X ∪ Y ↔ x ∈ X ∨ x ∈ Y
 }.
-Class Collection A C `{ElemOf A C, Empty C, Singleton A C,
+Class Set_ A C `{ElemOf A C, Empty C, Singleton A C,
     Union C, Intersection C, Difference C} : Prop := {
-  collection_simple :>> SimpleCollection A C;
+  set_semi_set :>> SemiSet A C;
   elem_of_intersection X Y (x : A) : x ∈ X ∩ Y ↔ x ∈ X ∧ x ∈ Y;
   elem_of_difference X Y (x : A) : x ∈ X ∖ Y ↔ x ∈ X ∧ x ∉ Y
 }.
 
-(** We axiomative a finite collection as a collection whose elements can be
+(** We axiomative a finite set as a set whose elements can be
 enumerated as a list. These elements, given by the [elements] function, may be
 in any order and should not contain duplicates. *)
 Class Elements A C := elements: C → list A.
@@ -1159,9 +1164,9 @@ Qed.
 
 (** Decidability of equality of the carrier set is admissible, but we add it
 anyway so as to avoid cycles in type class search. *)
-Class FinCollection A C `{ElemOf A C, Empty C, Singleton A C, Union C,
+Class FinSet A C `{ElemOf A C, Empty C, Singleton A C, Union C,
     Intersection C, Difference C, Elements A C, EqDecision A} : Prop := {
-  fin_collection :>> Collection A C;
+  fin_set_set :>> Set_ A C;
   elem_of_elements X x : x ∈ elements X ↔ x ∈ X;
   NoDup_elements X : NoDup (elements X)
 }.
@@ -1170,18 +1175,18 @@ Hint Mode Size ! : typeclass_instances.
 Arguments size {_ _} !_ / : simpl nomatch, assert.
 Instance: Params (@size) 2 := {}.
 
-(** The class [CollectionMonad M] axiomatizes a type constructor [M] that can be
-used to construct a collection [M A] with elements of type [A]. The advantage
-of this class, compared to [Collection], is that it also axiomatizes the
+(** The class [MonadSet M] axiomatizes a type constructor [M] that can be
+used to construct a set [M A] with elements of type [A]. The advantage
+of this class, compared to [Set_], is that it also axiomatizes the
 the monadic operations. The disadvantage, is that not many inhabits are
 possible (we will only provide an inhabitant using unordered lists without
-duplicates removed). More interesting implementations typically need
-decidability of equality, or a total order on the elements, which do not fit
+duplicates). More interesting implementations typically need
+decidable equality, or a total order on the elements, which do not fit
 in a type constructor of type [Type → Type]. *)
-Class CollectionMonad M `{∀ A, ElemOf A (M A),
+Class MonadSet M `{∀ A, ElemOf A (M A),
     ∀ A, Empty (M A), ∀ A, Singleton A (M A), ∀ A, Union (M A),
     !MBind M, !MRet M, !FMap M, !MJoin M} : Prop := {
-  collection_monad_simple A :> SimpleCollection A (M A);
+  monad_set_semi_set A :> SemiSet A (M A);
   elem_of_bind {A B} (f : A → M B) (X : M A) (x : B) :
     x ∈ X ≫= f ↔ ∃ y, x ∈ f y ∧ y ∈ X;
   elem_of_ret {A} (x y : A) : x ∈ mret y ↔ x = y;
@@ -1192,13 +1197,13 @@ Class CollectionMonad M `{∀ A, ElemOf A (M A),
 
 (** The function [fresh X] yields an element that is not contained in [X]. We
 will later prove that [fresh] is [Proper] with respect to the induced setoid
-equality on collections. *)
+equality on sets. *)
 Class Fresh A C := fresh: C → A.
 Hint Mode Fresh - ! : typeclass_instances.
 Instance: Params (@fresh) 3 := {}.
 Class FreshSpec A C `{ElemOf A C,
     Empty C, Singleton A C, Union C, Fresh A C} : Prop := {
-  fresh_collection_simple :>> SimpleCollection A C;
+  fresh_set_semi_set :>> SemiSet A C;
   fresh_proper_alt X Y : (∀ x, x ∈ X ↔ x ∈ Y) → fresh X = fresh Y;
   is_fresh (X : C) : fresh X ∉ X
 }.

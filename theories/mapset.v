@@ -35,7 +35,7 @@ Proof.
   f_equal. apply map_eq. intros i. apply option_eq. intros []. by apply E.
 Qed.
 
-Instance mapset_collection: Collection K (mapset M).
+Instance mapset_set: Set_ K (mapset M).
 Proof.
   split; [split | | ].
   - unfold empty, elem_of, mapset_empty, mapset_elem_of.
@@ -56,7 +56,7 @@ Proof.
 Qed.
 Global Instance mapset_leibniz : LeibnizEquiv (mapset M).
 Proof. intros ??. apply mapset_eq. Qed.
-Global Instance mapset_fin_collection : FinCollection K (mapset M).
+Global Instance mapset_fin_set : FinSet K (mapset M).
 Proof.
   split.
   - apply _.

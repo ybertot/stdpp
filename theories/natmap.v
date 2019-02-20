@@ -260,39 +260,39 @@ Instance natmap_dom {A} : Dom (natmap A) natset := mapset_dom.
 Instance: FinMapDom nat natmap natset := mapset_dom_spec.
 
 (* Fixpoint avoids this definition from being unfolded *)
-Fixpoint of_bools (βs : list bool) : natset :=
+Fixpoint bools_to_natset (βs : list bool) : natset :=
   let f (β : bool) := if β then Some () else None in
   Mapset $ list_to_natmap $ f <$> βs.
-Definition to_bools (sz : nat) (X : natset) : list bool :=
+Definition natset_to_bools (sz : nat) (X : natset) : list bool :=
   let f (mu : option ()) := match mu with Some _ => true | None => false end in
   resize sz false $ f <$> natmap_car (mapset_car X).
 
-Lemma of_bools_unfold βs :
+Lemma bools_to_natset_unfold βs :
   let f (β : bool) := if β then Some () else None in
-  of_bools βs = Mapset $ list_to_natmap $ f <$> βs.
+  bools_to_natset βs = Mapset $ list_to_natmap $ f <$> βs.
 Proof. by destruct βs. Qed.
-Lemma elem_of_of_bools βs i : i ∈ of_bools βs ↔ βs !! i = Some true.
+Lemma elem_of_bools_to_natset βs i : i ∈ bools_to_natset βs ↔ βs !! i = Some true.
 Proof.
-  rewrite of_bools_unfold; unfold elem_of, mapset_elem_of; simpl.
+  rewrite bools_to_natset_unfold; unfold elem_of, mapset_elem_of; simpl.
   rewrite list_to_natmap_spec, list_lookup_fmap.
   destruct (βs !! i) as [[]|]; compute; intuition congruence.
 Qed.
-Lemma of_bools_union βs1 βs2 :
+Lemma bools_to_natset_union βs1 βs2 :
   length βs1 = length βs2 →
-  of_bools (βs1 ||* βs2) = of_bools βs1 ∪ of_bools βs2.
+  bools_to_natset (βs1 ||* βs2) = bools_to_natset βs1 ∪ bools_to_natset βs2.
 Proof.
   rewrite <-Forall2_same_length; intros Hβs.
-  apply elem_of_equiv_L. intros i. rewrite elem_of_union, !elem_of_of_bools.
+  apply elem_of_equiv_L. intros i. rewrite elem_of_union, !elem_of_bools_to_natset.
   revert i. induction Hβs as [|[] []]; intros [|?]; naive_solver.
 Qed.
-Lemma to_bools_length (X : natset) sz : length (to_bools sz X) = sz.
+Lemma natset_to_bools_length (X : natset) sz : length (natset_to_bools sz X) = sz.
 Proof. apply resize_length. Qed.
-Lemma lookup_to_bools_ge sz X i : sz ≤ i → to_bools sz X !! i = None.
+Lemma lookup_natset_to_bools_ge sz X i : sz ≤ i → natset_to_bools sz X !! i = None.
 Proof. by apply lookup_resize_old. Qed.
-Lemma lookup_to_bools sz X i β :
-  i < sz → to_bools sz X !! i = Some β ↔ (i ∈ X ↔ β = true).
+Lemma lookup_natset_to_bools sz X i β :
+  i < sz → natset_to_bools sz X !! i = Some β ↔ (i ∈ X ↔ β = true).
 Proof.
-  unfold to_bools, elem_of, mapset_elem_of, lookup at 2, natmap_lookup; simpl.
+  unfold natset_to_bools, elem_of, mapset_elem_of, lookup at 2, natmap_lookup; simpl.
   intros. destruct (mapset_car X) as [l ?]; simpl.
   destruct (l !! i) as [mu|] eqn:Hmu; simpl.
   { rewrite lookup_resize, list_lookup_fmap, Hmu
@@ -301,30 +301,31 @@ Proof.
   rewrite lookup_resize_new by (rewrite ?fmap_length;
     eauto using lookup_ge_None_1); destruct β; intuition congruence.
 Qed.
-Lemma lookup_to_bools_true sz X i :
-  i < sz → to_bools sz X !! i = Some true ↔ i ∈ X.
-Proof. intros. rewrite lookup_to_bools by done. intuition. Qed.
-Lemma lookup_to_bools_false sz X i :
-  i < sz → to_bools sz X !! i = Some false ↔ i ∉ X.
-Proof. intros. rewrite lookup_to_bools by done. naive_solver. Qed.
-Lemma to_bools_union sz X1 X2 :
-  to_bools sz (X1 ∪ X2) = to_bools sz X1 ||* to_bools sz X2.
+Lemma lookup_natset_to_bools_true sz X i :
+  i < sz → natset_to_bools sz X !! i = Some true ↔ i ∈ X.
+Proof. intros. rewrite lookup_natset_to_bools by done. intuition. Qed.
+Lemma lookup_natset_to_bools_false sz X i :
+  i < sz → natset_to_bools sz X !! i = Some false ↔ i ∉ X.
+Proof. intros. rewrite lookup_natset_to_bools by done. naive_solver. Qed.
+Lemma natset_to_bools_union sz X1 X2 :
+  natset_to_bools sz (X1 ∪ X2) = natset_to_bools sz X1 ||* natset_to_bools sz X2.
 Proof.
   apply list_eq; intros i; rewrite lookup_zip_with.
-  destruct (decide (i < sz)); [|by rewrite !lookup_to_bools_ge by lia].
+  destruct (decide (i < sz)); [|by rewrite !lookup_natset_to_bools_ge by lia].
   apply option_eq; intros β.
-  rewrite lookup_to_bools, elem_of_union by done; intros.
+  rewrite lookup_natset_to_bools, elem_of_union by done; intros.
   destruct (decide (i ∈ X1)), (decide (i ∈ X2)); repeat first
-    [ rewrite (λ X H, proj2 (lookup_to_bools_true sz X i H)) by done
-    | rewrite (λ X H, proj2 (lookup_to_bools_false sz X i H)) by done];
+    [ rewrite (λ X H, proj2 (lookup_natset_to_bools_true sz X i H)) by done
+    | rewrite (λ X H, proj2 (lookup_natset_to_bools_false sz X i H)) by done];
     destruct β; naive_solver.
 Qed.
-Lemma to_of_bools βs sz : to_bools sz (of_bools βs) = resize sz false βs.
+Lemma natset_to_bools_to_natset βs sz :
+  natset_to_bools sz (bools_to_natset βs) = resize sz false βs.
 Proof.
   apply list_eq; intros i. destruct (decide (i < sz));
-    [|by rewrite lookup_to_bools_ge, lookup_resize_old by lia].
+    [|by rewrite lookup_natset_to_bools_ge, lookup_resize_old by lia].
   apply option_eq; intros β.
-  rewrite lookup_to_bools, elem_of_of_bools by done.
+  rewrite lookup_natset_to_bools, elem_of_bools_to_natset by done.
   destruct (decide (i < length βs)).
   { rewrite lookup_resize by done.
     destruct (lookup_lt_is_Some_2 βs i) as [[]]; destruct β; naive_solver. }

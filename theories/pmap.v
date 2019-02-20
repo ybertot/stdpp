@@ -303,10 +303,10 @@ Qed.
 
 Program Instance Pmap_countable `{Countable A} : Countable (Pmap A) := {
   encode m := encode (map_to_list m : list (positive * A));
-  decode p := map_of_list <$> decode p
+  decode p := list_to_map <$> decode p
 }.
 Next Obligation.
-  intros A ?? m; simpl. rewrite decode_encode; simpl. by rewrite map_of_to_list.
+  intros A ?? m; simpl. rewrite decode_encode; simpl. by rewrite list_to_map_to_list.
 Qed.
 
 (** * Finite sets *)

@@ -1,31 +1,31 @@
 (* Copyright (c) 2012-2019, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
-(** This file collects definitions and theorems on finite collections. Most
+(** This file collects definitions and theorems on finite sets. Most
 importantly, it implements a fold and size function and some useful induction
-principles on finite collections . *)
+principles on finite sets . *)
 From stdpp Require Import relations.
-From stdpp Require Export numbers collections.
+From stdpp Require Export numbers sets.
 Set Default Proof Using "Type*".
 
-Instance collection_size `{Elements A C} : Size C := length ∘ elements.
-Definition collection_fold `{Elements A C} {B}
+Instance set_size `{Elements A C} : Size C := length ∘ elements.
+Definition set_fold `{Elements A C} {B}
   (f : A → B → B) (b : B) : C → B := foldr f b ∘ elements.
 
-Instance collection_filter
+Instance set_filter
     `{Elements A C, Empty C, Singleton A C, Union C} : Filter A C := λ P _ X,
-  of_list (filter P (elements X)).
-Typeclasses Opaque collection_filter.
+  list_to_set (filter P (elements X)).
+Typeclasses Opaque set_filter.
 
-Definition collection_map `{Elements A C, Singleton B D, Empty D, Union D}
+Definition set_map `{Elements A C, Singleton B D, Empty D, Union D}
     (f : A → B) (X : C) : D :=
-  of_list (f <$> elements X).
-Typeclasses Opaque collection_map.
+  list_to_set (f <$> elements X).
+Typeclasses Opaque set_map.
 
-Section fin_collection.
-Context `{FinCollection A C}.
+Section fin_set.
+Context `{FinSet A C}.
 Implicit Types X Y : C.
 
-Lemma fin_collection_finite X : set_finite X.
+Lemma fin_set_finite X : set_finite X.
 Proof. by exists (elements X); intros; rewrite elem_of_elements. Qed.
 
 Instance elem_of_dec_slow : RelDecision (∈@{C}) | 100.
@@ -80,11 +80,11 @@ Proof.
 Qed.
 
 (** * The [size] operation *)
-Global Instance collection_size_proper: Proper ((≡) ==> (=)) (@size C _).
+Global Instance set_size_proper: Proper ((≡) ==> (=)) (@size C _).
 Proof. intros ?? E. apply Permutation_length. by rewrite E. Qed.
 
 Lemma size_empty : size (∅ : C) = 0.
-Proof. unfold size, collection_size. simpl. by rewrite elements_empty. Qed.
+Proof. unfold size, set_size. simpl. by rewrite elements_empty. Qed.
 Lemma size_empty_inv (X : C) : size X = 0 → X ≡ ∅.
 Proof.
   intros; apply equiv_empty; intros x; rewrite <-elem_of_elements.
@@ -95,27 +95,27 @@ Proof. split. apply size_empty_inv. by intros ->; rewrite size_empty. Qed.
 Lemma size_non_empty_iff (X : C) : size X ≠ 0 ↔ X ≢ ∅.
 Proof. by rewrite size_empty_iff. Qed.
 
-Lemma collection_choose_or_empty X : (∃ x, x ∈ X) ∨ X ≡ ∅.
+Lemma set_choose_or_empty X : (∃ x, x ∈ X) ∨ X ≡ ∅.
 Proof.
   destruct (elements X) as [|x l] eqn:HX; [right|left].
   - apply equiv_empty; intros x. by rewrite <-elem_of_elements, HX, elem_of_nil.
   - exists x. rewrite <-elem_of_elements, HX. by left.
 Qed.
-Lemma collection_choose X : X ≢ ∅ → ∃ x, x ∈ X.
-Proof. intros. by destruct (collection_choose_or_empty X). Qed.
-Lemma collection_choose_L `{!LeibnizEquiv C} X : X ≠ ∅ → ∃ x, x ∈ X.
-Proof. unfold_leibniz. apply collection_choose. Qed.
+Lemma set_choose X : X ≢ ∅ → ∃ x, x ∈ X.
+Proof. intros. by destruct (set_choose_or_empty X). Qed.
+Lemma set_choose_L `{!LeibnizEquiv C} X : X ≠ ∅ → ∃ x, x ∈ X.
+Proof. unfold_leibniz. apply set_choose. Qed.
 Lemma size_pos_elem_of X : 0 < size X → ∃ x, x ∈ X.
 Proof.
-  intros Hsz. destruct (collection_choose_or_empty X) as [|HX]; [done|].
+  intros Hsz. destruct (set_choose_or_empty X) as [|HX]; [done|].
   contradict Hsz. rewrite HX, size_empty; lia.
 Qed.
 
 Lemma size_singleton (x : A) : size ({[ x ]} : C) = 1.
-Proof. unfold size, collection_size. simpl. by rewrite elements_singleton. Qed.
+Proof. unfold size, set_size. simpl. by rewrite elements_singleton. Qed.
 Lemma size_singleton_inv X x y : size X = 1 → x ∈ X → y ∈ X → x = y.
 Proof.
-  unfold size, collection_size. simpl. rewrite <-!elem_of_elements.
+  unfold size, set_size. simpl. rewrite <-!elem_of_elements.
   generalize (elements X). intros [|? l]; intro; simplify_eq/=.
   rewrite (nil_length_inv l), !elem_of_list_singleton by done; congruence.
 Qed.
@@ -129,7 +129,7 @@ Qed.
 
 Lemma size_union X Y : X ## Y → size (X ∪ Y) = size X + size Y.
 Proof.
-  intros. unfold size, collection_size. simpl. rewrite <-app_length.
+  intros. unfold size, set_size. simpl. rewrite <-app_length.
   apply Permutation_length, NoDup_Permutation.
   - apply NoDup_elements.
   - apply NoDup_app; repeat split; try apply NoDup_elements.
@@ -154,28 +154,28 @@ Proof.
 Qed.
 
 (** * Induction principles *)
-Lemma collection_wf : wf (⊂@{C}).
+Lemma set_wf : wf (⊂@{C}).
 Proof. apply (wf_projected (<) size); auto using subset_size, lt_wf. Qed.
-Lemma collection_ind (P : C → Prop) :
+Lemma set_ind (P : C → Prop) :
   Proper ((≡) ==> iff) P →
   P ∅ → (∀ x X, x ∉ X → P X → P ({[ x ]} ∪ X)) → ∀ X, P X.
 Proof.
   intros ? Hemp Hadd. apply well_founded_induction with (⊂).
-  { apply collection_wf. }
-  intros X IH. destruct (collection_choose_or_empty X) as [[x ?]|HX].
+  { apply set_wf. }
+  intros X IH. destruct (set_choose_or_empty X) as [[x ?]|HX].
   - rewrite (union_difference {[ x ]} X) by set_solver.
     apply Hadd. set_solver. apply IH; set_solver.
   - by rewrite HX.
 Qed.
-Lemma collection_ind_L `{!LeibnizEquiv C} (P : C → Prop) :
+Lemma set_ind_L `{!LeibnizEquiv C} (P : C → Prop) :
   P ∅ → (∀ x X, x ∉ X → P X → P ({[ x ]} ∪ X)) → ∀ X, P X.
-Proof. apply collection_ind. by intros ?? ->%leibniz_equiv_iff. Qed.
+Proof. apply set_ind. by intros ?? ->%leibniz_equiv_iff. Qed.
 
-(** * The [collection_fold] operation *)
-Lemma collection_fold_ind {B} (P : B → C → Prop) (f : A → B → B) (b : B) :
+(** * The [set_fold] operation *)
+Lemma set_fold_ind {B} (P : B → C → Prop) (f : A → B → B) (b : B) :
   Proper ((=) ==> (≡) ==> iff) P →
   P b ∅ → (∀ x X r, x ∉ X → P r X → P (f x r) ({[ x ]} ∪ X)) →
-  ∀ X, P (collection_fold f b X) X.
+  ∀ X, P (set_fold f b X) X.
 Proof.
   intros ? Hemp Hadd.
   cut (∀ l, NoDup l → ∀ X, (∀ x, x ∈ X ↔ x ∈ l) → P (foldr f b l) X).
@@ -188,20 +188,20 @@ Proof.
     rewrite (union_difference {[ x ]} X) by set_solver.
     apply Hadd. set_solver. apply IH. set_solver.
 Qed.
-Lemma collection_fold_proper {B} (R : relation B) `{!Equivalence R}
+Lemma set_fold_proper {B} (R : relation B) `{!Equivalence R}
     (f : A → B → B) (b : B) `{!Proper ((=) ==> R ==> R) f}
     (Hf : ∀ a1 a2 b, R (f a1 (f a2 b)) (f a2 (f a1 b))) :
-  Proper ((≡) ==> R) (collection_fold f b : C → B).
+  Proper ((≡) ==> R) (set_fold f b : C → B).
 Proof. intros ?? E. apply (foldr_permutation R f b); auto. by rewrite E. Qed.
 
 (** * Minimal elements *)
 Lemma minimal_exists R `{!Transitive R, ∀ x y, Decision (R x y)} (X : C) :
   X ≢ ∅ → ∃ x, x ∈ X ∧ minimal R x X.
 Proof.
-  pattern X; apply collection_ind; clear X.
+  pattern X; apply set_ind; clear X.
   { by intros X X' HX; setoid_rewrite HX. }
   { done. }
-  intros x X ? IH Hemp. destruct (collection_choose_or_empty X) as [[z ?]|HX].
+  intros x X ? IH Hemp. destruct (set_choose_or_empty X) as [[z ?]|HX].
   { destruct IH as (x' & Hx' & Hmin); [set_solver|].
     destruct (decide (R x x')).
     - exists x; split; [set_solver|].
@@ -222,8 +222,8 @@ Section filter.
 
   Lemma elem_of_filter X x : x ∈ filter P X ↔ P x ∧ x ∈ X.
   Proof.
-    unfold filter, collection_filter.
-    by rewrite elem_of_of_list, elem_of_list_filter, elem_of_elements.
+    unfold filter, set_filter.
+    by rewrite elem_of_list_to_set, elem_of_list_filter, elem_of_elements.
   Qed.
   Global Instance set_unfold_filter X Q :
     SetUnfold (x ∈ X) Q → SetUnfold (x ∈ filter P X) (P x ∧ Q).
@@ -255,34 +255,34 @@ End filter.
 
 (** * Map *)
 Section map.
-  Context `{Collection B D}.
+  Context `{Set_ B D}.
 
   Lemma elem_of_map (f : A → B) (X : C) y :
-    y ∈ collection_map (D:=D) f X ↔ ∃ x, y = f x ∧ x ∈ X.
+    y ∈ set_map (D:=D) f X ↔ ∃ x, y = f x ∧ x ∈ X.
   Proof.
-    unfold collection_map. rewrite elem_of_of_list, elem_of_list_fmap.
+    unfold set_map. rewrite elem_of_list_to_set, elem_of_list_fmap.
     by setoid_rewrite elem_of_elements.
   Qed.
   Global Instance set_unfold_map (f : A → B) (X : C) (P : A → Prop) :
     (∀ y, SetUnfold (y ∈ X) (P y)) →
-    SetUnfold (x ∈ collection_map (D:=D) f X) (∃ y, x = f y ∧ P y).
+    SetUnfold (x ∈ set_map (D:=D) f X) (∃ y, x = f y ∧ P y).
   Proof. constructor. rewrite elem_of_map; naive_solver. Qed.
 
-  Global Instance collection_map_proper :
-    Proper (pointwise_relation _ (=) ==> (≡) ==> (≡)) (collection_map (C:=C) (D:=D)).
+  Global Instance set_map_proper :
+    Proper (pointwise_relation _ (=) ==> (≡) ==> (≡)) (set_map (C:=C) (D:=D)).
   Proof. intros f g ? X Y. set_unfold; naive_solver. Qed.
-  Global Instance collection_map_mono :
-    Proper (pointwise_relation _ (=) ==> (⊆) ==> (⊆)) (collection_map (C:=C) (D:=D)).
+  Global Instance set_map_mono :
+    Proper (pointwise_relation _ (=) ==> (⊆) ==> (⊆)) (set_map (C:=C) (D:=D)).
   Proof. intros f g ? X Y. set_unfold; naive_solver. Qed.
 
   Lemma elem_of_map_1 (f : A → B) (X : C) (y : B) :
-    y ∈ collection_map (D:=D) f X → ∃ x, y = f x ∧ x ∈ X.
+    y ∈ set_map (D:=D) f X → ∃ x, y = f x ∧ x ∈ X.
   Proof. set_solver. Qed.
   Lemma elem_of_map_2 (f : A → B) (X : C) (x : A) :
-    x ∈ X → f x ∈ collection_map (D:=D) f X.
+    x ∈ X → f x ∈ set_map (D:=D) f X.
   Proof. set_solver. Qed.
   Lemma elem_of_map_2_alt (f : A → B) (X : C) (x : A) (y : B) :
-    x ∈ X → y = f x → y ∈ collection_map (D:=D) f X.
+    x ∈ X → y = f x → y ∈ set_map (D:=D) f X.
   Proof. set_solver. Qed.
 End map.
 
@@ -321,4 +321,4 @@ Proof.
  refine (cast_if (decide (Exists P (elements X))));
    by rewrite set_Exists_elements.
 Defined.
-End fin_collection.
+End fin_set.

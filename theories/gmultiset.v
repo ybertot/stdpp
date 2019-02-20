@@ -66,7 +66,7 @@ Proof.
 Qed.
 Global Instance gmultiset_leibniz : LeibnizEquiv (gmultiset A).
 Proof. intros X Y. by rewrite gmultiset_eq. Qed.
-Global Instance gmultiset_equivalence : Equivalence (≡@{gmultiset A}).
+Global Instance gmultiset_equiv_equivalence : Equivalence (≡@{gmultiset A}).
 Proof. constructor; repeat intro; naive_solver. Qed.
 
 (* Multiplicity *)
@@ -90,11 +90,11 @@ Proof.
   destruct (X !! _), (Y !! _); simplify_option_eq; lia.
 Qed.
 
-(* Collection *)
+(* Set_ *)
 Lemma elem_of_multiplicity x X : x ∈ X ↔ 0 < multiplicity x X.
 Proof. done. Qed.
 
-Global Instance gmultiset_simple_collection : SimpleCollection A (gmultiset A).
+Global Instance gmultiset_simple_set : SemiSet A (gmultiset A).
 Proof.
   split.
   - intros x. rewrite elem_of_multiplicity, multiplicity_empty. lia.
