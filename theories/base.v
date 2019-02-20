@@ -1114,7 +1114,10 @@ Arguments insertE _ _ _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 (** The classes [SemiSet A C] and [Set_ A C] axiomatize sset of type [C] with
 elements of type [A]. The first class, [SemiSet] does not include intersection
 and difference. It is useful for the case of lists, where decidable equality
-is needed to implement intersection and difference, but not union. *)
+is needed to implement intersection and difference, but not union.
+
+Note that we cannot use the name [Set] since that is a reserved keyword. Hence
+we use [Set_]. *)
 Class SemiSet A C `{ElemOf A C,
     Empty C, Singleton A C, Union C} : Prop := {
   not_elem_of_empty (x : A) : x ∉ ∅;
