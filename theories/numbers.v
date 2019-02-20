@@ -399,7 +399,7 @@ Next Obligation. intros x y; apply Qclt_not_le. Qed.
 Next Obligation. done. Qed.
 Program Instance Qc_lt_dec: RelDecision Qclt := λ x y,
   if Qclt_le_dec x y then left _ else right _.
-Solve Obligations with try done.
+Next Obligation. done. Qed.
 Next Obligation. intros x y; apply Qcle_not_lt. Qed.
 
 Instance: PartialOrder (≤).
