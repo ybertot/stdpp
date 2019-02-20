@@ -325,4 +325,21 @@ Proof.
  refine (cast_if (decide (Exists P (elements X))));
    by rewrite set_Exists_elements.
 Defined.
+
+(** Alternative versions of finite and infinite predicates *)
+Lemma pred_finite_set (P : A → Prop) :
+  pred_finite P ↔ (∃ X : C, ∀ x, P x → x ∈ X).
+Proof.
+  split.
+  - intros [xs Hfin]. exists (list_to_set xs). set_solver.
+  - intros [X Hfin]. exists (elements X). set_solver.
+Qed.
+
+Lemma pred_infinite_set (P : A → Prop) :
+  pred_infinite P ↔ (∀ X : C, ∃ x, P x ∧ x ∉ X).
+Proof.
+  split.
+  - intros Hinf X. destruct (Hinf (elements X)). set_solver.
+  - intros Hinf xs. destruct (Hinf (list_to_set xs)). set_solver.
+Qed.
 End fin_set.
