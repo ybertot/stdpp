@@ -990,17 +990,39 @@ Section set_monad.
 End set_monad.
 
 (** Finite sets *)
-Definition set_finite `{ElemOf A B} (X : B) := ∃ l : list A, ∀ x, x ∈ X → x ∈ l.
+Definition pred_finite {A} (P : A → Prop) := ∃ xs : list A, ∀ x, P x → x ∈ xs.
+Definition set_finite `{ElemOf A B} (X : B) := pred_finite (∈ X).
 
-Section finite.
+Definition pred_infinite {A} (P : A → Prop) := ∀ xs : list A, ∃ x, P x ∧ x ∉ xs.
+Definition set_infinite `{ElemOf A C} (X : C) := pred_infinite (∈ X).
+
+Section pred_finite_infinite.
+  Lemma pred_finite_impl {A} (P Q : A → Prop) :
+    pred_finite P → (∀ x, Q x → P x) → pred_finite Q.
+  Proof. unfold pred_finite. set_solver. Qed.
+
+  Lemma pred_infinite_impl {A} (P Q : A → Prop) :
+    pred_infinite P → (∀ x, P x → Q x) → pred_infinite Q.
+  Proof. unfold pred_infinite. set_solver. Qed.
+
+  Lemma pred_not_infinite_finite {A} (P : A → Prop) :
+    pred_infinite P → pred_finite P → False.
+  Proof. intros Hinf [xs ?]. destruct (Hinf xs). set_solver. Qed.
+End pred_finite_infinite.
+
+Section set_finite_infinite.
   Context `{SemiSet A C}.
   Implicit Types X Y : C.
 
+  Lemma set_not_infinite_finite X : set_infinite X → set_finite X → False.
+  Proof. apply pred_not_infinite_finite. Qed.
+
   Global Instance set_finite_subseteq :
     Proper (flip (⊆) ==> impl) (@set_finite A C _).
-  Proof. intros X Y HX [l Hl]; exists l; set_solver. Qed.
+  Proof. intros X Y HX ?. eapply pred_finite_impl; set_solver. Qed.
   Global Instance set_finite_proper : Proper ((≡) ==> iff) (@set_finite A C _).
   Proof. intros X Y HX; apply exist_proper. by setoid_rewrite HX. Qed.
+
   Lemma empty_finite : set_finite (∅ : C).
   Proof. by exists []; intros ?; rewrite elem_of_empty. Qed.
   Lemma singleton_finite (x : A) : set_finite ({[ x ]} : C).
@@ -1014,7 +1036,18 @@ Section finite.
   Proof. intros [l ?]; exists l; set_solver. Qed.
   Lemma union_finite_inv_r X Y : set_finite (X ∪ Y) → set_finite Y.
   Proof. intros [l ?]; exists l; set_solver. Qed.
-End finite.
+
+  Global Instance set_infinite_subseteq :
+    Proper ((⊆) ==> impl) (@set_infinite A C _).
+  Proof. intros X Y HX ?. eapply pred_infinite_impl; set_solver. Qed.
+  Global Instance set_infinite_proper : Proper ((≡) ==> iff) (@set_infinite A C _).
+  Proof. intros X Y HX; apply forall_proper. by setoid_rewrite HX. Qed.
+
+  Lemma union_infinite_l X Y : set_infinite X → set_infinite (X ∪ Y).
+  Proof. intros Hinf xs. destruct (Hinf xs). set_solver. Qed.
+  Lemma union_infinite_r X Y : set_infinite Y → set_infinite (X ∪ Y).
+  Proof. intros Hinf xs. destruct (Hinf xs). set_solver. Qed.
+End set_finite_infinite.
 
 Section more_finite.
   Context `{Set_ A C}.
@@ -1032,6 +1065,10 @@ Section more_finite.
     intros [l ?] [k ?]; exists (l ++ k).
     intros x ?; destruct (decide (x ∈ Y)); rewrite elem_of_app; set_solver.
   Qed.
+
+  Lemma difference_infinite X Y :
+    set_infinite X → set_finite Y → set_infinite (X ∖ Y).
+  Proof. intros Hinf [xs ?] xs'. destruct (Hinf (xs ++ xs')). set_solver. Qed.
 End more_finite.
 
 (** Sets of sequences of natural numbers *)
