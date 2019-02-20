@@ -35,6 +35,10 @@ Proof.
 Defined.
 
 (** * The [elements] operation *)
+Global Instance set_unfold_elements X x P :
+  SetUnfold (x ∈ X) P → SetUnfold (x ∈ elements X) P.
+Proof. constructor. by rewrite elem_of_elements, (set_unfold (x ∈ X) P). Qed.
+
 Global Instance elements_proper: Proper ((≡) ==> (≡ₚ)) (elements (C:=C)).
 Proof.
   intros ?? E. apply NoDup_Permutation.
