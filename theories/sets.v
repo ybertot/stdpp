@@ -1054,24 +1054,47 @@ Section set_seq.
     - rewrite elem_of_empty. lia.
     - rewrite elem_of_union, elem_of_singleton, IH. lia.
   Qed.
+  Global Instance set_unfold_seq start len :
+    SetUnfold (x ∈ set_seq (C:=C) start len) (start ≤ x < start + len).
+  Proof. constructor; apply elem_of_set_seq. Qed.
 
-  Lemma set_seq_start_disjoint start len :
+  Lemma set_seq_plus_disjoint start len1 len2 :
+    set_seq (C:=C) start len1 ## set_seq (start + len1) len2.
+  Proof. set_solver by lia. Qed.
+  Lemma set_seq_plus start len1 len2 :
+    set_seq (C:=C) start (len1 + len2)
+    ≡ set_seq start len1 ∪ set_seq (start + len1) len2.
+  Proof. set_solver by lia. Qed.
+  Lemma set_seq_plus_L `{!LeibnizEquiv C} start len1 len2 :
+    set_seq (C:=C) start (len1 + len2)
+    = set_seq start len1 ∪ set_seq (start + len1) len2.
+  Proof. unfold_leibniz. apply set_seq_plus. Qed.
+
+  Lemma set_seq_S_start_disjoint start len :
     {[ start ]} ## set_seq (C:=C) (S start) len.
-  Proof. intros x. rewrite elem_of_singleton, elem_of_set_seq. lia. Qed.
+  Proof. set_solver by lia. Qed.
+  Lemma set_seq_S_start start len :
+    set_seq (C:=C) start (S len) ≡ {[ start ]} ∪ set_seq (S start) len.
+  Proof. set_solver by lia. Qed.
 
-  Lemma set_seq_S_disjoint start len :
+  Lemma set_seq_S_end_disjoint start len :
     {[ start + len ]} ## set_seq (C:=C) start len.
-  Proof. intros x. rewrite elem_of_singleton, elem_of_set_seq. lia. Qed.
-
-  Lemma set_seq_S_union start len :
+  Proof. set_solver by lia. Qed.
+  Lemma set_seq_S_end_union start len :
     set_seq start (S len) ≡@{C} {[ start + len ]} ∪ set_seq start len.
-  Proof.
-    intros x. rewrite elem_of_union, elem_of_singleton, !elem_of_set_seq. lia.
-  Qed.
-
-  Lemma set_seq_S_union_L `{!LeibnizEquiv C} start len :
+  Proof. set_solver by lia. Qed.
+  Lemma set_seq_S_end_union_L `{!LeibnizEquiv C} start len :
     set_seq start (S len) =@{C} {[ start + len ]} ∪ set_seq start len.
-  Proof. unfold_leibniz. apply set_seq_S_union. Qed.
+  Proof. unfold_leibniz. apply set_seq_S_end_union. Qed.
+
+  Lemma list_to_set_seq start len :
+    list_to_set (seq start len) =@{C} set_seq start len.
+  Proof. revert start; induction len; intros; f_equal/=; auto. Qed.
+
+  Lemma set_seq_finite start len : set_finite (set_seq (C:=C) start len).
+  Proof.
+    exists (seq start len); intros x. rewrite <-list_to_set_seq. set_solver.
+  Qed.
 End set_seq.
 
 (** Mimimal elements *)
