@@ -126,12 +126,14 @@ Qed.
 Global Instance gmultiset_elem_of_dec : RelDecision (∈@{gmultiset A}).
 Proof. refine (λ x X, cast_if (decide (0 < multiplicity x X))); done. Defined.
 
+Lemma gmultiset_elem_of_disj_union X Y x : x ∈ X ⊎ Y ↔ x ∈ X ∨ x ∈ Y.
+Proof. rewrite !elem_of_multiplicity, multiplicity_disj_union. lia. Qed.
+
 Global Instance set_unfold_gmultiset_disj_union x X Y P Q :
   SetUnfold (x ∈ X) P → SetUnfold (x ∈ Y) Q → SetUnfold (x ∈ X ⊎ Y) (P ∨ Q).
 Proof.
-  intros ??; constructor.
-  rewrite <-(set_unfold (x ∈ X) P), <-(set_unfold (x ∈ Y) Q).
-  rewrite !elem_of_multiplicity, multiplicity_disj_union. lia.
+  intros ??; constructor. rewrite gmultiset_elem_of_disj_union.
+  by rewrite <-(set_unfold (x ∈ X) P), <-(set_unfold (x ∈ Y) Q).
 Qed.
 
 (* Algebraic laws *)
