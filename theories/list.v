@@ -523,6 +523,8 @@ Lemma list_insert_commute l i j x y :
 Proof. revert i j. by induction l; intros [|?] [|?] ?; f_equal/=; auto. Qed.
 Lemma list_insert_id l i x : l !! i = Some x → <[i:=x]>l = l.
 Proof. revert i. induction l; intros [|i] [=]; f_equal/=; auto. Qed.
+Lemma list_insert_ge l i x : length l ≤ i → <[i:=x]>l = l.
+Proof. revert i. induction l; intros [|i] ?; f_equal/=; auto with lia. Qed.
 
 Lemma list_lookup_other l i x :
   length l ≠ 1 → l !! i = Some x → ∃ j y, j ≠ i ∧ l !! j = Some y.
@@ -689,6 +691,13 @@ Proof.
   - intros (x&Hx&?). by induction Hx; csimpl; repeat case_match;
       simplify_eq; try constructor; auto.
 Qed.
+Lemma list_elem_of_insert l i x : i < length l → x ∈ <[i:=x]>l.
+Proof. intros. by eapply elem_of_list_lookup_2, list_lookup_insert. Qed.
+Lemma nth_elem_of l i d : i < length l → nth i l d ∈ l.
+Proof.
+  intros; eapply elem_of_list_lookup_2.
+  destruct (nth_lookup_or_length l i d); [done | by lia].
+Qed.
 
 (** ** Properties of the [NoDup] predicate *)
 Lemma NoDup_nil : NoDup (@nil A) ↔ True.
@@ -851,6 +860,13 @@ Section find.
       [ match goal with x : prod _ _ |- _ => destruct x end
       | simplify_option_eq ]; eauto.
   Qed.
+  Lemma list_find_None l :
+    list_find P l = None → Forall (λ x, ¬ P x) l.
+  Proof.
+    induction l as [|? l IHl]; [eauto|]. simpl. case_decide; [done|].
+    intros. constructor; [done|]. apply IHl.
+    by destruct (list_find P l).
+  Qed.
   Lemma list_find_elem_of l x : x ∈ l → P x → is_Some (list_find P l).
   Proof.
     induction 1 as [|x y l ? IH]; intros; simplify_option_eq; eauto.
@@ -959,6 +975,11 @@ Proof.
   intros. apply list_eq. intros j. destruct (le_lt_dec n j).
   - by rewrite !lookup_take_ge.
   - by rewrite !lookup_take, !list_lookup_insert_ne by lia.
+Qed.
+Lemma take_insert_lt l n i x : i < n → take n (<[i:=x]>l) = <[i:=x]>(take n l).
+Proof.
+  revert l i. induction n as [|? IHn]; auto; simpl.
+  intros [|] [|] ?; auto; simpl. by rewrite IHn by lia.
 Qed.
 
 (** ** Properties of the [drop] function *)
@@ -2237,6 +2258,14 @@ Section Forall_Exists.
   Proof. by rewrite Forall_lookup. Qed.
   Lemma Forall_tail l : Forall P l → Forall P (tail l).
   Proof. destruct 1; simpl; auto. Qed.
+  Lemma Forall_nth d l : Forall P l ↔ ∀ i, i < length l → P (nth i l d).
+  Proof.
+    rewrite Forall_lookup. split.
+    - intros Hl ? [x Hl']%lookup_lt_is_Some_2.
+      rewrite (nth_lookup_Some _ _ _ _ Hl'). by eapply Hl.
+    - intros Hl i x Hl'. specialize (Hl _ (lookup_lt_Some _ _ _ Hl')).
+      by rewrite (nth_lookup_Some _ _ _ _ Hl') in Hl.
+  Qed.
   Lemma Forall_alter f l i :
     Forall P l → (∀ x, l!!i = Some x → P x → P (f x)) → Forall P (alter f i l).
   Proof.
