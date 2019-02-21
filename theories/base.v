@@ -782,6 +782,14 @@ Definition union_list `{Empty A} `{Union A} : list A → A := fold_right (∪) �
 Arguments union_list _ _ _ !_ / : assert.
 Notation "⋃ l" := (union_list l) (at level 20, format "⋃  l") : stdpp_scope.
 
+Class DisjUnion A := disj_union: A → A → A.
+Hint Mode DisjUnion ! : typeclass_instances.
+Instance: Params (@disj_union) 2 := {}.
+Infix "⊎" := disj_union (at level 50, left associativity) : stdpp_scope.
+Notation "(⊎)" := disj_union (only parsing) : stdpp_scope.
+Notation "( x ⊎)" := (disj_union x) (only parsing) : stdpp_scope.
+Notation "(⊎ x )" := (λ y, disj_union y x) (only parsing) : stdpp_scope.
+
 Class Intersection A := intersection: A → A → A.
 Hint Mode Intersection ! : typeclass_instances.
 Instance: Params (@intersection) 2 := {}.
