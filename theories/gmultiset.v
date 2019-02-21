@@ -126,6 +126,14 @@ Qed.
 Global Instance gmultiset_elem_of_dec : RelDecision (∈@{gmultiset A}).
 Proof. refine (λ x X, cast_if (decide (0 < multiplicity x X))); done. Defined.
 
+Global Instance set_unfold_gmultiset_disj_union x X Y P Q :
+  SetUnfold (x ∈ X) P → SetUnfold (x ∈ Y) Q → SetUnfold (x ∈ X ⊎ Y) (P ∨ Q).
+Proof.
+  intros ??; constructor.
+  rewrite <-(set_unfold (x ∈ X) P), <-(set_unfold (x ∈ Y) Q).
+  rewrite !elem_of_multiplicity, multiplicity_disj_union. lia.
+Qed.
+
 (* Algebraic laws *)
 (** For union *)
 Global Instance gmultiset_union_comm : Comm (=@{gmultiset A}) (∪).
