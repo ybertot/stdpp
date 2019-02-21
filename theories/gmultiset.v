@@ -169,6 +169,21 @@ Proof.
   intros X. apply gmultiset_eq; intros x. rewrite !multiplicity_intersection; lia.
 Qed.
 
+Lemma gmultiset_union_intersection_l X Y Z : X ∪ (Y ∩ Z) = (X ∪ Y) ∩ (X ∪ Z).
+Proof.
+  apply gmultiset_eq; intros y.
+  rewrite multiplicity_union, !multiplicity_intersection, !multiplicity_union. lia.
+Qed.
+Lemma gmultiset_union_intersection_r X Y Z : (X ∩ Y) ∪ Z = (X ∪ Z) ∩ (Y ∪ Z).
+Proof. by rewrite <-!(comm_L _ Z), gmultiset_union_intersection_l. Qed.
+Lemma gmultiset_intersection_union_l X Y Z : X ∩ (Y ∪ Z) = (X ∩ Y) ∪ (X ∩ Z).
+Proof.
+  apply gmultiset_eq; intros y.
+  rewrite multiplicity_union, !multiplicity_intersection, !multiplicity_union. lia.
+Qed.
+Lemma gmultiset_intersection_union_r X Y Z : (X ∪ Y) ∩ Z = (X ∩ Z) ∪ (Y ∩ Z).
+Proof. by rewrite <-!(comm_L _ Z), gmultiset_intersection_union_l. Qed.
+
 (** For disjoint union (aka sum) *)
 Global Instance gmultiset_disj_union_comm : Comm (=@{gmultiset A}) (⊎).
 Proof.
@@ -193,6 +208,24 @@ Proof.
 Qed.
 Global Instance gmultiset_disj_union_inj_2 X : Inj (=) (=) (⊎ X).
 Proof. intros Y1 Y2. rewrite <-!(comm_L _ X). apply (inj _). Qed.
+
+Lemma gmultiset_disj_union_intersection_l X Y Z : X ⊎ (Y ∩ Z) = (X ⊎ Y) ∩ (X ⊎ Z).
+Proof.
+  apply gmultiset_eq; intros y.
+  rewrite multiplicity_disj_union, !multiplicity_intersection,
+    !multiplicity_disj_union. lia.
+Qed.
+Lemma gmultiset_disj_union_intersection_r X Y Z : (X ∩ Y) ⊎ Z = (X ⊎ Z) ∩ (Y ⊎ Z).
+Proof. by rewrite <-!(comm_L _ Z), gmultiset_disj_union_intersection_l. Qed.
+
+Lemma gmultiset_disj_union_union_l X Y Z : X ⊎ (Y ∪ Z) = (X ⊎ Y) ∪ (X ⊎ Z).
+Proof.
+  apply gmultiset_eq; intros y.
+  rewrite multiplicity_disj_union, !multiplicity_union,
+    !multiplicity_disj_union. lia.
+Qed.
+Lemma gmultiset_disj_union_union_r X Y Z : (X ∪ Y) ⊎ Z = (X ⊎ Z) ∪ (Y ⊎ Z).
+Proof. by rewrite <-!(comm_L _ Z), gmultiset_disj_union_union_l. Qed.
 
 (** Misc *)
 Lemma gmultiset_non_empty_singleton x : {[ x ]} ≠@{gmultiset A} ∅.
