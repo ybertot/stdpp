@@ -752,6 +752,8 @@ Definition option_to_set `{Singleton A C, Empty C} (mx : option A) : C :=
   match mx with None => ∅ | Some x => {[ x ]} end.
 Fixpoint list_to_set `{Singleton A C, Empty C, Union C} (l : list A) : C :=
   match l with [] => ∅ | x :: l => {[ x ]} ∪ list_to_set l end.
+Fixpoint list_to_set_disj `{Singleton A C, Empty C, DisjUnion C} (l : list A) : C :=
+  match l with [] => ∅ | x :: l => {[ x ]} ⊎ list_to_set_disj l end.
 
 Section option_and_list_to_set.
   Context `{SemiSet A C}.
