@@ -12,7 +12,7 @@ Proof. solve_decision. Defined.
 
 Program Instance gmultiset_countable `{Countable A} :
     Countable (gmultiset A) := {|
-  encode X := encode (gmultiset_car X);  decode p := GMultiSet <$> decode p
+  encode X := encode (gmultiset_car X); decode p := GMultiSet <$> decode p
 |}.
 Next Obligation. intros A ?? [X]; simpl. by rewrite decode_encode. Qed.
 
@@ -250,7 +250,29 @@ Proof.
   by rewrite multiplicity_singleton, multiplicity_empty.
 Qed.
 
-(* Properties of the elements operation *)
+(** Conversion from lists *)
+Lemma list_to_set_disj_nil : list_to_set_disj [] =@{gmultiset A} ∅.
+Proof. done. Qed.
+Lemma list_to_set_disj_cons x l :
+  list_to_set_disj (x :: l) =@{gmultiset A} {[ x ]} ⊎ list_to_set_disj l.
+Proof. done. Qed.
+Lemma list_to_set_disj_app l1 l2 :
+  list_to_set_disj (l1 ++ l2) =@{gmultiset A} list_to_set_disj l1 ⊎ list_to_set_disj l2.
+Proof.
+  induction l1 as [|x l1 IH]; simpl.
+  - by rewrite (left_id_L _ _).
+  - by rewrite IH, (assoc_L _).
+Qed.
+Global Instance list_to_set_disj_perm :
+  Proper ((≡ₚ) ==> (=)) (list_to_set_disj (C:=gmultiset A)).
+Proof.
+  induction 1 as [|x l l' _ IH|x y l|l l' l'' _ IH1 _ IH2]; simpl; auto.
+  - by rewrite IH.
+  - by rewrite !(assoc_L _), (comm_L _ {[ x ]}).
+  - by rewrite IH1.
+Qed.
+
+(** Properties of the elements operation *)
 Lemma gmultiset_elements_empty : elements (∅ : gmultiset A) = [].
 Proof.
   unfold elements, gmultiset_elements; simpl. by rewrite map_to_list_empty.
