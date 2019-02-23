@@ -83,6 +83,13 @@ Lemma multiplicity_singleton x : multiplicity x {[ x ]} = 1.
 Proof. unfold multiplicity; simpl. by rewrite lookup_singleton. Qed.
 Lemma multiplicity_singleton_ne x y : x ≠ y → multiplicity x {[ y ]} = 0.
 Proof. intros. unfold multiplicity; simpl. by rewrite lookup_singleton_ne. Qed.
+Lemma multiplicity_singleton' x y :
+  multiplicity x {[ y ]} = if decide (x = y) then 1 else 0.
+Proof.
+  destruct (decide _) as [->|].
+  - by rewrite multiplicity_singleton.
+  - by rewrite multiplicity_singleton_ne.
+Qed.
 Lemma multiplicity_union X Y x :
   multiplicity x (X ∪ Y) = multiplicity x X `max` multiplicity x Y.
 Proof.
@@ -117,10 +124,9 @@ Global Instance gmultiset_simple_set : SemiSet A (gmultiset A).
 Proof.
   split.
   - intros x. rewrite elem_of_multiplicity, multiplicity_empty. lia.
-  - intros x y. destruct (decide (x = y)) as [->|].
-    + rewrite elem_of_multiplicity, multiplicity_singleton. split; auto with lia.
-    + rewrite elem_of_multiplicity, multiplicity_singleton_ne by done.
-      by split; auto with lia.
+  - intros x y.
+    rewrite elem_of_multiplicity, multiplicity_singleton'.
+    destruct (decide (x = y)); intuition lia.
   - intros X Y x. rewrite !elem_of_multiplicity, multiplicity_union. lia.
 Qed.
 Global Instance gmultiset_elem_of_dec : RelDecision (∈@{gmultiset A}).
@@ -411,9 +417,8 @@ Proof. rewrite (comm_L (⊎)). apply gmultiset_disj_union_subset_l. Qed.
 Lemma gmultiset_elem_of_singleton_subseteq x X : x ∈ X ↔ {[ x ]} ⊆ X.
 Proof.
   rewrite elem_of_multiplicity. split.
-  - intros Hx y; destruct (decide (x = y)) as [->|].
-    + rewrite multiplicity_singleton; lia.
-    + rewrite multiplicity_singleton_ne by done; lia.
+  - intros Hx y. rewrite multiplicity_singleton'.
+    destruct (decide (y = x)); naive_solver lia.
   - intros Hx. generalize (Hx x). rewrite multiplicity_singleton. lia.
 Qed.
 
