@@ -315,6 +315,10 @@ Section subrel.
 End subrel.
 
 (** * Theorems on well founded relations *)
+Lemma Acc_impl {A} (R1 R2 : relation A) x :
+  Acc R1 x → (∀ y1 y2, R2 y1 y2 → R1 y1 y2) → Acc R2 x.
+Proof. induction 1; constructor; naive_solver. Qed.
+
 Notation wf := well_founded.
 Definition wf_guard `{R : relation A} (n : nat) (wfR : wf R) : wf R :=
   Acc_intro_generator n wfR.
