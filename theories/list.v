@@ -3133,6 +3133,10 @@ Proof.
   - apply IH. intros. eapply Hunique; rewrite ?elem_of_cons; eauto.
 Qed.
 
+Global Instance omap_Permutation {A B} (f : A → option B) :
+  Proper ((≡ₚ) ==> (≡ₚ)) (omap f).
+Proof. induction 1; simpl; repeat case_match; econstructor; eauto. Qed.
+
 Section bind.
   Context {A B : Type} (f : A → list B).
 
