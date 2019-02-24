@@ -835,21 +835,6 @@ Section list_set.
   Qed.
 End list_set.
 
-(** ** Properties of the [filter] function *)
-Section filter.
-  Context (P : A → Prop) `{∀ x, Decision (P x)}.
-  Lemma elem_of_list_filter l x : x ∈ filter P l ↔ P x ∧ x ∈ l.
-  Proof.
-    unfold filter. induction l; simpl; repeat case_decide;
-       rewrite ?elem_of_nil, ?elem_of_cons; naive_solver.
-  Qed.
-  Lemma NoDup_filter l : NoDup l → NoDup (filter P l).
-  Proof.
-    unfold filter. induction 1; simpl; repeat case_decide;
-      rewrite ?NoDup_nil, ?NoDup_cons, ?elem_of_list_filter; tauto.
-  Qed.
-End filter.
-
 (** ** Properties of the [find] function *)
 Section find.
   Context (P : A → Prop) `{∀ x, Decision (P x)}.
@@ -1538,6 +1523,44 @@ Proof.
       * rewrite lookup_delete_ge, <-Nat.sub_succ_l by lia; simpl.
         by rewrite Nat.sub_0_r, <-Hl.
 Qed.
+
+(** ** Properties of the [filter] function *)
+Section filter.
+  Context (P : A → Prop) `{∀ x, Decision (P x)}.
+  Local Arguments filter {_ _ _} _ {_} !_ /.
+
+  Lemma filter_nil : filter P [] = [].
+  Proof. done. Qed.
+  Lemma filter_cons x l :
+    filter P (x :: l) = if decide (P x) then x :: filter P l else filter P l.
+  Proof. done. Qed.
+  Lemma filter_cons_True x l : P x → filter P (x :: l) = x :: filter P l.
+  Proof. intros. by rewrite filter_cons, decide_True. Qed.
+  Lemma filter_cons_False x l : ¬P x → filter P (x :: l) = filter P l.
+  Proof. intros. by rewrite filter_cons, decide_False. Qed.
+
+  Lemma elem_of_list_filter l x : x ∈ filter P l ↔ P x ∧ x ∈ l.
+  Proof.
+    induction l; simpl; repeat case_decide;
+      rewrite ?elem_of_nil, ?elem_of_cons; naive_solver.
+  Qed.
+  Lemma NoDup_filter l : NoDup l → NoDup (filter P l).
+  Proof.
+    induction 1; simpl; repeat case_decide;
+      rewrite ?NoDup_nil, ?NoDup_cons, ?elem_of_list_filter; tauto.
+  Qed.
+
+  Global Instance filter_Permutation : Proper ((≡ₚ) ==> (≡ₚ)) (filter P).
+  Proof. induction 1; repeat (simpl; repeat case_decide); by econstructor. Qed.
+
+  Lemma filter_length l : length (filter P l) ≤ length l.
+  Proof. induction l; simpl; repeat case_decide; simpl; lia. Qed.
+  Lemma filter_length_lt l x : x ∈ l → ¬P x → length (filter P l) < length l.
+  Proof.
+    intros [k ->]%elem_of_Permutation ?; simpl.
+    rewrite decide_False, Nat.lt_succ_r by done. apply filter_length.
+  Qed.
+End filter.
 
 (** ** Properties of the [prefix] and [suffix] predicates *)
 Global Instance: PreOrder (@prefix A).
