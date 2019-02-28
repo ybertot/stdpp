@@ -57,7 +57,6 @@ build-coq.8.8.0:
   <<: *template
   variables:
     OPAM_PINS: "coq version 8.8.0"
-    TIMING_PROJECT: "stdpp"
     TIMING_CONF: "coq-8.8.0"
   tags:
   - fp-timing
