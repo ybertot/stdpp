@@ -15,6 +15,8 @@ Proof. solve_decision. Defined.
 
 (** * Notations and properties of [nat] *)
 Arguments minus !_ !_ / : assert.
+Arguments Nat.max : simpl nomatch.
+
 Reserved Notation "x ≤ y ≤ z" (at level 70, y at next level).
 Reserved Notation "x ≤ y < z" (at level 70, y at next level).
 Reserved Notation "x < y < z" (at level 70, y at next level).
