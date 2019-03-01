@@ -6,6 +6,7 @@ abstract interfaces for ordered structures, sets, and various other data
 structures. *)
 
 From Coq Require Export Morphisms RelationClasses List Bool Utf8 Setoid.
+From Coq Require Import Permutation.
 Set Default Proof Using "Type".
 Export ListNotations.
 From Coq.Program Require Export Basics Syntax.
@@ -1210,17 +1211,26 @@ Class MonadSet M `{∀ A, ElemOf A (M A),
   elem_of_join {A} (X : M (M A)) (x : A) : x ∈ mjoin X ↔ ∃ Y, x ∈ Y ∧ Y ∈ X
 }.
 
-(** The function [fresh X] yields an element that is not contained in [X]. We
-will later prove that [fresh] is [Proper] with respect to the induced setoid
-equality on sets. *)
+(** The [Infinite A] class axiomatizes types [A] with infinitely many elements.
+It contains a function [fresh : list A → A] that given a list [xs] gives an
+element [fresh xs ∉ xs].
+
+We do not directly make [fresh] a field of the [Infinite] class, but use a
+separate operational type class [Fresh] for it. That way we can overload [fresh]
+to pick fresh elements from other data structure like sets. See the file
+[fin_sets], where we define [fresh : C → A] for any finite set implementation
+[FinSet C A].
+
+Note: we require [fresh] to respect permutations, which is needed to define the
+aforementioned [fresh] function on finite sets that respects set equality. *)
 Class Fresh A C := fresh: C → A.
 Hint Mode Fresh - ! : typeclass_instances.
 Instance: Params (@fresh) 3 := {}.
-Class FreshSpec A C `{ElemOf A C,
-    Empty C, Singleton A C, Union C, Fresh A C} : Prop := {
-  fresh_set_semi_set :>> SemiSet A C;
-  fresh_proper_alt X Y : (∀ x, x ∈ X ↔ x ∈ Y) → fresh X = fresh Y;
-  is_fresh (X : C) : fresh X ∉ X
+
+Class Infinite A := {
+  infinite_fresh :> Fresh A (list A);
+  infinite_is_fresh (xs : list A) : fresh xs ∉ xs;
+  infinite_fresh_Permutation :> Proper (@Permutation A ==> (=)) fresh;
 }.
 
 (** * Miscellaneous *)

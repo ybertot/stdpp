@@ -1,108 +1,147 @@
 (* Copyright (c) 2012-2019, Coq-std++ developers. *)
 (* This file is distributed under the terms of the BSD license. *)
-From stdpp Require Export fin_sets.
-From stdpp Require Import pretty relations.
+From stdpp Require Export list.
+From stdpp Require Import relations pretty.
 
-(** The class [Infinite] axiomatizes types with infinitely many elements
-by giving an injection from the natural numbers into the type. It is mostly
-used to provide a generic [fresh] algorithm. *)
-Class Infinite A := {
-  inject: nat → A;
-  inject_injective :> Inj (=) (=) inject;
-}.
-
-(** Instances *)
-Program Definition inj_infinite `{Infinite A} {B} (f : A → B) `{!Inj (=) (=) f} :
-  Infinite B := {| inject := f ∘ inject |}.
-
-Instance string_infinite: Infinite string := {| inject := λ x, "~" +:+ pretty x |}.
-Instance nat_infinite: Infinite nat := {| inject := id |}.
-Instance N_infinite: Infinite N := {| inject_injective := Nat2N.inj |}.
-Instance positive_infinite: Infinite positive := {| inject_injective := SuccNat2Pos.inj |}.
-Instance Z_infinite: Infinite Z := {| inject_injective := Nat2Z.inj |}.
-
-Instance option_infinite `{Infinite A} : Infinite (option A) := inj_infinite Some.
-Instance sum_infinite_l `{Infinite A} {B} : Infinite (A + B) := inj_infinite inl.
-Instance sum_infinite_r {A} `{Infinite B} : Infinite (A + B) := inj_infinite inr.
-Instance prod_infinite_l `{Infinite A, Inhabited B} : Infinite (A * B) :=
-  inj_infinite (,inhabitant).
-Instance prod_infinite_r `{Inhabited A, Infinite B} : Infinite (A * B) :=
-  inj_infinite (inhabitant,).
-
-Program Instance list_infinite `{Inhabited A}: Infinite (list A) :=
-  {| inject := λ i, replicate i inhabitant |}.
+(** * Generic constructions *)
+(** If [A] is infinite, and there is an injection from [A] to [B], then [B] is
+also infinite. Note that due to constructivity we need a rather strong notion of
+being injective, we also need a partial function [B → option A] back. *)
+Program Definition inj_infinite `{Infinite A} {B}
+    (f : A → B) (g : B → option A) (Hgf : ∀ x, g (f x) = Some x) :
+  Infinite B := {| infinite_fresh := f ∘ fresh ∘ omap g |}.
 Next Obligation.
-  intros A * i j Heqrep%(f_equal length).
-  rewrite !replicate_length in Heqrep; done.
+  intros A ? B f g Hfg xs Hxs; simpl in *.
+  apply (infinite_is_fresh (omap g xs)), elem_of_list_omap; eauto.
 Qed.
+Next Obligation. solve_proper. Qed.
 
-(** * Fresh elements *)
-(** We do not make [fresh_generic] an instance because it leads to overlap. For
-various set implementations, e.g. [Pset] and [natset], we have an efficient
-implementation of [Fresh], which should always be used. Only for specific set
-implementations like [gset], which are not meant to be computationally
-efficient in the first place, we make [fresh_generic] an instance.
+(** If there is an injective function [f : nat → B], then [B] is infinite. This
+construction works as follows: to obtain an element not in [xs], we return the
+first element [f 0], [f 1], [f 2], ... that is not in [xs].
 
-Since [fresh_generic] is too inefficient for all practical purposes, we seal
-off its definition. That way, Coq will not accidentally unfold it during
-unification or other tactics. *)
-Section fresh_generic.
-  Context `{FinSet A C, Infinite A, !RelDecision (∈@{C})}.
+This construction has a nice computational behavior to e.g. find fresh strings.
+Given some prefix [s], we use [f n := if n is S n' then s +:+ pretty n else s].
+The construction then finds the first string starting with [s] followed by a
+number that's not in the input list. For example, given [["H", "H1", "H4"]] and
+[s := "H"], it would find ["H2"]. *)
+Section search_infinite.
+  Context {B} (f : nat → B) `{!Inj (=) (=) f, !EqDecision B}.
 
-  Definition fresh_generic_body (s : C) (rec : ∀ s', s' ⊂ s → nat → A) (n : nat) : A :=
-    let cand := inject n in
-    match decide (cand ∈ s) with
-    | left H => rec _ (subset_difference_elem_of H) (S n)
-    | right _ => cand
+  Let R (xs : list B) (n1 n2 : nat) :=
+    n2 < n1 ∧ (f (n1 - 1)) ∈ xs.
+  Lemma search_infinite_step xs n : f n ∈ xs → R xs (1 + n) n.
+  Proof. split; [lia|]. replace (1 + n - 1) with n by lia; eauto. Qed.
+  Lemma search_infinite_R_wf xs : wf (R xs).
+  Proof.
+    revert xs. assert (help : ∀ xs n n',
+      Acc (R (filter (≠ f n') xs)) n → n' < n → Acc (R xs) n).
+    { induction 1 as [n _ IH]. constructor; intros n2 [??]. apply IH; [|lia].
+      split; [done|]. apply elem_of_list_filter; naive_solver lia. }
+    intros xs. induction (well_founded_ltof _ length xs) as [xs _ IH].
+    intros n1; constructor; intros n2 [Hn Hs].
+    apply help with (n2 - 1); [|lia]. apply IH. eapply filter_length_lt; eauto.
+  Qed.
+
+  Definition search_infinite_go (xs : list B) (n : nat)
+      (go : ∀ n', R xs n' n → B) : B :=
+    let x := f n in
+    match decide (x ∈ xs) with
+    | left Hx => go (S n) (search_infinite_step xs n Hx)
+    | right _ => x
     end.
 
-  Definition fresh_generic_fix_aux :
-    seal (Fix set_wf (const (nat → A)) fresh_generic_body). by eexists. Qed.
-  Definition fresh_generic_fix := fresh_generic_fix_aux.(unseal).
-
-  Lemma fresh_generic_fixpoint_unfold s n:
-    fresh_generic_fix s n = fresh_generic_body s (λ s' _, fresh_generic_fix s') n.
-  Proof.
-    unfold fresh_generic_fix. rewrite fresh_generic_fix_aux.(seal_eq).
-    refine (Fix_unfold_rel _ _ (const (pointwise_relation nat (=))) _ _ s n).
-    intros s' f g Hfg i. unfold fresh_generic_body. case_decide; naive_solver.
+  Program Definition search_infinite : Infinite B := {|
+    infinite_fresh xs :=
+      Fix_F _ (search_infinite_go xs) (wf_guard 32 (search_infinite_R_wf xs) 0)
+  |}.
+  Next Obligation.
+    intros xs. unfold fresh.
+    generalize 0 (wf_guard 32 (search_infinite_R_wf xs) 0). revert xs.
+    fix FIX 3; intros xs n [?]; simpl; unfold search_infinite_go at 1; simpl.
+    destruct (decide _); auto.
   Qed.
-
-  Lemma fresh_generic_fixpoint_spec s n :
-    ∃ m, n ≤ m ∧ fresh_generic_fix s n = inject m ∧ inject m ∉ s ∧
-         ∀ i, n ≤ i < m → inject i ∈ s.
-  Proof.
-    revert n.
-    induction s as [s IH] using (well_founded_ind set_wf); intros n.
-    setoid_rewrite fresh_generic_fixpoint_unfold; unfold fresh_generic_body.
-    destruct decide as [Hcase|Hcase]; [|by eauto with lia].
-    destruct (IH _ (subset_difference_elem_of Hcase) (S n))
-      as (m & Hmbound & Heqfix & Hnotin & Hinbelow).
-    exists m; repeat split; auto with lia.
-    - rewrite not_elem_of_difference, elem_of_singleton in Hnotin.
-      destruct Hnotin as [?|?%inject_injective]; auto with lia.
-    - intros i Hibound.
-      destruct (decide (i = n)) as [<-|Hneq]; [by auto|].
-      assert (inject i ∈ s ∖ {[inject n]}) by auto with lia.
-      set_solver.
+  Next Obligation.
+    intros xs1 xs2 Hxs. unfold fresh.
+    generalize (wf_guard 32 (search_infinite_R_wf xs1) 0).
+    generalize (wf_guard 32 (search_infinite_R_wf xs2) 0). generalize 0.
+    fix FIX 2. intros n [acc1] [acc2]; simpl; unfold search_infinite_go.
+    destruct (decide ( _ ∈ xs1)) as [H1|H1], (decide (_ ∈ xs2)) as [H2|H2]; auto.
+    - destruct H2. by rewrite <-Hxs.
+    - destruct H1. by rewrite Hxs.
   Qed.
+End search_infinite.
 
-  Instance fresh_generic : Fresh A C := λ s, fresh_generic_fix s 0.
+(** To select a fresh number from a given list [x₀ ... xₙ], a possible approach
+is to compute [(S x₀) `max` ... `max` (S xₙ) `max` 0]. For non-empty lists of
+non-negative numbers this is equal to taking the maximal element [xᵢ] and adding
+one.
 
-  Instance fresh_generic_spec : FreshSpec A C.
-  Proof.
-    split.
-    - apply _.
-    - intros X Y HeqXY. unfold fresh, fresh_generic.
-      destruct (fresh_generic_fixpoint_spec X 0)
-        as (mX & _ & -> & HnotinX & HbelowinX).
-      destruct (fresh_generic_fixpoint_spec Y 0)
-        as (mY & _ & -> & HnotinY & HbelowinY).
-      destruct (Nat.lt_trichotomy mX mY) as [case|[->|case]]; auto.
-      + contradict HnotinX. rewrite HeqXY. apply HbelowinY; lia.
-      + contradict HnotinY. rewrite <-HeqXY. apply HbelowinX; lia.
-    - intros X. unfold fresh, fresh_generic.
-      destruct (fresh_generic_fixpoint_spec X 0)
-        as (m & _ & -> & HnotinX & HbelowinX); auto.
+The construction below generalizes this construction to any type [A], function
+[f : A → A → A]. and initial value [a]. The fresh element is computed as
+[x₀ `f` ... `f` xₙ `f` a]. For numbers, the prototypical instance is
+[f x y := S x `max` y] and [a:=0], which gives the behavior described before.
+Note that this gives [a] (i.e. [0] for numbers) for the empty list. *)
+Section max_infinite.
+  Context {A} (f : A → A → A) (a : A) (lt : relation A).
+  Context (HR : ∀ x, ¬lt x x).
+  Context (HR1 : ∀ x y, lt x (f x y)).
+  Context (HR2 : ∀ x x' y, lt x x' → lt x (f y x')).
+  Context (Hf : ∀ x x' y, f x (f x' y) = f x' (f x y)).
+
+  Program Definition max_infinite: Infinite A := {|
+    infinite_fresh := foldr f a
+  |}.
+  Next Obligation.
+    cut (∀ xs x, x ∈ xs → lt x (foldr f a xs)).
+    { intros help xs []%help%HR. }
+    induction 1; simpl; auto.
   Qed.
-End fresh_generic.
+  Next Obligation. by apply (foldr_permutation_proper _ _ _). Qed.
+End max_infinite.
+
+(** Instances for number types *)
+Program Instance nat_infinite : Infinite nat :=
+  max_infinite (Nat.max ∘ S) 0 (<) _ _ _ _.
+Solve Obligations with (intros; simpl; lia).
+
+Program Instance N_infinite : Infinite N :=
+  max_infinite (N.max ∘ N.succ) 0%N N.lt _ _ _ _.
+Solve Obligations with (intros; simpl; lia).
+
+Program Instance positive_infinite : Infinite positive :=
+  max_infinite (Pos.max ∘ Pos.succ) 1%positive Pos.lt _ _ _ _.
+Solve Obligations with (intros; simpl; lia).
+
+Program Instance Z_infinite: Infinite Z :=
+  max_infinite (Z.max ∘ Z.succ) 0%Z Z.lt _ _ _ _.
+Solve Obligations with (intros; simpl; lia).
+
+(** Instances for option, sum, products *)
+Instance option_infinite `{Infinite A} : Infinite (option A) :=
+  inj_infinite Some id (λ _, eq_refl).
+
+Instance sum_infinite_l `{Infinite A} {B} : Infinite (A + B) :=
+  inj_infinite inl (maybe inl) (λ _, eq_refl).
+Instance sum_infinite_r {A} `{Infinite B} : Infinite (A + B) :=
+  inj_infinite inr (maybe inr)  (λ _, eq_refl).
+
+Instance prod_infinite_l `{Infinite A, Inhabited B} : Infinite (A * B) :=
+  inj_infinite (,inhabitant) (Some ∘ fst) (λ _, eq_refl).
+Instance prod_infinite_r `{Inhabited A, Infinite B} : Infinite (A * B) :=
+  inj_infinite (inhabitant,) (Some ∘ snd) (λ _, eq_refl).
+
+(** Instance for lists *)
+Program Instance list_infinite `{Inhabited A} : Infinite (list A) := {|
+  infinite_fresh xxs := replicate (fresh (length <$> xxs)) inhabitant
+|}.
+Next Obligation.
+  intros A ? xs ?. destruct (infinite_is_fresh (length <$> xs)).
+  apply elem_of_list_fmap. eexists; split; [|done].
+  unfold fresh. by rewrite replicate_length.
+Qed.
+Next Obligation. unfold fresh. by intros A ? xs1 xs2 ->. Qed.
+
+(** Instance for strings *)
+Program Instance string_infinite : Infinite string :=
+  search_infinite pretty.
