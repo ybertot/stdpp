@@ -940,6 +940,11 @@ Section pred_finite_infinite.
   Lemma pred_not_infinite_finite {A} (P : A → Prop) :
     pred_infinite P → pred_finite P → False.
   Proof. intros Hinf [xs ?]. destruct (Hinf xs). set_solver. Qed.
+
+  Lemma pred_infinite_True `{Infinite A} : pred_infinite (λ _: A, True).
+  Proof.
+    intros xs. exists (fresh xs). split; [done|]. apply infinite_is_fresh.
+  Qed.
 End pred_finite_infinite.
 
 Section set_finite_infinite.
