@@ -7,7 +7,9 @@ From stdpp Require Import relations.
 From stdpp Require Export numbers sets.
 Set Default Proof Using "Type*".
 
+(** Operations *)
 Instance set_size `{Elements A C} : Size C := length ∘ elements.
+
 Definition set_fold `{Elements A C} {B}
   (f : A → B → B) (b : B) : C → B := foldr f b ∘ elements.
 
@@ -21,6 +23,28 @@ Definition set_map `{Elements A C, Singleton B D, Empty D, Union D}
   list_to_set (f <$> elements X).
 Typeclasses Opaque set_map.
 
+Instance set_fresh `{Elements A C, Fresh A (list A)} : Fresh A C :=
+  fresh ∘ elements.
+Typeclasses Opaque set_filter.
+
+(** We generalize the [fresh] operation on sets to generate lists of fresh
+elements w.r.t. a set [X]. *)
+Fixpoint fresh_list `{Fresh A C, Union C, Singleton A C}
+    (n : nat) (X : C) : list A :=
+  match n with
+  | 0 => []
+  | S n => let x := fresh X in x :: fresh_list n ({[ x ]} ∪ X)
+  end.
+Instance: Params (@fresh_list) 6 := {}.
+
+(** The following inductive predicate classifies that a list of elements is
+in fact fresh w.r.t. a set [X]. *)
+Inductive Forall_fresh `{ElemOf A C} (X : C) : list A → Prop :=
+  | Forall_fresh_nil : Forall_fresh X []
+  | Forall_fresh_cons x xs :
+     x ∉ xs → x ∉ X → Forall_fresh X xs → Forall_fresh X (x :: xs).
+
+(** Properties **)
 Section fin_set.
 Context `{FinSet A C}.
 Implicit Types X Y : C.
@@ -342,4 +366,58 @@ Proof.
   - intros Hinf X. destruct (Hinf (elements X)). set_solver.
   - intros Hinf xs. destruct (Hinf (list_to_set xs)). set_solver.
 Qed.
+
+Section infinite.
+  Context `{Infinite A}.
+
+  (** Properties about the [fresh] operation on finite sets *)
+  Global Instance fresh_proper: Proper ((≡@{C}) ==> (=)) fresh.
+  Proof. unfold fresh, set_fresh. solve_proper. Qed.
+
+  Lemma is_fresh X : fresh X ∉ X.
+  Proof.
+    unfold fresh, set_fresh. rewrite <-elem_of_elements. apply infinite_is_fresh.
+  Qed.
+  Lemma exist_fresh X : ∃ x, x ∉ X.
+  Proof. exists (fresh X). apply is_fresh. Qed.
+
+  (** Properties about the [fresh_list] operation on finite sets *)
+  Global Instance fresh_list_proper n : Proper ((≡@{C}) ==> (=)) (fresh_list n).
+  Proof. induction n as [|n IH]; intros ?? E; by setoid_subst. Qed.
+
+  Lemma Forall_fresh_NoDup X xs : Forall_fresh X xs → NoDup xs.
+  Proof. induction 1; by constructor. Qed.
+  Lemma Forall_fresh_elem_of X xs x : Forall_fresh X xs → x ∈ xs → x ∉ X.
+  Proof.
+    intros HX; revert x; rewrite <-Forall_forall. by induction HX; constructor.
+  Qed.
+  Lemma Forall_fresh_alt X xs :
+    Forall_fresh X xs ↔ NoDup xs ∧ ∀ x, x ∈ xs → x ∉ X.
+  Proof.
+    split; eauto using Forall_fresh_NoDup, Forall_fresh_elem_of.
+    rewrite <-Forall_forall.
+    intros [Hxs Hxs']. induction Hxs; decompose_Forall_hyps; constructor; auto.
+  Qed.
+  Lemma Forall_fresh_subseteq X Y xs :
+    Forall_fresh X xs → Y ⊆ X → Forall_fresh Y xs.
+  Proof. rewrite !Forall_fresh_alt; set_solver. Qed.
+
+  Lemma fresh_list_length n X : length (fresh_list n X) = n.
+  Proof. revert X. induction n; simpl; auto. Qed.
+  Lemma fresh_list_is_fresh n X x : x ∈ fresh_list n X → x ∉ X.
+  Proof.
+    revert X. induction n as [|n IH]; intros X; simpl;[by rewrite elem_of_nil|].
+    rewrite elem_of_cons; intros [->| Hin]; [apply is_fresh|].
+    apply IH in Hin; set_solver.
+  Qed.
+  Lemma NoDup_fresh_list n X : NoDup (fresh_list n X).
+  Proof.
+    revert X. induction n; simpl; constructor; auto.
+    intros Hin; apply fresh_list_is_fresh in Hin; set_solver.
+  Qed.
+  Lemma Forall_fresh_list X n : Forall_fresh X (fresh_list n X).
+  Proof.
+    rewrite Forall_fresh_alt; eauto using NoDup_fresh_list, fresh_list_is_fresh.
+  Qed.
+End infinite.
 End fin_set.

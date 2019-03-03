@@ -264,9 +264,3 @@ Proof.
   - by rewrite option_guard_True by (rewrite elem_of_dom; eauto).
   - by rewrite option_guard_False by (rewrite not_elem_of_dom; eauto).
 Qed.
-
-(** * Fresh elements *)
-Instance gset_fresh `{Countable A, Infinite A} : Fresh A (gset A) :=
-  fresh_generic.
-Instance gset_fresh_spec `{Countable A, Infinite A} : FreshSpec A (gset A) :=
-  fresh_generic_spec.
