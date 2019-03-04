@@ -1226,12 +1226,14 @@ aforementioned [fresh] function on finite sets that respects set equality. *)
 Class Fresh A C := fresh: C → A.
 Hint Mode Fresh - ! : typeclass_instances.
 Instance: Params (@fresh) 3 := {}.
+Arguments fresh : simpl never.
 
 Class Infinite A := {
   infinite_fresh :> Fresh A (list A);
   infinite_is_fresh (xs : list A) : fresh xs ∉ xs;
   infinite_fresh_Permutation :> Proper (@Permutation A ==> (=)) fresh;
 }.
+Arguments infinite_fresh : simpl never.
 
 (** * Miscellaneous *)
 Class Half A := half: A → A.
