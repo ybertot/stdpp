@@ -1975,14 +1975,14 @@ Section map_seq.
     - by rewrite IH, Nat.add_succ_r, !insert_union_singleton_l, (assoc_L _).
   Qed.
 
-  Lemma map_seq_cons_disjoint start xs x :
+  Lemma map_seq_cons_disjoint start xs :
     map_seq (M:=M A) (S start) xs !! start = None.
   Proof. rewrite lookup_map_seq_None. lia. Qed.
   Lemma map_seq_cons start xs x :
     map_seq start (x :: xs) =@{M A} <[start:=x]> (map_seq (S start) xs).
   Proof. done. Qed.
 
-  Lemma map_seq_snoc_disjoint start xs x :
+  Lemma map_seq_snoc_disjoint start xs :
     map_seq (M:=M A) start xs !! (start+length xs) = None.
   Proof. rewrite lookup_map_seq_None. lia. Qed.
   Lemma map_seq_snoc start xs x :
