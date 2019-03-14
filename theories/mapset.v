@@ -76,7 +76,7 @@ Section deciders.
     match X1, X2 with Mapset m1, Mapset m2 => cast_if (decide (m1 = m2)) end);
     abstract congruence.
   Defined.
-  Program Instance mapset_countable `{Countable (M ())} : Countable (mapset M) :=
+  Global Program Instance mapset_countable `{Countable (M ())} : Countable (mapset M) :=
     inj_countable mapset_car (Some ∘ Mapset) _.
   Next Obligation. by intros ? ? []. Qed.
   Global Instance mapset_equiv_dec : RelDecision (≡@{mapset M}) | 1.
