@@ -85,10 +85,9 @@ instance, such as lists. *)
 Instance map_equiv `{∀ A, Lookup K A (M A), Equiv A} : Equiv (M A) | 20 :=
   λ m1 m2, ∀ i, m1 !! i ≡ m2 !! i.
 
-(** The relation [intersection_forall R] on finite maps describes that the
-relation [R] holds for each pair in the intersection. *)
 Definition map_Forall `{Lookup K A M} (P : K → A → Prop) : M → Prop :=
   λ m, ∀ i x, m !! i = Some x → P i x.
+
 Definition map_relation `{∀ A, Lookup K A (M A)} {A B} (R : A → B → Prop)
     (P : A → Prop) (Q : B → Prop) (m1 : M A) (m2 : M B) : Prop := ∀ i,
   option_relation R P Q (m1 !! i) (m2 !! i).
