@@ -64,3 +64,18 @@ To obtain a development version, add the Iris opam repository:
 
 Run `make -jN` in this directory to build the library, where `N` is the number
 of your CPU cores.  Then run `make install` to install the library.
+
+## Contributing to std++
+
+If you want to report a bug, please use the
+[issue tracker](https://gitlab.mpi-sws.org/iris/stdpp/issues).  You will have to
+create an account at the
+[MPI-SWS GitLab](https://gitlab.mpi-sws.org/users/sign_in) (use the "Register"
+tab).
+
+To contribute code, please send your MPI-SWS GitLab username to
+[Ralf Jung](https://gitlab.mpi-sws.org/jung) to enable personal projects for
+your account.  Then you can fork the
+[Coq-std++ git repository](https://gitlab.mpi-sws.org/iris/stdpp), make your
+changes in your fork, and create a merge request.
+
