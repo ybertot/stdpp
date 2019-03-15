@@ -130,4 +130,8 @@ Proof.
 Qed.
 End mapset.
 
+(** [mapset_elem_of] internally contains an equality; make sure that tactics do
+not unfold it and try to unify [∈] against goals with [=]. *)
+Opaque mapset_elem_of.
+
 Arguments mapset_eq_dec : simpl never.
