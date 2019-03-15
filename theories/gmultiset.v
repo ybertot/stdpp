@@ -215,7 +215,7 @@ Proof.
   by rewrite multiplicity_disj_union, multiplicity_empty.
 Qed.
 Global Instance gmultiset_disj_union_right_id : RightId (=@{gmultiset A}) ∅ (⊎).
-Proof. intros X. by rewrite (comm_L (∪)), (left_id_L _ _). Qed.
+Proof. intros X. by rewrite (comm_L (⊎)), (left_id_L _ _). Qed.
 
 Global Instance gmultiset_disj_union_inj_1 X : Inj (=) (=) (X ⊎).
 Proof.
