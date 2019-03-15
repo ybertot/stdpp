@@ -30,12 +30,12 @@ Arguments Permutation {_} _ _ : assert.
 Arguments Forall_cons {_} _ _ _ _ _ : assert.
 Remove Hints Permutation_cons : typeclass_instances.
 
-Notation "(::)" := cons (only parsing) : stdpp_scope.
-Notation "( x ::)" := (cons x) (only parsing) : stdpp_scope.
-Notation "(:: l )" := (λ x, cons x l) (only parsing) : stdpp_scope.
-Notation "(++)" := app (only parsing) : stdpp_scope.
-Notation "( l ++)" := (app l) (only parsing) : stdpp_scope.
-Notation "(++ k )" := (λ l, app l k) (only parsing) : stdpp_scope.
+Notation "(::)" := cons (only parsing) : list_scope.
+Notation "( x ::)" := (cons x) (only parsing) : list_scope.
+Notation "(:: l )" := (λ x, cons x l) (only parsing) : list_scope.
+Notation "(++)" := app (only parsing) : list_scope.
+Notation "( l ++)" := (app l) (only parsing) : list_scope.
+Notation "(++ k )" := (λ l, app l k) (only parsing) : list_scope.
 
 Infix "≡ₚ" := Permutation (at level 70, no associativity) : stdpp_scope.
 Notation "(≡ₚ)" := Permutation (only parsing) : stdpp_scope.
