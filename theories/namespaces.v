@@ -14,7 +14,8 @@ Definition ndot_aux : seal (@ndot_def). by eexists. Qed.
 Definition ndot {A A_dec A_count}:= unseal ndot_aux A A_dec A_count.
 Definition ndot_eq : @ndot = @ndot_def := seal_eq ndot_aux.
 
-Definition nclose_def (N : namespace) : coPset := coPset_suffixes (encode N).
+Definition nclose_def (N : namespace) : coPset :=
+  coPset_suffixes (positives_flatten N).
 Definition nclose_aux : seal (@nclose_def). by eexists. Qed.
 Instance nclose : UpClose namespace coPset := unseal nclose_aux.
 Definition nclose_eq : @nclose = @nclose_def := seal_eq nclose_aux.
@@ -36,17 +37,12 @@ Section namespace.
 
   Lemma nclose_nroot : ↑nroot = (⊤:coPset).
   Proof. rewrite nclose_eq. by apply (sig_eq_pi _). Qed.
-  Lemma encode_nclose N : encode N ∈ (↑N:coPset).
-  Proof.
-    rewrite nclose_eq.
-    by apply elem_coPset_suffixes; exists xH; rewrite (left_id_L _ _).
-  Qed.
 
   Lemma nclose_subseteq N x : ↑N.@x ⊆ (↑N : coPset).
   Proof.
     intros p. unfold up_close. rewrite !nclose_eq, !ndot_eq.
     unfold nclose_def, ndot_def; rewrite !elem_coPset_suffixes.
-    intros [q ->]. destruct (list_encode_suffix N (ndot_def N x)) as [q' ?].
+    intros [q ->]. destruct (positives_flatten_suffix N (ndot_def N x)) as [q' ?].
     { by exists [encode x]. }
     by exists (q ++ q')%positive; rewrite <-(assoc_L _); f_equal.
   Qed.
@@ -54,8 +50,6 @@ Section namespace.
   Lemma nclose_subseteq' E N x : ↑N ⊆ E → ↑N.@x ⊆ E.
   Proof. intros. etrans; eauto using nclose_subseteq. Qed.
 
-  Lemma ndot_nclose N x : encode (N.@x) ∈ (↑N:coPset).
-  Proof. apply nclose_subseteq with x, encode_nclose. Qed.
   Lemma nclose_infinite N : ¬set_finite (↑ N : coPset).
   Proof. rewrite nclose_eq. apply coPset_suffixes_infinite. Qed.
 
@@ -64,7 +58,7 @@ Section namespace.
     intros Hxy a. unfold up_close. rewrite !nclose_eq, !ndot_eq.
     unfold nclose_def, ndot_def; rewrite !elem_coPset_suffixes.
     intros [qx ->] [qy Hqy].
-    revert Hqy. by intros [= ?%encode_inj]%list_encode_suffix_eq.
+    revert Hqy. by intros [= ?%encode_inj]%positives_flatten_suffix_eq.
   Qed.
 
   Lemma ndot_preserve_disjoint_l N E x : ↑N ## E → ↑N.@x ## E.

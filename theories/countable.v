@@ -212,62 +212,16 @@ Next Obligation.
 Qed.
 
 (** ** Lists *)
-(* Lists are encoded as 1 separated sequences of 0s corresponding to the unary
-representation of the elements. *)
-Fixpoint list_encode `{Countable A} (acc : positive) (l : list A) : positive :=
-  match l with
-  | [] => acc
-  | x :: l => list_encode (Nat.iter (encode_nat x) (~0) (acc~1)) l
-  end.
-Fixpoint list_decode `{Countable A} (acc : list A)
-    (n : nat) (p : positive) : option (list A) :=
-  match p with
-  | 1 => Some acc
-  | p~0 => list_decode acc (S n) p
-  | p~1 => x ← decode_nat n; list_decode (x :: acc) O p
-  end.
-Lemma x0_iter_x1 n acc : Nat.iter n (~0) acc~1 = acc ++ Nat.iter n (~0) 3.
-Proof. by induction n; f_equal/=. Qed.
-Lemma list_encode_app' `{Countable A} (l1 l2 : list A) acc :
-  list_encode acc (l1 ++ l2) = list_encode acc l1 ++ list_encode 1 l2.
-Proof.
-  revert acc; induction l1; simpl; auto.
-  induction l2 as [|x l IH]; intros acc; simpl; [by rewrite ?(left_id_L _ _)|].
-  by rewrite !(IH (Nat.iter _ _ _)), (assoc_L _), x0_iter_x1.
-Qed.
-Program Instance list_countable `{Countable A} : Countable (list A) :=
-  {| encode := list_encode 1; decode := list_decode [] 0 |}.
+Global Program Instance list_countable `{Countable A} : Countable (list A) :=
+  {| encode xs := positives_flatten (encode <$> xs);
+     decode p := positives ← positives_unflatten p;
+                 mapM decode positives; |}.
 Next Obligation.
-  intros A ??; simpl.
-  assert (∀ m acc n p, list_decode acc n (Nat.iter m (~0) p)
-    = list_decode acc (n + m) p) as decode_iter.
-  { induction m as [|m IH]; intros acc n p; simpl; [by rewrite Nat.add_0_r|].
-    by rewrite IH, Nat.add_succ_r. }
-  cut (∀ l acc, list_decode acc 0 (list_encode 1 l) = Some (l ++ acc))%list.
-  { by intros help l; rewrite help, (right_id_L _ _). }
-  induction l as [|x l IH] using @rev_ind; intros acc; [done|].
-  rewrite list_encode_app'; simpl; rewrite <-x0_iter_x1, decode_iter; simpl.
-  by rewrite decode_encode_nat; simpl; rewrite IH, <-(assoc_L _).
-Qed.
-Lemma list_encode_app `{Countable A} (l1 l2 : list A) :
-  encode (l1 ++ l2)%list = encode l1 ++ encode l2.
-Proof. apply list_encode_app'. Qed.
-Lemma list_encode_cons `{Countable A} x (l : list A) :
-  encode (x :: l) = Nat.iter (encode_nat x) (~0) 3 ++ encode l.
-Proof. apply (list_encode_app' [_]). Qed.
-Lemma list_encode_suffix `{Countable A} (l k : list A) :
-  l `suffix_of` k → ∃ q, encode k = q ++ encode l.
-Proof. intros [l' ->]; exists (encode l'); apply list_encode_app. Qed.
-Lemma list_encode_suffix_eq `{Countable A} q1 q2 (l1 l2 : list A) :
-  length l1 = length l2 → q1 ++ encode l1 = q2 ++ encode l2 → l1 = l2.
-Proof.
-  revert q1 q2 l2; induction l1 as [|a1 l1 IH];
-    intros q1 q2 [|a2 l2] ?; simplify_eq/=; auto.
-  rewrite !list_encode_cons, !(assoc _); intros Hl.
-  assert (l1 = l2) as <- by eauto; clear IH; f_equal.
-  apply (inj encode_nat); apply (inj (++ encode l1)) in Hl; revert Hl; clear.
-  generalize (encode_nat a2).
-  induction (encode_nat a1); intros [|?] ?; naive_solver.
+  intros A EqA CA xs.
+  simpl.
+  rewrite positives_unflatten_flatten.
+  simpl.
+  apply (mapM_fmap_Some _ _ _ decode_encode).
 Qed.
 
 (** ** Numbers *)

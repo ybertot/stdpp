@@ -354,6 +354,42 @@ Section list_set.
     end.
 End list_set.
 
+(* These next functions allow to efficiently encode lists of positives (bit strings)
+   into a single positive and go in the other direction as well. This is for
+   example used for the countable instance of lists and in namespaces.
+   The main functions are positives_flatten and positives_unflatten. *)
+Fixpoint positives_flatten_go (xs : list positive) (acc : positive) : positive :=
+  match xs with
+  | [] => acc
+  | x :: xs => positives_flatten_go xs (acc~1~0 ++ Preverse (Pdup x))
+  end.
+
+(** Flatten a list of positives into a single positive by
+    duplicating the bits of each element, so that
+    * 0 -> 00
+    * 1 -> 11
+    and then separating each element with 10. *)
+Definition positives_flatten (xs : list positive) : positive :=
+  positives_flatten_go xs 1.
+
+Fixpoint positives_unflatten_go
+        (p : positive)
+        (acc_xs : list positive)
+        (acc_elm : positive)
+  : option (list positive) :=
+  match p with
+  | 1 => Some acc_xs
+  | p'~0~0 => positives_unflatten_go p' acc_xs (acc_elm~0)
+  | p'~1~1 => positives_unflatten_go p' acc_xs (acc_elm~1)
+  | p'~1~0 => positives_unflatten_go p' (acc_elm :: acc_xs) 1
+  | _ => None
+  end%positive.
+
+(** Unflatten a positive into a list of positives, assuming the encoding
+    used by positives_flatten. *)
+Definition positives_unflatten (p : positive) : option (list positive) :=
+  positives_unflatten_go p [] 1.
+
 (** * Basic tactics on lists *)
 (** The tactic [discriminate_list] discharges a goal if it submseteq
 a list equality involving [(::)] and [(++)] of two lists that have a different
@@ -3624,6 +3660,115 @@ Proof. split; induction 1; constructor; auto. Qed.
 Instance TCForall_app {A} (P : A → Prop) xs ys :
   TCForall P xs → TCForall P ys → TCForall P (xs ++ ys).
 Proof. rewrite !TCForall_Forall. apply Forall_app_2. Qed.
+
+Section positives_flatten_unflatten.
+  Local Open Scope positive_scope.
+
+  Lemma positives_flatten_go_app xs acc :
+    positives_flatten_go xs acc = acc ++ positives_flatten_go xs 1.
+  Proof.
+    revert acc.
+    induction xs as [|x xs IH]; intros acc; simpl.
+    - reflexivity.
+    - rewrite IH.
+      rewrite (IH (6 ++ _)).
+      rewrite 2!(assoc_L (++)).
+      reflexivity.
+  Qed.
+  
+  Lemma positives_unflatten_go_app p suffix xs acc :
+    positives_unflatten_go (suffix ++ Preverse (Pdup p)) xs acc =
+    positives_unflatten_go suffix xs (acc ++ p).
+  Proof.
+    revert suffix acc.
+    induction p as [p IH|p IH|]; intros acc suffix; simpl.
+    - rewrite 2!Preverse_xI.
+      rewrite 2!(assoc_L (++)).
+      rewrite IH.
+      reflexivity.
+    - rewrite 2!Preverse_xO.
+      rewrite 2!(assoc_L (++)).
+      rewrite IH.
+      reflexivity.
+    - reflexivity.
+  Qed.
+  
+  Lemma positives_unflatten_flatten_go suffix xs acc :
+    positives_unflatten_go (suffix ++ positives_flatten_go xs 1) acc 1 =
+    positives_unflatten_go suffix (xs ++ acc) 1.
+  Proof.
+    revert suffix acc.
+    induction xs as [|x xs IH]; intros suffix acc; simpl.
+    - reflexivity.
+    - rewrite positives_flatten_go_app.
+      rewrite (assoc_L (++)).
+      rewrite IH.
+      rewrite (assoc_L (++)).
+      rewrite positives_unflatten_go_app.
+      simpl.
+      rewrite (left_id_L 1 (++)).
+      reflexivity.
+  Qed.
+  
+  Lemma positives_unflatten_flatten xs :
+    positives_unflatten (positives_flatten xs) = Some xs.
+  Proof.
+    unfold positives_flatten, positives_unflatten.
+    replace (positives_flatten_go xs 1)
+      with (1 ++ positives_flatten_go xs 1)
+      by apply (left_id_L 1 (++)).
+    rewrite positives_unflatten_flatten_go.
+    simpl.
+    rewrite (right_id_L [] (++)%list).
+    reflexivity.
+  Qed.
+  
+  Lemma positives_flatten_app xs ys :
+    positives_flatten (xs ++ ys) = positives_flatten xs ++ positives_flatten ys.
+  Proof.
+    unfold positives_flatten.
+    revert ys.
+    induction xs as [|x xs IH]; intros ys; simpl.
+    - rewrite (left_id_L 1 (++)).
+      reflexivity.
+    - rewrite positives_flatten_go_app, (positives_flatten_go_app xs).
+      rewrite IH.
+      rewrite (assoc_L (++)).
+      reflexivity.
+  Qed.
+  
+  Lemma positives_flatten_cons x xs :
+    positives_flatten (x :: xs) = 1~1~0 ++ Preverse (Pdup x) ++ positives_flatten xs.
+  Proof.
+    change (x :: xs) with ([x] ++ xs)%list.
+    rewrite positives_flatten_app.
+    rewrite (assoc_L (++)).
+    reflexivity.
+  Qed.
+  
+  Lemma positives_flatten_suffix (l k : list positive) :
+    l `suffix_of` k → ∃ q, positives_flatten k = q ++ positives_flatten l.
+  Proof.
+    intros [l' ->].
+    exists (positives_flatten l').
+    apply positives_flatten_app.
+  Qed.
+  
+  Lemma positives_flatten_suffix_eq p1 p2 (xs ys : list positive) :
+    length xs = length ys →
+    p1 ++ positives_flatten xs = p2 ++ positives_flatten ys →
+    xs = ys.
+  Proof.
+    revert p1 p2 ys; induction xs as [|x xs IH];
+      intros p1 p2 [|y ys] ?; simplify_eq/=; auto.
+    rewrite !positives_flatten_cons, !(assoc _); intros Hl.
+    assert (xs = ys) as <- by eauto; clear IH H; f_equal.
+    apply (inj (++ positives_flatten xs)) in Hl.
+    rewrite 2!Preverse_Pdup in Hl.
+    apply (Pdup_suffix_eq _ _ p1 p2) in Hl.
+    by apply (inj Preverse).
+  Qed.
+End positives_flatten_unflatten.
 
 (** * Relection over lists *)
 (** We define a simple data structure [rlist] to capture a syntactic
