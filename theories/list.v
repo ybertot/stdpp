@@ -354,21 +354,23 @@ Section list_set.
     end.
 End list_set.
 
-(* These next functions allow to efficiently encode lists of positives (bit strings)
-   into a single positive and go in the other direction as well. This is for
-   example used for the countable instance of lists and in namespaces.
-   The main functions are positives_flatten and positives_unflatten. *)
+(** These next functions allow to efficiently encode lists of positives (bit
+strings) into a single positive and go in the other direction as well. This is
+for example used for the countable instance of lists and in namespaces.
+ The main functions are [positives_flatten] and [positives_unflatten]. *)
 Fixpoint positives_flatten_go (xs : list positive) (acc : positive) : positive :=
   match xs with
   | [] => acc
   | x :: xs => positives_flatten_go xs (acc~1~0 ++ Preverse (Pdup x))
   end.
 
-(** Flatten a list of positives into a single positive by
-    duplicating the bits of each element, so that
-    * 0 -> 00
-    * 1 -> 11
-    and then separating each element with 10. *)
+(** Flatten a list of positives into a single positive by duplicating the bits
+of each element, so that:
+
+- [0 -> 00]
+- [1 -> 11]
+
+and then separating each element with [10]. *)
 Definition positives_flatten (xs : list positive) : positive :=
   positives_flatten_go xs 1.
 
@@ -386,7 +388,7 @@ Fixpoint positives_unflatten_go
   end%positive.
 
 (** Unflatten a positive into a list of positives, assuming the encoding
-    used by positives_flatten. *)
+used by [positives_flatten]. *)
 Definition positives_unflatten (p : positive) : option (list positive) :=
   positives_unflatten_go p [] 1.
 
