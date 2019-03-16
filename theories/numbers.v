@@ -197,6 +197,23 @@ Proof Preverse_app p (1~0).
 Lemma Preverse_xI p : Preverse (p~1) = (1~1) ++ Preverse p.
 Proof Preverse_app p (1~1).
 
+Lemma Preverse_involutive p :
+  Preverse (Preverse p) = p.
+Proof.
+  induction p as [p IH|p IH|]; simpl.
+  - by rewrite Preverse_xI, Preverse_app, IH.
+  - by rewrite Preverse_xO, Preverse_app, IH.
+  - reflexivity.
+Qed.
+    
+Instance Preverse_inj : Inj (=) (=) Preverse.
+Proof.
+  intros p q eq.
+  rewrite <- (Preverse_involutive p).
+  rewrite <- (Preverse_involutive q).
+  by rewrite eq.
+Qed.
+
 Fixpoint Plength (p : positive) : nat :=
   match p with 1 => 0%nat | p~0 | p~1 => S (Plength p) end.
 Lemma Papp_length p1 p2 : Plength (p1 ++ p2) = (Plength p2 + Plength p1)%nat.
@@ -207,6 +224,59 @@ Proof.
   split.
   - exists (y - x)%positive. symmetry. apply Pplus_minus. lia.
   - intros [z ->]. lia.
+Qed.
+
+(** Duplicate the bits of a positive, i.e. 1~0~1 -> 1~0~0~1~1 and
+    1~1~0~0 -> 1~1~1~0~0~0~0 *)
+Fixpoint Pdup (p : positive) : positive :=
+  match p with
+  | 1 => 1
+  | p'~0 => (Pdup p')~0~0
+  | p'~1 => (Pdup p')~1~1
+  end.
+
+Lemma Pdup_app p q :
+  Pdup (p ++ q) = Pdup p ++ Pdup q.
+Proof.
+  revert p.
+  induction q as [p IH|p IH|]; intros q; simpl.
+  - by rewrite IH.
+  - by rewrite IH.
+  - reflexivity.
+Qed.
+
+Lemma Pdup_suffix_eq p q s1 s2 :
+  s1~1~0 ++ Pdup p = s2~1~0 ++ Pdup q → p = q.
+Proof.
+  revert q.
+  induction p as [p IH|p IH|]; intros [q|q|] eq; simplify_eq/=.
+  - by rewrite (IH q).
+  - by rewrite (IH q).
+  - reflexivity.
+Qed.
+
+Instance Pdup_inj : Inj (=) (=) Pdup.
+Proof.
+  intros p q eq.
+  apply (Pdup_suffix_eq _ _ 1 1).
+  by rewrite eq.
+Qed.
+
+Lemma Preverse_Pdup p :
+  Preverse (Pdup p) = Pdup (Preverse p).
+Proof.
+  induction p as [p IH|p IH|]; simpl.
+  - rewrite 3!Preverse_xI.
+    rewrite (assoc_L (++)).
+    rewrite IH.
+    rewrite Pdup_app.
+    reflexivity.
+  - rewrite 3!Preverse_xO.
+    rewrite (assoc_L (++)).
+    rewrite IH.
+    rewrite Pdup_app.
+    reflexivity.
+  - reflexivity.
 Qed.
 
 Close Scope positive_scope.
