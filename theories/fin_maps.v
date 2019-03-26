@@ -1302,7 +1302,7 @@ Lemma map_zip_with_fmap_1 {A' A B C} (f : A → B → C)
     (g : A' → A) (m1 : M A') (m2 : M B) :
   map_zip_with f (g <$> m1) m2 = map_zip_with (λ x y, f (g x) y) m1 m2.
 Proof.
-  rewrite <- (map_fmap_id m2) at 1. by rewrite map_zip_with_fmap. 
+  rewrite <- (map_fmap_id m2) at 1. by rewrite map_zip_with_fmap.
 Qed.
 
 Lemma map_zip_with_fmap_2 {A B' B C} (f : A → B → C)
