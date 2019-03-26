@@ -1250,6 +1250,9 @@ Lemma insert_merge (m1 : M A) (m2 : M B) i x y z :
   f (Some y) (Some z) = Some x →
   <[i:=x]>(merge f m1 m2) = merge f (<[i:=y]>m1) (<[i:=z]>m2).
 Proof. by intros; apply partial_alter_merge. Qed.
+Lemma delete_merge (m1 : M A) (m2 : M B) i :
+  delete i (merge f m1 m2) = merge f (delete i m1) (delete i m2).
+Proof. by intros; apply partial_alter_merge. Qed.
 Lemma merge_singleton i x y z :
   f (Some y) (Some z) = Some x →
   merge f ({[i := y]} : M A) ({[i := z]} : M B) = {[i := x]}.
@@ -1280,6 +1283,9 @@ Proof. unfold map_zip_with. by rewrite merge_empty by done. Qed.
 Lemma map_insert_zip_with {A B C} (f : A → B → C) (m1 : M A) (m2 : M B) i y z :
   <[i:=f y z]>(map_zip_with f m1 m2) = map_zip_with f (<[i:=y]>m1) (<[i:=z]>m2).
 Proof. unfold map_zip_with. by erewrite insert_merge by done. Qed.
+Lemma map_delete_zip_with {A B C} (f : A → B → C) (m1 : M A) (m2 : M B) i :
+  delete i (map_zip_with f m1 m2) = map_zip_with f (delete i m1) (delete i m2).
+Proof. unfold map_zip_with. by rewrite delete_merge. Qed.
 Lemma map_zip_with_singleton {A B C} (f : A → B → C) i x y :
   map_zip_with f ({[ i := x ]} : M A) ({[ i := y ]} : M B) = {[ i := f x y ]}.
 Proof. unfold map_zip_with. by erewrite merge_singleton. Qed.
@@ -1296,7 +1302,7 @@ Lemma map_zip_with_fmap_1 {A' A B C} (f : A → B → C)
     (g : A' → A) (m1 : M A') (m2 : M B) :
   map_zip_with f (g <$> m1) m2 = map_zip_with (λ x y, f (g x) y) m1 m2.
 Proof.
-  rewrite <- (map_fmap_id m2) at 1. by rewrite map_zip_with_fmap. 
+  rewrite <- (map_fmap_id m2) at 1. by rewrite map_zip_with_fmap.
 Qed.
 
 Lemma map_zip_with_fmap_2 {A B' B C} (f : A → B → C)
