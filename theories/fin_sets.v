@@ -101,6 +101,14 @@ Proof.
   apply Permutation_singleton. by rewrite <-(right_id ∅ (∪) {[x]}),
     elements_union_singleton, elements_empty by set_solver.
 Qed.
+Lemma elements_disj_union (X Y : C) :
+  X ## Y → elements (X ∪ Y) ≡ₚ elements X ++ elements Y.
+Proof.
+  intros HXY. apply NoDup_Permutation.
+  - apply NoDup_elements.
+  - apply NoDup_app. set_solver by eauto using NoDup_elements.
+  - set_solver.
+Qed.
 Lemma elements_submseteq X Y : X ⊆ Y → elements X ⊆+ elements Y.
 Proof.
   intros; apply NoDup_submseteq; eauto using NoDup_elements.
@@ -221,6 +229,22 @@ Lemma set_fold_proper {B} (R : relation B) `{!Equivalence R}
     (Hf : ∀ a1 a2 b, R (f a1 (f a2 b)) (f a2 (f a1 b))) :
   Proper ((≡) ==> R) (set_fold f b : C → B).
 Proof. intros ?? E. apply (foldr_permutation R f b); auto. by rewrite E. Qed.
+
+Lemma set_fold_empty {B} (f : A → B → B) (b : B) :
+  set_fold f b (∅ : C) = b.
+Proof. by unfold set_fold; simpl; rewrite elements_empty. Qed.
+Lemma set_fold_singleton {B} (f : A → B → B) (b : B) (a : A) :
+  set_fold f b ({[a]} : C) = f a b.
+Proof. by unfold set_fold; simpl; rewrite elements_singleton. Qed.
+Lemma set_fold_disj_union (f : A → A → A) (b : A) X Y :
+  Comm (=) f →
+  Assoc (=) f →
+  X ## Y →
+  set_fold f b (X ∪ Y) = set_fold f (set_fold f b X) Y.
+Proof.
+  intros Hcomm Hassoc Hdisj. unfold set_fold; simpl.
+  by rewrite elements_disj_union, <- foldr_app, (comm (++)).
+Qed.
 
 (** * Minimal elements *)
 Lemma minimal_exists R `{!Transitive R, ∀ x y, Decision (R x y)} (X : C) :

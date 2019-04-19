@@ -330,7 +330,23 @@ Proof.
   destruct (X !! x); naive_solver lia.
 Qed.
 
-(* Properties of the size operation *)
+(** Properties of the set_fold operation *)
+Lemma gmultiset_set_fold_empty {B} (f : A → B → B) (b : B) :
+  set_fold f b (∅ : gmultiset A) = b.
+Proof. by unfold set_fold; simpl; rewrite gmultiset_elements_empty. Qed.
+Lemma gmultiset_set_fold_singleton {B} (f : A → B → B) (b : B) (a : A) :
+  set_fold f b ({[a]} : gmultiset A) = f a b.
+Proof. by unfold set_fold; simpl; rewrite gmultiset_elements_singleton. Qed.
+Lemma gmultiset_set_fold_disj_union (f : A → A → A) (b : A) X Y :
+  Comm (=) f →
+  Assoc (=) f →
+  set_fold f b (X ⊎ Y) = set_fold f (set_fold f b X) Y.
+Proof.
+  intros Hcomm Hassoc. unfold set_fold; simpl.
+  by rewrite gmultiset_elements_disj_union, <- foldr_app, (comm (++)).
+Qed.
+
+(** Properties of the size operation *)
 Lemma gmultiset_size_empty : size (∅ : gmultiset A) = 0.
 Proof. done. Qed.
 Lemma gmultiset_size_empty_inv X : size X = 0 → X = ∅.
@@ -370,7 +386,7 @@ Proof.
   by rewrite gmultiset_elements_disj_union, app_length.
 Qed.
 
-(* Order stuff *)
+(** Order stuff *)
 Global Instance gmultiset_po : PartialOrder (⊆@{gmultiset A}).
 Proof.
   split; [split|].
@@ -464,6 +480,13 @@ Proof.
   rewrite HX at 2; rewrite gmultiset_size_disj_union. lia.
 Qed.
 
+Lemma gmultiset_empty_difference X Y : Y ⊆ X → Y ∖ X = ∅.
+Proof.
+  intros HYX. unfold_leibniz. intros x.
+  rewrite multiplicity_difference, multiplicity_empty.
+  specialize (HYX x). lia.
+Qed.
+
 Lemma gmultiset_non_empty_difference X Y : X ⊂ Y → Y ∖ X ≠ ∅.
 Proof.
   intros [_ HXY2] Hdiff; destruct HXY2; intros x.
@@ -471,13 +494,16 @@ Proof.
   rewrite multiplicity_difference, multiplicity_empty; lia.
 Qed.
 
+Lemma gmultiset_difference_diag X : X ∖ X = ∅.
+Proof. by apply gmultiset_empty_difference. Qed.
+
 Lemma gmultiset_difference_subset X Y : X ≠ ∅ → X ⊆ Y → Y ∖ X ⊂ Y.
 Proof.
   intros. eapply strict_transitive_l; [by apply gmultiset_union_subset_r|].
   by rewrite <-(gmultiset_disj_union_difference X Y).
 Qed.
 
-(* Mononicity *)
+(** Mononicity *)
 Lemma gmultiset_elements_submseteq X Y : X ⊆ Y → elements X ⊆+ elements Y.
 Proof.
   intros ->%gmultiset_disj_union_difference. rewrite gmultiset_elements_disj_union.
@@ -495,7 +521,7 @@ Proof.
     gmultiset_size_disj_union by auto. lia.
 Qed.
 
-(* Well-foundedness *)
+(** Well-foundedness *)
 Lemma gmultiset_wf : wf (⊂@{gmultiset A}).
 Proof.
   apply (wf_projected (<) size); auto using gmultiset_subset_size, lt_wf.
