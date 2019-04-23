@@ -136,10 +136,11 @@ Lemma gmultiset_elem_of_disj_union X Y x : x ∈ X ⊎ Y ↔ x ∈ X ∨ x ∈ Y
 Proof. rewrite !elem_of_multiplicity, multiplicity_disj_union. lia. Qed.
 
 Global Instance set_unfold_gmultiset_disj_union x X Y P Q :
-  SetUnfold (x ∈ X) P → SetUnfold (x ∈ Y) Q → SetUnfold (x ∈ X ⊎ Y) (P ∨ Q).
+  SetUnfoldElemOf x X P → SetUnfoldElemOf x Y Q →
+  SetUnfoldElemOf x (X ⊎ Y) (P ∨ Q).
 Proof.
   intros ??; constructor. rewrite gmultiset_elem_of_disj_union.
-  by rewrite <-(set_unfold (x ∈ X) P), <-(set_unfold (x ∈ Y) Q).
+  by rewrite <-(set_unfold_elem_of x X P), <-(set_unfold_elem_of x Y Q).
 Qed.
 
 (* Algebraic laws *)

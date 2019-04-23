@@ -44,10 +44,10 @@ Instance propset_join : MJoin propset := λ A (XX : propset (propset A)),
 Instance propset_monad_set : MonadSet propset.
 Proof. by split; try apply _. Qed.
 
-Instance set_unfold_propset_top {A} (x : A) : SetUnfold (x ∈ (⊤ : propset A)) True.
+Instance set_unfold_propset_top {A} (x : A) : SetUnfoldElemOf x (⊤ : propset A) True.
 Proof. by constructor. Qed.
 Instance set_unfold_PropSet {A} (P : A → Prop) x Q :
-  SetUnfoldSimpl (P x) Q → SetUnfold (x ∈ PropSet P) Q.
+  SetUnfoldSimpl (P x) Q → SetUnfoldElemOf x (PropSet P) Q.
 Proof. intros HPQ. constructor. apply HPQ. Qed.
 
 Global Opaque propset_elem_of propset_top propset_empty propset_singleton.
