@@ -34,6 +34,12 @@ Lemma top_subseteq {A} (X : propset A) : X ⊆ ⊤.
 Proof. done. Qed.
 Hint Resolve top_subseteq : core.
 
+Definition set_to_propset `{ElemOf A C} (X : C) : propset A :=
+  {[ x | x ∈ X ]}.
+Lemma elem_of_set_to_propset `{SemiSet A C} x (X : C) :
+  x ∈ set_to_propset X ↔ x ∈ X.
+Proof. done. Qed.
+
 Instance propset_ret : MRet propset := λ A (x : A), {[ x ]}.
 Instance propset_bind : MBind propset := λ A B (f : A → propset B) (X : propset A),
   PropSet (λ b, ∃ a, b ∈ f a ∧ a ∈ X).

@@ -237,11 +237,6 @@ Section gset.
   Global Instance gset_dom {A} : Dom (gmap K A) (gset K) := mapset_dom.
   Global Instance gset_dom_spec : FinMapDom K (gmap K) (gset K) := mapset_dom_spec.
 
-  Definition gset_to_propset (X : gset K) : propset K :=
-    {[ x | x ∈ X ]}.
-  Lemma elem_of_gset_to_propset (X : gset K) x : x ∈ gset_to_propset X ↔ x ∈ X.
-  Proof. done. Qed.
-
   Definition gset_to_gmap {A} (x : A) (X : gset K) : gmap K A :=
     (λ _, x) <$> mapset_car X.
 
