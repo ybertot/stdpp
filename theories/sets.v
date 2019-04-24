@@ -96,6 +96,20 @@ Class SetUnfold (P Q : Prop) := { set_unfold : P ↔ Q }.
 Arguments set_unfold _ _ {_} : assert.
 Hint Mode SetUnfold + - : typeclass_instances.
 
+(** The class [SetUnfoldElemOf] is a more specialized version of [SetUnfold]
+for propositions of the shape [x ∈ X] to improve performance. *)
+Class SetUnfoldElemOf `{ElemOf A C} (x : A) (X : C) (Q : Prop) :=
+  { set_unfold_elem_of : x ∈ X ↔ Q }.
+Arguments set_unfold_elem_of {_ _ _} _ _ _ {_} : assert.
+Hint Mode SetUnfoldElemOf + + + - + - : typeclass_instances.
+
+Instance set_unfold_elem_of_default `{ElemOf A C} (x : A) (X : C) :
+  SetUnfoldElemOf x X (x ∈ X) | 1000.
+Proof. done. Qed.
+Instance set_unfold_elem_of_set_unfold `{ElemOf A C} (x : A) (X : C) Q :
+  SetUnfoldElemOf x X Q → SetUnfold (x ∈ X) Q.
+Proof. by destruct 1; constructor. Qed.
+
 Class SetUnfoldSimpl (P Q : Prop) := { set_unfold_simpl : SetUnfold P Q }.
 Hint Extern 0 (SetUnfoldSimpl _ _) => csimpl; constructor : typeclass_instances.
 
@@ -146,47 +160,49 @@ Section set_unfold_simple.
   Implicit Types x y : A.
   Implicit Types X Y : C.
 
-  Global Instance set_unfold_empty x : SetUnfold (x ∈ (∅ : C)) False.
+  Global Instance set_unfold_empty x : SetUnfoldElemOf x (∅ : C) False.
   Proof. constructor. split. apply not_elem_of_empty. done. Qed.
-  Global Instance set_unfold_singleton x y : SetUnfold (x ∈ ({[ y ]} : C)) (x = y).
+  Global Instance set_unfold_singleton x y : SetUnfoldElemOf x ({[ y ]} : C) (x = y).
   Proof. constructor; apply elem_of_singleton. Qed.
   Global Instance set_unfold_union x X Y P Q :
-    SetUnfold (x ∈ X) P → SetUnfold (x ∈ Y) Q → SetUnfold (x ∈ X ∪ Y) (P ∨ Q).
+    SetUnfoldElemOf x X P → SetUnfoldElemOf x Y Q →
+    SetUnfoldElemOf x (X ∪ Y) (P ∨ Q).
   Proof.
     intros ??; constructor.
-    by rewrite elem_of_union, (set_unfold (x ∈ X) P), (set_unfold (x ∈ Y) Q).
+    by rewrite elem_of_union,
+      (set_unfold_elem_of x X P), (set_unfold_elem_of x Y Q).
   Qed.
   Global Instance set_unfold_equiv_same X : SetUnfold (X ≡ X) True | 1.
   Proof. done. Qed.
   Global Instance set_unfold_equiv_empty_l X (P : A → Prop) :
-    (∀ x, SetUnfold (x ∈ X) (P x)) → SetUnfold (∅ ≡ X) (∀ x, ¬P x) | 5.
+    (∀ x, SetUnfoldElemOf x X (P x)) → SetUnfold (∅ ≡ X) (∀ x, ¬P x) | 5.
   Proof.
     intros ?; constructor. unfold equiv, set_equiv.
     pose proof (not_elem_of_empty (C:=C)); naive_solver.
   Qed.
   Global Instance set_unfold_equiv_empty_r (P : A → Prop) X :
-    (∀ x, SetUnfold (x ∈ X) (P x)) → SetUnfold (X ≡ ∅) (∀ x, ¬P x) | 5.
+    (∀ x, SetUnfoldElemOf x X (P x)) → SetUnfold (X ≡ ∅) (∀ x, ¬P x) | 5.
   Proof.
     intros ?; constructor. unfold equiv, set_equiv.
     pose proof (not_elem_of_empty (C:=C)); naive_solver.
   Qed.
   Global Instance set_unfold_equiv (P Q : A → Prop) X :
-    (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
+    (∀ x, SetUnfoldElemOf x X (P x)) → (∀ x, SetUnfoldElemOf x Y (Q x)) →
     SetUnfold (X ≡ Y) (∀ x, P x ↔ Q x) | 10.
   Proof. constructor. apply forall_proper; naive_solver. Qed.
   Global Instance set_unfold_subseteq (P Q : A → Prop) X Y :
-    (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
+    (∀ x, SetUnfoldElemOf x X (P x)) → (∀ x, SetUnfoldElemOf x Y (Q x)) →
     SetUnfold (X ⊆ Y) (∀ x, P x → Q x).
   Proof. constructor. apply forall_proper; naive_solver. Qed.
   Global Instance set_unfold_subset (P Q : A → Prop) X :
-    (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
+    (∀ x, SetUnfoldElemOf x X (P x)) → (∀ x, SetUnfoldElemOf x Y (Q x)) →
     SetUnfold (X ⊂ Y) ((∀ x, P x → Q x) ∧ ¬∀ x, Q x → P x).
   Proof.
     constructor. unfold strict.
     repeat f_equiv; apply forall_proper; naive_solver.
   Qed.
   Global Instance set_unfold_disjoint (P Q : A → Prop) X Y :
-    (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
+    (∀ x, SetUnfoldElemOf x X (P x)) → (∀ x, SetUnfoldElemOf x Y (Q x)) →
     SetUnfold (X ## Y) (∀ x, P x → Q x → False).
   Proof. constructor. unfold disjoint, set_disjoint. naive_solver. Qed.
 
@@ -194,13 +210,13 @@ Section set_unfold_simple.
   Global Instance set_unfold_equiv_same_L X : SetUnfold (X = X) True | 1.
   Proof. done. Qed.
   Global Instance set_unfold_equiv_empty_l_L X (P : A → Prop) :
-    (∀ x, SetUnfold (x ∈ X) (P x)) → SetUnfold (∅ = X) (∀ x, ¬P x) | 5.
+    (∀ x, SetUnfoldElemOf x X (P x)) → SetUnfold (∅ = X) (∀ x, ¬P x) | 5.
   Proof. constructor. unfold_leibniz. by apply set_unfold_equiv_empty_l. Qed.
   Global Instance set_unfold_equiv_empty_r_L (P : A → Prop) X :
-    (∀ x, SetUnfold (x ∈ X) (P x)) → SetUnfold (X = ∅) (∀ x, ¬P x) | 5.
+    (∀ x, SetUnfoldElemOf x X (P x)) → SetUnfold (X = ∅) (∀ x, ¬P x) | 5.
   Proof. constructor. unfold_leibniz. by apply set_unfold_equiv_empty_r. Qed.
   Global Instance set_unfold_equiv_L (P Q : A → Prop) X Y :
-    (∀ x, SetUnfold (x ∈ X) (P x)) → (∀ x, SetUnfold (x ∈ Y) (Q x)) →
+    (∀ x, SetUnfoldElemOf x X (P x)) → (∀ x, SetUnfoldElemOf x Y (Q x)) →
     SetUnfold (X = Y) (∀ x, P x ↔ Q x) | 10.
   Proof. constructor. unfold_leibniz. by apply set_unfold_equiv. Qed.
 End set_unfold_simple.
@@ -211,16 +227,18 @@ Section set_unfold.
   Implicit Types X Y : C.
 
   Global Instance set_unfold_intersection x X Y P Q :
-    SetUnfold (x ∈ X) P → SetUnfold (x ∈ Y) Q → SetUnfold (x ∈ X ∩ Y) (P ∧ Q).
+    SetUnfoldElemOf x X P → SetUnfoldElemOf x Y Q →
+    SetUnfoldElemOf x (X ∩ Y) (P ∧ Q).
   Proof.
     intros ??; constructor. rewrite elem_of_intersection.
-    by rewrite (set_unfold (x ∈ X) P), (set_unfold (x ∈ Y) Q).
+    by rewrite (set_unfold_elem_of x X P), (set_unfold_elem_of x Y Q).
   Qed.
   Global Instance set_unfold_difference x X Y P Q :
-    SetUnfold (x ∈ X) P → SetUnfold (x ∈ Y) Q → SetUnfold (x ∈ X ∖ Y) (P ∧ ¬Q).
+    SetUnfoldElemOf x X P → SetUnfoldElemOf x Y Q →
+    SetUnfoldElemOf x (X ∖ Y) (P ∧ ¬Q).
   Proof.
     intros ??; constructor. rewrite elem_of_difference.
-    by rewrite (set_unfold (x ∈ X) P), (set_unfold (x ∈ Y) Q).
+    by rewrite (set_unfold_elem_of x X P), (set_unfold_elem_of x Y Q).
   Qed.
 End set_unfold.
 
@@ -228,18 +246,19 @@ Section set_unfold_monad.
   Context `{MonadSet M}.
 
   Global Instance set_unfold_ret {A} (x y : A) :
-    SetUnfold (x ∈ mret (M:=M) y) (x = y).
+    SetUnfoldElemOf x (mret (M:=M) y) (x = y).
   Proof. constructor; apply elem_of_ret. Qed.
   Global Instance set_unfold_bind {A B} (f : A → M B) X (P Q : A → Prop) :
-    (∀ y, SetUnfold (y ∈ X) (P y)) → (∀ y, SetUnfold (x ∈ f y) (Q y)) →
-    SetUnfold (x ∈ X ≫= f) (∃ y, Q y ∧ P y).
+    (∀ y, SetUnfoldElemOf y X (P y)) → (∀ y, SetUnfoldElemOf x (f y) (Q y)) →
+    SetUnfoldElemOf x (X ≫= f) (∃ y, Q y ∧ P y).
   Proof. constructor. rewrite elem_of_bind; naive_solver. Qed.
   Global Instance set_unfold_fmap {A B} (f : A → B) (X : M A) (P : A → Prop) :
-    (∀ y, SetUnfold (y ∈ X) (P y)) →
-    SetUnfold (x ∈ f <$> X) (∃ y, x = f y ∧ P y).
+    (∀ y, SetUnfoldElemOf y X (P y)) →
+    SetUnfoldElemOf x (f <$> X) (∃ y, x = f y ∧ P y).
   Proof. constructor. rewrite elem_of_fmap; naive_solver. Qed.
   Global Instance set_unfold_join {A} (X : M (M A)) (P : M A → Prop) :
-    (∀ Y, SetUnfold (Y ∈ X) (P Y)) → SetUnfold (x ∈ mjoin X) (∃ Y, x ∈ Y ∧ P Y).
+    (∀ Y, SetUnfoldElemOf Y X (P Y)) →
+    SetUnfoldElemOf x (mjoin X) (∃ Y, x ∈ Y ∧ P Y).
   Proof. constructor. rewrite elem_of_join; naive_solver. Qed.
 End set_unfold_monad.
 
@@ -248,19 +267,20 @@ Section set_unfold_list.
   Implicit Types x : A.
   Implicit Types l : list A.
 
-  Global Instance set_unfold_nil x : SetUnfold (x ∈ []) False.
+  Global Instance set_unfold_nil x : SetUnfoldElemOf x [] False.
   Proof. constructor; apply elem_of_nil. Qed.
   Global Instance set_unfold_cons x y l P :
-    SetUnfold (x ∈ l) P → SetUnfold (x ∈ y :: l) (x = y ∨ P).
-  Proof. constructor. by rewrite elem_of_cons, (set_unfold (x ∈ l) P). Qed.
+    SetUnfoldElemOf x l P → SetUnfoldElemOf x (y :: l) (x = y ∨ P).
+  Proof. constructor. by rewrite elem_of_cons, (set_unfold_elem_of x l P). Qed.
   Global Instance set_unfold_app x l k P Q :
-    SetUnfold (x ∈ l) P → SetUnfold (x ∈ k) Q → SetUnfold (x ∈ l ++ k) (P ∨ Q).
+    SetUnfoldElemOf x l P → SetUnfoldElemOf x k Q →
+    SetUnfoldElemOf x (l ++ k) (P ∨ Q).
   Proof.
     intros ??; constructor.
-    by rewrite elem_of_app, (set_unfold (x ∈ l) P), (set_unfold (x ∈ k) Q).
+    by rewrite elem_of_app, (set_unfold_elem_of x l P), (set_unfold_elem_of x k Q).
   Qed.
   Global Instance set_unfold_included l k (P Q : A → Prop) :
-    (∀ x, SetUnfold (x ∈ l) (P x)) → (∀ x, SetUnfold (x ∈ k) (Q x)) →
+    (∀ x, SetUnfoldElemOf x l (P x)) → (∀ x, SetUnfoldElemOf x k (Q x)) →
     SetUnfold (l ⊆ k) (∀ x, P x → Q x).
   Proof.
     constructor; unfold subseteq, list_subseteq.
@@ -768,10 +788,10 @@ Section option_and_list_to_set.
   Proof. by rewrite elem_of_list_to_set. Qed.
 
   Global Instance set_unfold_option_to_set (mx : option A) x :
-    SetUnfold (x ∈ option_to_set (C:=C) mx) (mx = Some x).
+    SetUnfoldElemOf x (option_to_set (C:=C) mx) (mx = Some x).
   Proof. constructor; apply elem_of_option_to_set. Qed.
   Global Instance set_unfold_list_to_set (l : list A) x P :
-    SetUnfold (x ∈ l) P → SetUnfold (x ∈ list_to_set (C:=C) l) P.
+    SetUnfoldElemOf x l P → SetUnfoldElemOf x (list_to_set (C:=C) l) P.
   Proof. constructor. by rewrite elem_of_list_to_set, (set_unfold (x ∈ l) P). Qed.
 
   Lemma list_to_set_nil : list_to_set [] =@{C} ∅.
@@ -812,7 +832,7 @@ Section set_monad_base.
     destruct (decide P); naive_solver.
   Qed.
   Global Instance set_unfold_guard `{Decision P} {A} (x : A) (X : M A) Q :
-    SetUnfold (x ∈ X) Q → SetUnfold (x ∈ guard P; X) (P ∧ Q).
+    SetUnfoldElemOf x X Q → SetUnfoldElemOf x (guard P; X) (P ∧ Q).
   Proof. constructor. by rewrite elem_of_guard, (set_unfold (x ∈ X) Q). Qed.
   Lemma bind_empty {A B} (f : A → M B) X :
     X ≫= f ≡ ∅ ↔ X ≡ ∅ ∨ ∀ x, x ∈ X → f x ≡ ∅.
@@ -1029,7 +1049,7 @@ Section set_seq.
     - rewrite elem_of_union, elem_of_singleton, IH. lia.
   Qed.
   Global Instance set_unfold_seq start len :
-    SetUnfold (x ∈ set_seq (C:=C) start len) (start ≤ x < start + len).
+    SetUnfoldElemOf x (set_seq (C:=C) start len) (start ≤ x < start + len).
   Proof. constructor; apply elem_of_set_seq. Qed.
 
   Lemma set_seq_plus_disjoint start len1 len2 :

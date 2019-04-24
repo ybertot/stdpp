@@ -60,8 +60,8 @@ Defined.
 
 (** * The [elements] operation *)
 Global Instance set_unfold_elements X x P :
-  SetUnfold (x ∈ X) P → SetUnfold (x ∈ elements X) P.
-Proof. constructor. by rewrite elem_of_elements, (set_unfold (x ∈ X) P). Qed.
+  SetUnfoldElemOf x X P → SetUnfoldElemOf x (elements X) P.
+Proof. constructor. by rewrite elem_of_elements, (set_unfold_elem_of x X P). Qed.
 
 Global Instance elements_proper: Proper ((≡) ==> (≡ₚ)) (elements (C:=C)).
 Proof.
@@ -278,9 +278,9 @@ Section filter.
     by rewrite elem_of_list_to_set, elem_of_list_filter, elem_of_elements.
   Qed.
   Global Instance set_unfold_filter X Q :
-    SetUnfold (x ∈ X) Q → SetUnfold (x ∈ filter P X) (P x ∧ Q).
+    SetUnfoldElemOf x X Q → SetUnfoldElemOf x (filter P X) (P x ∧ Q).
   Proof.
-    intros ??; constructor. by rewrite elem_of_filter, (set_unfold (x ∈ X) Q).
+    intros ??; constructor. by rewrite elem_of_filter, (set_unfold_elem_of x X Q).
   Qed.
 
   Lemma filter_empty : filter P (∅:C) ≡ ∅.
@@ -316,8 +316,8 @@ Section map.
     by setoid_rewrite elem_of_elements.
   Qed.
   Global Instance set_unfold_map (f : A → B) (X : C) (P : A → Prop) :
-    (∀ y, SetUnfold (y ∈ X) (P y)) →
-    SetUnfold (x ∈ set_map (D:=D) f X) (∃ y, x = f y ∧ P y).
+    (∀ y, SetUnfoldElemOf y X (P y)) →
+    SetUnfoldElemOf x (set_map (D:=D) f X) (∃ y, x = f y ∧ P y).
   Proof. constructor. rewrite elem_of_map; naive_solver. Qed.
 
   Global Instance set_map_proper :
