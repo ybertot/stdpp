@@ -44,3 +44,4 @@ theories/infinite.v
 theories/nat_cancel.v
 theories/namespaces.v
 theories/telescopes.v
+theories/binders.v
