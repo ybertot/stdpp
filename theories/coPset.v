@@ -318,7 +318,7 @@ Proof.
 Qed.
 
 (** * Conversion to and from gsets of positives *)
-Lemma coPset_to_gset_wf (m : Pmap ()) : gmap_wf (K:=positive) m.
+Lemma coPset_to_gset_wf (m : Pmap ()) : gmap_wf positive m.
 Proof. done. Qed.
 Definition coPset_to_gset (X : coPset) : gset positive :=
   let 'Mapset m := coPset_to_Pset X in

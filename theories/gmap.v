@@ -9,11 +9,11 @@ From stdpp Require Import pmap mapset propset.
 (** * The data structure *)
 (** We pack a [Pmap] together with a proof that ensures that all keys correspond
 to codes of actual elements of the countable type. *)
-Definition gmap_wf `{Countable K} {A} : Pmap A → Prop :=
-  map_Forall (λ p _, encode <$> decode p = Some p).
+Definition gmap_wf K `{Countable K} {A} : Pmap A → Prop :=
+  map_Forall (λ p _, encode (A:=K) <$> decode p = Some p).
 Record gmap K `{Countable K} A := GMap {
   gmap_car : Pmap A;
-  gmap_prf : bool_decide (gmap_wf gmap_car)
+  gmap_prf : bool_decide (gmap_wf K gmap_car)
 }.
 Arguments GMap {_ _ _ _} _ _ : assert.
 Arguments gmap_car {_ _ _ _} _ : assert.
@@ -35,7 +35,7 @@ Instance gmap_lookup `{Countable K} {A} : Lookup K A (gmap K A) := λ i m,
 Instance gmap_empty `{Countable K} {A} : Empty (gmap K A) := GMap ∅ I.
 Global Opaque gmap_empty.
 Lemma gmap_partial_alter_wf `{Countable K} {A} (f : option A → option A) m i :
-  gmap_wf m → gmap_wf (partial_alter f (encode i) m).
+  gmap_wf K m → gmap_wf K (partial_alter f (encode (A:=K) i) m).
 Proof.
   intros Hm p x. destruct (decide (encode i = p)) as [<-|?].
   - rewrite decode_encode; eauto.
@@ -47,13 +47,13 @@ Instance gmap_partial_alter `{Countable K} {A} :
     (bool_decide_pack _ (gmap_partial_alter_wf f m i
     (bool_decide_unpack _ Hm))).
 Lemma gmap_fmap_wf `{Countable K} {A B} (f : A → B) m :
-  gmap_wf m → gmap_wf (f <$> m).
+  gmap_wf K m → gmap_wf K (f <$> m).
 Proof. intros ? p x. rewrite lookup_fmap, fmap_Some; intros (?&?&?); eauto. Qed.
 Instance gmap_fmap `{Countable K} : FMap (gmap K) := λ A B f m,
   let (m,Hm) := m in GMap (f <$> m)
     (bool_decide_pack _ (gmap_fmap_wf f m (bool_decide_unpack _ Hm))).
 Lemma gmap_omap_wf `{Countable K} {A B} (f : A → option B) m :
-  gmap_wf m → gmap_wf (omap f m).
+  gmap_wf K m → gmap_wf K (omap f m).
 Proof. intros ? p x; rewrite lookup_omap, bind_Some; intros (?&?&?); eauto. Qed.
 Instance gmap_omap `{Countable K} : OMap (gmap K) := λ A B f m,
   let (m,Hm) := m in GMap (omap f m)
@@ -61,7 +61,7 @@ Instance gmap_omap `{Countable K} : OMap (gmap K) := λ A B f m,
 Lemma gmap_merge_wf `{Countable K} {A B C}
     (f : option A → option B → option C) m1 m2 :
   let f' o1 o2 := match o1, o2 with None, None => None | _, _ => f o1 o2 end in
-  gmap_wf m1 → gmap_wf m2 → gmap_wf (merge f' m1 m2).
+  gmap_wf K m1 → gmap_wf K m2 → gmap_wf K (merge f' m1 m2).
 Proof.
   intros f' Hm1 Hm2 p z; rewrite lookup_merge by done; intros.
   destruct (m1 !! _) eqn:?, (m2 !! _) eqn:?; naive_solver.

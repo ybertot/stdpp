@@ -145,12 +145,12 @@ Proof. unfold_leibniz; apply dom_fmap. Qed.
 End fin_map_dom.
 
 Lemma dom_seq `{FinMapDom nat M D} {A} start (xs : list A) :
-  dom D (map_seq start xs) ≡ set_seq start (length xs).
+  dom D (map_seq start (M:=M A) xs) ≡ set_seq start (length xs).
 Proof.
   revert start. induction xs as [|x xs IH]; intros start; simpl.
   - by rewrite dom_empty.
   - by rewrite dom_insert, IH.
 Qed.
 Lemma dom_seq_L `{FinMapDom nat M D, !LeibnizEquiv D} {A} start (xs : list A) :
-  dom D (map_seq start xs) = set_seq start (length xs).
+  dom D (map_seq (M:=M A) start xs) = set_seq start (length xs).
 Proof. unfold_leibniz. apply dom_seq. Qed.

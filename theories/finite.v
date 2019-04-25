@@ -33,7 +33,7 @@ Hint Immediate finite_countable : typeclass_instances.
 Definition find `{Finite A} P `{∀ x, Decision (P x)} : option A :=
   list_find P (enum A) ≫= decode_nat ∘ fst.
 
-Lemma encode_lt_card `{finA: Finite A} x : encode_nat x < card A.
+Lemma encode_lt_card `{finA: Finite A} (x : A) : encode_nat x < card A.
 Proof.
   destruct finA as [xs Hxs HA]; unfold encode_nat, encode, card; simpl.
   rewrite Nat2Pos.id by done; simpl.
@@ -42,7 +42,7 @@ Proof.
   - destruct xs; simpl. exfalso; eapply not_elem_of_nil, (HA x). lia.
 Qed.
 Lemma encode_decode A `{finA: Finite A} i :
-  i < card A → ∃ x, decode_nat i = Some x ∧ encode_nat x = i.
+  i < card A → ∃ x : A, decode_nat i = Some x ∧ encode_nat x = i.
 Proof.
   destruct finA as [xs Hxs HA].
   unfold encode_nat, decode_nat, encode, decode, card; simpl.
@@ -52,7 +52,7 @@ Proof.
   destruct (list_find_Some (x =) xs j y) as [? ->]; auto.
   rewrite Hj; csimpl; eauto using NoDup_lookup.
 Qed.
-Lemma find_Some `{finA: Finite A} P `{∀ x, Decision (P x)} x :
+Lemma find_Some `{finA: Finite A} P `{∀ x, Decision (P x)} (x : A) :
   find P = Some x → P x.
 Proof.
   destruct finA as [xs Hxs HA]; unfold find, decode_nat, decode; simpl.
@@ -60,7 +60,7 @@ Proof.
   rewrite !Nat2Pos.id in Hx by done.
   destruct (list_find_Some P xs i y); naive_solver.
 Qed.
-Lemma find_is_Some `{finA: Finite A} P `{∀ x, Decision (P x)} x :
+Lemma find_is_Some `{finA: Finite A} P `{∀ x, Decision (P x)} (x : A) :
   P x → ∃ y, find P = Some y ∧ P y.
 Proof.
   destruct finA as [xs Hxs HA]; unfold find, decode; simpl.
@@ -309,7 +309,7 @@ Definition list_enum {A} (l : list A) : ∀ n, list { l : list A | length l = n 
   | S n => foldr (λ x, (sig_map (x ::) (λ _ H, f_equal S H) <$> (go n) ++)) [] l
   end.
 
-Program Instance list_finite `{Finite A} n : Finite { l | length l = n } :=
+Program Instance list_finite `{Finite A} n : Finite { l : list A | length l = n } :=
   {| enum := list_enum (enum A) n |}.
 Next Obligation.
   intros ????. induction n as [|n IH]; simpl; [apply NoDup_singleton |].
@@ -335,7 +335,7 @@ Next Obligation.
   - rewrite elem_of_app. eauto.
 Qed.
 
-Lemma list_card `{Finite A} n : card { l | length l = n } = card A ^ n.
+Lemma list_card `{Finite A} n : card { l : list A | length l = n } = card A ^ n.
 Proof.
   unfold card; simpl. induction n as [|n IH]; simpl; auto.
   rewrite <-IH. clear IH. generalize (list_enum (enum A) n).

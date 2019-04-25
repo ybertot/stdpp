@@ -897,6 +897,9 @@ Notation "(∉ X )" := (λ x, x ∉ X) (only parsing) : stdpp_scope.
 Infix "∈@{ B }" := (@elem_of _ B _) (at level 70, only parsing) : stdpp_scope.
 Notation "(∈@{ B } )" := (@elem_of _ B _) (only parsing) : stdpp_scope.
 
+Notation "x ∉@{ B } X" := (¬x ∈@{B} X) (at level 80, only parsing) : stdpp_scope.
+Notation "(∉@{ B } )" := (λ x X, x ∉@{B} X) (only parsing) : stdpp_scope.
+
 Class Disjoint A := disjoint : A → A → Prop.
  Hint Mode Disjoint ! : typeclass_instances.
 Instance: Params (@disjoint) 2 := {}.
@@ -1136,15 +1139,15 @@ Note that we cannot use the name [Set] since that is a reserved keyword. Hence
 we use [Set_]. *)
 Class SemiSet A C `{ElemOf A C,
     Empty C, Singleton A C, Union C} : Prop := {
-  not_elem_of_empty (x : A) : x ∉ ∅;
-  elem_of_singleton (x y : A) : x ∈ {[ y ]} ↔ x = y;
-  elem_of_union X Y (x : A) : x ∈ X ∪ Y ↔ x ∈ X ∨ x ∈ Y
+  not_elem_of_empty (x : A) : x ∉@{C} ∅;
+  elem_of_singleton (x y : A) : x ∈@{C} {[ y ]} ↔ x = y;
+  elem_of_union (X Y : C) (x : A) : x ∈ X ∪ Y ↔ x ∈ X ∨ x ∈ Y
 }.
 Class Set_ A C `{ElemOf A C, Empty C, Singleton A C,
     Union C, Intersection C, Difference C} : Prop := {
   set_semi_set :>> SemiSet A C;
-  elem_of_intersection X Y (x : A) : x ∈ X ∩ Y ↔ x ∈ X ∧ x ∈ Y;
-  elem_of_difference X Y (x : A) : x ∈ X ∖ Y ↔ x ∈ X ∧ x ∉ Y
+  elem_of_intersection (X Y : C) (x : A) : x ∈ X ∩ Y ↔ x ∈ X ∧ x ∈ Y;
+  elem_of_difference (X Y : C) (x : A) : x ∈ X ∖ Y ↔ x ∈ X ∧ x ∉ Y
 }.
 
 (** We axiomative a finite set as a set whose elements can be
@@ -1183,8 +1186,8 @@ anyway so as to avoid cycles in type class search. *)
 Class FinSet A C `{ElemOf A C, Empty C, Singleton A C, Union C,
     Intersection C, Difference C, Elements A C, EqDecision A} : Prop := {
   fin_set_set :>> Set_ A C;
-  elem_of_elements X x : x ∈ elements X ↔ x ∈ X;
-  NoDup_elements X : NoDup (elements X)
+  elem_of_elements (X : C) x : x ∈ elements X ↔ x ∈ X;
+  NoDup_elements (X : C) : NoDup (elements X)
 }.
 Class Size C := size: C → nat.
 Hint Mode Size ! : typeclass_instances.
@@ -1205,10 +1208,11 @@ Class MonadSet M `{∀ A, ElemOf A (M A),
   monad_set_semi_set A :> SemiSet A (M A);
   elem_of_bind {A B} (f : A → M B) (X : M A) (x : B) :
     x ∈ X ≫= f ↔ ∃ y, x ∈ f y ∧ y ∈ X;
-  elem_of_ret {A} (x y : A) : x ∈ mret y ↔ x = y;
+  elem_of_ret {A} (x y : A) : x ∈@{M A} mret y ↔ x = y;
   elem_of_fmap {A B} (f : A → B) (X : M A) (x : B) :
     x ∈ f <$> X ↔ ∃ y, x = f y ∧ y ∈ X;
-  elem_of_join {A} (X : M (M A)) (x : A) : x ∈ mjoin X ↔ ∃ Y, x ∈ Y ∧ Y ∈ X
+  elem_of_join {A} (X : M (M A)) (x : A) :
+    x ∈ mjoin X ↔ ∃ Y : M A, x ∈ Y ∧ Y ∈ X
 }.
 
 (** The [Infinite A] class axiomatizes types [A] with infinitely many elements.
@@ -1255,7 +1259,7 @@ Notation "(⊑ y )" := (λ x, sqsubseteq x y) (only parsing) : stdpp_scope.
 Infix "⊑@{ A }" := (@sqsubseteq A _) (at level 70, only parsing) : stdpp_scope.
 Notation "(⊑@{ A } )" := (@sqsubseteq A _) (only parsing) : stdpp_scope.
 
-Instance sqsubseteq_rewrite `{SqSubsetEq A} : RewriteRelation (⊑) := {}.
+Instance sqsubseteq_rewrite `{SqSubsetEq A} : RewriteRelation (⊑@{A}) := {}.
 
 Hint Extern 0 (_ ⊑ _) => reflexivity : core.
 
