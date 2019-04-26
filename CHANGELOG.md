@@ -4,7 +4,7 @@ API-breaking change is listed.
 ## std++ 1.2.0 (released TBA)
 
 Coq 8.9 is supported by this release, but Coq 8.6 is no longer supported. Use
-std++ 1.1 if you have to use Coq 8.6. The repository moved to a new location:
+std++ 1.1 if you have to use Coq 8.6. The repository moved to a new location at
 https://gitlab.mpi-sws.org/iris/stdpp and automatically generated Coq-doc of
 master is available at https://plv.mpi-sws.org/coqdoc/stdpp/.
 
@@ -27,7 +27,7 @@ New features:
   and `rtsc`, respectively).
 - Different notions of confluence (diamond property, confluence, local
   confluence) and the relations between these.
-- Define a `size` function for finite maps and prove some properties.
+- A `size` function for finite maps and prove some properties.
 - More results about `Qp` fractions.
 - More miscellaneous results about sets, maps, lists, multisets.
 - Various type class utilities, e.g. `TCEq`, `TCIf`, `TCDiag`, `NoBackTrack` and
