@@ -48,7 +48,7 @@ Arguments unseal {_ _} _ : assert.
 Arguments seal_eq {_ _} _ : assert.
 
 (** * Non-backtracking type classes *)
-(** The type class [NoBackTrack P] can be used to establish [P] without ever
+(** The type class [TCNoBackTrack P] can be used to establish [P] without ever
 backtracking on the instance of [P] that has been found. Backtracking may
 normally happen when [P] contains evars that could be instanciated in different
 ways depending on which instance is picked, and type class search somewhere else
@@ -60,8 +60,8 @@ issue #6714.
 
 See https://gitlab.mpi-sws.org/FP/iris-coq/merge_requests/112 for a rationale
 of this type class. *)
-Class NoBackTrack (P : Prop) := { no_backtrack : P }.
-Hint Extern 0 (NoBackTrack _) => constructor; apply _ : typeclass_instances.
+Class TCNoBackTrack (P : Prop) := { tc_no_backtrack : P }.
+Hint Extern 0 (TCNoBackTrack _) => constructor; apply _ : typeclass_instances.
 
 (* A conditional at the type class level. Note that [TCIf P Q R] is not the same
 as [TCOr (TCAnd P Q) R]: the latter will backtrack to [R] if it fails to

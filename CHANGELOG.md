@@ -30,8 +30,8 @@ New features:
 - A `size` function for finite maps and prove some properties.
 - More results about `Qp` fractions.
 - More miscellaneous results about sets, maps, lists, multisets.
-- Various type class utilities, e.g. `TCEq`, `TCIf`, `TCDiag`, `NoBackTrack` and
-  `tc_to_bool`.
+- Various type class utilities, e.g. `TCEq`, `TCIf`, `TCDiag`, `TCNoBackTrack`,
+  and `tc_to_bool`.
 - Generalize `gset_to_propset` to `set_to_propset` for any `SemiSet`.
 
 Changes:

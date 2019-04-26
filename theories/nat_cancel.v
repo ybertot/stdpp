@@ -54,7 +54,7 @@ Module nat_cancel.
 
   we wrap the entire canceler in the [NoBackTrack] class. *)
   Instance nat_cancel_start m n m' n' :
-    NoBackTrack (NatCancelL m n m' n') → NatCancel m n m' n'.
+    TCNoBackTrack (NatCancelL m n m' n') → NatCancel m n m' n'.
   Proof. by intros [?]. Qed.
 
   Class MakeNatS (n1 n2 m : nat) := make_nat_S : m = n1 + n2.
