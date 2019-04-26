@@ -1,7 +1,7 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## std++ 1.2.0 (released TBA)
+## std++ 1.2.0 (released 2019-04-26)
 
 Coq 8.9 is supported by this release, but Coq 8.6 is no longer supported. Use
 std++ 1.1 if you have to use Coq 8.6. The repository moved to a new location at
