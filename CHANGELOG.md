@@ -1,22 +1,77 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## std++ master
+## std++ 1.2.0 (released TBA)
 
-Numerous functions and theorems have been renamed.
+Coq 8.9 is supported by this release, but Coq 8.6 is no longer supported. Use
+std++ 1.1 if you have to use Coq 8.6. The repository moved to a new location:
+https://gitlab.mpi-sws.org/iris/stdpp and automatically generated Coq-doc of
+master is available at https://plv.mpi-sws.org/coqdoc/stdpp/.
 
-- Consistently use `set` instead of `collection`.
-- Rename the `Collection` type class into `Set_`. Likewise, `SimpleCollection`
-  is called `SemiSet`, and `FinCollection` is called `FinSet`, and
-  `CollectionMonad` is called `MonadSet`.
-- Rename `collections.v` and `fin_collections.v` into `sets.v` and `fin_sets.v`,
-  respectively.
-- Rename `set A := A → Prop` (`theories/set.v`) into `propset`, and likewise
-  `bset` into `boolset`.
-- Consistently prefer `X_to_Y` for conversion functions, e.g. `list_to_map`
-  instead of the former `map_of_list`.
+This release of std++ received contributions by Dan Frumin, Hai Dang, Jan-Oliver
+Kaiser, Mackie Loeffel, Maxime Dénès, Ralf Jung, Robbert Krebbers, and Tej
+Chajed.
 
-The following `sed` script should get you a long way:
+New features:
+
+- New notations `=@{A}`, `≡@{A}`, `∈@{A}`, `∉@{A}`, `##@{A}`, `⊆@{A}`, `⊂@{A}`,
+  `⊑@{A}`, `≡ₚ@{A}` for being explicit about the type.
+- A definition of basic telescopes `tele` and some theory about them.
+- A simple type class based canceler `NatCancel` for natural numbers.
+- A type `binder` for anonymous and named binders to be used in program language
+  definitions with string-based binders.
+- More results about `set_fold` on sets and multisets.
+- Notions of infinite and finite predicates/sets and basic theory about them.
+- New operation `map_seq`.
+- The symmetric and reflexive/transitive/symmetric closure of a relation (`sc`
+  and `rtsc`, respectively).
+- Different notions of confluence (diamond property, confluence, local
+  confluence) and the relations between these.
+- Define a `size` function for finite maps and prove some properties.
+- More results about `Qp` fractions.
+- More miscellaneous results about sets, maps, lists, multisets.
+- Various type class utilities, e.g. `TCEq`, `TCIf`, `TCDiag`, `NoBackTrack` and
+  `tc_to_bool`.
+- Generalize `gset_to_propset` to `set_to_propset` for any `SemiSet`.
+
+Changes:
+
+- Consistently use `lia` instead of `omega` everywhere.
+- Consistently block `simpl` on all `Z` operations.
+- The `Infinite` class is now defined using a function `fresh : list A → A`
+  that given a list `xs`, gives an element `fresh xs ∉ xs`.
+- Make `default` an abbreviation for `from_option id` (instead of just swapping
+  the argument order of `from_option`).
+- More efficient `Countable` instance for `list` that is linear instead of
+  exponential.
+- Improve performance of `set_solver` significantly by introducing specialized
+  type class `SetUnfoldElemOf` for propositions involving `∈`.
+- Make `gset` a `Definition` instead of a `Notation` to improve performance.
+- Use `disj_union` (notation `⊎`) for disjoint union on multisets (that adds the
+  multiplicities). Repurpose `∪` on multisets for the actual union (that takes
+  the max of the multiplicities). 
+
+Naming:
+
+- Consistently use the `set` prefix instead of the `collection` prefix for
+  definitions and lemmas.
+- Renaming of classes:
+  + `Collection` into `Set_` (`_` since `Set` is a reserved keyword)
+  + `SimpleCollection` into `SemiSet`
+  + `FinCollection` into `FinSet`
+  + `CollectionMonad` into `MonadSet`
+- Types:
+  + `set A := A → Prop` into `propset`
+  + `bset := A → bool` into `boolset`.
+- Files:
+  + `collections.v` into `sets.v`
+  + `fin_collections.v` into `fin_sets.v`
+  + `bset` into `boolset`
+  + `set` into `propset`
+- Consistently use the naming scheme `X_to_Y` for conversion functions, e.g.
+  `list_to_map` instead of the former `map_of_list`.
+
+The following `sed` script should perform most of the renaming:
 
 ```
 sed '
