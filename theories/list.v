@@ -2317,6 +2317,11 @@ Section Forall_Exists.
   Proof. rewrite Forall_lookup. eauto. Qed.
   Lemma Forall_lookup_2 l : (∀ i x, l !! i = Some x → P x) → Forall P l.
   Proof. by rewrite Forall_lookup. Qed.
+  Lemma Forall_reverse l : Forall P (reverse l) ↔ Forall P l.
+  Proof.
+    induction l as [|x l IH]; simpl; [done|].
+    rewrite reverse_cons, Forall_cons, Forall_app, Forall_singleton. naive_solver.
+  Qed.
   Lemma Forall_tail l : Forall P l → Forall P (tail l).
   Proof. destruct 1; simpl; auto. Qed.
   Lemma Forall_nth d l : Forall P l ↔ ∀ i, i < length l → P (nth i l d).
