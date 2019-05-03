@@ -18,10 +18,12 @@ Notation tail := tl.
 Notation take := firstn.
 Notation drop := skipn.
 
+Arguments head {_} _ : assert.
 Arguments tail {_} _ : assert.
 Arguments take {_} !_ !_ / : assert.
 Arguments drop {_} !_ !_ / : assert.
 
+Instance: Params (@head) 1 := {}.
 Instance: Params (@tail) 1 := {}.
 Instance: Params (@take) 1 := {}.
 Instance: Params (@drop) 1 := {}.
