@@ -1,5 +1,6 @@
 opam-version: "1.2"
 name: "coq-stdpp"
+synopsis: "This project contains an extended \"Standard Library\" for Coq called coq-std++"
 maintainer: "Ralf Jung <jung@mpi-sws.org>"
 homepage: "https://gitlab.mpi-sws.org/iris/stdpp"
 authors: "Robbert Krebbers, Jacques-Henri Jourdan, Ralf Jung"
