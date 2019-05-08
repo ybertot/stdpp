@@ -17,6 +17,8 @@ Proof. solve_decision. Defined.
 Arguments minus !_ !_ / : assert.
 Arguments Nat.max : simpl nomatch.
 
+Typeclasses Opaque lt.
+
 Reserved Notation "x ≤ y ≤ z" (at level 70, y at next level).
 Reserved Notation "x ≤ y < z" (at level 70, y at next level).
 Reserved Notation "x < y < z" (at level 70, y at next level).
@@ -59,7 +61,7 @@ Proof.
   by apply (Eqdep_dec.eq_dep_eq_dec (λ x y, decide (x = y))), aux.
 Qed.
 Instance nat_lt_pi: ∀ x y : nat, ProofIrrel (x < y).
-Proof. apply _. Qed.
+Proof. unfold lt. apply _. Qed.
 
 Lemma nat_le_sum (x y : nat) : x ≤ y ↔ ∃ z, y = x + z.
 Proof. split. exists (y - x); lia. intros [z ->]; lia. Qed.
@@ -121,6 +123,9 @@ Notation max_list := (max_list_with id).
 
 (** * Notations and properties of [positive] *)
 Open Scope positive_scope.
+
+Typeclasses Opaque Pos.le.
+Typeclasses Opaque Pos.lt.
 
 Infix "≤" := Pos.le : positive_scope.
 Notation "x ≤ y ≤ z" := (x ≤ y ∧ y ≤ z) : positive_scope.
@@ -282,6 +287,9 @@ Qed.
 Close Scope positive_scope.
 
 (** * Notations and properties of [N] *)
+Typeclasses Opaque N.le.
+Typeclasses Opaque N.lt.
+
 Infix "≤" := N.le : N_scope.
 Notation "x ≤ y ≤ z" := (x ≤ y ∧ y ≤ z)%N : N_scope.
 Notation "x ≤ y < z" := (x ≤ y ∧ y < z)%N : N_scope.
@@ -305,6 +313,9 @@ Program Instance N_lt_dec : RelDecision N.lt := λ x y,
   match N.compare x y with Lt => left _ | _ => right _ end.
 Solve Obligations with naive_solver.
 Instance N_inhabited: Inhabited N := populate 1%N.
+Instance N_lt_pi x y : ProofIrrel (x < y)%N.
+Proof. unfold N.lt. apply _. Qed.
+
 Instance N_le_po: PartialOrder (≤)%N.
 Proof.
   repeat split; red. apply N.le_refl. apply N.le_trans. apply N.le_antisymm.
@@ -313,6 +324,9 @@ Hint Extern 0 (_ ≤ _)%N => reflexivity : core.
 
 (** * Notations and properties of [Z] *)
 Open Scope Z_scope.
+
+Typeclasses Opaque Z.le.
+Typeclasses Opaque Z.lt.
 
 Infix "≤" := Z.le : Z_scope.
 Notation "x ≤ y ≤ z" := (x ≤ y ∧ y ≤ z) : Z_scope.
@@ -342,6 +356,9 @@ Instance Z_eq_dec: EqDecision Z := Z.eq_dec.
 Instance Z_le_dec: RelDecision Z.le := Z_le_dec.
 Instance Z_lt_dec: RelDecision Z.lt := Z_lt_dec.
 Instance Z_inhabited: Inhabited Z := populate 1.
+Instance Z_lt_pi x y : ProofIrrel (x < y).
+Proof. unfold Z.lt. apply _. Qed.
+
 Instance Z_le_po : PartialOrder (≤).
 Proof.
   repeat split; red. apply Z.le_refl. apply Z.le_trans. apply Z.le_antisymm.
@@ -446,6 +463,9 @@ Instance Z_of_N_inj: Inj (=) (=) Z.of_N := N2Z.inj.
 (* Add others here. *)
 
 (** * Notations and properties of [Qc] *)
+Typeclasses Opaque Qcle.
+Typeclasses Opaque Qclt.
+
 Open Scope Qc_scope.
 Delimit Scope Qc_scope with Qc.
 Notation "1" := (Q2Qc 1) : Qc_scope.
@@ -473,6 +493,8 @@ Program Instance Qc_lt_dec: RelDecision Qclt := λ x y,
   if Qclt_le_dec x y then left _ else right _.
 Next Obligation. done. Qed.
 Next Obligation. intros x y; apply Qcle_not_lt. Qed.
+Instance Qc_lt_pi x y : ProofIrrel (x < y).
+Proof. unfold Qclt. apply _. Qed.
 
 Instance: PartialOrder (≤).
 Proof.
