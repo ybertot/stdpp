@@ -47,6 +47,8 @@ Instance S_inj: Inj (=) (=) S.
 Proof. by injection 1. Qed.
 Instance nat_le_po: PartialOrder (≤).
 Proof. repeat split; repeat intro; auto with lia. Qed.
+Instance nat_le_total: Total (≤).
+Proof. repeat intro; lia. Qed.
 
 Instance nat_le_pi: ∀ x y : nat, ProofIrrel (x ≤ y).
 Proof.
@@ -145,6 +147,9 @@ Instance positive_le_dec: RelDecision Pos.le.
 Proof. refine (λ x y, decide ((x ?= y) ≠ Gt)). Defined.
 Instance positive_lt_dec: RelDecision Pos.lt.
 Proof. refine (λ x y, decide ((x ?= y) = Lt)). Defined.
+Instance positive_le_total: Total Pos.le.
+Proof. repeat intro; lia. Qed.
+
 Instance positive_inhabited: Inhabited positive := populate 1.
 
 Instance maybe_xO : Maybe xO := λ p, match p with p~0 => Some p | _ => None end.
@@ -320,6 +325,9 @@ Instance N_le_po: PartialOrder (≤)%N.
 Proof.
   repeat split; red. apply N.le_refl. apply N.le_trans. apply N.le_antisymm.
 Qed.
+Instance N_le_total: Total (≤)%N.
+Proof. repeat intro; lia. Qed.
+
 Hint Extern 0 (_ ≤ _)%N => reflexivity : core.
 
 (** * Notations and properties of [Z] *)
@@ -363,6 +371,8 @@ Instance Z_le_po : PartialOrder (≤).
 Proof.
   repeat split; red. apply Z.le_refl. apply Z.le_trans. apply Z.le_antisymm.
 Qed.
+Instance Z_le_total: Total Z.le.
+Proof. repeat intro; lia. Qed.
 
 Lemma Z_pow_pred_r n m : 0 < m → n * n ^ (Z.pred m) = n ^ m.
 Proof.
@@ -496,14 +506,17 @@ Next Obligation. intros x y; apply Qcle_not_lt. Qed.
 Instance Qc_lt_pi x y : ProofIrrel (x < y).
 Proof. unfold Qclt. apply _. Qed.
 
-Instance: PartialOrder (≤).
+Instance Qc_le_po: PartialOrder (≤).
 Proof.
   repeat split; red. apply Qcle_refl. apply Qcle_trans. apply Qcle_antisym.
 Qed.
-Instance: StrictOrder (<).
+Instance Qc_lt_strict: StrictOrder (<).
 Proof.
   split; red. intros x Hx. by destruct (Qclt_not_eq x x). apply Qclt_trans.
 Qed.
+Instance Qc_le_total: Total Qcle.
+Proof. intros x y. destruct (Qclt_le_dec x y); auto using Qclt_le_weak. Qed.
+
 Lemma Qcmult_0_l x : 0 * x = 0.
 Proof. ring. Qed.
 Lemma Qcmult_0_r x : x * 0 = 0.
