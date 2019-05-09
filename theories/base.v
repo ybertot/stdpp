@@ -505,7 +505,12 @@ Arguments id _ _ / : assert.
 Arguments compose _ _ _ _ _ _ / : assert.
 Arguments flip _ _ _ _ _ _ / : assert.
 Arguments const _ _ _ _ / : assert.
-Typeclasses Transparent id compose flip const.
+Typeclasses Transparent id compose const.
+
+(** Make sure that [flip] is type class opaque, otherwise one gets loops due to
+instance involving [flip], e.g. [RelDecision R → RelDecision (flip R)] could be
+used indefinitely. *)
+Typeclasses Opaque flip.
 
 Definition fun_map {A A' B B'} (f: A' → A) (g: B → B') (h : A → B) : A' → B' :=
   g ∘ h ∘ f.
