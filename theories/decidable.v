@@ -135,7 +135,7 @@ Lemma dexists_proj1 `(P : A → Prop) `{∀ x, Decision (P x)} (x : dsig P) p :
   dexist (`x) p = x.
 Proof. apply dsig_eq; reflexivity. Qed.
 
-(** * Instances of Decision *)
+(** * Instances of [Decision] *)
 (** Instances of [Decision] for operators of propositional logic. *)
 Instance True_dec: Decision True := left I.
 Instance False_dec: Decision False := right (False_rect False).
@@ -192,3 +192,11 @@ Proof. destruct (decide Q); tauto. Qed.
 Program Definition inj_eq_dec `{EqDecision A} {B} (f : B → A)
   `{!Inj (=) (=) f} : EqDecision B := λ x y, cast_if (decide (f x = f y)).
 Solve Obligations with firstorder congruence.
+
+(** * Instances of [RelDecision] *)
+Definition flip_dec {A} (R : relation A) `{!RelDecision R} :
+  RelDecision (flip R) := λ x y, decide_rel R y x.
+(** We do not declare this as an actual instance since Coq can unify [flip ?R]
+with any relation. Coq's standard library is carrying out the same approach for
+the [Reflexive], [Transitive], etc, instance of [flip]. *)
+Hint Extern 3 (RelDecision (flip _)) => apply flip_dec : typeclass_instances.
