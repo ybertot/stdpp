@@ -17,7 +17,7 @@ Infix "+:+" := String.append (at level 60, right associativity) : stdpp_scope.
 Arguments String.append : simpl never.
 
 (** * Decision of equality *)
-Instance assci_eq_dec : EqDecision ascii := ascii_dec.
+Instance ascii_eq_dec : EqDecision ascii := ascii_dec.
 Instance string_eq_dec : EqDecision string.
 Proof. solve_decision. Defined.
 Instance string_app_inj : Inj (=) (=) (String.append s1).
