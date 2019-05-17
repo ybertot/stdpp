@@ -23,6 +23,8 @@ Proof. solve_decision. Defined.
 Instance string_app_inj : Inj (=) (=) (String.append s1).
 Proof. intros s1 ???. induction s1; simplify_eq/=; f_equal/=; auto. Qed.
 
+Instance string_inhabited : Inhabited string := populate "".
+
 (* Reverse *)
 Fixpoint string_rev_app (s1 s2 : string) : string :=
   match s1 with
