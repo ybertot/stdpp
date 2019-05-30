@@ -302,8 +302,11 @@ Notation "x < y ≤ z" := (x < y ∧ y ≤ z)%N : N_scope.
 Notation "x ≤ y ≤ z ≤ z'" := (x ≤ y ∧ y ≤ z ∧ z ≤ z')%N : N_scope.
 Notation "(≤)" := N.le (only parsing) : N_scope.
 Notation "(<)" := N.lt (only parsing) : N_scope.
+
 Infix "`div`" := N.div (at level 35) : N_scope.
 Infix "`mod`" := N.modulo (at level 35) : N_scope.
+Infix "`max`" := N.max (at level 35) : N_scope.
+Infix "`min`" := N.min (at level 35) : N_scope.
 
 Arguments N.add : simpl never.
 
@@ -351,6 +354,8 @@ Infix "`quot`" := Z.quot (at level 35) : Z_scope.
 Infix "`rem`" := Z.rem (at level 35) : Z_scope.
 Infix "≪" := Z.shiftl (at level 35) : Z_scope.
 Infix "≫" := Z.shiftr (at level 35) : Z_scope.
+Infix "`max`" := Z.max (at level 35) : Z_scope.
+Infix "`min`" := Z.min (at level 35) : Z_scope.
 
 Instance Zpos_inj : Inj (=) (=) Zpos.
 Proof. by injection 1. Qed.
