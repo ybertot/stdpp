@@ -224,6 +224,11 @@ Proof.
     rewrite (union_difference {[ x ]} X) by set_solver.
     apply Hadd. set_solver. apply IH. set_solver.
 Qed.
+Lemma set_fold_ind_L `{!LeibnizEquiv C}
+    {B} (P : B → C → Prop) (f : A → B → B) (b : B) :
+  P b ∅ → (∀ x X r, x ∉ X → P r X → P (f x r) ({[ x ]} ∪ X)) →
+  ∀ X, P (set_fold f b X) X.
+Proof. apply set_fold_ind. by intros ?? -> ?? ->%leibniz_equiv. Qed.
 Lemma set_fold_proper {B} (R : relation B) `{!Equivalence R}
     (f : A → B → B) (b : B) `{!Proper ((=) ==> R ==> R) f}
     (Hf : ∀ a1 a2 b, R (f a1 (f a2 b)) (f a2 (f a1 b))) :
