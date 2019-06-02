@@ -1226,7 +1226,10 @@ to pick fresh elements from other data structure like sets. See the file
 [FinSet C A].
 
 Note: we require [fresh] to respect permutations, which is needed to define the
-aforementioned [fresh] function on finite sets that respects set equality. *)
+aforementioned [fresh] function on finite sets that respects set equality.
+
+Instead of instantiating [Infinite] directly, consider using [max_infinite] or
+[inj_infinite] from the [infinite] module. *)
 Class Fresh A C := fresh: C → A.
 Hint Mode Fresh - ! : typeclass_instances.
 Instance: Params (@fresh) 3 := {}.
