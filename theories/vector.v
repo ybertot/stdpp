@@ -244,6 +244,7 @@ Fixpoint vinsert {A n} (i : fin n) (x : A) : vec A n → vec A n :=
 Lemma vec_to_list_insert {A n} i x (v : vec A n) :
   vec_to_list (vinsert i x v) = insert (fin_to_nat i) x (vec_to_list v).
 Proof. induction v; inv_fin i. done. simpl. intros. by rewrite IHv. Qed.
+
 Lemma vlookup_insert {A n} i x (v : vec A n) : vinsert i x v !!! i = x.
 Proof. by induction i; inv_vec v. Qed.
 Lemma vlookup_insert_ne {A n} i j x (v : vec A n) :
@@ -255,6 +256,30 @@ Qed.
 Lemma vlookup_insert_self {A n} i (v : vec A n) : vinsert i (v !!! i) v = v.
 Proof. by induction v; inv_fin i; intros; f_equal/=. Qed.
 
+Lemma vmap_insert {A B} (f : A → B) (n : nat) i x (v : vec A n) :
+  vmap f (vinsert i x v) = vinsert i (f x) (vmap f v).
+Proof. induction v; inv_fin i; intros; f_equal/=; auto. Qed.
+
+(** The functions [vtake i v] and [vdrop i v] take the first [i] elements of
+a vector [v], respectively remove the first [i] elements of a vector [v]. *)
+Fixpoint vtake {A n} (i : fin n) : vec A n → vec A i :=
+  match i in fin n return vec A n → vec A i with
+  | 0%fin => λ _, [#]
+  | FS i => vec_S_inv _ (λ x v, x ::: vtake i v)
+  end.
+Fixpoint vdrop {A n} (i : fin n) : vec A n → vec A (n - i) :=
+  match i in fin n return vec A n → vec A (n - i) with
+  | 0%fin => id
+  | FS i => vec_S_inv _ (λ _, vdrop i)
+  end.
+
+Lemma vec_to_list_take {A n} i (v : vec A n) :
+  vec_to_list (vtake i v) = take (fin_to_nat i) (vec_to_list v).
+Proof. induction i; inv_vec v; intros; f_equal/=; auto. Qed.
+Lemma vec_to_list_drop {A n} i (v : vec A n) :
+  vec_to_list (vdrop i v) = drop (fin_to_nat i) (vec_to_list v).
+Proof. induction i; inv_vec v; intros; f_equal/=; auto. Qed.
+
 (** The function [vreplicate n x] generates a vector with length [n] of elements
 with value [x]. *)
 Fixpoint vreplicate {A} (n : nat) (x : A) : vec A n :=
@@ -263,6 +288,13 @@ Fixpoint vreplicate {A} (n : nat) (x : A) : vec A n :=
 Lemma vec_to_list_replicate {A} n (x : A) :
   vec_to_list (vreplicate n x) = replicate n x.
 Proof. induction n; by f_equal/=. Qed.
+
+Lemma vlookup_replicate {A} n (x : A) i : vreplicate n x !!! i = x.
+Proof. induction i; f_equal/=; auto. Qed.
+
+Lemma vmap_replicate {A B} (f : A → B) n (x : A) :
+  vmap f (vreplicate n x) = vreplicate n (f x).
+Proof. induction n; f_equal/=; auto. Qed.
 
 (* Vectors can be inhabited. *)
 Global Instance vec_0_inhabited T : Inhabited (vec T 0) := populate [#].
