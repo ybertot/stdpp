@@ -260,6 +260,10 @@ with value [x]. *)
 Fixpoint vreplicate {A} (n : nat) (x : A) : vec A n :=
   match n with 0 => [#] | S n => x ::: vreplicate n x end.
 
+Lemma vec_to_list_replicate {A} n (x : A) :
+  vec_to_list (vreplicate n x) = replicate n x.
+Proof. induction n; by f_equal/=. Qed.
+
 (* Vectors can be inhabited. *)
 Global Instance vec_0_inhabited T : Inhabited (vec T 0) := populate [#].
 Global Instance vec_inhabited `{Inhabited T} n : Inhabited (vec T n) :=
