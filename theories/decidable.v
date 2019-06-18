@@ -91,6 +91,10 @@ Definition bool_decide (P : Prop) {dec : Decision P} : bool :=
 Lemma bool_decide_reflect P `{dec : Decision P} : reflect P (bool_decide P).
 Proof. unfold bool_decide. destruct dec; [left|right]; assumption. Qed.
 
+Lemma bool_decide_decide P `{!Decision P} :
+  bool_decide P = if decide P then true else false.
+Proof. reflexivity. Qed.
+
 Tactic Notation "case_bool_decide" "as" ident (Hd) :=
   match goal with
   | H : context [@bool_decide ?P ?dec] |- _ =>
