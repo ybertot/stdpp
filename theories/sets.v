@@ -653,8 +653,22 @@ Section set.
   Lemma difference_mono_r X1 X2 Y : X1 ⊆ X2 → X1 ∖ Y ⊆ X2 ∖ Y.
   Proof. set_solver. Qed.
 
+  Lemma subseteq_difference_r X Y1 Y2 :
+    X ## Y2 → X ⊆ Y1 → X ⊆ Y1 ∖ Y2.
+  Proof. set_solver. Qed.
+  Lemma subseteq_difference_l X1 X2 Y : X1 ⊆ Y → X1 ∖ X2 ⊆ Y.
+  Proof. set_solver. Qed.
+
   (** Disjointness *)
   Lemma disjoint_intersection X Y : X ## Y ↔ X ∩ Y ≡ ∅.
+  Proof. set_solver. Qed.
+  Lemma disjoint_difference_l1 X1 X2 Y : Y ⊆ X2 → X1 ∖ X2 ## Y.
+  Proof. set_solver. Qed.
+  Lemma disjoint_difference_l2 X1 X2 Y : X1 ## Y → X1 ∖ X2 ## Y.
+  Proof. set_solver. Qed.
+  Lemma disjoint_difference_r1 X Y1 Y2 : X ⊆ Y2 → X ## Y1 ∖ Y2.
+  Proof. set_solver. Qed.
+  Lemma disjoint_difference_r2 X Y1 Y2 : X ## Y1 → X ## Y1 ∖ Y2.
   Proof. set_solver. Qed.
 
   Section leibniz.
