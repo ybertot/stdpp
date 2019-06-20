@@ -753,6 +753,10 @@ Section sig_map.
 End sig_map.
 Arguments sig_map _ _ _ _ _ _ !_ / : assert.
 
+Definition proj1_ex {P : Prop} {Q : P → Prop} (p : ∃ x, Q x) : P :=
+  let '(ex_intro _ x _) := p in x.
+Definition proj2_ex {P : Prop} {Q : P → Prop} (p : ∃ x, Q x) : Q (proj1_ex p) :=
+  let '(ex_intro _ x H) := p in H.
 
 (** * Operations on sets *)
 (** We define operational type classes for the traditional operations and
