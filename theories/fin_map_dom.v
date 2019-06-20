@@ -119,6 +119,17 @@ Proof.
     eauto using (empty_finite (C:=D)), (union_finite (C:=D)),
     (singleton_finite (C:=D)).
 Qed.
+Global Instance dom_proper `{!Equiv A} : Proper ((≡@{M A}) ==> (≡)) (dom D).
+Proof.
+  intros m1 m2 EQm. apply elem_of_equiv. intros i.
+  rewrite !elem_of_dom, EQm. done.
+Qed.
+(** If [D] has Leibniz equality, we can show an even stronger result.  This is a
+common case e.g. when having a [gmap K A] where the key [K] has Leibniz equality
+(and thus also [gset K], the usual domain) but the value type [A] does not. *)
+Global Instance dom_proper_L `{!Equiv A, !LeibnizEquiv D} :
+  Proper ((≡@{M A}) ==> (=)) (dom D) | 0.
+Proof. intros ???. unfold_leibniz. by apply dom_proper. Qed.
 
 Context `{!LeibnizEquiv D}.
 Lemma dom_empty_L {A} : dom D (@empty (M A) _) = ∅.
