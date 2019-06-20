@@ -1,5 +1,7 @@
 From stdpp Require Import namespaces strings.
 
+Set Ltac Backtrace.
+
 Lemma test1 (N1 N2 : namespace) :
   N1 ## N2 → ↑N1 ⊆@{coPset} ⊤ ∖ ↑N2.
 Proof. solve_ndisj. Qed.
