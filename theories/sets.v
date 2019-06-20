@@ -656,6 +656,10 @@ Section set.
   (** Disjointness *)
   Lemma disjoint_intersection X Y : X ## Y ↔ X ∩ Y ≡ ∅.
   Proof. set_solver. Qed.
+  Lemma disjoint_difference_l X Y1 Y2 : Y1 ## X → Y1 ∖ Y2 ## X.
+  Proof. set_solver. Qed.
+  Lemma disjoint_difference_r X Y1 Y2 : X ## Y1 → X ## Y1 ∖ Y2.
+  Proof. set_solver. Qed.
 
   Section leibniz.
     Context `{!LeibnizEquiv C}.

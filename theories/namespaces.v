@@ -88,13 +88,15 @@ Hint Resolve namespace_subseteq_difference : ndisj.
 Hint Extern 0 (_ ## _) => apply ndot_ne_disjoint; congruence : ndisj.
 Hint Resolve ndot_preserve_disjoint_l ndot_preserve_disjoint_r : ndisj.
 Hint Resolve nclose_subseteq' ndisj_difference_l : ndisj.
-Hint Resolve namespace_subseteq_difference_l | 100 : ndisj.
 Hint Resolve (empty_subseteq (A:=positive) (C:=coPset)) : ndisj.
 Hint Resolve (union_least (A:=positive) (C:=coPset)) : ndisj.
+(* Fall-back rules that lose information (but let other rules above apply). *)
+Hint Resolve namespace_subseteq_difference_l | 100 : ndisj.
+Hint Resolve (disjoint_difference_l (A:=positive) (C:=coPset)) | 100 : ndisj.
 
 Ltac solve_ndisj :=
   repeat match goal with
   | H : _ ∪ _ ⊆ _ |- _ => apply union_subseteq in H as [??]
   end;
-  solve [eauto 10 with ndisj].
+  solve [eauto 12 with ndisj].
 Hint Extern 1000 => solve_ndisj : solve_ndisj.
