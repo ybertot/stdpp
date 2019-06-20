@@ -66,9 +66,6 @@ Section namespace.
 
   Lemma ndot_preserve_disjoint_r N E x : E ## ↑N → E ## ↑N.@x.
   Proof. intros. by apply symmetry, ndot_preserve_disjoint_l. Qed.
-
-  Lemma ndisj_difference_l E N1 N2 : ↑N2 ⊆ (↑N1 : coPset) → E ∖ ↑N1 ## ↑N2.
-  Proof. set_solver. Qed.
 End namespace.
 
 (* The hope is that registering these will suffice to solve most goals
@@ -77,17 +74,25 @@ of the forms:
 - [↑N1 ⊆ E ∖ ↑N2 ∖ .. ∖ ↑Nn]
 - [E1 ∖ ↑N1 ⊆ E2 ∖ ↑N2 ∖ .. ∖ ↑Nn] *)
 Create HintDb ndisj.
+
 (* Rules for goals of the form [_ ⊆ _] *)
+(* If-and-only-if rules. Well, not quite, but for the fragment we are
+considering they are. *)
 Hint Resolve (subseteq_difference_r (A:=positive) (C:=coPset)) : ndisj.
-Hint Resolve nclose_subseteq' : ndisj.
 Hint Resolve (empty_subseteq (A:=positive) (C:=coPset)) : ndisj.
 Hint Resolve (union_least (A:=positive) (C:=coPset)) : ndisj.
+(* Fallback, loses lots of information but lets other rules make progress. *)
 Hint Resolve (subseteq_difference_l (A:=positive) (C:=coPset)) | 100 : ndisj.
+Hint Resolve nclose_subseteq' | 100 : ndisj.
+
 (* Rules for goals of the form [_ ## _] *)
+(* The base rule that we want to ultimately get down to. *)
 Hint Extern 0 (_ ## _) => apply ndot_ne_disjoint; congruence : ndisj.
-Hint Resolve ndot_preserve_disjoint_l ndot_preserve_disjoint_r : ndisj.
-Hint Resolve ndisj_difference_l : ndisj.
-Hint Resolve (disjoint_difference_l (A:=positive) (C:=coPset)) | 100 : ndisj.
+(* Fallback, loses lots of information but lets other rules make progress.
+Tests show trying [disjoint_difference_l1] first gives better performance. *)
+Hint Resolve (disjoint_difference_l1 (A:=positive) (C:=coPset)) | 50 : ndisj.
+Hint Resolve (disjoint_difference_l2 (A:=positive) (C:=coPset)) | 100 : ndisj.
+Hint Resolve ndot_preserve_disjoint_l ndot_preserve_disjoint_r | 100 : ndisj.
 
 Ltac solve_ndisj :=
   repeat match goal with
