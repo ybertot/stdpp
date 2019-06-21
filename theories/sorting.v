@@ -116,6 +116,10 @@ End sorted.
 Section merge_sort_correct.
   Context  {A} (R : relation A) `{∀ x y, Decision (R x y)}.
 
+  Lemma list_merge_nil_l l2 : list_merge R [] l2 = l2.
+  Proof. by destruct l2. Qed.
+  Lemma list_merge_nil_r l1 : list_merge R l1 [] = l1.
+  Proof. by destruct l1. Qed.
   Lemma list_merge_cons x1 x2 l1 l2 :
     list_merge R (x1 :: l1) (x2 :: l2) =
       if decide (R x1 x2) then x1 :: list_merge R l1 (x2 :: l2)
