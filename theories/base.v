@@ -327,6 +327,8 @@ Class Trichotomy {A} (R : relation A) :=
   trichotomy x y : R x y ∨ x = y ∨ R y x.
 Class TrichotomyT {A} (R : relation A) :=
   trichotomyT x y : {R x y} + {x = y} + {R y x}.
+Class Involutive {A} (R : relation A) (f : A → A) :=
+  involutive x : R (f (f x)) x.
 
 Arguments irreflexivity {_} _ {_} _ _ : assert.
 Arguments inj {_ _ _ _} _ {_} _ _ _ : assert.
@@ -344,6 +346,7 @@ Arguments anti_symm {_ _} _ {_} _ _ _ _ : assert.
 Arguments total {_} _ {_} _ _ : assert.
 Arguments trichotomy {_} _ {_} _ _ : assert.
 Arguments trichotomyT {_} _ {_} _ _ : assert.
+Arguments involutive {_ _} _ {_} _ : assert.
 
 Lemma not_symmetry `{R : relation A, !Symmetric R} x y : ¬R x y → ¬R y x.
 Proof. intuition. Qed.
