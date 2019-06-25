@@ -286,6 +286,18 @@ Section set_unfold_list.
     constructor; unfold subseteq, list_subseteq.
     apply forall_proper; naive_solver.
   Qed.
+
+  Global Instance set_unfold_reverse x l P :
+    SetUnfoldElemOf x l P → SetUnfoldElemOf x (reverse l) P.
+  Proof. constructor. by rewrite elem_of_reverse, (set_unfold_elem_of x l P). Qed.
+
+  Global Instance set_unfold_list_fmap {B} (f : A → B) l P :
+    (∀ y, SetUnfoldElemOf y l (P y)) →
+    SetUnfoldElemOf x (f <$> l) (∃ y, x = f y ∧ P y).
+  Proof.
+    constructor. rewrite elem_of_list_fmap. f_equiv; intros y.
+    by rewrite (set_unfold_elem_of y l (P y)).
+  Qed.
 End set_unfold_list.
 
 Ltac set_unfold :=
