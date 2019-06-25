@@ -2245,6 +2245,9 @@ Proof. split; firstorder. Qed.
 Lemma list_subseteq_nil l : [] ⊆ l.
 Proof. intros x. by rewrite elem_of_nil. Qed.
 
+Global Instance list_subseteq_Permutation: Proper ((≡ₚ) ==> (≡ₚ) ==> (↔)) (⊆@{list A}) .
+Proof. intros l1 l2 Hl k1 k2 Hk. apply forall_proper; intros x. by rewrite Hl, Hk. Qed.
+
 (** ** Properties of the [Forall] and [Exists] predicate *)
 Lemma Forall_Exists_dec (P Q : A → Prop) (dec : ∀ x, {P x} + {Q x}) :
   ∀ l, {Forall P l} + {Exists Q l}.
@@ -2400,6 +2403,10 @@ Section Forall_Exists.
     intros ?? l. induction l using rev_ind; auto.
     rewrite Forall_app, Forall_singleton; intros [??]; auto.
   Qed.
+
+  Global Instance Forall_Permutation: Proper ((≡ₚ) ==> (↔)) (Forall P).
+  Proof. intros l1 l2 Hl. rewrite !Forall_forall. by setoid_rewrite Hl. Qed.
+
   Lemma Exists_exists l : Exists P l ↔ ∃ x, x ∈ l ∧ P x.
   Proof.
     split.
@@ -2418,6 +2425,9 @@ Section Forall_Exists.
   Lemma Exists_impl (Q : A → Prop) l :
     Exists P l → (∀ x, P x → Q x) → Exists Q l.
   Proof. intros H ?. induction H; auto. Defined.
+
+  Global Instance Exists_Permutation: Proper ((≡ₚ) ==> (↔)) (Exists P).
+  Proof. intros l1 l2 Hl. rewrite !Exists_exists. by setoid_rewrite Hl. Qed.
 
   Lemma Exists_not_Forall l : Exists (not ∘ P) l → ¬Forall P l.
   Proof. induction 1; inversion_clear 1; contradiction. Qed.
