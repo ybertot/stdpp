@@ -506,6 +506,8 @@ Tactic Notation "naive_solver" tactic(tac) :=
   end;
   let rec go n :=
   repeat match goal with
+  (**i solve the goal *)
+  | |- _ => fast_done
   (**i intros *)
   | |- ∀ _, _ => intro
   (**i simplification of assumptions *)
@@ -522,8 +524,6 @@ Tactic Notation "naive_solver" tactic(tac) :=
   | H : Is_true (_ && _) |- _ => apply andb_True in H; destruct H
   (**i simplify and solve equalities *)
   | |- _ => progress simplify_eq/=
-  (**i solve the goal *)
-  | |- _ => fast_done
   (**i operations that generate more subgoals *)
   | |- _ ∧ _ => split
   | |- Is_true (bool_decide _) => apply (bool_decide_pack _)
