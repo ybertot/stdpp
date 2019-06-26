@@ -1388,6 +1388,10 @@ Lemma imap_fmap {B C} (f : nat → B → C) (g : A → B) l :
   imap f (g <$> l) = imap (λ n, f n ∘ g) l.
 Proof. revert f. induction l; intros; f_equal/=; eauto. Qed.
 
+Lemma fmap_imap {B C} (f : nat → A → B) (g : B → C) l :
+  g <$> imap f l = imap (λ n, g ∘ f n) l.
+Proof. revert f. induction l; intros; f_equal/=; eauto. Qed.
+
 Lemma imap_const {B} (f : A → B) l : imap (const f) l = f <$> l.
 Proof. induction l; f_equal/=; auto. Qed.
 
@@ -1396,6 +1400,25 @@ Proof.
   revert f i. induction l as [|x l IH]; intros f [|i]; f_equal/=; auto.
   by rewrite IH.
 Qed.
+
+Lemma imap_length {B} (f : nat → A → B) l :
+  length (imap f l) = length l.
+Proof. revert f. induction l; simpl; eauto. Qed.
+
+Lemma elem_of_lookup_imap_1 {B} (f : nat → A → B) l (x : B) :
+  x ∈ imap f l → ∃ i y, x = f i y ∧ l !! i = Some y.
+Proof.
+  intros [i Hin]%elem_of_list_lookup. rewrite list_lookup_imap in Hin.
+  simplify_option_eq; naive_solver.
+Qed.
+Lemma elem_of_lookup_imap_2 {B} (f : nat → A → B) l x i : l !! i = Some x → f i x ∈ imap f l.
+Proof.
+  intros Hl. rewrite elem_of_list_lookup.
+  exists i. by rewrite list_lookup_imap, Hl.
+Qed.
+Lemma elem_of_lookup_imap {B} (f : nat → A → B) l (x : B) :
+  x ∈ imap f l ↔ ∃ i y, x = f i y ∧ l !! i = Some y.
+Proof. naive_solver eauto using elem_of_lookup_imap_1, elem_of_lookup_imap_2. Qed.
 
 (** ** Properties of the [mask] function *)
 Lemma mask_nil f βs : mask f βs [] =@{list A} [].
@@ -1447,6 +1470,16 @@ Qed.
 (** ** Properties of the [seq] function *)
 Lemma fmap_seq j n : S <$> seq j n = seq (S j) n.
 Proof. revert j. induction n; intros; f_equal/=; auto. Qed.
+Lemma imap_seq {B} l (g : nat → B) i :
+  imap (λ j _, g (i + j)) l = g <$> seq i (length l).
+Proof.
+  revert i. induction l as [|x l IH]; [done|].
+  csimpl. intros n. rewrite <-IH, <-plus_n_O. f_equal.
+  apply imap_ext. intros. simpl. f_equal. lia.
+Qed.
+Lemma imap_seq_0 {B} l (g : nat → B) :
+  imap (λ j _, g j) l = g <$> seq 0 (length l).
+Proof. rewrite (imap_ext _ (λ i o, g (0 + i))%nat); [|done]. apply imap_seq. Qed.
 Lemma lookup_seq j n i : i < n → seq j n !! i = Some (j + i).
 Proof.
   revert j i. induction n as [|n IH]; intros j [|i] ?; simpl; auto with lia.
@@ -1458,6 +1491,13 @@ Lemma lookup_seq_inv j n i j' : seq j n !! i = Some j' → j' = j + i ∧ i < n.
 Proof.
   destruct (le_lt_dec n i); [by rewrite lookup_seq_ge|].
   rewrite lookup_seq by done. intuition congruence.
+Qed.
+Lemma NoDup_seq j n : NoDup (seq j n).
+Proof. apply NoDup_ListNoDup, seq_NoDup. Qed.
+Lemma seq_S_end_app j n : seq j (S n) = seq j n ++ [j + n].
+Proof.
+  revert j. induction n as [|n IH]; intros j; simpl in *; f_equal; [done |].
+  rewrite IH. f_equal. f_equal. lia.
 Qed.
 
 (** ** Properties of the [Permutation] predicate *)
