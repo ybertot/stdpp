@@ -41,6 +41,11 @@ Section merge_sort.
   Definition merge_sort : list A → list A := merge_sort_aux [].
 End merge_sort.
 
+(** Helper definition for [Sorted_reverse] below *)
+Inductive TlRel {A} (R : relation A) (a : A) : list A → Prop :=
+  | TlRel_nil : TlRel R a []
+  | TlRel_cons b l : R b a → TlRel R a (l ++ [b]).
+
 (** ** Properties of the [Sorted] and [StronglySorted] predicate *)
 Section sorted.
   Context {A} (R : relation A).
@@ -112,7 +117,27 @@ Section sorted.
         rewrite ?Forall_fmap; eauto using Forall_impl.
     Qed.
   End fmap.
+
+  Lemma HdRel_reverse l x : HdRel R x l → TlRel (flip R) x (reverse l).
+  Proof. destruct 1; rewrite ?reverse_cons; by constructor. Qed.
+
+  Lemma Sorted_snoc l x : Sorted R l → TlRel R x l → Sorted R (l ++ [x]).
+  Proof.
+    induction 1 as [|y l Hsort IH Hhd]; intros Htl; simpl.
+    { repeat constructor. }
+    constructor. apply IH.
+    - inversion Htl as [|? [|??]]; simplify_list_eq; by constructor.
+    - destruct Hhd; constructor; [|done].
+      inversion Htl as [|? [|??]]; by try discriminate_list.
+  Qed.
 End sorted.
+
+Lemma Sorted_reverse {A} (R : relation A) l :
+  Sorted R l → Sorted (flip R) (reverse l).
+Proof.
+  induction 1; rewrite ?reverse_nil, ?reverse_cons;
+    auto using Sorted_snoc, HdRel_reverse.
+Qed.
 
 (** ** Correctness of merge sort *)
 Section merge_sort_correct.
