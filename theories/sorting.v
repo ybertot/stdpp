@@ -96,20 +96,22 @@ Section sorted.
     end); clear go; abstract first [by constructor | by inversion 1].
   Defined.
 
-  Context {B} (f : A → B).
-  Lemma HdRel_fmap (R1 : relation A) (R2 : relation B) x l :
-    (∀ y, R1 x y → R2 (f x) (f y)) → HdRel R1 x l → HdRel R2 (f x) (f <$> l).
-  Proof. destruct 2; constructor; auto. Qed.
-  Lemma Sorted_fmap (R1 : relation A) (R2 : relation B) l :
-    (∀ x y, R1 x y → R2 (f x) (f y)) → Sorted R1 l → Sorted R2 (f <$> l).
-  Proof. induction 2; simpl; constructor; eauto using HdRel_fmap. Qed.
-  Lemma StronglySorted_fmap (R1 : relation A) (R2 : relation B) l :
-    (∀ x y, R1 x y → R2 (f x) (f y)) →
-    StronglySorted R1 l → StronglySorted R2 (f <$> l).
-  Proof.
-    induction 2; csimpl; constructor;
-      rewrite ?Forall_fmap; eauto using Forall_impl.
-  Qed.
+  Section fmap.
+    Context {B} (f : A → B).
+    Lemma HdRel_fmap (R1 : relation A) (R2 : relation B) x l :
+      (∀ y, R1 x y → R2 (f x) (f y)) → HdRel R1 x l → HdRel R2 (f x) (f <$> l).
+    Proof. destruct 2; constructor; auto. Qed.
+    Lemma Sorted_fmap (R1 : relation A) (R2 : relation B) l :
+      (∀ x y, R1 x y → R2 (f x) (f y)) → Sorted R1 l → Sorted R2 (f <$> l).
+    Proof. induction 2; simpl; constructor; eauto using HdRel_fmap. Qed.
+    Lemma StronglySorted_fmap (R1 : relation A) (R2 : relation B) l :
+      (∀ x y, R1 x y → R2 (f x) (f y)) →
+      StronglySorted R1 l → StronglySorted R2 (f <$> l).
+    Proof.
+      induction 2; csimpl; constructor;
+        rewrite ?Forall_fmap; eauto using Forall_impl.
+    Qed.
+  End fmap.
 End sorted.
 
 (** ** Correctness of merge sort *)
