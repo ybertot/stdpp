@@ -467,6 +467,13 @@ Proof.
     apply Nat.mod_bound_pos; lia. }
   by rewrite <-Nat2Z.inj_mul, <-Nat2Z.inj_add, <-Nat.div_mod.
 Qed.
+Lemma Z_succ_pred_induction y (P : Z → Prop) :
+  P y →
+  (∀ x, y ≤ x → P x → P (Z.succ x)) →
+  (∀ x, x ≤ y → P x → P (Z.pred x)) →
+  (∀ x, P x).
+Proof. intros H0 HS HP. by apply (Z.order_induction' _ _ y). Qed.
+
 Close Scope Z_scope.
 
 (** * Injectivity of casts *)
