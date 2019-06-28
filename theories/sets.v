@@ -885,6 +885,8 @@ Section quantifiers.
   Proof. unfold set_Forall. set_solver. Qed.
   Lemma set_Forall_union_inv_2 X Y : set_Forall P (X ∪ Y) → set_Forall P Y.
   Proof. unfold set_Forall. set_solver. Qed.
+  Lemma set_Forall_list_to_set l : set_Forall P (list_to_set (C:=C) l) ↔ Forall P l.
+  Proof. rewrite Forall_forall. unfold set_Forall. set_solver. Qed.
 
   Lemma set_Exists_empty : ¬set_Exists P (∅ : C).
   Proof. unfold set_Exists. set_solver. Qed.
@@ -897,6 +899,8 @@ Section quantifiers.
   Lemma set_Exists_union_inv X Y :
     set_Exists P (X ∪ Y) → set_Exists P X ∨ set_Exists P Y.
   Proof. unfold set_Exists. set_solver. Qed.
+  Lemma set_Exists_list_to_set l : set_Exists P (list_to_set (C:=C) l) ↔ Exists P l.
+  Proof. rewrite Exists_exists. unfold set_Exists. set_solver. Qed.
 End quantifiers.
 
 Section more_quantifiers.
