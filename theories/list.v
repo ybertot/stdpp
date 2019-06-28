@@ -394,6 +394,13 @@ used by [positives_flatten]. *)
 Definition positives_unflatten (p : positive) : option (list positive) :=
   positives_unflatten_go p [] 1.
 
+
+(** [seqZ m n] generates the sequence [m], [m + 1], ..., [m + n - 1] 
+over integers, provided [n >= 0]. If n < 0, then the range is empty. **)
+Definition seqZ (m len: Z) : list Z :=
+  (λ i: nat, Z.add i m) <$> (seq 0 (Z.to_nat len)).
+Arguments seqZ : simpl never.
+
 (** * Basic tactics on lists *)
 (** The tactic [discriminate_list] discharges a goal if it submseteq
 a list equality involving [(::)] and [(++)] of two lists that have a different
@@ -1459,6 +1466,7 @@ Proof.
   destruct (le_lt_dec n i); [by rewrite lookup_seq_ge|].
   rewrite lookup_seq by done. intuition congruence.
 Qed.
+
 
 (** ** Properties of the [Permutation] predicate *)
 Lemma Permutation_nil l : l ≡ₚ [] ↔ l = [].
@@ -3344,6 +3352,55 @@ Section mapM.
     mapM f l = Some k → (∀ x y, f x = Some y → g y = x) → g <$> k = l.
   Proof. eauto using mapM_fmap_Forall2_Some_inv, Forall2_true, mapM_length. Qed.
 End mapM.
+
+(** ** Properties of the [seqZ] function *)
+Section seqZ.
+  Implicit Types (m n: Z) (i j: nat).
+  Local Open Scope Z.
+  Lemma seqZ_nil m n: n ≤ 0 → seqZ m n = [].
+  Proof. by destruct n. Qed.
+  Lemma seqZ_cons m n: 0 < n → seqZ m n = m :: seqZ (Z.succ m) (Z.pred n).
+  Proof.
+    intros H. unfold seqZ. replace n with (Z.succ (Z.pred n)) at 1 by lia.
+    rewrite Z2Nat.inj_succ by lia. f_equal/=.
+    rewrite <-fmap_seq, <-list_fmap_compose.
+    apply map_ext; naive_solver lia.
+  Qed.
+  Lemma seqZ_length m n: length (seqZ m n) = Z.to_nat n.
+  Proof. unfold seqZ; by rewrite fmap_length, seq_length. Qed.
+  Lemma seqZ_fmap m m' n: Z.add m <$> seqZ m' n = seqZ (m + m') n.
+  Proof.
+    revert m'. induction n as [|n ? IH|] using (Z_succ_pred_induction 0); intros m'.
+    - by rewrite seqZ_nil.
+    - rewrite (seqZ_cons m') by lia. rewrite (seqZ_cons (m + m')) by lia.
+      f_equal/=. rewrite Z.pred_succ, IH; simpl. f_equal; lia.
+    - by rewrite !seqZ_nil by lia.
+  Qed.
+  Lemma seqZ_lookup_lt m n i: i < n → seqZ m n !! i = Some (m + i).
+  Proof.
+    revert m i.
+    induction n as [|n ? IH|] using (Z_succ_pred_induction 0); intros m i Hi; try lia.
+    rewrite seqZ_cons by lia. destruct i as [|i]; simpl.
+    - f_equal; lia.
+    - rewrite Z.pred_succ, IH by lia. f_equal; lia.
+  Qed.
+  Lemma seqZ_lookup_ge m n i : n ≤ i → seqZ m n !! i = None.
+  Proof.
+    revert m i.
+    induction n as [|n ? IH|] using (Z_succ_pred_induction 0); intros m i Hi; try lia.
+    - by rewrite seqZ_nil.
+    - rewrite seqZ_cons by lia.
+      destruct i as [|i]; simpl; [lia|]. by rewrite Z.pred_succ, IH by lia.
+    - by rewrite seqZ_nil by lia.
+  Qed.
+  Lemma seqZ_lookup m n i m' : seqZ m n !! i = Some m' ↔ m' = m + i ∧ i < n.
+  Proof.
+    destruct (Z_le_gt_dec n i).
+    { rewrite seqZ_lookup_ge by lia. naive_solver lia. }
+    rewrite seqZ_lookup_lt by lia. naive_solver lia.
+  Qed.
+End seqZ.
+
 
 (** ** Properties of the [permutations] function *)
 Section permutations.
