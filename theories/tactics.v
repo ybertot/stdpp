@@ -355,7 +355,7 @@ Ltac solve_proper_prepare :=
      show up in the goal. To check that we actually have an equivalence relation
      on functions, we try to eta expand [f], which will only succeed if [f] is
      actually a function. *)
-     let f' := constr:(λ x y, f x y) in
+     let f' := constr:(λ x, f x) in
      (* Now forcefully introduce the first ∀ and other ∀s that show up in the
      goal afterwards. *)
      intros ?; intros
