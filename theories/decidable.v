@@ -112,13 +112,28 @@ Proof. rewrite bool_decide_spec; trivial. Qed.
 Lemma bool_decide_pack (P : Prop) {dec : Decision P} : P → bool_decide P.
 Proof. rewrite bool_decide_spec; trivial. Qed.
 Hint Resolve bool_decide_pack : core.
-Lemma bool_decide_true (P : Prop) `{Decision P} : P → bool_decide P = true.
-Proof. case_bool_decide; tauto. Qed.
-Lemma bool_decide_false (P : Prop) `{Decision P} : ¬P → bool_decide P = false.
-Proof. case_bool_decide; tauto. Qed.
+
+Lemma bool_decide_eq_true (P : Prop) `{Decision P} : bool_decide P = true ↔ P.
+Proof. case_bool_decide; intuition discriminate. Qed.
+Lemma bool_decide_eq_false (P : Prop) `{Decision P} : bool_decide P = false ↔ ¬P.
+Proof. case_bool_decide; intuition discriminate. Qed.
 Lemma bool_decide_iff (P Q : Prop) `{Decision P, Decision Q} :
   (P ↔ Q) → bool_decide P = bool_decide Q.
 Proof. repeat case_bool_decide; tauto. Qed.
+
+Lemma bool_decide_eq_true_1 P `{!Decision P}: bool_decide P = true → P.
+Proof. apply bool_decide_eq_true. Qed.
+Lemma bool_decide_eq_true_2 P `{!Decision P}: P → bool_decide P = true.
+Proof. apply bool_decide_eq_true. Qed.
+
+Lemma bool_decide_eq_false_1 P `{!Decision P}: bool_decide P = false → ¬P.
+Proof. apply bool_decide_eq_false. Qed.
+Lemma bool_decide_eq_false_2 P `{!Decision P}: ¬P → bool_decide P = false.
+Proof. apply bool_decide_eq_false. Qed.
+
+(** Backwards compatibility notations. *)
+Notation bool_decide_true := bool_decide_eq_true_2.
+Notation bool_decide_false := bool_decide_eq_false_2.
 
 (** * Decidable Sigma types *)
 (** Leibniz equality on Sigma types requires the equipped proofs to be
