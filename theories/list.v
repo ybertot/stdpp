@@ -572,6 +572,9 @@ Lemma list_insert_id l i x : l !! i = Some x → <[i:=x]>l = l.
 Proof. revert i. induction l; intros [|i] [=]; f_equal/=; auto. Qed.
 Lemma list_insert_ge l i x : length l ≤ i → <[i:=x]>l = l.
 Proof. revert i. induction l; intros [|i] ?; f_equal/=; auto with lia. Qed.
+Lemma list_insert_insert l i x y :
+  <[i:=x]> (<[i:=y]> l) = <[i:=x]> l.
+Proof. revert i. induction l; intros [|i]; f_equal/=; auto. Qed.
 
 Lemma list_lookup_other l i x :
   length l ≠ 1 → l !! i = Some x → ∃ j y, j ≠ i ∧ l !! j = Some y.
@@ -962,6 +965,8 @@ Proof.
 Qed.
 Lemma take_nil n : take n [] =@{list A} [].
 Proof. by destruct n. Qed.
+Lemma take_S_r l n x : l !! n = Some x → take (S n) l = take n l ++ [x].
+Proof. revert n. induction l; intros []; naive_solver eauto with f_equal. Qed.
 Lemma take_app l k : take (length l) (l ++ k) = l.
 Proof. induction l; f_equal/=; auto. Qed.
 Lemma take_app_alt l k n : n = length l → take n (l ++ k) = l.
@@ -1019,6 +1024,9 @@ Lemma drop_0 l : drop 0 l = l.
 Proof. done. Qed.
 Lemma drop_nil n : drop n [] =@{list A} [].
 Proof. by destruct n. Qed.
+Lemma drop_S l x n :
+  l !! n = Some x → drop n l = x :: drop (S n) l.
+Proof. revert n. induction l; intros []; naive_solver. Qed.
 Lemma drop_length l n : length (drop n l) = length l - n.
 Proof. revert n. by induction l; intros [|i]; f_equal/=. Qed.
 Lemma drop_ge l n : length l ≤ n → drop n l = [].
@@ -1117,6 +1125,9 @@ Proof. done. Qed.
 Lemma replicate_plus n m x :
   replicate (n + m) x = replicate n x ++ replicate m x.
 Proof. induction n; f_equal/=; auto. Qed.
+Lemma replicate_cons_app n x :
+  x :: replicate n x = replicate n x ++ [x].
+Proof. induction n; f_equal/=; eauto.  Qed.
 Lemma take_replicate n m x : take n (replicate m x) = replicate (min n m) x.
 Proof. revert m. by induction n; intros [|?]; f_equal/=. Qed.
 Lemma take_replicate_plus n m x : take n (replicate (n + m) x) = replicate n x.
@@ -3673,6 +3684,35 @@ Section zip_with.
     Forall (λ x, ∀ y, P y → Q (f x y)) l → Forall P k →
     Forall Q (zip_with f l k).
   Proof. intros Hl. revert k. induction Hl; destruct 1; simpl in *; auto. Qed.
+
+  Lemma elem_of_lookup_zip_with_1 l k (z : C) :
+    z ∈ zip_with f l k → ∃ i x y, z = f x y ∧ l !! i = Some x ∧ k !! i = Some y.
+  Proof.
+    intros [i Hin]%elem_of_list_lookup. rewrite lookup_zip_with in Hin.
+    simplify_option_eq; naive_solver.
+  Qed.
+
+  Lemma elem_of_lookup_zip_with_2 l k x y (z : C) i :
+    l !! i = Some x → k !! i = Some y → f x y ∈ zip_with f l k.
+  Proof.
+    intros Hl Hk. rewrite elem_of_list_lookup.
+    exists i. by rewrite lookup_zip_with, Hl, Hk.
+  Qed.
+
+  Lemma elem_of_lookup_zip_with l k (z : C) :
+    z ∈ zip_with f l k ↔ ∃ i x y, z = f x y ∧ l !! i = Some x ∧ k !! i = Some y.
+  Proof.
+    naive_solver eauto using
+                 elem_of_lookup_zip_with_1, elem_of_lookup_zip_with_2.
+  Qed.
+
+  Lemma elem_of_zip_with l k (z : C) :
+    z ∈ zip_with f l k → ∃ x y, z = f x y ∧ x ∈ l ∧ y ∈ k.
+  Proof.
+    intros ?%elem_of_lookup_zip_with.
+    naive_solver eauto using elem_of_list_lookup_2.
+  Qed.
+
 End zip_with.
 
 Lemma zip_with_sublist_alter {A B} (f : A → B → A) g l k i n l' k' :
@@ -3711,6 +3751,14 @@ Section zip.
     rewrite <-Forall2_same_length. intros Hlk1 Hlk2. revert l1 k1 Hlk1.
     induction Hlk2; intros ?? [|??????]; simpl; auto.
   Qed.
+
+  Lemma elem_of_zip_l x1 x2 l k :
+    (x1, x2) ∈ zip l k → x1 ∈ l.
+  Proof. intros ?%elem_of_zip_with. naive_solver. Qed.
+
+  Lemma elem_of_zip_r x1 x2 l k :
+    (x1, x2) ∈ zip l k → x2 ∈ k.
+  Proof. intros ?%elem_of_zip_with. naive_solver. Qed.
 End zip.
 
 Lemma elem_of_zipped_map {A B} (f : list A → list A → A → B) l k x :
