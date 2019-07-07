@@ -907,6 +907,15 @@ Section find.
     induction 1 as [|x y l ? IH]; intros; simplify_option_eq; eauto.
     by destruct IH as [[i x'] ->]; [|exists (S i, x')].
   Qed.
+
+  Lemma list_find_fmap {B : Type} (f : B → A) (l : list B) :
+    list_find P (f <$> l) = prod_map id f <$> list_find (P ∘ f) l.
+  Proof.
+    induction l as [|x y IH]; [done|]. simpl.
+    case_decide; [done|].
+    change (list_fmap B A f y) with (f <$> y). (* FIXME it simplified too much *)
+    rewrite IH. by destruct (list_find (P ∘ f) y).
+  Qed.
 End find.
 
 (** ** Properties of the [reverse] function *)
