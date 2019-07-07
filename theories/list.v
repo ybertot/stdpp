@@ -926,6 +926,23 @@ Section find.
   Qed.
 End find.
 
+(** ** Properties of the [omap] function *)
+Lemma list_fmap_omap {B C : Type} (f : A → option B) (g : B → C) (l : list A) :
+  g <$> omap f l = omap (λ x, g <$> (f x)) l.
+Proof.
+  induction l as [|x y IH]; [done|]. simpl.
+  destruct (f x); [|done]. simpl. by f_equal.
+Qed.
+Lemma list_omap_ext {B C : Type} (f : A → option C) (g : B → option C)
+      (l1 : list A) (l2 : list B) :
+  Forall2 (λ a b, f a = g b) l1 l2 →
+  omap f l1 = omap g l2.
+Proof.
+  induction 1 as [|x y l l' Hfg ? IH]; [done|].
+  simpl. rewrite Hfg. destruct (g y); [|done].
+  by f_equal.
+Qed.
+
 (** ** Properties of the [reverse] function *)
 Lemma reverse_nil : reverse [] =@{list A} [].
 Proof. done. Qed.
