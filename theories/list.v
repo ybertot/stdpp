@@ -916,6 +916,14 @@ Section find.
     change (list_fmap B A f y) with (f <$> y). (* FIXME it simplified too much *)
     rewrite IH. by destruct (list_find (P ∘ f) y).
   Qed.
+
+  Lemma list_find_proper (Q : A → Prop) `{∀ x, Decision (Q x)} l :
+    (∀ x, P x ↔ Q x) →
+    list_find P l = list_find Q l.
+  Proof.
+    intros HPQ. induction l as [|x y IH]; [done|]. simpl.
+    erewrite decide_iff by done. by rewrite IH.
+  Qed.
 End find.
 
 (** ** Properties of the [reverse] function *)
