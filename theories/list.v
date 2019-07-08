@@ -3100,7 +3100,7 @@ Section fmap.
     (∀ x, f x ≡ g x) → f <$> l ≡ g <$> l.
   Proof. induction l; constructor; auto. Qed.
 
-  Global Instance: Inj (=) (=) f → Inj (=) (=) (fmap f).
+  Global Instance fmap_inj: Inj (=) (=) f → Inj (=) (=) (fmap f).
   Proof.
     intros ? l1. induction l1 as [|x l1 IH]; [by intros [|??]|].
     intros [|??]; intros; f_equal/=; simplify_eq; auto.
