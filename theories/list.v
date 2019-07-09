@@ -913,11 +913,11 @@ Section find.
   Proof.
     induction l as [|x l IH]; [done|]. simpl.
     case_decide; [done|].
-    change (list_fmap B A f l) with (f <$> l). (* FIXME it simplified too much *)
+    change (list_fmap B A f l) with (f <$> l). (* induction didn't re-fold *)
     rewrite IH. by destruct (list_find (P ∘ f) l).
   Qed.
 
-  Lemma list_find_proper (Q : A → Prop) `{∀ x, Decision (Q x)} l :
+  Lemma list_find_ext (Q : A → Prop) `{∀ x, Decision (Q x)} l :
     (∀ x, P x ↔ Q x) →
     list_find P l = list_find Q l.
   Proof.
