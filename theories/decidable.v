@@ -94,6 +94,9 @@ Proof. unfold bool_decide. destruct dec; [left|right]; assumption. Qed.
 Lemma bool_decide_decide P `{!Decision P} :
   bool_decide P = if decide P then true else false.
 Proof. reflexivity. Qed.
+Lemma decide_bool_decide P {Hdec: Decision P} {X : Type} (x1 x2 : X):
+  (if decide P then x1 else x2) = (if bool_decide P then x1 else x2).
+Proof. unfold bool_decide, decide. destruct Hdec; reflexivity. Qed.
 
 Tactic Notation "case_bool_decide" "as" ident (Hd) :=
   match goal with

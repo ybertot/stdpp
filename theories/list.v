@@ -921,7 +921,9 @@ Section find.
     list_find P l = list_find Q l.
   Proof.
     intros HPQ. induction l as [|x l IH]; [done|]. simpl.
-    erewrite decide_iff by done. by rewrite IH.
+    rewrite !decide_bool_decide.
+    rewrite (bool_decide_iff _ (Q x)) by done.
+    rewrite IH. done.
   Qed.
 End find.
 
