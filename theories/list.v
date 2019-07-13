@@ -907,7 +907,40 @@ Section find.
     induction 1 as [|x y l ? IH]; intros; simplify_option_eq; eauto.
     by destruct IH as [[i x'] ->]; [|exists (S i, x')].
   Qed.
+
+  Lemma list_find_fmap {B : Type} (f : B → A) (l : list B) :
+    list_find P (f <$> l) = prod_map id f <$> list_find (P ∘ f) l.
+  Proof.
+    induction l as [|x l IH]; [done|]. csimpl. (* csimpl re-folds fmap *)
+    case_decide; [done|].
+    rewrite IH. by destruct (list_find (P ∘ f) l).
+  Qed.
+
+  Lemma list_find_ext (Q : A → Prop) `{∀ x, Decision (Q x)} l :
+    (∀ x, P x ↔ Q x) →
+    list_find P l = list_find Q l.
+  Proof.
+    intros HPQ. induction l as [|x l IH]; [done|]. simpl.
+    erewrite decide_iff by done. by rewrite IH.
+  Qed.
 End find.
+
+(** ** Properties of the [omap] function *)
+Lemma list_fmap_omap {B C : Type} (f : A → option B) (g : B → C) (l : list A) :
+  g <$> omap f l = omap (λ x, g <$> (f x)) l.
+Proof.
+  induction l as [|x y IH]; [done|]. csimpl.
+  destruct (f x); [|done]. csimpl. by f_equal.
+Qed.
+Lemma list_omap_ext {B C : Type} (f : A → option C) (g : B → option C)
+      (l1 : list A) (l2 : list B) :
+  Forall2 (λ a b, f a = g b) l1 l2 →
+  omap f l1 = omap g l2.
+Proof.
+  induction 1 as [|x y l l' Hfg ? IH]; [done|].
+  csimpl. rewrite Hfg. destruct (g y); [|done].
+  by f_equal.
+Qed.
 
 (** ** Properties of the [reverse] function *)
 Lemma reverse_nil : reverse [] =@{list A} [].
