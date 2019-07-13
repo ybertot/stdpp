@@ -920,10 +920,8 @@ Section find.
     (∀ x, P x ↔ Q x) →
     list_find P l = list_find Q l.
   Proof.
-    intros HPQ. induction l as [|x l IH]; [done|]. simpl.
-    rewrite !decide_bool_decide.
-    rewrite (bool_decide_iff _ (Q x)) by done.
-    rewrite IH. done.
+    intros HPQ. induction l as [|x l IH]; simpl; [done|].
+    by rewrite (decide_iff (P x) (Q x)), IH by done.
   Qed.
 End find.
 
