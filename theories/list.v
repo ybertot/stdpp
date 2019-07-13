@@ -911,9 +911,8 @@ Section find.
   Lemma list_find_fmap {B : Type} (f : B → A) (l : list B) :
     list_find P (f <$> l) = prod_map id f <$> list_find (P ∘ f) l.
   Proof.
-    induction l as [|x l IH]; [done|]. simpl.
+    induction l as [|x l IH]; [done|]. csimpl. (* csimpl re-folds fmap *)
     case_decide; [done|].
-    change (list_fmap B A f l) with (f <$> l). (* induction didn't re-fold *)
     rewrite IH. by destruct (list_find (P ∘ f) l).
   Qed.
 
@@ -930,8 +929,8 @@ End find.
 Lemma list_fmap_omap {B C : Type} (f : A → option B) (g : B → C) (l : list A) :
   g <$> omap f l = omap (λ x, g <$> (f x)) l.
 Proof.
-  induction l as [|x y IH]; [done|]. simpl.
-  destruct (f x); [|done]. simpl. by f_equal.
+  induction l as [|x y IH]; [done|]. csimpl.
+  destruct (f x); [|done]. csimpl. by f_equal.
 Qed.
 Lemma list_omap_ext {B C : Type} (f : A → option C) (g : B → option C)
       (l1 : list A) (l2 : list B) :
@@ -939,7 +938,7 @@ Lemma list_omap_ext {B C : Type} (f : A → option C) (g : B → option C)
   omap f l1 = omap g l2.
 Proof.
   induction 1 as [|x y l l' Hfg ? IH]; [done|].
-  simpl. rewrite Hfg. destruct (g y); [|done].
+  csimpl. rewrite Hfg. destruct (g y); [|done].
   by f_equal.
 Qed.
 
