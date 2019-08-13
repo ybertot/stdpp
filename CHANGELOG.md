@@ -1,6 +1,19 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
+## std++ 1.2.1 (unreleased)
+
+This release of std++ received contributions by Michael Sammler, Paolo
+G. Giarrusso, Ralf Jung, Robbert Krebbers, and Simon Spies.
+
+Noteworthy additions and changes:
+
+- `max` and `min` infix notations for `N` and `Z` like we have for `nat`.
+- Make `solve_ndisj` tactic more powerful.
+- Add typeclass `Involutive`.
+- Improved `naive_solver` performance in case the goal is trivially solvable.
+- A bunch of new lemmas for list operations.
+
 ## std++ 1.2.0 (released 2019-04-26)
 
 Coq 8.9 is supported by this release, but Coq 8.6 is no longer supported. Use
