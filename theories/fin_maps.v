@@ -860,7 +860,7 @@ Proof.
 Defined.
 
 (** Properties of the imap function *)
-Lemma lookup_imap {A B} (f : K → A → option B) (m : M A) i :
+Lemma map_lookup_imap {A B} (f : K → A → option B) (m : M A) i :
   map_imap f m !! i = m !! i ≫= f i.
 Proof.
   unfold map_imap; destruct (m !! i ≫= f i) as [y|] eqn:Hi; simpl.
@@ -874,6 +874,39 @@ Proof.
     intros ([i' x]&->&Hi'); simplify_eq/=.
     rewrite elem_of_list_omap in Hi'; destruct Hi' as ([j y]&Hj&?).
     rewrite elem_of_map_to_list in Hj; simplify_option_eq.
+Qed.
+
+Lemma map_imap_Some {A} (m : M A) : map_imap (λ _, Some) m = m.
+Proof.
+  apply map_eq. intros i. rewrite map_lookup_imap. by destruct (m !! i).
+Qed.
+
+Lemma map_imap_insert {A B} (f : K → A → option B) (i : K) (v : A) (m : M A) :
+  map_imap f (<[i:=v]> m) = match f i v with
+                            | None   => delete i (map_imap f m)
+                            | Some w => <[i:=w]> (map_imap f m)
+                            end.
+Proof.
+  destruct (f i v) as [w|] eqn:Hw.
+  - apply map_eq. intros k. rewrite map_lookup_imap.
+    destruct (decide (k = i)) as [->|Hk_not_i].
+    + by rewrite lookup_insert, lookup_insert.
+    + rewrite !lookup_insert_ne by done.
+      by rewrite map_lookup_imap.
+  - apply map_eq. intros k. rewrite map_lookup_imap.
+    destruct (decide (k = i)) as [->|Hk_not_i].
+    + by rewrite lookup_insert, lookup_delete.
+    + rewrite lookup_insert_ne, lookup_delete_ne by done.
+      by rewrite map_lookup_imap.
+Qed.
+
+Lemma map_imap_ext {A1 A2 B} (f1 : K → A1 → option B)
+    (f2 : K → A2 → option B) (m1 : M A1) (m2 : M A2) :
+  (∀ k, f1 k <$> (m1 !! k) = f2 k <$> (m2 !! k)) →
+  map_imap f1 m1 = map_imap f2 m2.
+Proof.
+  intros HExt. apply map_eq. intros i. rewrite !map_lookup_imap.
+  specialize (HExt i). destruct (m1 !! i), (m2 !! i); naive_solver.
 Qed.
 
 (** ** Properties of the size operation *)
