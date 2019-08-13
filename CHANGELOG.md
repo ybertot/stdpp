@@ -4,7 +4,7 @@ API-breaking change is listed.
 ## std++ 1.2.1 (unreleased)
 
 This release of std++ received contributions by Michael Sammler, Paolo
-G. Giarrusso, Ralf Jung, Robbert Krebbers, and Simon Spies.
+G. Giarrusso, Ralf Jung, Robbert Krebbers, Simon Spies, and Rodolphe Lepigre.
 
 Noteworthy additions and changes:
 
@@ -13,6 +13,7 @@ Noteworthy additions and changes:
 - Add typeclass `Involutive`.
 - Improved `naive_solver` performance in case the goal is trivially solvable.
 - A bunch of new lemmas for list operations.
+- `lookup_imap` renamed into `map_lookup_imap`.
 
 ## std++ 1.2.0 (released 2019-04-26)
 
