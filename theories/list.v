@@ -1155,6 +1155,8 @@ Lemma elem_of_replicate_inv x n y : x ∈ replicate n y → x = y.
 Proof. induction n; simpl; rewrite ?elem_of_nil, ?elem_of_cons; intuition. Qed.
 Lemma replicate_S n x : replicate (S n) x = x :: replicate  n x.
 Proof. done. Qed.
+Lemma replicate_S_end n x : replicate (S n) x = replicate n x ++ [x].
+Proof. induction n; f_equal/=; auto. Qed.
 Lemma replicate_plus n m x :
   replicate (n + m) x = replicate n x ++ replicate m x.
 Proof. induction n; f_equal/=; auto. Qed.
