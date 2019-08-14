@@ -4,17 +4,17 @@ API-breaking change is listed.
 ## std++ 1.2.1 (unreleased)
 
 This release of std++ received contributions by Michael Sammler, Paolo
-G. Giarrusso, Ralf Jung, Robbert Krebbers, Simon Spies, Rodolphe Lepigre and
-Paulo Emílio de Vilhena.
+G. Giarrusso, Paulo Emílio de Vilhena, Ralf Jung, Robbert Krebbers,
+Rodolphe Lepigre, and Simon Spies.
 
 Noteworthy additions and changes:
 
-- `max` and `min` infix notations for `N` and `Z` like we have for `nat`.
+- Introduce `max` and `min` infix notations for `N` and `Z` like we have for `nat`.
 - Make `solve_ndisj` tactic more powerful.
-- Add typeclass `Involutive`.
-- Improved `naive_solver` performance in case the goal is trivially solvable.
-- A bunch of new lemmas for list, set, and map operations.
-- `lookup_imap` renamed into `map_lookup_imap`.
+- Add type class `Involutive`.
+- Improve `naive_solver` performance in case the goal is trivially solvable.
+- Add a bunch of new lemmas for list, set, and map operations.
+- Rename `lookup_imap` into `map_lookup_imap`.
 
 ## std++ 1.2.0 (released 2019-04-26)
 
