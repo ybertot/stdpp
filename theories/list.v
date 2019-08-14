@@ -668,6 +668,42 @@ Proof.
   revert i j. induction k; intros i j ?; simpl;
     rewrite 1?list_insert_commute by lia; auto with f_equal.
 Qed.
+Lemma list_inserts_app_l l1 l2 l3 i :
+  list_inserts i (l1 ++ l2) l3 = list_inserts (length l1 + i) l2 (list_inserts i l1 l3).
+Proof.
+  revert l1 i; induction l1 as [|x l1 IH]; [done|].
+  intro i. simpl. rewrite IH, Nat.add_succ_r. apply list_insert_inserts_lt. lia.
+Qed.
+Lemma list_inserts_app_r l1 l2 l3 i :
+  list_inserts (length l2 + i) l1 (l2 ++ l3) = l2 ++ list_inserts i l1 l3.
+Proof.
+  revert l1 i; induction l1 as [|x l1 IH]; [done|].
+  intros i. simpl. by rewrite plus_n_Sm, IH, insert_app_r.
+Qed.
+Lemma list_inserts_nil l1 i : list_inserts i l1 [] = [].
+Proof.
+  revert i; induction l1 as [|x l1 IH]; [done|].
+  intro i. simpl. by rewrite IH.
+Qed.
+Lemma list_inserts_cons l1 l2 i x :
+  list_inserts (S i) l1 (x :: l2) = x :: list_inserts i l1 l2.
+Proof.
+  revert i; induction l1 as [|y l1 IH]; [done|].
+  intro i. simpl. by rewrite IH.
+Qed.
+Lemma list_inserts_0_r l1 l2 l3 :
+  length l1 = length l2 → list_inserts 0 l1 (l2 ++ l3) = l1 ++ l3.
+Proof.
+  revert l2. induction l1 as [|x l1 IH]; intros [|y l2] ?; simplify_eq/=; [done|].
+  rewrite list_inserts_cons. simpl. by rewrite IH.
+Qed.
+Lemma list_inserts_0_l l1 l2 l3 :
+  length l1 = length l3 → list_inserts 0 (l1 ++ l2) l3 = l1.
+Proof.
+  revert l3. induction l1 as [|x l1 IH]; intros [|z l3] ?; simplify_eq/=.
+  { by rewrite list_inserts_nil. }
+  rewrite list_inserts_cons. simpl. by rewrite IH.
+Qed.
 
 (** ** Properties of the [elem_of] predicate *)
 Lemma not_elem_of_nil x : x ∉ [].

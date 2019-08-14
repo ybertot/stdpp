@@ -1114,12 +1114,17 @@ Section map_filter.
       naive_solver.
   Qed.
 
+  Lemma map_filter_insert_not' m i x :
+    ¬ P (i, x) → (∀ y, m !! i = Some y → ¬ P (i, y)) →
+    filter P (<[i:=x]> m) = filter P m.
+  Proof.
+    intros Hx HP. apply map_filter_lookup_eq. intros j y Hy.
+    rewrite lookup_insert_Some. naive_solver.
+  Qed.
+
   Lemma map_filter_insert_not m i x :
     (∀ y, ¬ P (i, y)) → filter P (<[i:=x]> m) = filter P m.
-  Proof.
-    intros HP. apply map_filter_lookup_eq. intros j y Hy.
-    by rewrite lookup_insert_ne by naive_solver.
-  Qed.
+  Proof. intros HP. by apply map_filter_insert_not'. Qed.
 
   Lemma map_filter_delete m i : filter P (delete i m) = delete i (filter P m).
   Proof.
@@ -1139,6 +1144,16 @@ Section map_filter.
 
   Lemma map_filter_empty : filter P (∅ : M A) = ∅.
   Proof. apply map_fold_empty. Qed.
+
+  Lemma map_filter_alt m : filter P m = list_to_map (filter P (map_to_list m)).
+  Proof.
+    apply list_to_map_flip. induction m as [|k x m ? IH] using map_ind.
+    { by rewrite map_to_list_empty, map_filter_empty, map_to_list_empty. }
+    rewrite map_to_list_insert, filter_cons by done. destruct (decide (P _)).
+    - rewrite map_filter_insert by done.
+      by rewrite map_to_list_insert, IH by (rewrite map_filter_lookup_None; auto).
+    - by rewrite map_filter_insert_not' by naive_solver.
+  Qed.
 End map_filter.
 
 (** ** Properties of the [map_Forall] predicate *)

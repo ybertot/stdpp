@@ -279,6 +279,13 @@ Section gset.
     - by rewrite option_guard_True by (rewrite elem_of_dom; eauto).
     - by rewrite option_guard_False by (rewrite not_elem_of_dom; eauto).
   Qed.
+  Lemma dom_gset_to_gmap {A} (X : gset K) (x : A) :
+    dom _ (gset_to_gmap x X) = X.
+  Proof.
+    induction X as [| y X not_in IH] using set_ind_L.
+    - rewrite gset_to_gmap_empty, dom_empty_L; done.
+    - rewrite gset_to_gmap_union_singleton, dom_insert_L, IH; done.
+  Qed.
 End gset.
 
 Typeclasses Opaque gset.
