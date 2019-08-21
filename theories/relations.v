@@ -137,6 +137,8 @@ Section closure.
 
   Lemma nsteps_once x y : R x y → nsteps R 1 x y.
   Proof. eauto. Qed.
+  Lemma nsteps_once_inv x y : nsteps R 1 x y → R x y.
+  Proof. inversion 1 as [|???? Hhead Htail]; inversion Htail; by subst. Qed.
   Lemma nsteps_trans n m x y z :
     nsteps R n x y → nsteps R m y z → nsteps R (n + m) x z.
   Proof. induction 1; simpl; eauto. Qed.
