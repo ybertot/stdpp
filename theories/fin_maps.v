@@ -1369,6 +1369,13 @@ Proof.
   by destruct (m1 !! i), (m2 !! i).
 Qed.
 
+Lemma map_zip_with_flip {A B C} (f : A → B → C) (m1 : M A) (m2 : M B) :
+  map_zip_with (flip f) m2 m1 = map_zip_with f m1 m2.
+Proof.
+  apply map_eq; intro i. rewrite !map_lookup_zip_with.
+  by destruct (m1 !! i), (m2 !! i).
+Qed.
+
 Lemma map_zip_with_map_zip {A B C} (f : A → B → C) (m1 : M A) (m2 : M B) :
   map_zip_with f m1 m2 = curry f <$> map_zip m1 m2.
 Proof.
