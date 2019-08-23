@@ -3677,7 +3677,7 @@ Section zip_with.
     zip_with f l (k1 ++ k2)
     = zip_with f (take (length k1) l) k1 ++ zip_with f (drop (length k1) l) k2.
   Proof. revert l. induction k1; intros [|??]; f_equal/=; auto. Qed.
-  Lemma zip_with_flip l k : zip_with (flip f) k l =  zip_with f l k.
+  Lemma zip_with_flip l k : zip_with (flip f) k l = zip_with f l k.
   Proof. revert k. induction l; intros [|??]; f_equal/=; auto. Qed.
   Lemma zip_with_ext (g : A → B → C) l1 l2 k1 k2 :
     (∀ x y, f x y = g x y) → l1 = l2 → k1 = k2 →
