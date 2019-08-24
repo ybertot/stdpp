@@ -3,8 +3,8 @@ API-breaking change is listed.
 
 ## std++ 1.2.1 (unreleased)
 
-This release of std++ received contributions by Michael Sammler, Paolo
-G. Giarrusso, Paulo Emílio de Vilhena, Ralf Jung, Robbert Krebbers,
+This release of std++ received contributions by Dan Frumin, Michael Sammler,
+Paolo G. Giarrusso, Paulo Emílio de Vilhena, Ralf Jung, Robbert Krebbers,
 Rodolphe Lepigre, and Simon Spies.
 
 Noteworthy additions and changes:
