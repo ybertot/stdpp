@@ -591,6 +591,13 @@ Instance unit_leibniz : LeibnizEquiv unit.
 Proof. intros [] []; reflexivity. Qed.
 Instance unit_inhabited: Inhabited unit := populate ().
 
+(** ** Empty *)
+Instance Empty_set_equiv : Equiv Empty_set := λ _ _, True.
+Instance Empty_set_equivalence : Equivalence (≡@{Empty_set}).
+Proof. repeat split. Qed.
+Instance Empty_set_leibniz : LeibnizEquiv Empty_set.
+Proof. intros [] []; reflexivity. Qed.
+
 (** ** Products *)
 Notation "( x ,)" := (pair x) (only parsing) : stdpp_scope.
 Notation "(, y )" := (λ x, (x,y)) (only parsing) : stdpp_scope.
