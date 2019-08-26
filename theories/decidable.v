@@ -184,6 +184,8 @@ Instance bool_eq_dec : EqDecision bool.
 Proof. solve_decision. Defined.
 Instance unit_eq_dec : EqDecision unit.
 Proof. solve_decision. Defined.
+Instance Empty_set_eq_dec : EqDecision Empty_set.
+Proof. solve_decision. Defined.
 Instance prod_eq_dec `{EqDecision A, EqDecision B} : EqDecision (A * B).
 Proof. solve_decision. Defined.
 Instance sum_eq_dec `{EqDecision A, EqDecision B} : EqDecision (A + B).
