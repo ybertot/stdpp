@@ -246,6 +246,12 @@ Qed.
 Lemma option_cardinality `{Finite A} : card (option A) = S (card A).
 Proof. unfold card. simpl. by rewrite fmap_length. Qed.
 
+Program Instance Empty_set_finite : Finite Empty_set := {| enum := [] |}.
+Next Obligation. by apply NoDup_nil. Qed.
+Next Obligation. intros []. Qed.
+Lemma Empty_set_card : card Empty_set = 0.
+Proof. done. Qed.
+
 Program Instance unit_finite : Finite () := {| enum := [tt] |}.
 Next Obligation. apply NoDup_singleton. Qed.
 Next Obligation. intros []. by apply elem_of_list_singleton. Qed.

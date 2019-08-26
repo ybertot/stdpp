@@ -102,6 +102,11 @@ Section inj_countable'.
   Next Obligation. intros x. by f_equal/=. Qed.
 End inj_countable'.
 
+(** ** Empty *)
+Program Instance Empty_set_countable : Countable Empty_set :=
+  {| encode u := 1; decode p := None |}.
+Next Obligation. by intros []. Qed.
+
 (** ** Unit *)
 Program Instance unit_countable : Countable unit :=
   {| encode u := 1; decode p := Some () |}.
