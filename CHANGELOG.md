@@ -1,7 +1,7 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## std++ 1.2.1 (unreleased)
+## std++ 1.2.1 (released 2019-08-29)
 
 This release of std++ received contributions by Dan Frumin, Michael Sammler,
 Paolo G. Giarrusso, Paulo Emílio de Vilhena, Ralf Jung, Robbert Krebbers,
