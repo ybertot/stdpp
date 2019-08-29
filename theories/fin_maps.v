@@ -1190,6 +1190,9 @@ Proof.
 Qed.
 Lemma map_Forall_delete m i : map_Forall P m → map_Forall P (delete i m).
 Proof. intros Hm j x; rewrite lookup_delete_Some. naive_solver. Qed.
+Lemma map_Forall_foldr_delete m is :
+  map_Forall P m → map_Forall P (foldr delete m is).
+Proof. induction is; eauto using map_Forall_delete. Qed.
 Lemma map_Forall_ind (Q : M A → Prop) :
   Q ∅ →
   (∀ m i x, m !! i = None → P i x → map_Forall P m → Q m → Q (<[i:=x]>m)) →
@@ -1604,6 +1607,9 @@ Proof. intros A ?. by apply union_with_idemp. Qed.
 Lemma lookup_union {A} (m1 m2 : M A) i :
   (m1 ∪ m2) !! i = union_with (λ x _, Some x) (m1 !! i) (m2 !! i).
 Proof. apply lookup_union_with. Qed.
+Lemma lookup_union_r {A} (m1 m2 : M A) i :
+  m1 !! i = None → (m1 ∪ m2) !! i = m2 !! i.
+Proof. intros Hi. by rewrite lookup_union, Hi, (left_id_L _ _).  Qed.
 Lemma lookup_union_Some_raw {A} (m1 m2 : M A) i x :
   (m1 ∪ m2) !! i = Some x ↔
     m1 !! i = Some x ∨ (m1 !! i = None ∧ m2 !! i = Some x).
@@ -1761,6 +1767,22 @@ Qed.
 Lemma delete_union {A} (m1 m2 : M A) i :
   delete i (m1 ∪ m2) = delete i m1 ∪ delete i m2.
 Proof. apply delete_union_with. Qed.
+Lemma map_Forall_union_11 {A} (m1 m2 : M A) P :
+  map_Forall P (m1 ∪ m2) → map_Forall P m1.
+Proof. intros HP i x ?. apply HP, lookup_union_Some_raw; auto. Qed.
+Lemma map_Forall_union_12 {A} (m1 m2 : M A) P :
+  m1 ##ₘ m2 → map_Forall P (m1 ∪ m2) → map_Forall P m2.
+Proof. intros ? HP i x ?. apply HP, lookup_union_Some; auto. Qed.
+Lemma map_Forall_union_2 {A} (m1 m2 : M A) P :
+  map_Forall P m1 → map_Forall P m2 → map_Forall P (m1 ∪ m2).
+Proof. intros ???? [|[]]%lookup_union_Some_raw; eauto. Qed.
+Lemma map_Forall_union {A} (m1 m2 : M A) P :
+  m1 ##ₘ m2 →
+  map_Forall P (m1 ∪ m2) ↔ map_Forall P m1 ∧ map_Forall P m2.
+Proof.
+  naive_solver eauto using map_Forall_union_11,
+    map_Forall_union_12, map_Forall_union_2.
+Qed.
 
 (** ** Properties of the [union_list] operation *)
 Lemma map_disjoint_union_list_l {A} (ms : list (M A)) (m : M A) :
@@ -1795,9 +1817,21 @@ Proof.
   induction is; simpl; [done |]. rewrite elem_of_cons; intros.
   rewrite lookup_delete_ne; intuition.
 Qed.
+Lemma lookup_foldr_delete_Some {A} (m : M A) is j y :
+  foldr delete m is !! j = Some y ↔ j ∉ is ∧ m !! j = Some y.
+Proof. induction is; simpl; rewrite ?lookup_delete_Some; set_solver. Qed.
 Lemma foldr_delete_notin {A} (m : M A) is :
   Forall (λ i, m !! i = None) is → foldr delete m is = m.
 Proof. induction 1; simpl; [done |]. rewrite delete_notin; congruence. Qed.
+Lemma foldr_delete_commute {A} (m : M A) is j :
+  delete j (foldr delete m is) = foldr delete (delete j m) is.
+Proof. induction is as [|?? IH]; [done| ]. simpl. by rewrite delete_commute, IH. Qed.
+Lemma foldr_delete_insert {A} (m : M A) is j x :
+  j ∈ is → foldr delete (<[j:=x]>m) is = foldr delete m is.
+Proof.
+  induction 1 as [i is|j i is ? IH]; simpl; [|by rewrite IH].
+  by rewrite !foldr_delete_commute, delete_insert_delete.
+Qed.
 Lemma foldr_delete_insert_ne {A} (m : M A) is j x :
   j ∉ is → foldr delete (<[j:=x]>m) is = <[j:=x]>(foldr delete m is).
 Proof.
