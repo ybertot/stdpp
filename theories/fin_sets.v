@@ -401,7 +401,7 @@ Section infinite.
 
   (** Properties about the [fresh] operation on finite sets *)
   Global Instance fresh_proper: Proper ((≡@{C}) ==> (=)) fresh.
-  Proof. unfold fresh, set_fresh. solve_proper. Qed.
+  Proof. unfold fresh, set_fresh. by intros X1 X2 ->. Qed.
 
   Lemma is_fresh X : fresh X ∉ X.
   Proof.
