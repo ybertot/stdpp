@@ -73,7 +73,7 @@ Instance gmap_merge `{Countable K} : Merge (gmap K) := λ A B C f m1 m2,
     (bool_decide_unpack _ Hm1) (bool_decide_unpack _ Hm2))).
 Instance gmap_to_list `{Countable K} {A} : FinMapToList K A (gmap K A) := λ m,
   let (m,_) := m in omap (λ ix : positive * A,
-    let (i,x) := ix in (,x) <$> decode i) (map_to_list m).
+    let (i,x) := ix in (., x) <$> decode i) (map_to_list m).
 
 (** * Instantiation of the finite map interface *)
 Instance gmap_finmap `{Countable K} : FinMap K (gmap K).
@@ -139,12 +139,12 @@ Section curry_uncurry.
   (* FIXME: the type annotations `option (gmap K2 A)` are silly. Maybe these are
   a consequence of Coq bug #5735 *)
   Lemma lookup_gmap_curry (m : gmap K1 (gmap K2 A)) i j :
-    gmap_curry m !! (i,j) = (m !! i : option (gmap K2 A)) ≫= (!! j).
+    gmap_curry m !! (i,j) = (m !! i : option (gmap K2 A)) ≫= (.!! j).
   Proof.
-    apply (map_fold_ind (λ mr m, mr !! (i,j) = m !! i ≫= (!! j))).
+    apply (map_fold_ind (λ mr m, mr !! (i,j) = m !! i ≫= (.!! j))).
     { by rewrite !lookup_empty. }
     clear m; intros i' m2 m m12 Hi' IH.
-    apply (map_fold_ind (λ m2r m2, m2r !! (i,j) = <[i':=m2]> m !! i ≫= (!! j))).
+    apply (map_fold_ind (λ m2r m2, m2r !! (i,j) = <[i':=m2]> m !! i ≫= (.!! j))).
     { rewrite IH. destruct (decide (i' = i)) as [->|].
       - rewrite lookup_insert, Hi'; simpl; by rewrite lookup_empty.
       - by rewrite lookup_insert_ne by done. }
@@ -156,9 +156,9 @@ Section curry_uncurry.
   Qed.
 
   Lemma lookup_gmap_uncurry (m : gmap (K1 * K2) A) i j :
-    (gmap_uncurry m !! i : option (gmap K2 A)) ≫= (!! j) = m !! (i, j).
+    (gmap_uncurry m !! i : option (gmap K2 A)) ≫= (.!! j) = m !! (i, j).
   Proof.
-    apply (map_fold_ind (λ mr m, mr !! i ≫= (!! j) = m !! (i, j))).
+    apply (map_fold_ind (λ mr m, mr !! i ≫= (.!! j) = m !! (i, j))).
     { by rewrite !lookup_empty. }
     clear m; intros [i' j'] x m12 mr Hij' IH.
     destruct (decide (i = i')) as [->|].
@@ -202,7 +202,7 @@ Section curry_uncurry.
     intros Hne. apply map_eq; intros i. destruct (m !! i) as [m2|] eqn:Hm.
     - destruct (gmap_uncurry (gmap_curry m) !! i) as [m2'|] eqn:Hcurry.
       + f_equal. apply map_eq. intros j.
-        trans ((gmap_uncurry (gmap_curry m) !! i : option (gmap _ _)) ≫= (!! j)).
+        trans ((gmap_uncurry (gmap_curry m) !! i : option (gmap _ _)) ≫= (.!! j)).
         { by rewrite Hcurry. }
         by rewrite lookup_gmap_uncurry, lookup_gmap_curry, Hm.
       + rewrite lookup_gmap_uncurry_None in Hcurry.

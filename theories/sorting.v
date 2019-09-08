@@ -85,7 +85,7 @@ Section sorted.
       assert (x2 ∈ x1 :: l1) as Hx2' by (by rewrite E; left).
       assert (x1 ∈ x2 :: l2) as Hx1' by (by rewrite <-E; left).
       inversion Hx1'; inversion Hx2'; simplify_eq; auto. }
-    f_equal. by apply IH, (inj (x2 ::)).
+    f_equal. by apply IH, (inj (x2 ::.)).
   Qed.
   Lemma Sorted_unique `{!Transitive R, !AntiSymm (=) R} l1 l2 :
     Sorted R l1 → Sorted R l2 → l1 ≡ₚ l2 → l1 = l2.

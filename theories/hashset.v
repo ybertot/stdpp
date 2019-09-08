@@ -129,7 +129,7 @@ Definition remove_dups_fast (l : list A) : list A :=
   | [x] => [x]
   | _ =>
      let n : Z := length l in
-     elements (foldr (λ x, ({[ x ]} ∪)) ∅ l :
+     elements (foldr (λ x, ({[ x ]} ∪.)) ∅ l :
        hashset (λ x, hash x `mod` (2 * n))%Z)
   end.
 Lemma elem_of_remove_dups_fast l x : x ∈ remove_dups_fast l ↔ x ∈ l.

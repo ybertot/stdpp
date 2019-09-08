@@ -224,14 +224,14 @@ Proof.
     apply IHl.
     { intros i x. rewrite Pelem_of_to_list. intros [(?&Hi&?)|Hi].
       + rewrite Preverse_xO, Preverse_xI, !(assoc_L _) in Hi.
-        by apply (inj (++ _)) in Hi.
+        by apply (inj (.++ _)) in Hi.
       + apply (Hin (i~0) x). by rewrite Preverse_xO, (assoc_L _) in Hi. }
     apply IHr; auto. intros i x Hi.
     apply (Hin (i~1) x). by rewrite Preverse_xI, (assoc_L _) in Hi.
   - apply IHl.
     { intros i x. rewrite Pelem_of_to_list. intros [(?&Hi&?)|Hi].
       + rewrite Preverse_xO, Preverse_xI, !(assoc_L _) in Hi.
-        by apply (inj (++ _)) in Hi.
+        by apply (inj (.++ _)) in Hi.
       + apply (Hin (i~0) x). by rewrite Preverse_xO, (assoc_L _) in Hi. }
     apply IHr; auto. intros i x Hi.
     apply (Hin (i~1) x). by rewrite Preverse_xI, (assoc_L _) in Hi.

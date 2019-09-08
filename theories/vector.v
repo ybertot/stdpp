@@ -21,15 +21,15 @@ Arguments vcons {_} _ {_} _.
 
 Infix ":::" := vcons (at level 60, right associativity) : vector_scope.
 Notation "(:::)" := vcons (only parsing) : vector_scope.
-Notation "( x :::)" := (vcons x) (only parsing) : vector_scope.
-Notation "(::: v )" := (λ x, vcons x v) (only parsing) : vector_scope.
+Notation "( x :::.)" := (vcons x) (only parsing) : vector_scope.
+Notation "(.::: v )" := (λ x, vcons x v) (only parsing) : vector_scope.
 Notation "[# ] " := vnil : vector_scope.
 Notation "[# x ] " := (vcons x vnil) : vector_scope.
 Notation "[# x ; .. ; y ] " := (vcons x .. (vcons y vnil) ..) : vector_scope.
 Infix "+++" := vapp (at level 60, right associativity) : vector_scope.
 Notation "(+++)" := vapp (only parsing) : vector_scope.
-Notation "( v +++)" := (vapp v) (only parsing) : vector_scope.
-Notation "(+++ w )" := (λ v, vapp v w) (only parsing) : vector_scope.
+Notation "( v +++.)" := (vapp v) (only parsing) : vector_scope.
+Notation "(.+++ w )" := (λ v, vapp v w) (only parsing) : vector_scope.
 
 (** Notice that we cannot define [Vector.nth] as an instance of our [Lookup]
 type class, as it has a dependent type. *)
