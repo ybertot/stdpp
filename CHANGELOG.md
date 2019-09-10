@@ -6,6 +6,10 @@ API-breaking change is listed.
 - Rename `dom_map_filter` into `dom_map_filter_subseteq` and repurpose
   `dom_map_filter` for the version with the equality. This follows the naming
   convention for similar lemmas.
+- Disambiguate Haskell-style notations for partially applied operators. For
+  example, change `(!! i)` into `(.!! x)` so that `!!` can also be used as a
+  prefix, as done in VST. A sed script to perform the renaming can be found at:
+  https://gitlab.mpi-sws.org/iris/stdpp/merge_requests/93
 
 ## std++ 1.2.1 (released 2019-08-29)
 
