@@ -12,6 +12,8 @@ Notation length := List.length.
 
 (** * Fix scopes *)
 Open Scope string_scope.
+(* Make sure [list_scope] has priority over [string_scope], so that
+   the "++" notation designates list concatenation. *)
 Open Scope list_scope.
 Infix "+:+" := String.append (at level 60, right associativity) : stdpp_scope.
 Arguments String.append : simpl never.
