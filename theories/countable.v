@@ -269,7 +269,7 @@ Next Obligation.
 Qed.
 
 (** ** Generic trees *)
-Close Scope positive.
+Local Close Scope positive.
 
 Inductive gen_tree (T : Type) : Type :=
   | GenLeaf : T → gen_tree T

@@ -7,7 +7,7 @@ From Coq Require Export EqdepFacts PArith NArith ZArith NPeano.
 From Coq Require Import QArith Qcanon.
 From stdpp Require Export base decidable option.
 Set Default Proof Using "Type".
-Open Scope nat_scope.
+Local Open Scope nat_scope.
 
 Coercion Z.of_nat : nat >-> Z.
 Instance comparison_eq_dec : EqDecision comparison.
@@ -124,7 +124,7 @@ Definition max_list_with {A} (f : A → nat) : list A → nat :=
 Notation max_list := (max_list_with id).
 
 (** * Notations and properties of [positive] *)
-Open Scope positive_scope.
+Local Open Scope positive_scope.
 
 Typeclasses Opaque Pos.le.
 Typeclasses Opaque Pos.lt.
@@ -289,7 +289,7 @@ Proof.
   - reflexivity.
 Qed.
 
-Close Scope positive_scope.
+Local Close Scope positive_scope.
 
 (** * Notations and properties of [N] *)
 Typeclasses Opaque N.le.
@@ -334,7 +334,7 @@ Proof. repeat intro; lia. Qed.
 Hint Extern 0 (_ ≤ _)%N => reflexivity : core.
 
 (** * Notations and properties of [Z] *)
-Open Scope Z_scope.
+Local Open Scope Z_scope.
 
 Typeclasses Opaque Z.le.
 Typeclasses Opaque Z.lt.
@@ -474,7 +474,7 @@ Lemma Z_succ_pred_induction y (P : Z → Prop) :
   (∀ x, P x).
 Proof. intros H0 HS HP. by apply (Z.order_induction' _ _ y). Qed.
 
-Close Scope Z_scope.
+Local Close Scope Z_scope.
 
 (** * Injectivity of casts *)
 Instance N_of_nat_inj: Inj (=) (=) N.of_nat := Nat2N.inj.
@@ -488,7 +488,7 @@ Instance Z_of_N_inj: Inj (=) (=) Z.of_N := N2Z.inj.
 Typeclasses Opaque Qcle.
 Typeclasses Opaque Qclt.
 
-Open Scope Qc_scope.
+Local Open Scope Qc_scope.
 Delimit Scope Qc_scope with Qc.
 Notation "1" := (Q2Qc 1) : Qc_scope.
 Notation "2" := (1+1) : Qc_scope.
@@ -648,7 +648,7 @@ Proof.
   apply Qc_is_canon; simpl.
   by rewrite !Qred_correct, <-inject_Z_opp, <-inject_Z_plus.
 Qed.
-Close Scope Qc_scope.
+Local Close Scope Qc_scope.
 
 (** * Positive rationals *)
 (** The theory of positive rationals is very incomplete. We merely provide
