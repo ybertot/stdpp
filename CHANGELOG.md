@@ -1,6 +1,12 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
+## std++ master
+
+- Rename `dom_map_filter` into `dom_map_filter_subseteq` and repurpose
+  `dom_map_filter` for the version with the equality. This follows the naming
+  convention for similar lemmas.
+
 ## std++ 1.2.1 (released 2019-08-29)
 
 This release of std++ received contributions by Dan Frumin, Michael Sammler,
