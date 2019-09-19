@@ -41,7 +41,7 @@ Proof. by constructor. Qed.
 Global Instance equal_equivalence : Equivalence (≡@{stream A}).
 Proof.
   split.
-  - now cofix FIX; intros [??]; constructor.
+  - now cofix FIX; intros ?; constructor.
   - now cofix FIX; intros ?? [??]; constructor.
   - cofix FIX; intros ??? [??] [??]; constructor; etrans; eauto.
 Qed.
