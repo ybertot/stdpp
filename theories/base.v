@@ -167,11 +167,11 @@ Notation "'False'" := False (format "False") : type_scope.
 (** * Equality *)
 (** Introduce some Haskell style like notations. *)
 Notation "(=)" := eq (only parsing) : stdpp_scope.
-Notation "( x =)" := (eq x) (only parsing) : stdpp_scope.
-Notation "(= x )" := (λ y, eq y x) (only parsing) : stdpp_scope.
+Notation "( x =.)" := (eq x) (only parsing) : stdpp_scope.
+Notation "(.= x )" := (λ y, eq y x) (only parsing) : stdpp_scope.
 Notation "(≠)" := (λ x y, x ≠ y) (only parsing) : stdpp_scope.
-Notation "( x ≠)" := (λ y, x ≠ y) (only parsing) : stdpp_scope.
-Notation "(≠ x )" := (λ y, y ≠ x) (only parsing) : stdpp_scope.
+Notation "( x ≠.)" := (λ y, x ≠ y) (only parsing) : stdpp_scope.
+Notation "(.≠ x )" := (λ y, y ≠ x) (only parsing) : stdpp_scope.
 
 Infix "=@{ A }" := (@eq A)
   (at level 70, only parsing, no associativity) : stdpp_scope.
@@ -199,12 +199,12 @@ Infix "≡@{ A }" := (@equiv A _)
   (at level 70, only parsing, no associativity) : stdpp_scope.
 
 Notation "(≡)" := equiv (only parsing) : stdpp_scope.
-Notation "( X ≡)" := (equiv X) (only parsing) : stdpp_scope.
-Notation "(≡ X )" := (λ Y, Y ≡ X) (only parsing) : stdpp_scope.
+Notation "( X ≡.)" := (equiv X) (only parsing) : stdpp_scope.
+Notation "(.≡ X )" := (λ Y, Y ≡ X) (only parsing) : stdpp_scope.
 Notation "(≢)" := (λ X Y, ¬X ≡ Y) (only parsing) : stdpp_scope.
 Notation "X ≢ Y":= (¬X ≡ Y) (at level 70, no associativity) : stdpp_scope.
-Notation "( X ≢)" := (λ Y, X ≢ Y) (only parsing) : stdpp_scope.
-Notation "(≢ X )" := (λ Y, Y ≢ X) (only parsing) : stdpp_scope.
+Notation "( X ≢.)" := (λ Y, X ≢ Y) (only parsing) : stdpp_scope.
+Notation "(.≢ X )" := (λ Y, Y ≢ X) (only parsing) : stdpp_scope.
 
 Notation "(≡@{ A } )" := (@equiv A _) (only parsing) : stdpp_scope.
 Notation "(≢@{ A } )" := (λ X Y, ¬X ≡@{A} Y) (only parsing) : stdpp_scope.
@@ -295,8 +295,8 @@ Hint Mode ProofIrrel ! : typeclass_instances.
 
 (** ** Common properties *)
 (** These operational type classes allow us to refer to common mathematical
-properties in a generic way. For example, for injectivity of [(k ++)] it
-allows us to write [inj (k ++)] instead of [app_inv_head k]. *)
+properties in a generic way. For example, for injectivity of [(k ++.)] it
+allows us to write [inj (k ++.)] instead of [app_inv_head k]. *)
 Class Inj {A B} (R : relation A) (S : relation B) (f : A → B) : Prop :=
   inj x y : S (f x) (f y) → R x y.
 Class Inj2 {A B C} (R1 : relation A) (R2 : relation B)
@@ -414,16 +414,16 @@ Class TotalOrder {A} (R : relation A) : Prop := {
 
 (** * Logic *)
 Notation "(∧)" := and (only parsing) : stdpp_scope.
-Notation "( A ∧)" := (and A) (only parsing) : stdpp_scope.
-Notation "(∧ B )" := (λ A, A ∧ B) (only parsing) : stdpp_scope.
+Notation "( A ∧.)" := (and A) (only parsing) : stdpp_scope.
+Notation "(.∧ B )" := (λ A, A ∧ B) (only parsing) : stdpp_scope.
 
 Notation "(∨)" := or (only parsing) : stdpp_scope.
-Notation "( A ∨)" := (or A) (only parsing) : stdpp_scope.
-Notation "(∨ B )" := (λ A, A ∨ B) (only parsing) : stdpp_scope.
+Notation "( A ∨.)" := (or A) (only parsing) : stdpp_scope.
+Notation "(.∨ B )" := (λ A, A ∨ B) (only parsing) : stdpp_scope.
 
 Notation "(↔)" := iff (only parsing) : stdpp_scope.
-Notation "( A ↔)" := (iff A) (only parsing) : stdpp_scope.
-Notation "(↔ B )" := (λ A, A ↔ B) (only parsing) : stdpp_scope.
+Notation "( A ↔.)" := (iff A) (only parsing) : stdpp_scope.
+Notation "(.↔ B )" := (λ A, A ↔ B) (only parsing) : stdpp_scope.
 
 Hint Extern 0 (_ ↔ _) => reflexivity : core.
 Hint Extern 0 (_ ↔ _) => symmetry; assumption : core.
@@ -488,18 +488,18 @@ Proof. unfold impl. red; intuition. Qed.
 (** * Common data types *)
 (** ** Functions *)
 Notation "(→)" := (λ A B, A → B) (only parsing) : stdpp_scope.
-Notation "( A →)" := (λ B, A → B) (only parsing) : stdpp_scope.
-Notation "(→ B )" := (λ A, A → B) (only parsing) : stdpp_scope.
+Notation "( A →.)" := (λ B, A → B) (only parsing) : stdpp_scope.
+Notation "(.→ B )" := (λ A, A → B) (only parsing) : stdpp_scope.
 
 Notation "t $ r" := (t r)
   (at level 65, right associativity, only parsing) : stdpp_scope.
 Notation "($)" := (λ f x, f x) (only parsing) : stdpp_scope.
-Notation "($ x )" := (λ f, f x) (only parsing) : stdpp_scope.
+Notation "(.$ x )" := (λ f, f x) (only parsing) : stdpp_scope.
 
 Infix "∘" := compose : stdpp_scope.
 Notation "(∘)" := compose (only parsing) : stdpp_scope.
-Notation "( f ∘)" := (compose f) (only parsing) : stdpp_scope.
-Notation "(∘ f )" := (λ g, compose g f) (only parsing) : stdpp_scope.
+Notation "( f ∘.)" := (compose f) (only parsing) : stdpp_scope.
+Notation "(.∘ f )" := (λ g, compose g f) (only parsing) : stdpp_scope.
 
 Instance impl_inhabited {A} `{Inhabited B} : Inhabited (A → B) :=
   populate (λ _, inhabitant).
@@ -599,8 +599,8 @@ Instance Empty_set_leibniz : LeibnizEquiv Empty_set.
 Proof. intros [] []; reflexivity. Qed.
 
 (** ** Products *)
-Notation "( x ,)" := (pair x) (only parsing) : stdpp_scope.
-Notation "(, y )" := (λ x, (x,y)) (only parsing) : stdpp_scope.
+Notation "( x ,.)" := (pair x) (only parsing) : stdpp_scope.
+Notation "(., y )" := (λ x, (x,y)) (only parsing) : stdpp_scope.
 
 Notation "p .1" := (fst p) (at level 2, left associativity, format "p .1").
 Notation "p .2" := (snd p) (at level 2, left associativity, format "p .2").
@@ -786,8 +786,8 @@ Hint Mode Union ! : typeclass_instances.
 Instance: Params (@union) 2 := {}.
 Infix "∪" := union (at level 50, left associativity) : stdpp_scope.
 Notation "(∪)" := union (only parsing) : stdpp_scope.
-Notation "( x ∪)" := (union x) (only parsing) : stdpp_scope.
-Notation "(∪ x )" := (λ y, union y x) (only parsing) : stdpp_scope.
+Notation "( x ∪.)" := (union x) (only parsing) : stdpp_scope.
+Notation "(.∪ x )" := (λ y, union y x) (only parsing) : stdpp_scope.
 Infix "∪*" := (zip_with (∪)) (at level 50, left associativity) : stdpp_scope.
 Notation "(∪*)" := (zip_with (∪)) (only parsing) : stdpp_scope.
 Infix "∪**" := (zip_with (zip_with (∪)))
@@ -804,24 +804,24 @@ Hint Mode DisjUnion ! : typeclass_instances.
 Instance: Params (@disj_union) 2 := {}.
 Infix "⊎" := disj_union (at level 50, left associativity) : stdpp_scope.
 Notation "(⊎)" := disj_union (only parsing) : stdpp_scope.
-Notation "( x ⊎)" := (disj_union x) (only parsing) : stdpp_scope.
-Notation "(⊎ x )" := (λ y, disj_union y x) (only parsing) : stdpp_scope.
+Notation "( x ⊎.)" := (disj_union x) (only parsing) : stdpp_scope.
+Notation "(.⊎ x )" := (λ y, disj_union y x) (only parsing) : stdpp_scope.
 
 Class Intersection A := intersection: A → A → A.
 Hint Mode Intersection ! : typeclass_instances.
 Instance: Params (@intersection) 2 := {}.
 Infix "∩" := intersection (at level 40) : stdpp_scope.
 Notation "(∩)" := intersection (only parsing) : stdpp_scope.
-Notation "( x ∩)" := (intersection x) (only parsing) : stdpp_scope.
-Notation "(∩ x )" := (λ y, intersection y x) (only parsing) : stdpp_scope.
+Notation "( x ∩.)" := (intersection x) (only parsing) : stdpp_scope.
+Notation "(.∩ x )" := (λ y, intersection y x) (only parsing) : stdpp_scope.
 
 Class Difference A := difference: A → A → A.
 Hint Mode Difference ! : typeclass_instances.
 Instance: Params (@difference) 2 := {}.
 Infix "∖" := difference (at level 40, left associativity) : stdpp_scope.
 Notation "(∖)" := difference (only parsing) : stdpp_scope.
-Notation "( x ∖)" := (difference x) (only parsing) : stdpp_scope.
-Notation "(∖ x )" := (λ y, difference y x) (only parsing) : stdpp_scope.
+Notation "( x ∖.)" := (difference x) (only parsing) : stdpp_scope.
+Notation "(.∖ x )" := (λ y, difference y x) (only parsing) : stdpp_scope.
 Infix "∖*" := (zip_with (∖)) (at level 40, left associativity) : stdpp_scope.
 Notation "(∖*)" := (zip_with (∖)) (only parsing) : stdpp_scope.
 Infix "∖**" := (zip_with (zip_with (∖)))
@@ -846,12 +846,12 @@ Hint Mode SubsetEq ! : typeclass_instances.
 Instance: Params (@subseteq) 2 := {}.
 Infix "⊆" := subseteq (at level 70) : stdpp_scope.
 Notation "(⊆)" := subseteq (only parsing) : stdpp_scope.
-Notation "( X ⊆)" := (subseteq X) (only parsing) : stdpp_scope.
-Notation "(⊆ X )" := (λ Y, Y ⊆ X) (only parsing) : stdpp_scope.
+Notation "( X ⊆.)" := (subseteq X) (only parsing) : stdpp_scope.
+Notation "(.⊆ X )" := (λ Y, Y ⊆ X) (only parsing) : stdpp_scope.
 Notation "X ⊈ Y" := (¬X ⊆ Y) (at level 70) : stdpp_scope.
 Notation "(⊈)" := (λ X Y, X ⊈ Y) (only parsing) : stdpp_scope.
-Notation "( X ⊈)" := (λ Y, X ⊈ Y) (only parsing) : stdpp_scope.
-Notation "(⊈ X )" := (λ Y, Y ⊈ X) (only parsing) : stdpp_scope.
+Notation "( X ⊈.)" := (λ Y, X ⊈ Y) (only parsing) : stdpp_scope.
+Notation "(.⊈ X )" := (λ Y, Y ⊈ X) (only parsing) : stdpp_scope.
 
 Infix "⊆@{ A }" := (@subseteq A _) (at level 70, only parsing) : stdpp_scope.
 Notation "(⊆@{ A } )" := (@subseteq A _) (only parsing) : stdpp_scope.
@@ -870,12 +870,12 @@ Hint Extern 0 (_ ⊆** _) => reflexivity : core.
 
 Infix "⊂" := (strict (⊆)) (at level 70) : stdpp_scope.
 Notation "(⊂)" := (strict (⊆)) (only parsing) : stdpp_scope.
-Notation "( X ⊂)" := (strict (⊆) X) (only parsing) : stdpp_scope.
-Notation "(⊂ X )" := (λ Y, Y ⊂ X) (only parsing) : stdpp_scope.
+Notation "( X ⊂.)" := (strict (⊆) X) (only parsing) : stdpp_scope.
+Notation "(.⊂ X )" := (λ Y, Y ⊂ X) (only parsing) : stdpp_scope.
 Notation "X ⊄ Y" := (¬X ⊂ Y) (at level 70) : stdpp_scope.
 Notation "(⊄)" := (λ X Y, X ⊄ Y) (only parsing) : stdpp_scope.
-Notation "( X ⊄)" := (λ Y, X ⊄ Y) (only parsing) : stdpp_scope.
-Notation "(⊄ X )" := (λ Y, Y ⊄ X) (only parsing) : stdpp_scope.
+Notation "( X ⊄.)" := (λ Y, X ⊄ Y) (only parsing) : stdpp_scope.
+Notation "(.⊄ X )" := (λ Y, Y ⊄ X) (only parsing) : stdpp_scope.
 
 Infix "⊂@{ A }" := (strict (⊆@{A})) (at level 70, only parsing) : stdpp_scope.
 Notation "(⊂@{ A } )" := (strict (⊆@{A})) (only parsing) : stdpp_scope.
@@ -903,12 +903,12 @@ Hint Mode ElemOf - ! : typeclass_instances.
 Instance: Params (@elem_of) 3 := {}.
 Infix "∈" := elem_of (at level 70) : stdpp_scope.
 Notation "(∈)" := elem_of (only parsing) : stdpp_scope.
-Notation "( x ∈)" := (elem_of x) (only parsing) : stdpp_scope.
-Notation "(∈ X )" := (λ x, elem_of x X) (only parsing) : stdpp_scope.
+Notation "( x ∈.)" := (elem_of x) (only parsing) : stdpp_scope.
+Notation "(.∈ X )" := (λ x, elem_of x X) (only parsing) : stdpp_scope.
 Notation "x ∉ X" := (¬x ∈ X) (at level 80) : stdpp_scope.
 Notation "(∉)" := (λ x X, x ∉ X) (only parsing) : stdpp_scope.
-Notation "( x ∉)" := (λ X, x ∉ X) (only parsing) : stdpp_scope.
-Notation "(∉ X )" := (λ x, x ∉ X) (only parsing) : stdpp_scope.
+Notation "( x ∉.)" := (λ X, x ∉ X) (only parsing) : stdpp_scope.
+Notation "(.∉ X )" := (λ x, x ∉ X) (only parsing) : stdpp_scope.
 
 Infix "∈@{ B }" := (@elem_of _ B _) (at level 70, only parsing) : stdpp_scope.
 Notation "(∈@{ B } )" := (@elem_of _ B _) (only parsing) : stdpp_scope.
@@ -1005,8 +1005,8 @@ Arguments omap {_ _ _ _} _ !_ / : assert.
 Instance: Params (@omap) 4 := {}.
 
 Notation "m ≫= f" := (mbind f m) (at level 60, right associativity) : stdpp_scope.
-Notation "( m ≫=)" := (λ f, mbind f m) (only parsing) : stdpp_scope.
-Notation "(≫= f )" := (mbind f) (only parsing) : stdpp_scope.
+Notation "( m ≫=.)" := (λ f, mbind f m) (only parsing) : stdpp_scope.
+Notation "(.≫= f )" := (mbind f) (only parsing) : stdpp_scope.
 Notation "(≫=)" := (λ m f, mbind f m) (only parsing) : stdpp_scope.
 
 Notation "x ← y ; z" := (y ≫= (λ x : _, z))
@@ -1043,8 +1043,8 @@ Hint Mode Lookup - - ! : typeclass_instances.
 Instance: Params (@lookup) 4 := {}.
 Notation "m !! i" := (lookup i m) (at level 20) : stdpp_scope.
 Notation "(!!)" := lookup (only parsing) : stdpp_scope.
-Notation "( m !!)" := (λ i, m !! i) (only parsing) : stdpp_scope.
-Notation "(!! i )" := (lookup i) (only parsing) : stdpp_scope.
+Notation "( m !!.)" := (λ i, m !! i) (only parsing) : stdpp_scope.
+Notation "(.!! i )" := (lookup i) (only parsing) : stdpp_scope.
 Arguments lookup _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The singleton map *)
@@ -1272,8 +1272,8 @@ Hint Mode SqSubsetEq ! : typeclass_instances.
 Instance: Params (@sqsubseteq) 2 := {}.
 Infix "⊑" := sqsubseteq (at level 70) : stdpp_scope.
 Notation "(⊑)" := sqsubseteq (only parsing) : stdpp_scope.
-Notation "( x ⊑)" := (sqsubseteq x) (only parsing) : stdpp_scope.
-Notation "(⊑ y )" := (λ x, sqsubseteq x y) (only parsing) : stdpp_scope.
+Notation "( x ⊑.)" := (sqsubseteq x) (only parsing) : stdpp_scope.
+Notation "(.⊑ y )" := (λ x, sqsubseteq x y) (only parsing) : stdpp_scope.
 
 Infix "⊑@{ A }" := (@sqsubseteq A _) (at level 70, only parsing) : stdpp_scope.
 Notation "(⊑@{ A } )" := (@sqsubseteq A _) (only parsing) : stdpp_scope.
@@ -1287,16 +1287,16 @@ Hint Mode Meet ! : typeclass_instances.
 Instance: Params (@meet) 2 := {}.
 Infix "⊓" := meet (at level 40) : stdpp_scope.
 Notation "(⊓)" := meet (only parsing) : stdpp_scope.
-Notation "( x ⊓)" := (meet x) (only parsing) : stdpp_scope.
-Notation "(⊓ y )" := (λ x, meet x y) (only parsing) : stdpp_scope.
+Notation "( x ⊓.)" := (meet x) (only parsing) : stdpp_scope.
+Notation "(.⊓ y )" := (λ x, meet x y) (only parsing) : stdpp_scope.
 
 Class Join A := join: A → A → A.
 Hint Mode Join ! : typeclass_instances.
 Instance: Params (@join) 2 := {}.
 Infix "⊔" := join (at level 50) : stdpp_scope.
 Notation "(⊔)" := join (only parsing) : stdpp_scope.
-Notation "( x ⊔)" := (join x) (only parsing) : stdpp_scope.
-Notation "(⊔ y )" := (λ x, join x y) (only parsing) : stdpp_scope.
+Notation "( x ⊔.)" := (join x) (only parsing) : stdpp_scope.
+Notation "(.⊔ y )" := (λ x, join x y) (only parsing) : stdpp_scope.
 
 Class Top A := top : A.
 Hint Mode Top ! : typeclass_instances.

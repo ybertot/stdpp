@@ -218,12 +218,12 @@ Qed.
 Global Instance gmultiset_disj_union_right_id : RightId (=@{gmultiset A}) ∅ (⊎).
 Proof. intros X. by rewrite (comm_L (⊎)), (left_id_L _ _). Qed.
 
-Global Instance gmultiset_disj_union_inj_1 X : Inj (=) (=) (X ⊎).
+Global Instance gmultiset_disj_union_inj_1 X : Inj (=) (=) (X ⊎.).
 Proof.
   intros Y1 Y2. rewrite !gmultiset_eq. intros HX x; generalize (HX x).
   rewrite !multiplicity_disj_union. lia.
 Qed.
-Global Instance gmultiset_disj_union_inj_2 X : Inj (=) (=) (⊎ X).
+Global Instance gmultiset_disj_union_inj_2 X : Inj (=) (=) (.⊎ X).
 Proof. intros Y1 Y2. rewrite <-!(comm_L _ X). apply (inj _). Qed.
 
 Lemma gmultiset_disj_union_intersection_l X Y Z : X ⊎ (Y ∩ Z) = (X ⊎ Y) ∩ (X ⊎ Z).

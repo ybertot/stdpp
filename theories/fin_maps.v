@@ -121,7 +121,7 @@ Instance map_difference `{Merge M} {A} : Difference (M A) :=
 of the elements. Implemented by conversion to lists, so not very efficient. *)
 Definition map_imap `{∀ A, Insert K A (M A), ∀ A, Empty (M A),
     ∀ A, FinMapToList K A (M A)} {A B} (f : K → A → option B) (m : M A) : M B :=
-  list_to_map (omap (λ ix, (fst ix,) <$> curry f ix) (map_to_list m)).
+  list_to_map (omap (λ ix, (fst ix ,.) <$> curry f ix) (map_to_list m)).
 
 (* The zip operation on maps combines two maps key-wise. The keys of resulting
 map correspond to the keys that are in both maps. *)
@@ -507,7 +507,7 @@ Lemma insert_empty {A} i (x : A) : <[i:=x]>(∅ : M A) = {[i := x]}.
 Proof. done. Qed.
 Lemma insert_non_empty {A} (m : M A) i x : <[i:=x]>m ≠ ∅.
 Proof.
-  intros Hi%(f_equal (!! i)). by rewrite lookup_insert, lookup_empty in Hi.
+  intros Hi%(f_equal (.!! i)). by rewrite lookup_insert, lookup_empty in Hi.
 Qed.
 
 Lemma insert_subseteq {A} (m : M A) i x : m !! i = None → m ⊆ <[i:=x]>m.
@@ -575,7 +575,7 @@ Lemma lookup_singleton_ne {A} i j (x : A) :
 Proof. by rewrite lookup_singleton_None. Qed.
 Lemma map_non_empty_singleton {A} i (x : A) : {[i := x]} ≠ (∅ : M A).
 Proof.
-  intros Hix. apply (f_equal (!! i)) in Hix.
+  intros Hix. apply (f_equal (.!! i)) in Hix.
   by rewrite lookup_empty, lookup_singleton in Hix.
 Qed.
 Lemma insert_singleton {A} i (x y : A) : <[i:=y]>({[i := x]} : M A) = {[i := y]}.
@@ -1625,7 +1625,7 @@ Lemma lookup_union_None {A} (m1 m2 : M A) i :
 Proof. rewrite lookup_union.  destruct (m1 !! i), (m2 !! i); naive_solver. Qed.
 Lemma map_positive_l {A} (m1 m2 : M A) : m1 ∪ m2 = ∅ → m1 = ∅.
 Proof.
-  intros Hm. apply map_empty. intros i. apply (f_equal (!! i)) in Hm.
+  intros Hm. apply map_empty. intros i. apply (f_equal (.!! i)) in Hm.
   rewrite lookup_empty, lookup_union_None in Hm; tauto.
 Qed.
 Lemma map_positive_l_alt {A} (m1 m2 : M A) : m1 ≠ ∅ → m1 ∪ m2 ≠ ∅.

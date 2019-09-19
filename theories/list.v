@@ -33,20 +33,20 @@ Arguments Forall_cons {_} _ _ _ _ _ : assert.
 Remove Hints Permutation_cons : typeclass_instances.
 
 Notation "(::)" := cons (only parsing) : list_scope.
-Notation "( x ::)" := (cons x) (only parsing) : list_scope.
-Notation "(:: l )" := (λ x, cons x l) (only parsing) : list_scope.
+Notation "( x ::.)" := (cons x) (only parsing) : list_scope.
+Notation "(.:: l )" := (λ x, cons x l) (only parsing) : list_scope.
 Notation "(++)" := app (only parsing) : list_scope.
-Notation "( l ++)" := (app l) (only parsing) : list_scope.
-Notation "(++ k )" := (λ l, app l k) (only parsing) : list_scope.
+Notation "( l ++.)" := (app l) (only parsing) : list_scope.
+Notation "(.++ k )" := (λ l, app l k) (only parsing) : list_scope.
 
 Infix "≡ₚ" := Permutation (at level 70, no associativity) : stdpp_scope.
 Notation "(≡ₚ)" := Permutation (only parsing) : stdpp_scope.
-Notation "( x ≡ₚ)" := (Permutation x) (only parsing) : stdpp_scope.
-Notation "(≡ₚ x )" := (λ y, y ≡ₚ x) (only parsing) : stdpp_scope.
+Notation "( x ≡ₚ.)" := (Permutation x) (only parsing) : stdpp_scope.
+Notation "(.≡ₚ x )" := (λ y, y ≡ₚ x) (only parsing) : stdpp_scope.
 Notation "(≢ₚ)" := (λ x y, ¬x ≡ₚ y) (only parsing) : stdpp_scope.
 Notation "x ≢ₚ y":= (¬x ≡ₚ y) (at level 70, no associativity) : stdpp_scope.
-Notation "( x ≢ₚ)" := (λ y, x ≢ₚ y) (only parsing) : stdpp_scope.
-Notation "(≢ₚ x )" := (λ y, y ≢ₚ x) (only parsing) : stdpp_scope.
+Notation "( x ≢ₚ.)" := (λ y, x ≢ₚ y) (only parsing) : stdpp_scope.
+Notation "(.≢ₚ x )" := (λ y, y ≢ₚ x) (only parsing) : stdpp_scope.
 
 Infix "≡ₚ@{ A }" :=
   (@Permutation A) (at level 70, no associativity, only parsing) : stdpp_scope.
@@ -237,7 +237,7 @@ Fixpoint mask {A} (f : A → A) (βs : list bool) (l : list A) : list A :=
 (** The function [permutations l] yields all permutations of [l]. *)
 Fixpoint interleave {A} (x : A) (l : list A) : list (list A) :=
   match l with
-  | [] => [[x]]| y :: l => (x :: y :: l) :: ((y ::) <$> interleave x l)
+  | [] => [[x]]| y :: l => (x :: y :: l) :: ((y ::.) <$> interleave x l)
   end.
 Fixpoint permutations {A} (l : list A) : list (list A) :=
   match l with [] => [[]] | x :: l => permutations l ≫= interleave x end.
@@ -261,7 +261,7 @@ Section prefix_suffix_ops.
     | l1, [] => (l1, [], [])
     | x1 :: l1, x2 :: l2 =>
       if decide_rel (=) x1 x2
-      then prod_map id (x1 ::) (go l1 l2) else (x1 :: l1, x2 :: l2, [])
+      then prod_map id (x1 ::.) (go l1 l2) else (x1 :: l1, x2 :: l2, [])
     end.
   Definition max_suffix (l1 l2 : list A) : list A * list A * list A :=
     match max_prefix (reverse l1) (reverse l2) with
@@ -296,7 +296,7 @@ Hint Extern 0 (_ ⊆+ _) => reflexivity : core.
 Fixpoint list_remove `{EqDecision A} (x : A) (l : list A) : option (list A) :=
   match l with
   | [] => None
-  | y :: l => if decide (x = y) then Some l else (y ::) <$> list_remove x l
+  | y :: l => if decide (x = y) then Some l else (y ::.) <$> list_remove x l
   end.
 
 (** Removes all elements in the list [k] from the list [l]. The function returns
@@ -352,7 +352,7 @@ Section list_set.
     match l with
     | [] => []
     | x :: l => foldr (λ y,
-        match f x y with None => id | Some z => (z ::) end) (go l k) k
+        match f x y with None => id | Some z => (z ::.) end) (go l k) k
     end.
 End list_set.
 
@@ -442,9 +442,9 @@ Implicit Types l k : list A.
 
 Global Instance: Inj2 (=) (=) (=) (@cons A).
 Proof. by injection 1. Qed.
-Global Instance: ∀ k, Inj (=) (=) (k ++).
+Global Instance: ∀ k, Inj (=) (=) (k ++.).
 Proof. intros ???. apply app_inv_head. Qed.
-Global Instance: ∀ k, Inj (=) (=) (++ k).
+Global Instance: ∀ k, Inj (=) (=) (.++ k).
 Proof. intros ???. apply app_inv_tail. Qed.
 Global Instance: Assoc (=) (@app A).
 Proof. intros ???. apply app_assoc. Qed.
@@ -728,7 +728,7 @@ Lemma not_elem_of_app l1 l2 x : x ∉ l1 ++ l2 ↔ x ∉ l1 ∧ x ∉ l2.
 Proof. rewrite elem_of_app. tauto. Qed.
 Lemma elem_of_list_singleton x y : x ∈ [y] ↔ x = y.
 Proof. rewrite elem_of_cons, elem_of_nil. tauto. Qed.
-Global Instance elem_of_list_permutation_proper x : Proper ((≡ₚ) ==> iff) (x ∈).
+Global Instance elem_of_list_permutation_proper x : Proper ((≡ₚ) ==> iff) (x ∈.).
 Proof. induction 1; rewrite ?elem_of_nil, ?elem_of_cons; intuition. Qed.
 Lemma elem_of_list_split l x : x ∈ l → ∃ l1 l2, l = l1 ++ x :: l2.
 Proof.
@@ -1370,7 +1370,7 @@ Proof.
   rewrite (Nat.mul_comm _ n) in Hlookup.
   unfold sublist_lookup in *; simplify_option_eq;
     [|by rewrite !lookup_ge_None_2 by auto].
-  apply (f_equal (!! i `mod` n)) in Hlookup.
+  apply (f_equal (.!! i `mod` n)) in Hlookup.
   by rewrite !lookup_take, !lookup_drop, <-!Nat.div_mod in Hlookup
     by (auto using Nat.mod_upper_bound with lia).
 Qed.
@@ -1611,15 +1611,15 @@ Proof.
   - by rewrite (right_id_L [] (++)).
   - rewrite Permutation_middle, IH. simpl. by rewrite Permutation_middle.
 Qed.
-Global Instance: ∀ x : A, Inj (≡ₚ) (≡ₚ) (x ::).
+Global Instance: ∀ x : A, Inj (≡ₚ) (≡ₚ) (x ::.).
 Proof. red. eauto using Permutation_cons_inv. Qed.
-Global Instance: ∀ k : list A, Inj (≡ₚ) (≡ₚ) (k ++).
+Global Instance: ∀ k : list A, Inj (≡ₚ) (≡ₚ) (k ++.).
 Proof.
   red. induction k as [|x k IH]; intros l1 l2; simpl; auto.
-  intros. by apply IH, (inj (x ::)).
+  intros. by apply IH, (inj (x ::.)).
 Qed.
-Global Instance: ∀ k : list A, Inj (≡ₚ) (≡ₚ) (++ k).
-Proof. intros k l1 l2. rewrite !(comm (++) _ k). by apply (inj (k ++)). Qed.
+Global Instance: ∀ k : list A, Inj (≡ₚ) (≡ₚ) (.++ k).
+Proof. intros k l1 l2. rewrite !(comm (++) _ k). by apply (inj (k ++.)). Qed.
 Lemma replicate_Permutation n x l : replicate n x ≡ₚ l → replicate n x = l.
 Proof.
   intros Hl. apply replicate_as_elem_of. split.
@@ -1646,7 +1646,7 @@ Proof.
   { apply elem_of_list_lookup. rewrite Hk, elem_of_cons; auto. }
   exists (take i k), (drop (S i) k). split.
   - by rewrite take_drop_middle.
-  - rewrite <-delete_take_drop. apply (inj (x ::)).
+  - rewrite <-delete_take_drop. apply (inj (x ::.)).
     by rewrite <-Hk, <-(delete_Permutation k) by done.
 Qed.
 
@@ -2488,7 +2488,7 @@ Section Forall_Exists.
   Qed.
   Lemma Forall_replicate n x : P x → Forall P (replicate n x).
   Proof. induction n; simpl; constructor; auto. Qed.
-  Lemma Forall_replicate_eq n (x : A) : Forall (x =) (replicate n x).
+  Lemma Forall_replicate_eq n (x : A) : Forall (x =.) (replicate n x).
   Proof using -(P). induction n; simpl; constructor; auto. Qed.
   Lemma Forall_take n l : Forall P l → Forall P (take n l).
   Proof. intros Hl. revert n. induction Hl; intros [|?]; simpl; auto. Qed.
@@ -2606,10 +2606,10 @@ Lemma existb_True (f : A → bool) xs : existsb f xs ↔ Exists f xs.
 Proof. split. induction xs; naive_solver. induction 1; naive_solver. Qed.
 
 Lemma replicate_as_Forall (x : A) n l :
-  replicate n x = l ↔ length l = n ∧ Forall (x =) l.
+  replicate n x = l ↔ length l = n ∧ Forall (x =.) l.
 Proof. rewrite replicate_as_elem_of, Forall_forall. naive_solver. Qed.
 Lemma replicate_as_Forall_2 (x : A) n l :
-  length l = n → Forall (x =) l → replicate n x = l.
+  length l = n → Forall (x =.) l → replicate n x = l.
 Proof. by rewrite replicate_as_Forall. Qed.
 End more_general_properties.
 
@@ -3392,14 +3392,14 @@ Section ret_join.
   Lemma elem_of_list_join (x : A) (ls : list (list A)) :
     x ∈ mjoin ls ↔ ∃ l : list A, x ∈ l ∧ l ∈ ls.
   Proof. by rewrite list_join_bind, elem_of_list_bind. Qed.
-  Lemma join_nil (ls : list (list A)) : mjoin ls = [] ↔ Forall (= []) ls.
+  Lemma join_nil (ls : list (list A)) : mjoin ls = [] ↔ Forall (.= []) ls.
   Proof.
     split; [|by induction 1 as [|[|??] ?]].
     by induction ls as [|[|??] ?]; constructor; auto.
   Qed.
-  Lemma join_nil_1 (ls : list (list A)) : mjoin ls = [] → Forall (= []) ls.
+  Lemma join_nil_1 (ls : list (list A)) : mjoin ls = [] → Forall (.= []) ls.
   Proof. by rewrite join_nil. Qed.
-  Lemma join_nil_2 (ls : list (list A)) : Forall (= []) ls → mjoin ls = [].
+  Lemma join_nil_2 (ls : list (list A)) : Forall (.= []) ls → mjoin ls = [].
   Proof. by rewrite join_nil. Qed.
   Lemma Forall_join (P : A → Prop) (ls: list (list A)) :
     Forall (Forall P) ls → Forall P (mjoin ls).
@@ -4008,7 +4008,7 @@ Section positives_flatten_unflatten.
       intros p1 p2 [|y ys] ?; simplify_eq/=; auto.
     rewrite !positives_flatten_cons, !(assoc _); intros Hl.
     assert (xs = ys) as <- by eauto; clear IH H; f_equal.
-    apply (inj (++ positives_flatten xs)) in Hl.
+    apply (inj (.++ positives_flatten xs)) in Hl.
     rewrite 2!Preverse_Pdup in Hl.
     apply (Pdup_suffix_eq _ _ p1 p2) in Hl.
     by apply (inj Preverse).
@@ -4018,7 +4018,7 @@ End positives_flatten_unflatten.
 (** * Relection over lists *)
 (** We define a simple data structure [rlist] to capture a syntactic
 representation of lists consisting of constants, applications and the nil list.
-Note that we represent [(x ::)] as [rapp (rnode [x])]. For now, we abstract
+Note that we represent [(x ::.)] as [rapp (rnode [x])]. For now, we abstract
 over the type of constants, but later we use [nat]s and a list representing
 a corresponding environment. *)
 Inductive rlist (A : Type) :=
@@ -4071,7 +4071,7 @@ End quote.
 Section eval.
   Context {A} (E : env A).
 
-  Lemma eval_alt t : eval E t = to_list t ≫= default [] ∘ (E !!).
+  Lemma eval_alt t : eval E t = to_list t ≫= default [] ∘ (E !!.).
   Proof.
     induction t; csimpl.
     - done.

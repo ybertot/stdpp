@@ -18,15 +18,15 @@ Definition card A `{Finite A} := length (enum A).
 
 Program Definition finite_countable `{Finite A} : Countable A := {|
   encode := λ x,
-    Pos.of_nat $ S $ default 0 $ fst <$> list_find (x =) (enum A);
+    Pos.of_nat $ S $ default 0 $ fst <$> list_find (x =.) (enum A);
   decode := λ p, enum A !! pred (Pos.to_nat p)
 |}.
 Arguments Pos.of_nat : simpl never.
 Next Obligation.
   intros ?? [xs Hxs HA] x; unfold encode, decode; simpl.
-  destruct (list_find_elem_of (x =) xs x) as [[i y] Hi]; auto.
+  destruct (list_find_elem_of (x =.) xs x) as [[i y] Hi]; auto.
   rewrite Nat2Pos.id by done; simpl; rewrite Hi; simpl.
-  destruct (list_find_Some (x =) xs i y); naive_solver.
+  destruct (list_find_Some (x =.) xs i y); naive_solver.
 Qed.
 Hint Immediate finite_countable : typeclass_instances.
 
@@ -38,7 +38,7 @@ Proof.
   destruct finA as [xs Hxs HA]; unfold encode_nat, encode, card; simpl.
   rewrite Nat2Pos.id by done; simpl.
   destruct (list_find _ xs) as [[i y]|] eqn:?; simpl.
-  - destruct (list_find_Some (x =) xs i y); eauto using lookup_lt_Some.
+  - destruct (list_find_Some (x =.) xs i y); eauto using lookup_lt_Some.
   - destruct xs; simpl. exfalso; eapply not_elem_of_nil, (HA x). lia.
 Qed.
 Lemma encode_decode A `{finA: Finite A} i :
@@ -48,8 +48,8 @@ Proof.
   unfold encode_nat, decode_nat, encode, decode, card; simpl.
   intros Hi. apply lookup_lt_is_Some in Hi. destruct Hi as [x Hx].
   exists x. rewrite !Nat2Pos.id by done; simpl.
-  destruct (list_find_elem_of (x =) xs x) as [[j y] Hj]; auto.
-  destruct (list_find_Some (x =) xs j y) as [? ->]; auto.
+  destruct (list_find_elem_of (x =.) xs x) as [[j y] Hj]; auto.
+  destruct (list_find_Some (x =.) xs j y) as [? ->]; auto.
   rewrite Hj; csimpl; eauto using NoDup_lookup.
 Qed.
 Lemma find_Some `{finA: Finite A} P `{∀ x, Decision (P x)} (x : A) :
@@ -282,7 +282,7 @@ Lemma sum_card `{Finite A, Finite B} : card (A + B) = card A + card B.
 Proof. unfold card. simpl. by rewrite app_length, !fmap_length. Qed.
 
 Program Instance prod_finite `{Finite A, Finite B} : Finite (A * B)%type :=
-  {| enum := foldr (λ x, (pair x <$> enum B ++)) [] (enum A) |}.
+  {| enum := foldr (λ x, (pair x <$> enum B ++.)) [] (enum A) |}.
 Next Obligation.
   intros ??????. induction (NoDup_enum A) as [|x xs Hx Hxs IH]; simpl.
   { constructor. }
@@ -312,7 +312,7 @@ Definition list_enum {A} (l : list A) : ∀ n, list { l : list A | length l = n 
   fix go n :=
   match n with
   | 0 => [[]↾eq_refl]
-  | S n => foldr (λ x, (sig_map (x ::) (λ _ H, f_equal S H) <$> (go n) ++)) [] l
+  | S n => foldr (λ x, (sig_map (x ::.) (λ _ H, f_equal S H) <$> (go n) ++.)) [] l
   end.
 
 Program Instance list_finite `{Finite A} n : Finite { l : list A | length l = n } :=

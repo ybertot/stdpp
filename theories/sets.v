@@ -485,7 +485,7 @@ Section semi_set.
   Qed.
   Lemma union_list_mono Xs Ys : Xs ⊆* Ys → ⋃ Xs ⊆ ⋃ Ys.
   Proof. induction 1; simpl; auto using union_mono. Qed.
-  Lemma empty_union_list Xs : ⋃ Xs ≡ ∅ ↔ Forall (≡ ∅) Xs.
+  Lemma empty_union_list Xs : ⋃ Xs ≡ ∅ ↔ Forall (.≡ ∅) Xs.
   Proof.
     split.
     - induction Xs; simpl; rewrite ?empty_union; intuition.
@@ -554,7 +554,7 @@ Section semi_set.
     Proof. unfold_leibniz. apply union_list_app. Qed.
     Lemma union_list_reverse_L Xs : ⋃ (reverse Xs) = ⋃ Xs.
     Proof. unfold_leibniz. apply union_list_reverse. Qed.
-    Lemma empty_union_list_L Xs : ⋃ Xs = ∅ ↔ Forall (= ∅) Xs.
+    Lemma empty_union_list_L Xs : ⋃ Xs = ∅ ↔ Forall (.= ∅) Xs.
     Proof. unfold_leibniz. by rewrite empty_union_list. Qed. 
   End leibniz.
 
@@ -567,7 +567,7 @@ Section semi_set.
 
     Lemma non_empty_union X Y : X ∪ Y ≢ ∅ ↔ X ≢ ∅ ∨ Y ≢ ∅.
     Proof. rewrite empty_union. destruct (decide (X ≡ ∅)); intuition. Qed.
-    Lemma non_empty_union_list Xs : ⋃ Xs ≢ ∅ → Exists (≢ ∅) Xs.
+    Lemma non_empty_union_list Xs : ⋃ Xs ≢ ∅ → Exists (.≢ ∅) Xs.
     Proof. rewrite empty_union_list. apply (not_Forall_Exists _). Qed.
 
     Context `{!LeibnizEquiv C}.
@@ -577,7 +577,7 @@ Section semi_set.
     Proof. unfold_leibniz. apply set_not_subset_inv. Qed.
     Lemma non_empty_union_L X Y : X ∪ Y ≠ ∅ ↔ X ≠ ∅ ∨ Y ≠ ∅.
     Proof. unfold_leibniz. apply non_empty_union. Qed.
-    Lemma non_empty_union_list_L Xs : ⋃ Xs ≠ ∅ → Exists (≠ ∅) Xs.
+    Lemma non_empty_union_list_L Xs : ⋃ Xs ≠ ∅ → Exists (.≠ ∅) Xs.
     Proof. unfold_leibniz. apply non_empty_union_list. Qed.
   End dec.
 End semi_set.
@@ -973,10 +973,10 @@ End set_monad.
 
 (** Finite sets *)
 Definition pred_finite {A} (P : A → Prop) := ∃ xs : list A, ∀ x, P x → x ∈ xs.
-Definition set_finite `{ElemOf A B} (X : B) := pred_finite (∈ X).
+Definition set_finite `{ElemOf A B} (X : B) := pred_finite (.∈ X).
 
 Definition pred_infinite {A} (P : A → Prop) := ∀ xs : list A, ∃ x, P x ∧ x ∉ xs.
-Definition set_infinite `{ElemOf A C} (X : C) := pred_infinite (∈ X).
+Definition set_infinite `{ElemOf A C} (X : C) := pred_infinite (.∈ X).
 
 Section pred_finite_infinite.
   Lemma pred_finite_impl {A} (P Q : A → Prop) :

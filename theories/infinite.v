@@ -35,7 +35,7 @@ Section search_infinite.
   Lemma search_infinite_R_wf xs : wf (R xs).
   Proof.
     revert xs. assert (help : ∀ xs n n',
-      Acc (R (filter (≠ f n') xs)) n → n' < n → Acc (R xs) n).
+      Acc (R (filter (.≠ f n') xs)) n → n' < n → Acc (R xs) n).
     { induction 1 as [n _ IH]. constructor; intros n2 [??]. apply IH; [|lia].
       split; [done|]. apply elem_of_list_filter; naive_solver lia. }
     intros xs. induction (well_founded_ltof _ length xs) as [xs _ IH].
@@ -127,9 +127,9 @@ Instance sum_infinite_r {A} `{Infinite B} : Infinite (A + B) :=
   inj_infinite inr (maybe inr)  (λ _, eq_refl).
 
 Instance prod_infinite_l `{Infinite A, Inhabited B} : Infinite (A * B) :=
-  inj_infinite (,inhabitant) (Some ∘ fst) (λ _, eq_refl).
+  inj_infinite (., inhabitant) (Some ∘ fst) (λ _, eq_refl).
 Instance prod_infinite_r `{Inhabited A, Infinite B} : Infinite (A * B) :=
-  inj_infinite (inhabitant,) (Some ∘ snd) (λ _, eq_refl).
+  inj_infinite (inhabitant ,.) (Some ∘ snd) (λ _, eq_refl).
 
 (** Instance for lists *)
 Program Instance list_infinite `{Inhabited A} : Infinite (list A) := {|

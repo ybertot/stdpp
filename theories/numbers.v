@@ -170,8 +170,8 @@ Fixpoint Papp (p1 p2 : positive) : positive :=
   end.
 Infix "++" := Papp : positive_scope.
 Notation "(++)" := Papp (only parsing) : positive_scope.
-Notation "( p ++)" := (Papp p) (only parsing) : positive_scope.
-Notation "(++ q )" := (λ p, Papp p q) (only parsing) : positive_scope.
+Notation "( p ++.)" := (Papp p) (only parsing) : positive_scope.
+Notation "(.++ q )" := (λ p, Papp p q) (only parsing) : positive_scope.
 
 Fixpoint Preverse_go (p1 p2 : positive) : positive :=
   match p2 with
@@ -187,7 +187,7 @@ Global Instance Papp_1_r : RightId (=) 1 (++).
 Proof. done. Qed.
 Global Instance Papp_assoc : Assoc (=) (++).
 Proof. intros ?? p. by induction p; intros; f_equal/=. Qed.
-Global Instance Papp_inj p : Inj (=) (=) (++ p).
+Global Instance Papp_inj p : Inj (=) (=) (.++ p).
 Proof. intros ???. induction p; simplify_eq; auto. Qed.
 
 Lemma Preverse_go_app p1 p2 p3 :
