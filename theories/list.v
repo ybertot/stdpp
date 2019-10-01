@@ -921,46 +921,6 @@ Section list_set.
   Qed.
 End list_set.
 
-(** ** Properties of the [find] function *)
-Section find.
-  Context (P : A → Prop) `{∀ x, Decision (P x)}.
-  Lemma list_find_Some l i x :
-    list_find P l = Some (i,x) → l !! i = Some x ∧ P x.
-  Proof.
-    revert i; induction l; intros [] ?; repeat first
-      [ match goal with x : prod _ _ |- _ => destruct x end
-      | simplify_option_eq ]; eauto.
-  Qed.
-  Lemma list_find_None l :
-    list_find P l = None → Forall (λ x, ¬ P x) l.
-  Proof.
-    induction l as [|? l IHl]; [eauto|]. simpl. case_decide; [done|].
-    intros. constructor; [done|]. apply IHl.
-    by destruct (list_find P l).
-  Qed.
-  Lemma list_find_elem_of l x : x ∈ l → P x → is_Some (list_find P l).
-  Proof.
-    induction 1 as [|x y l ? IH]; intros; simplify_option_eq; eauto.
-    by destruct IH as [[i x'] ->]; [|exists (S i, x')].
-  Qed.
-
-  Lemma list_find_fmap {B : Type} (f : B → A) (l : list B) :
-    list_find P (f <$> l) = prod_map id f <$> list_find (P ∘ f) l.
-  Proof.
-    induction l as [|x l IH]; [done|]. csimpl. (* csimpl re-folds fmap *)
-    case_decide; [done|].
-    rewrite IH. by destruct (list_find (P ∘ f) l).
-  Qed.
-
-  Lemma list_find_ext (Q : A → Prop) `{∀ x, Decision (Q x)} l :
-    (∀ x, P x ↔ Q x) →
-    list_find P l = list_find Q l.
-  Proof.
-    intros HPQ. induction l as [|x l IH]; simpl; [done|].
-    by rewrite (decide_iff (P x) (Q x)), IH by done.
-  Qed.
-End find.
-
 (** ** Properties of the [omap] function *)
 Lemma list_fmap_omap {B C : Type} (f : A → option B) (g : B → C) (l : list A) :
   g <$> omap f l = omap (λ x, g <$> (f x)) l.
@@ -3153,6 +3113,59 @@ Section setoid.
     induction n; destruct 2; simpl; repeat (constructor || f_equiv); auto.
   Qed.
 End setoid.
+
+(** * Properties of the [find] function *)
+Section find.
+  Context {A} (P : A → Prop) `{∀ x, Decision (P x)}.
+
+  Lemma list_find_Some l i x  :
+    list_find P l = Some (i,x) ↔
+      l !! i = Some x ∧ P x ∧ ∀ j, j < i → ∃ y, l !! j = Some y ∧ ¬P y.
+  Proof.
+    revert i. induction l as [|y l IH]; intros i; csimpl; [naive_solver|].
+    case_decide.
+    - split; [naive_solver lia|]. intros (Hi&HP&Hlt).
+      destruct i as [|i]; simplify_eq/=; [done|].
+      destruct (Hlt 0); naive_solver lia.
+    - split.
+      + intros ([i' x']&Hl&?)%fmap_Some; simplify_eq/=.
+        apply IH in Hl as (?&?&Hlt). split_and!; [done..|].
+        intros [|j] ?; naive_solver lia.
+      + intros (?&?&Hlt). destruct i as [|i]; simplify_eq/=; [done|].
+        rewrite (proj2 (IH i)); [done|]. split_and!; [done..|].
+        intros j ?. destruct (Hlt (S j)); naive_solver lia.
+  Qed.
+
+  Lemma list_find_elem_of l x : x ∈ l → P x → is_Some (list_find P l).
+  Proof.
+    induction 1 as [|x y l ? IH]; intros; simplify_option_eq; eauto.
+    by destruct IH as [[i x'] ->]; [|exists (S i, x')].
+  Qed.
+
+  Lemma list_find_None l :
+    list_find P l = None ↔ Forall (λ x, ¬P x) l.
+  Proof.
+    rewrite eq_None_not_Some, Forall_forall. split.
+    - intros Hl x Hx HP. destruct Hl. eauto using list_find_elem_of.
+    - intros HP [[i x] (?%elem_of_list_lookup_2&?&?)%list_find_Some]; naive_solver.
+  Qed.
+
+  Lemma list_find_fmap {B : Type} (f : B → A) (l : list B) :
+    list_find P (f <$> l) = prod_map id f <$> list_find (P ∘ f) l.
+  Proof.
+    induction l as [|x l IH]; [done|]; csimpl. (* csimpl re-folds fmap *)
+    case_decide; [done|].
+    rewrite IH. by destruct (list_find (P ∘ f) l).
+  Qed.
+
+  Lemma list_find_ext (Q : A → Prop) `{∀ x, Decision (Q x)} l :
+    (∀ x, P x ↔ Q x) →
+    list_find P l = list_find Q l.
+  Proof.
+    intros HPQ. induction l as [|x l IH]; simpl; [done|].
+    by rewrite (decide_iff (P x) (Q x)), IH by done.
+  Qed.
+End find.
 
 (** * Properties of the monadic operations *)
 Lemma list_fmap_id {A} (l : list A) : id <$> l = l.
