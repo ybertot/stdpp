@@ -6,6 +6,7 @@ API-breaking change is listed.
 - Rename `dom_map_filter` into `dom_map_filter_subseteq` and repurpose
   `dom_map_filter` for the version with the equality. This follows the naming
   convention for similar lemmas.
+- Generalize `list_find_Some` and `list_find_None` to become bi-implications.
 - Disambiguate Haskell-style notations for partially applied operators. For
   example, change `(!! i)` into `(.!! x)` so that `!!` can also be used as a
   prefix, as done in VST. A sed script to perform the renaming can be found at:

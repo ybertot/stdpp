@@ -37,8 +37,8 @@ Lemma encode_lt_card `{finA: Finite A} (x : A) : encode_nat x < card A.
 Proof.
   destruct finA as [xs Hxs HA]; unfold encode_nat, encode, card; simpl.
   rewrite Nat2Pos.id by done; simpl.
-  destruct (list_find _ xs) as [[i y]|] eqn:?; simpl.
-  - destruct (list_find_Some (x =.) xs i y); eauto using lookup_lt_Some.
+  destruct (list_find _ xs) as [[i y]|] eqn:HE; simpl.
+  - apply list_find_Some in HE as (?&?&?); eauto using lookup_lt_Some.
   - destruct xs; simpl. exfalso; eapply not_elem_of_nil, (HA x). lia.
 Qed.
 Lemma encode_decode A `{finA: Finite A} i :
@@ -49,8 +49,8 @@ Proof.
   intros Hi. apply lookup_lt_is_Some in Hi. destruct Hi as [x Hx].
   exists x. rewrite !Nat2Pos.id by done; simpl.
   destruct (list_find_elem_of (x =.) xs x) as [[j y] Hj]; auto.
-  destruct (list_find_Some (x =.) xs j y) as [? ->]; auto.
-  rewrite Hj; csimpl; eauto using NoDup_lookup.
+  split; [done|]; rewrite Hj; simpl.
+  apply list_find_Some in Hj as (?&->&?). eauto using NoDup_lookup.
 Qed.
 Lemma find_Some `{finA: Finite A} P `{∀ x, Decision (P x)} (x : A) :
   find P = Some x → P x.
@@ -65,8 +65,8 @@ Lemma find_is_Some `{finA: Finite A} P `{∀ x, Decision (P x)} (x : A) :
 Proof.
   destruct finA as [xs Hxs HA]; unfold find, decode; simpl.
   intros Hx. destruct (list_find_elem_of P xs x) as [[i y] Hi]; auto.
-  rewrite Hi. destruct (list_find_Some P xs i y); simplify_eq/=; auto.
-  exists y. by rewrite !Nat2Pos.id by done.
+  rewrite Hi; simpl. rewrite !Nat2Pos.id by done. simpl.
+  apply list_find_Some in Hi; naive_solver.
 Qed.
 
 Definition encode_fin `{Finite A} (x : A) : fin (card A) :=
