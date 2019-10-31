@@ -79,3 +79,9 @@ your account.  Then you can fork the
 [Coq-std++ git repository](https://gitlab.mpi-sws.org/iris/stdpp), make your
 changes in your fork, and create a merge request.
 
+## Common problems
+
+On Windows, differences in line endings may cause tests to fail. This can be 
+fixed by setting Git's autocrlf option to true:
+`git config --global core.autocrlf true`
+
