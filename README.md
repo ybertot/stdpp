@@ -83,5 +83,5 @@ changes in your fork, and create a merge request.
 
 On Windows, differences in line endings may cause tests to fail. This can be 
 fixed by setting Git's autocrlf option to true:
-`git config --global core.autocrlf true`
 
+    git config --global core.autocrlf true
