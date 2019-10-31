@@ -730,10 +730,28 @@ Lemma elem_of_list_singleton x y : x ∈ [y] ↔ x = y.
 Proof. rewrite elem_of_cons, elem_of_nil. tauto. Qed.
 Global Instance elem_of_list_permutation_proper x : Proper ((≡ₚ) ==> iff) (x ∈.).
 Proof. induction 1; rewrite ?elem_of_nil, ?elem_of_cons; intuition. Qed.
+Lemma elem_of_list_lookup_1 l x : x ∈ l → ∃ i, l !! i = Some x.
+Proof.
+  induction 1 as [|???? IH]; [by exists 0 |].
+  destruct IH as [i ?]; auto. by exists (S i).
+Qed.
+Lemma elem_of_list_lookup_2 l i x : l !! i = Some x → x ∈ l.
+Proof.
+  revert i. induction l; intros [|i] ?; simplify_eq/=; constructor; eauto.
+Qed.
+Lemma elem_of_list_lookup l x : x ∈ l ↔ ∃ i, l !! i = Some x.
+Proof. firstorder eauto using elem_of_list_lookup_1, elem_of_list_lookup_2. Qed.
+Lemma elem_of_list_split_length l i x :
+  l !! i = Some x → ∃ l1 l2, l = l1 ++ x :: l2 ∧ i = length l1.
+Proof.
+  revert i; induction l as [|y l IH]; intros [|i] Hl; simplify_eq/=.
+  - exists []; eauto.
+  - destruct (IH _ Hl) as (?&?&?&?); simplify_eq/=.
+    eexists (y :: _); eauto.
+Qed.
 Lemma elem_of_list_split l x : x ∈ l → ∃ l1 l2, l = l1 ++ x :: l2.
 Proof.
-  induction 1 as [x l|x y l ? [l1 [l2 ->]]]; [by eexists [], l|].
-  by exists (y :: l1), l2.
+  intros [? (?&?&?&_)%elem_of_list_split_length]%elem_of_list_lookup_1; eauto.
 Qed.
 Lemma elem_of_list_split_l `{EqDecision A} l x :
   x ∈ l → ∃ l1 l2, l = l1 ++ x :: l2 ∧ x ∉ l1.
@@ -757,17 +775,6 @@ Proof.
     exists l1, (l2 ++ [y]).
     rewrite elem_of_app, elem_of_list_singleton, <-(assoc_L (++)). naive_solver.
 Qed.
-Lemma elem_of_list_lookup_1 l x : x ∈ l → ∃ i, l !! i = Some x.
-Proof.
-  induction 1 as [|???? IH]; [by exists 0 |].
-  destruct IH as [i ?]; auto. by exists (S i).
-Qed.
-Lemma elem_of_list_lookup_2 l i x : l !! i = Some x → x ∈ l.
-Proof.
-  revert i. induction l; intros [|i] ?; simplify_eq/=; constructor; eauto.
-Qed.
-Lemma elem_of_list_lookup l x : x ∈ l ↔ ∃ i, l !! i = Some x.
-Proof. firstorder eauto using elem_of_list_lookup_1, elem_of_list_lookup_2. Qed.
 Lemma elem_of_list_omap {B} (f : A → option B) l (y : B) :
   y ∈ omap f l ↔ ∃ x, x ∈ l ∧ f x = Some y.
 Proof.
