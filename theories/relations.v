@@ -149,6 +149,20 @@ Section closure.
   Lemma rtc_nsteps x y : rtc R x y → ∃ n, nsteps R n x y.
   Proof. induction 1; firstorder eauto. Qed.
 
+  Lemma nsteps_plus_inv n m x z :
+    nsteps R (n + m) x z → ∃ y, nsteps R n x y ∧ nsteps R m y z.
+  Proof.
+    revert x.
+    induction n as [|n IH]; intros x Hx; simpl; [by eauto|].
+    inversion Hx; naive_solver.
+  Qed.
+
+  Lemma nsteps_inv_r n x z : nsteps R (S n) x z → ∃ y, nsteps R n x y ∧ R y z.
+  Proof.
+    rewrite <- PeanoNat.Nat.add_1_r.
+    intros (?&?&?%nsteps_once_inv)%nsteps_plus_inv; eauto.
+  Qed.
+
   Lemma bsteps_once n x y : R x y → bsteps R (S n) x y.
   Proof. eauto. Qed.
   Lemma bsteps_plus_r n m x y :
