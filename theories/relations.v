@@ -135,6 +135,10 @@ Section closure.
   Lemma rtc_nf x y : rtc R x y → nf R x → x = y.
   Proof. destruct 1 as [x|x y1 y2]. done. intros []; eauto. Qed.
 
+  Lemma rtc_congruence {B} (f : A → B) (R' : relation B) x y :
+    (∀ x y, R x y → R' (f x) (f y)) → rtc R x y → rtc R' (f x) (f y).
+  Proof. induction 2; econstructor; eauto. Qed.
+
   Lemma nsteps_once x y : R x y → nsteps R 1 x y.
   Proof. eauto. Qed.
   Lemma nsteps_once_inv x y : nsteps R 1 x y → R x y.
@@ -162,6 +166,10 @@ Section closure.
     rewrite <- PeanoNat.Nat.add_1_r.
     intros (?&?&?%nsteps_once_inv)%nsteps_plus_inv; eauto.
   Qed.
+
+  Lemma nsteps_congruence {B} (f : A → B) (R' : relation B) n x y :
+    (∀ x y, R x y → R' (f x) (f y)) → nsteps R n x y → nsteps R' n (f x) (f y).
+  Proof. induction 2; econstructor; eauto. Qed.
 
   Lemma bsteps_once n x y : R x y → bsteps R (S n) x y.
   Proof. eauto. Qed.
@@ -204,6 +212,10 @@ Section closure.
     - apply H; intuition lia.
   Qed.
 
+  Lemma bsteps_congruence {B} (f : A → B) (R' : relation B) n x y :
+    (∀ x y, R x y → R' (f x) (f y)) → bsteps R n x y → bsteps R' n (f x) (f y).
+  Proof. induction 2; econstructor; eauto. Qed.
+
   Lemma tc_transitive x y z : tc R x y → tc R y z → tc R x z.
   Proof. induction 1; eauto. Qed.
   Global Instance tc_transitive' : Transitive (tc R).
@@ -217,6 +229,10 @@ Section closure.
   Lemma tc_rtc x y : tc R x y → rtc R x y.
   Proof. induction 1; eauto. Qed.
 
+  Lemma tc_congruence {B} (f : A → B) (R' : relation B) x y :
+    (∀ x y, R x y → R' (f x) (f y)) → tc R x y → tc R' (f x) (f y).
+  Proof. induction 2; econstructor; by eauto. Qed.
+
   Global Instance sc_symmetric : Symmetric (sc R).
   Proof. unfold Symmetric, sc. naive_solver. Qed.
 
@@ -224,6 +240,11 @@ Section closure.
   Proof. by left. Qed.
   Lemma sc_rl x y : R y x → sc R x y.
   Proof. by right. Qed.
+
+  Lemma sc_congruence {B} (f : A → B) (R' : relation B) x y :
+    (∀ x y, R x y → R' (f x) (f y)) → sc R x y → sc R' (f x) (f y).
+  Proof. induction 2; econstructor; by eauto. Qed.
+
 End closure.
 
 Section more_closure.
@@ -240,6 +261,11 @@ Section more_closure.
   Proof. induction 1; econstructor; eauto using sc_lr. Qed.
   Lemma rtc_rtsc_lr x y : rtc R y x → rtsc R x y.
   Proof. intros. symmetry. eauto using rtc_rtsc_rl. Qed.
+
+  Lemma rtsc_congruence {B} (f : A → B) (R' : relation B) x y :
+    (∀ x y, R x y → R' (f x) (f y)) → rtsc R x y → rtsc R' (f x) (f y).
+  Proof. unfold rtsc; eauto using rtc_congruence, sc_congruence. Qed.
+
 End more_closure.
 
 Section properties.
