@@ -31,7 +31,7 @@ Instance listset_nodup_difference: Difference C :=
   λ '(ListsetNoDup l Hl) '(ListsetNoDup k Hk),
     ListsetNoDup _ (NoDup_list_difference _ k Hl).
 
-Instance: Set_ A C.
+Instance listset_nodup_set: Set_ A C.
 Proof.
   split; [split | | ].
   - by apply not_elem_of_nil.
@@ -42,7 +42,7 @@ Proof.
 Qed.
 
 Global Instance listset_nodup_elems: Elements A C := listset_nodup_car.
-Global Instance: FinSet A C.
+Global Instance listset_nodup_fin_set: FinSet A C.
 Proof. split. apply _. done. by intros [??]. Qed.
 End list_set.
 
