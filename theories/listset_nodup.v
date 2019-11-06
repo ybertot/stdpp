@@ -21,15 +21,15 @@ Instance listset_nodup_elem_of: ElemOf A C := λ x l, x ∈ listset_nodup_car l.
 Instance listset_nodup_empty: Empty C := ListsetNoDup [] (@NoDup_nil_2 _).
 Instance listset_nodup_singleton: Singleton A C := λ x,
   ListsetNoDup [x] (NoDup_singleton x).
-Instance listset_nodup_union: Union C := λ l k,
-  let (l',Hl) := l in let (k',Hk) := k
-  in ListsetNoDup _ (NoDup_list_union _ _ Hl Hk).
-Instance listset_nodup_intersection: Intersection C := λ l k,
-  let (l',Hl) := l in let (k',Hk) := k
-  in ListsetNoDup _ (NoDup_list_intersection _ k' Hl).
-Instance listset_nodup_difference: Difference C := λ l k,
-  let (l',Hl) := l in let (k',Hk) := k
-  in ListsetNoDup _ (NoDup_list_difference _ k' Hl).
+Instance listset_nodup_union: Union C :=
+  λ '(ListsetNoDup l Hl) '(ListsetNoDup k Hk),
+    ListsetNoDup _ (NoDup_list_union _ _ Hl Hk).
+Instance listset_nodup_intersection: Intersection C :=
+  λ '(ListsetNoDup l Hl) '(ListsetNoDup k Hk),
+    ListsetNoDup _ (NoDup_list_intersection _ k Hl).
+Instance listset_nodup_difference: Difference C :=
+  λ '(ListsetNoDup l Hl) '(ListsetNoDup k Hk),
+    ListsetNoDup _ (NoDup_list_difference _ k Hl).
 
 Instance: Set_ A C.
 Proof.

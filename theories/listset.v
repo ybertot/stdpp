@@ -15,8 +15,8 @@ Context {A : Type}.
 Global Instance listset_elem_of: ElemOf A (listset A) := λ x l, x ∈ listset_car l.
 Global Instance listset_empty: Empty (listset A) := Listset [].
 Global Instance listset_singleton: Singleton A (listset A) := λ x, Listset [x].
-Global Instance listset_union: Union (listset A) := λ l k,
-  let (l') := l in let (k') := k in Listset (l' ++ k').
+Global Instance listset_union: Union (listset A) := λ '(Listset l) '(Listset k),
+  Listset (l ++ k).
 Global Opaque listset_singleton listset_empty.
 
 Global Instance listset_simple_set : SemiSet A (listset A).
@@ -45,10 +45,10 @@ Proof using Aeq.
   refine (λ x X, cast_if (decide (x ∈ listset_car X))); done.
 Defined.
 
-Global Instance listset_intersection: Intersection (listset A) := λ l k,
-  let (l') := l in let (k') := k in Listset (list_intersection l' k').
-Global Instance listset_difference: Difference (listset A) := λ l k,
-  let (l') := l in let (k') := k in Listset (list_difference l' k').
+Global Instance listset_intersection: Intersection (listset A) :=
+  λ '(Listset l) '(Listset k), Listset (list_intersection l k).
+Global Instance listset_difference: Difference (listset A) :=
+  λ '(Listset l) '(Listset k), Listset (list_difference l k).
 
 Instance listset_set: Set_ A (listset A).
 Proof.
@@ -69,10 +69,10 @@ Qed.
 End listset.
 
 Instance listset_ret: MRet listset := λ A x, {[ x ]}.
-Instance listset_fmap: FMap listset := λ A B f l,
-  let (l') := l in Listset (f <$> l').
-Instance listset_bind: MBind listset := λ A B f l,
-  let (l') := l in Listset (mbind (listset_car ∘ f) l').
+Instance listset_fmap: FMap listset := λ A B f '(Listset l),
+  Listset (f <$> l).
+Instance listset_bind: MBind listset := λ A B f '(Listset l),
+  Listset (mbind (listset_car ∘ f) l).
 Instance listset_join: MJoin listset := λ A, mbind id.
 
 Instance listset_set_monad : MonadSet listset.
