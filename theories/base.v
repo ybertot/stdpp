@@ -1161,7 +1161,7 @@ Class SemiSet A C `{ElemOf A C,
 }.
 Class Set_ A C `{ElemOf A C, Empty C, Singleton A C,
     Union C, Intersection C, Difference C} : Prop := {
-  set_semi_set :>> SemiSet A C;
+  set_semi_set :> SemiSet A C;
   elem_of_intersection (X Y : C) (x : A) : x ∈ X ∩ Y ↔ x ∈ X ∧ x ∈ Y;
   elem_of_difference (X Y : C) (x : A) : x ∈ X ∖ Y ↔ x ∈ X ∧ x ∉ Y
 }.
@@ -1201,7 +1201,7 @@ Qed.
 anyway so as to avoid cycles in type class search. *)
 Class FinSet A C `{ElemOf A C, Empty C, Singleton A C, Union C,
     Intersection C, Difference C, Elements A C, EqDecision A} : Prop := {
-  fin_set_set :>> Set_ A C;
+  fin_set_set :> Set_ A C;
   elem_of_elements (X : C) x : x ∈ elements X ↔ x ∈ X;
   NoDup_elements (X : C) : NoDup (elements X)
 }.
