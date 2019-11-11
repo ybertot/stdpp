@@ -1082,6 +1082,27 @@ Section set_seq.
     SetUnfoldElemOf x (set_seq (C:=C) start len) (start ≤ x < start + len).
   Proof. constructor; apply elem_of_set_seq. Qed.
 
+  Lemma set_seq_len_pos n start len : n ∈ set_seq (C:=C) start len → 0 < len.
+  Proof. rewrite elem_of_set_seq. lia. Qed.
+
+  Lemma set_seq_subseteq start1 len1 start2 len2 :
+    0 < len1 →
+    set_seq (C:=C) start1 len1 ⊆ set_seq (C:=C) start2 len2 ↔
+      start2 ≤ start1 ∧ start1 + len1 ≤ start2 + len2.
+  Proof.
+    intros Hlen. set_unfold. split.
+    - intros Hx. pose proof (Hx start1). pose proof (Hx (start1 + len1 - 1)). lia.
+    - intros Heq x. lia.
+  Qed.
+
+  Lemma set_seq_subseteq_len_gt start1 len1 start2 len2 :
+    set_seq (C:=C) start1 len1 ⊆ set_seq (C:=C) start2 len2 → len1 ≤ len2.
+  Proof.
+    destruct len1 as [|len1].
+    - set_unfold. lia.
+    - rewrite set_seq_subseteq; lia.
+  Qed.
+
   Lemma set_seq_plus_disjoint start len1 len2 :
     set_seq (C:=C) start len1 ## set_seq (start + len1) len2.
   Proof. set_solver by lia. Qed.
