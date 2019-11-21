@@ -9,11 +9,11 @@ From stdpp Require Import pmap mapset propset.
 (** * The data structure *)
 (** We pack a [Pmap] together with a proof that ensures that all keys correspond
 to codes of actual elements of the countable type. *)
-Definition gmap_wf K `{Countable K} {A} : Pmap A → Prop :=
-  map_Forall (λ p _, encode (A:=K) <$> decode p = Some p).
+Definition gmap_wf K `{Countable K} {A} (m : Pmap A) : Prop :=
+  bool_decide (map_Forall (λ p _, encode (A:=K) <$> decode p = Some p) m).
 Record gmap K `{Countable K} A := GMap {
   gmap_car : Pmap A;
-  gmap_prf : bool_decide (gmap_wf K gmap_car)
+  gmap_prf : gmap_wf K gmap_car
 }.
 Arguments GMap {_ _ _ _} _ _ : assert.
 Arguments gmap_car {_ _ _ _} _ : assert.
@@ -30,50 +30,53 @@ Proof.
 Defined.
 
 (** * Operations on the data structure *)
-Instance gmap_lookup `{Countable K} {A} : Lookup K A (gmap K A) := λ i m,
-  let (m,_) := m in m !! encode i.
+Instance gmap_lookup `{Countable K} {A} : Lookup K A (gmap K A) :=
+  λ i '(GMap m _), m !! encode i.
 Instance gmap_empty `{Countable K} {A} : Empty (gmap K A) := GMap ∅ I.
 Global Opaque gmap_empty.
 Lemma gmap_partial_alter_wf `{Countable K} {A} (f : option A → option A) m i :
   gmap_wf K m → gmap_wf K (partial_alter f (encode (A:=K) i) m).
 Proof.
+  unfold gmap_wf; rewrite !bool_decide_spec.
   intros Hm p x. destruct (decide (encode i = p)) as [<-|?].
   - rewrite decode_encode; eauto.
   - rewrite lookup_partial_alter_ne by done. by apply Hm.
 Qed.
+
 Instance gmap_partial_alter `{Countable K} {A} :
-    PartialAlter K A (gmap K A) := λ f i m,
-  let (m,Hm) := m in GMap (partial_alter f (encode i) m)
-    (bool_decide_pack _ (gmap_partial_alter_wf f m i
-    (bool_decide_unpack _ Hm))).
+    PartialAlter K A (gmap K A) := λ f i '(GMap m Hm),
+  GMap (partial_alter f (encode i) m) (gmap_partial_alter_wf f m i Hm).
+
 Lemma gmap_fmap_wf `{Countable K} {A B} (f : A → B) m :
   gmap_wf K m → gmap_wf K (f <$> m).
-Proof. intros ? p x. rewrite lookup_fmap, fmap_Some; intros (?&?&?); eauto. Qed.
-Instance gmap_fmap `{Countable K} : FMap (gmap K) := λ A B f m,
-  let (m,Hm) := m in GMap (f <$> m)
-    (bool_decide_pack _ (gmap_fmap_wf f m (bool_decide_unpack _ Hm))).
+Proof.
+  unfold gmap_wf; rewrite !bool_decide_spec.
+  intros ? p x. rewrite lookup_fmap, fmap_Some; intros (?&?&?); eauto.
+Qed.
+Instance gmap_fmap `{Countable K} : FMap (gmap K) := λ A B f '(GMap m Hm),
+  GMap (f <$> m) (gmap_fmap_wf f m Hm).
 Lemma gmap_omap_wf `{Countable K} {A B} (f : A → option B) m :
   gmap_wf K m → gmap_wf K (omap f m).
-Proof. intros ? p x; rewrite lookup_omap, bind_Some; intros (?&?&?); eauto. Qed.
-Instance gmap_omap `{Countable K} : OMap (gmap K) := λ A B f m,
-  let (m,Hm) := m in GMap (omap f m)
-    (bool_decide_pack _ (gmap_omap_wf f m (bool_decide_unpack _ Hm))).
+Proof.
+  unfold gmap_wf; rewrite !bool_decide_spec.
+  intros ? p x; rewrite lookup_omap, bind_Some; intros (?&?&?); eauto.
+Qed.
+Instance gmap_omap `{Countable K} : OMap (gmap K) := λ A B f '(GMap m Hm),
+  GMap (omap f m) (gmap_omap_wf f m Hm).
 Lemma gmap_merge_wf `{Countable K} {A B C}
     (f : option A → option B → option C) m1 m2 :
   let f' o1 o2 := match o1, o2 with None, None => None | _, _ => f o1 o2 end in
   gmap_wf K m1 → gmap_wf K m2 → gmap_wf K (merge f' m1 m2).
 Proof.
-  intros f' Hm1 Hm2 p z; rewrite lookup_merge by done; intros.
+  intros f'; unfold gmap_wf; rewrite !bool_decide_spec.
+  intros Hm1 Hm2 p z; rewrite lookup_merge by done; intros.
   destruct (m1 !! _) eqn:?, (m2 !! _) eqn:?; naive_solver.
 Qed.
-Instance gmap_merge `{Countable K} : Merge (gmap K) := λ A B C f m1 m2,
-  let (m1,Hm1) := m1 in let (m2,Hm2) := m2 in
+Instance gmap_merge `{Countable K} : Merge (gmap K) := λ A B C f '(GMap m1 Hm1) '(GMap m2 Hm2),
   let f' o1 o2 := match o1, o2 with None, None => None | _, _ => f o1 o2 end in
-  GMap (merge f' m1 m2) (bool_decide_pack _ (gmap_merge_wf f _ _
-    (bool_decide_unpack _ Hm1) (bool_decide_unpack _ Hm2))).
-Instance gmap_to_list `{Countable K} {A} : FinMapToList K A (gmap K A) := λ m,
-  let (m,_) := m in omap (λ ix : positive * A,
-    let (i,x) := ix in (., x) <$> decode i) (map_to_list m).
+  GMap (merge f' m1 m2) (gmap_merge_wf f m1 m2 Hm1 Hm2).
+Instance gmap_to_list `{Countable K} {A} : FinMapToList K A (gmap K A) := λ '(GMap m _),
+  omap (λ '(i, x), (., x) <$> decode i) (map_to_list m).
 
 (** * Instantiation of the finite map interface *)
 Instance gmap_finmap `{Countable K} : FinMap K (gmap K).
@@ -130,7 +133,7 @@ Definition gmap_curry `{Countable K1, Countable K2} {A} :
     map_fold (λ i2 x, <[(i1,i2):=x]>) macc m') ∅.
 Definition gmap_uncurry `{Countable K1, Countable K2} {A} :
     gmap (K1 * K2) A → gmap K1 (gmap K2 A) :=
-  map_fold (λ ii x, let '(i1,i2) := ii in
+  map_fold (λ '(i1, i2) x,
     partial_alter (Some ∘ <[i2:=x]> ∘ default ∅) i1) ∅.
 
 Section curry_uncurry.

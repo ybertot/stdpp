@@ -319,10 +319,10 @@ Qed.
 
 (** * Conversion to and from gsets of positives *)
 Lemma coPset_to_gset_wf (m : Pmap ()) : gmap_wf positive m.
-Proof. done. Qed.
+Proof. unfold gmap_wf. by rewrite bool_decide_spec. Qed.
 Definition coPset_to_gset (X : coPset) : gset positive :=
   let 'Mapset m := coPset_to_Pset X in
-  Mapset (GMap m (bool_decide_pack _ (coPset_to_gset_wf m))).
+  Mapset (GMap m (coPset_to_gset_wf m)).
 
 Definition gset_to_coPset (X : gset positive) : coPset :=
   let 'Mapset (GMap (PMap t Ht) _) := X in Pset_to_coPset_raw t ↾ Pset_to_coPset_wf _ Ht.
