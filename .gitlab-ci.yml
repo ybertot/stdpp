@@ -38,6 +38,7 @@ build-coq.8.11.dev:
   variables:
     OPAM_PINS: "coq version 8.11.dev"
     CI_COQCHK: "1"
+  allow_failure: true # FIXME https://github.com/coq/coq/issues/11161
 
 build-coq.8.10.1:
   <<: *template
