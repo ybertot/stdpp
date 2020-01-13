@@ -47,7 +47,7 @@ build-coq.8.10.2:
   variables:
     OPAM_PINS: "coq version 8.10.2"
     OPAM_PKG: "coq-stdpp"
-    DOC_DIR: "coqdoc@center.mpi-sws.org:stdpp"
+#    DOC_DIR: "coqdoc@center.mpi-sws.org:stdpp"
     TIMING_CONF: "coq-8.10.2"
   tags:
   - fp-timing
