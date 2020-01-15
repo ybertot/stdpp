@@ -209,7 +209,7 @@ Proof. by destruct mx. Qed.
 Lemma option_fmap_ext {A B} (f g : A → B) mx :
   (∀ x, f x = g x) → f <$> mx = g <$> mx.
 Proof. intros; destruct mx; f_equal/=; auto. Qed.
-Lemma option_fmap_equiv_ext `{Equiv A, Equiv B} (f g : A → B) (mx : option A) :
+Lemma option_fmap_equiv_ext {A} `{Equiv B} (f g : A → B) (mx : option A) :
   (∀ x, f x ≡ g x) → f <$> mx ≡ g <$> mx.
 Proof. destruct mx; constructor; auto. Qed.
 Lemma option_fmap_bind {A B C} (f : A → B) (g : B → option C) mx :
