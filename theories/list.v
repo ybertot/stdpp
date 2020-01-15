@@ -482,6 +482,8 @@ Lemma nil_or_length_pos l : l = [] ∨ length l ≠ 0.
 Proof. destruct l; simpl; auto with lia. Qed.
 Lemma nil_length_inv l : length l = 0 → l = [].
 Proof. by destruct l. Qed.
+Lemma lookup_cons_ne_0 l x i : i ≠ 0 → (x :: l) !! i = l !! pred i.
+Proof. by destruct i. Qed.
 Lemma lookup_nil i : @nil A !! i = None.
 Proof. by destruct i. Qed.
 Lemma lookup_tail l i : tail l !! i = l !! S i.
