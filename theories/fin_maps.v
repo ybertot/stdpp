@@ -1336,6 +1336,10 @@ Proof.
   unfold map_zip_with. rewrite lookup_merge by done.
   by destruct (m1 !! i), (m2 !! i).
 Qed.
+Lemma map_lookup_zip_with_Some {A B C} (f : A → B → C) (m1 : M A) (m2 : M B) i z :
+  map_zip_with f m1 m2 !! i = Some z ↔
+    ∃ x y, z = f x y ∧ m1 !! i = Some x ∧ m2 !! i = Some y.
+Proof. rewrite map_lookup_zip_with. destruct (m1 !! i), (m2 !! i); naive_solver. Qed.
 
 Lemma map_zip_with_empty {A B C} (f : A → B → C) :
   map_zip_with f (∅ : M A) (∅ : M B) = ∅.
