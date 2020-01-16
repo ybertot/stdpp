@@ -214,6 +214,13 @@ Section setoid.
   Proof.
     intros ? m m' ? k; rewrite !lookup_fmap. by apply option_fmap_proper.
   Qed.
+  Global Instance map_zip_with_proper `{Equiv B, Equiv C} (f : A → B → C) :
+    Proper ((≡) ==> (≡) ==> (≡)) f →
+    Proper ((≡) ==> (≡) ==> (≡)) (map_zip_with (M:=M) f).
+  Proof.
+    intros Hf m1 m1' Hm1 m2 m2' Hm2. apply merge_ext; try done.
+    destruct 1; destruct 1; repeat f_equiv; constructor || done.
+  Qed.
 End setoid.
 
 (** ** General properties *)
