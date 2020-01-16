@@ -3770,6 +3770,10 @@ Section zip_with.
     revert k i. induction l; intros [|??] [|?]; f_equal/=; auto.
     by destruct (_ !! _).
   Qed.
+  Lemma lookup_zip_with_Some l k i z :
+    zip_with f l k !! i = Some z
+    ↔ ∃ x y, z = f x y ∧ l !! i = Some x ∧ k !! i = Some y.
+  Proof. rewrite lookup_zip_with. destruct (l !! i), (k !! i); naive_solver. Qed.
   Lemma insert_zip_with l k i x y :
     <[i:=f x y]>(zip_with f l k) = zip_with f (<[i:=x]>l) (<[i:=y]>k).
   Proof. revert i k. induction l; intros [|?] [|??]; f_equal/=; auto. Qed.
