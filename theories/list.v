@@ -777,15 +777,6 @@ Proof.
     exists l1, (l2 ++ [y]).
     rewrite elem_of_app, elem_of_list_singleton, <-(assoc_L (++)). naive_solver.
 Qed.
-Lemma elem_of_list_omap {B} (f : A → option B) l (y : B) :
-  y ∈ omap f l ↔ ∃ x, x ∈ l ∧ f x = Some y.
-Proof.
-  split.
-  - induction l as [|x l]; csimpl; repeat case_match; inversion 1; subst;
-      setoid_rewrite elem_of_cons; naive_solver.
-  - intros (x&Hx&?). by induction Hx; csimpl; repeat case_match;
-      simplify_eq; try constructor; auto.
-Qed.
 Lemma list_elem_of_insert l i x : i < length l → x ∈ <[i:=x]>l.
 Proof. intros. by eapply elem_of_list_lookup_2, list_lookup_insert. Qed.
 Lemma nth_elem_of l i d : i < length l → nth i l d ∈ l.
@@ -929,23 +920,6 @@ Section list_set.
     - done.
   Qed.
 End list_set.
-
-(** ** Properties of the [omap] function *)
-Lemma list_fmap_omap {B C : Type} (f : A → option B) (g : B → C) (l : list A) :
-  g <$> omap f l = omap (λ x, g <$> (f x)) l.
-Proof.
-  induction l as [|x y IH]; [done|]. csimpl.
-  destruct (f x); [|done]. csimpl. by f_equal.
-Qed.
-Lemma list_omap_ext {B C : Type} (f : A → option C) (g : B → option C)
-      (l1 : list A) (l2 : list B) :
-  Forall2 (λ a b, f a = g b) l1 l2 →
-  omap f l1 = omap g l2.
-Proof.
-  induction 1 as [|x y l l' Hfg ? IH]; [done|].
-  csimpl. rewrite Hfg. destruct (g y); [|done].
-  by f_equal.
-Qed.
 
 (** ** Properties of the [reverse] function *)
 Lemma reverse_nil : reverse [] =@{list A} [].
@@ -1425,59 +1399,6 @@ Proof.
     take_app_alt by (rewrite ?app_length, ?take_length, ?Hk; lia).
 Qed.
 
-(** ** Properties of the [imap] function *)
-Lemma imap_nil {B} (f : nat → A → B) : imap f [] = [].
-Proof. done. Qed.
-Lemma imap_app {B} (f : nat → A → B) l1 l2 :
-  imap f (l1 ++ l2) = imap f l1 ++ imap (λ n, f (length l1 + n)) l2.
-Proof.
-  revert f. induction l1 as [|x l1 IH]; intros f; f_equal/=; auto.
-  by rewrite IH.
-Qed.
-Lemma imap_cons {B} (f : nat → A → B) x l :
-  imap f (x :: l) = f 0 x :: imap (f ∘ S) l.
-Proof. done. Qed.
-
-Lemma imap_ext {B} (f g : nat → A → B) l :
-  (∀ i x, l !! i = Some x → f i x = g i x) → imap f l = imap g l.
-Proof. revert f g; induction l as [|x l IH]; intros; f_equal/=; eauto. Qed.
-
-Lemma imap_fmap {B C} (f : nat → B → C) (g : A → B) l :
-  imap f (g <$> l) = imap (λ n, f n ∘ g) l.
-Proof. revert f. induction l; intros; f_equal/=; eauto. Qed.
-
-Lemma fmap_imap {B C} (f : nat → A → B) (g : B → C) l :
-  g <$> imap f l = imap (λ n, g ∘ f n) l.
-Proof. revert f. induction l; intros; f_equal/=; eauto. Qed.
-
-Lemma imap_const {B} (f : A → B) l : imap (const f) l = f <$> l.
-Proof. induction l; f_equal/=; auto. Qed.
-
-Lemma list_lookup_imap {B} (f : nat → A → B) l i : imap f l !! i = f i <$> l !! i.
-Proof.
-  revert f i. induction l as [|x l IH]; intros f [|i]; f_equal/=; auto.
-  by rewrite IH.
-Qed.
-
-Lemma imap_length {B} (f : nat → A → B) l :
-  length (imap f l) = length l.
-Proof. revert f. induction l; simpl; eauto. Qed.
-
-Lemma elem_of_lookup_imap_1 {B} (f : nat → A → B) l (x : B) :
-  x ∈ imap f l → ∃ i y, x = f i y ∧ l !! i = Some y.
-Proof.
-  intros [i Hin]%elem_of_list_lookup. rewrite list_lookup_imap in Hin.
-  simplify_option_eq; naive_solver.
-Qed.
-Lemma elem_of_lookup_imap_2 {B} (f : nat → A → B) l x i : l !! i = Some x → f i x ∈ imap f l.
-Proof.
-  intros Hl. rewrite elem_of_list_lookup.
-  exists i. by rewrite list_lookup_imap, Hl.
-Qed.
-Lemma elem_of_lookup_imap {B} (f : nat → A → B) l (x : B) :
-  x ∈ imap f l ↔ ∃ i y, x = f i y ∧ l !! i = Some y.
-Proof. naive_solver eauto using elem_of_lookup_imap_1, elem_of_lookup_imap_2. Qed.
-
 (** ** Properties of the [mask] function *)
 Lemma mask_nil f βs : mask f βs [] =@{list A} [].
 Proof. by destruct βs. Qed.
@@ -1524,40 +1445,6 @@ Lemma lookup_mask_notin f βs l i :
 Proof.
   revert i βs. induction l; intros [] [|[]] ?; simplify_eq/=; auto.
 Qed.
-
-(** ** Properties of the [seq] function *)
-Lemma fmap_seq j n : S <$> seq j n = seq (S j) n.
-Proof. revert j. induction n; intros; f_equal/=; auto. Qed.
-Lemma imap_seq {B} l (g : nat → B) i :
-  imap (λ j _, g (i + j)) l = g <$> seq i (length l).
-Proof.
-  revert i. induction l as [|x l IH]; [done|].
-  csimpl. intros n. rewrite <-IH, <-plus_n_O. f_equal.
-  apply imap_ext. intros. simpl. f_equal. lia.
-Qed.
-Lemma imap_seq_0 {B} l (g : nat → B) :
-  imap (λ j _, g j) l = g <$> seq 0 (length l).
-Proof. rewrite (imap_ext _ (λ i o, g (0 + i))%nat); [|done]. apply imap_seq. Qed.
-Lemma lookup_seq j n i : i < n → seq j n !! i = Some (j + i).
-Proof.
-  revert j i. induction n as [|n IH]; intros j [|i] ?; simpl; auto with lia.
-  rewrite IH; auto with lia.
-Qed.
-Lemma lookup_seq_ge j n i : n ≤ i → seq j n !! i = None.
-Proof. revert j i. induction n; intros j [|i] ?; simpl; auto with lia. Qed.
-Lemma lookup_seq_inv j n i j' : seq j n !! i = Some j' → j' = j + i ∧ i < n.
-Proof.
-  destruct (le_lt_dec n i); [by rewrite lookup_seq_ge|].
-  rewrite lookup_seq by done. intuition congruence.
-Qed.
-Lemma NoDup_seq j n : NoDup (seq j n).
-Proof. apply NoDup_ListNoDup, seq_NoDup. Qed.
-Lemma seq_S_end_app j n : seq j (S n) = seq j n ++ [j + n].
-Proof.
-  revert j. induction n as [|n IH]; intros j; simpl in *; f_equal; [done |].
-  rewrite IH. f_equal. f_equal. lia.
-Qed.
-
 
 (** ** Properties of the [Permutation] predicate *)
 Lemma Permutation_nil l : l ≡ₚ [] ↔ l = [].
@@ -2585,15 +2472,6 @@ End more_general_properties.
 Lemma Forall_swap {A B} (Q : A → B → Prop) l1 l2 :
   Forall (λ y, Forall (Q y) l1) l2 ↔ Forall (λ x, Forall (flip Q x) l2) l1.
 Proof. repeat setoid_rewrite Forall_forall. simpl. split; eauto. Qed.
-Lemma Forall_seq (P : nat → Prop) i n :
-  Forall P (seq i n) ↔ ∀ j, i ≤ j < i + n → P j.
-Proof.
-  rewrite Forall_lookup. split.
-  - intros H j [??]. apply (H (j - i)).
-    rewrite lookup_seq; auto with f_equal lia.
-  - intros H j x Hj. apply lookup_seq_inv in Hj.
-    destruct Hj; subst. auto with lia.
-Qed.
 
 Lemma Forall2_same_length {A B} (l : list A) (k : list B) :
   Forall2 (λ _ _, True) l k ↔ length l = length k.
@@ -3189,9 +3067,12 @@ Section fmap.
   Lemma list_fmap_ext (g : A → B) (l1 l2 : list A) :
     (∀ x, f x = g x) → l1 = l2 → fmap f l1 = fmap g l2.
   Proof. intros ? <-. induction l1; f_equal/=; auto. Qed.
-  Lemma list_fmap_equiv_ext `{Equiv B} (g : A → B) l :
+  Lemma list_fmap_equiv_ext `{!Equiv B} (g : A → B) l :
     (∀ x, f x ≡ g x) → f <$> l ≡ g <$> l.
   Proof. induction l; constructor; auto. Qed.
+  Global Instance list_fmap_proper `{!Equiv A, !Equiv B} :
+    Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡)) (fmap f).
+  Proof. induction 2; simpl; [constructor|solve_proper]. Qed.
 
   Global Instance fmap_inj: Inj (=) (=) f → Inj (=) (=) (fmap f).
   Proof.
@@ -3340,9 +3221,40 @@ Proof.
   - apply IH. intros. eapply Hunique; rewrite ?elem_of_cons; eauto.
 Qed.
 
-Global Instance omap_Permutation {A B} (f : A → option B) :
-  Proper ((≡ₚ) ==> (≡ₚ)) (omap f).
-Proof. induction 1; simpl; repeat case_match; econstructor; eauto. Qed.
+Section omap.
+  Context {A B : Type} (f : A → option B).
+  Implicit Types l : list A.
+
+  Lemma list_fmap_omap {C} (g : B → C) l :
+    g <$> omap f l = omap (λ x, g <$> (f x)) l.
+  Proof.
+    induction l as [|x y IH]; [done|]. csimpl.
+    destruct (f x); csimpl; [|done]. by f_equal.
+  Qed.
+  Lemma list_omap_ext {A'} (g : A' → option B) l1 (l2 : list A') :
+    Forall2 (λ a b, f a = g b) l1 l2 →
+    omap f l1 = omap g l2.
+  Proof.
+    induction 1 as [|x y l l' Hfg ? IH]; [done|].
+    csimpl. rewrite Hfg. destruct (g y); [|done]. by f_equal.
+  Qed.
+  Global Instance list_omap_proper `{!Equiv A, !Equiv B} :
+    Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡)) (omap f).
+  Proof.
+    intros Hf. induction 1 as [|x1 x2 l1 l2 Hx Hl]; csimpl; [constructor|].
+    destruct (Hf _ _ Hx); by repeat f_equiv.
+  Qed.
+  Lemma elem_of_list_omap l y : y ∈ omap f l ↔ ∃ x, x ∈ l ∧ f x = Some y.
+  Proof.
+    split.
+    - induction l as [|x l]; csimpl; repeat case_match; inversion 1; subst;
+        setoid_rewrite elem_of_cons; naive_solver.
+    - intros (x&Hx&?). by induction Hx; csimpl; repeat case_match;
+        simplify_eq; try constructor; auto.
+  Qed.
+  Global Instance omap_Permutation : Proper ((≡ₚ) ==> (≡ₚ)) (omap f).
+  Proof. induction 1; simpl; repeat case_match; econstructor; eauto. Qed.
+End omap.
 
 Section bind.
   Context {A B : Type} (f : A → list B).
@@ -3353,6 +3265,9 @@ Section bind.
   Lemma Forall_bind_ext (g : A → list B) (l : list A) :
     Forall (λ x, f x = g x) l → l ≫= f = l ≫= g.
   Proof. by induction 1; f_equal/=. Qed.
+  Global Instance list_bind_proper `{!Equiv A, !Equiv B} :
+    Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡)) (mbind f).
+  Proof. induction 2; simpl; [constructor|solve_proper]. Qed.
   Global Instance bind_sublist: Proper (sublist ==> sublist) (mbind f).
   Proof.
     induction 1; simpl; auto;
@@ -3405,9 +3320,11 @@ End bind.
 Section ret_join.
   Context {A : Type}.
 
+  Global Instance list_join_proper `{!Equiv A} : Proper ((≡) ==> (≡)) (mjoin (A:=A)).
+  Proof. induction 1; simpl; [constructor|solve_proper]. Qed.
   Lemma list_join_bind (ls : list (list A)) : mjoin ls = ls ≫= id.
   Proof. by induction ls; f_equal/=. Qed.
-  Global Instance mjoin_Permutation : Proper ((≡ₚ@{list A}) ==> (≡ₚ)) mjoin.
+  Global Instance join_Permutation : Proper ((≡ₚ@{list A}) ==> (≡ₚ)) mjoin.
   Proof. intros ?? E. by rewrite !list_join_bind, E. Qed.
   Lemma elem_of_list_ret (x y : A) : x ∈ @mret list _ A y ↔ x = y.
   Proof. apply elem_of_list_singleton. Qed.
@@ -3436,12 +3353,17 @@ Section mapM.
 
   Lemma mapM_ext (g : A → option B) l : (∀ x, f x = g x) → mapM f l = mapM g l.
   Proof. intros Hfg. by induction l; simpl; rewrite ?Hfg, ?IHl. Qed.
+  Global Instance mapM_proper `{!Equiv A, !Equiv B} :
+    Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡)) (mbind f).
+  Proof. induction 2; simpl; [solve_proper|constructor]. Qed.
+
   Lemma Forall2_mapM_ext (g : A → option B) l k :
     Forall2 (λ x y, f x = g y) l k → mapM f l = mapM g k.
   Proof. induction 1 as [|???? Hfg ? IH]; simpl. done. by rewrite Hfg, IH. Qed.
   Lemma Forall_mapM_ext (g : A → option B) l :
     Forall (λ x, f x = g x) l → mapM f l = mapM g l.
   Proof. induction 1 as [|?? Hfg ? IH]; simpl. done. by rewrite Hfg, IH. Qed.
+
   Lemma mapM_Some_1 l k : mapM f l = Some k → Forall2 (λ x y, f x = Some y) l k.
   Proof.
     revert k. induction l as [|x l]; intros [|y k]; simpl; try done.
@@ -3496,6 +3418,112 @@ Section mapM.
     mapM f l = Some k → (∀ x y, f x = Some y → g y = x) → g <$> k = l.
   Proof. eauto using mapM_fmap_Forall2_Some_inv, Forall2_true, mapM_length. Qed.
 End mapM.
+
+Lemma imap_const {A B} (f : A → B) l : imap (const f) l = f <$> l.
+Proof. induction l; f_equal/=; auto. Qed.
+
+Section imap.
+  Context {A B : Type} (f : nat → A → B).
+
+  Lemma imap_ext g l :
+    (∀ i x, l !! i = Some x → f i x = g i x) → imap f l = imap g l.
+  Proof. revert f g; induction l as [|x l IH]; intros; f_equal/=; eauto. Qed.
+  Global Instance imap_proper `{!Equiv A, !Equiv B} :
+    (∀ i, Proper ((≡) ==> (≡)) (f i)) → Proper ((≡) ==> (≡)) (imap f).
+  Proof.
+    intros Hf l1 l2 Hl. revert f Hf.
+    induction Hl; intros f Hf; simpl; [constructor|repeat f_equiv; naive_solver].
+  Qed.
+
+  Lemma imap_nil : imap f [] = [].
+  Proof. done. Qed.
+  Lemma imap_app l1 l2 :
+    imap f (l1 ++ l2) = imap f l1 ++ imap (λ n, f (length l1 + n)) l2.
+  Proof.
+    revert f. induction l1 as [|x l1 IH]; intros f; f_equal/=; auto.
+    by rewrite IH.
+  Qed.
+  Lemma imap_cons x l : imap f (x :: l) = f 0 x :: imap (f ∘ S) l.
+  Proof. done. Qed.
+
+  Lemma imap_fmap {C} (g : C → A) l : imap f (g <$> l) = imap (λ n, f n ∘ g) l.
+  Proof. revert f. induction l; intros; f_equal/=; eauto. Qed.
+  Lemma fmap_imap {C} (g : B → C) l : g <$> imap f l = imap (λ n, g ∘ f n) l.
+  Proof. revert f. induction l; intros; f_equal/=; eauto. Qed.
+
+  Lemma list_lookup_imap l i : imap f l !! i = f i <$> l !! i.
+  Proof.
+    revert f i. induction l as [|x l IH]; intros f [|i]; f_equal/=; auto.
+    by rewrite IH.
+  Qed.
+
+  Lemma imap_length l : length (imap f l) = length l.
+  Proof. revert f. induction l; simpl; eauto. Qed.
+
+  Lemma elem_of_lookup_imap_1 l x :
+    x ∈ imap f l → ∃ i y, x = f i y ∧ l !! i = Some y.
+  Proof.
+    intros [i Hin]%elem_of_list_lookup. rewrite list_lookup_imap in Hin.
+    simplify_option_eq; naive_solver.
+  Qed.
+  Lemma elem_of_lookup_imap_2 l x i : l !! i = Some x → f i x ∈ imap f l.
+  Proof.
+    intros Hl. rewrite elem_of_list_lookup.
+    exists i. by rewrite list_lookup_imap, Hl.
+  Qed.
+  Lemma elem_of_lookup_imap l x :
+    x ∈ imap f l ↔ ∃ i y, x = f i y ∧ l !! i = Some y.
+  Proof. naive_solver eauto using elem_of_lookup_imap_1, elem_of_lookup_imap_2. Qed.
+End imap.
+
+
+(** ** Properties of the [seq] function *)
+Section seq.
+  Implicit Types m n i j : nat.
+
+  Lemma fmap_seq j n : S <$> seq j n = seq (S j) n.
+  Proof. revert j. induction n; intros; f_equal/=; auto. Qed.
+  Lemma imap_seq {A} (l : list A) (g : nat → A) i :
+    imap (λ j _, g (i + j)) l = g <$> seq i (length l).
+  Proof.
+    revert i. induction l as [|x l IH]; [done|].
+    csimpl. intros n. rewrite <-IH, <-plus_n_O. f_equal.
+    apply imap_ext; simpl; auto with lia.
+  Qed.
+  Lemma imap_seq_0 {A} (l : list A) (g : nat → A) :
+    imap (λ j _, g j) l = g <$> seq 0 (length l).
+  Proof. rewrite (imap_ext _ (λ i o, g (0 + i))%nat); [|done]. apply imap_seq. Qed.
+  Lemma lookup_seq j n i : i < n → seq j n !! i = Some (j + i).
+  Proof.
+    revert j i. induction n as [|n IH]; intros j [|i] ?; simpl; auto with lia.
+    rewrite IH; auto with lia.
+  Qed.
+  Lemma lookup_seq_ge j n i : n ≤ i → seq j n !! i = None.
+  Proof. revert j i. induction n; intros j [|i] ?; simpl; auto with lia. Qed.
+  Lemma lookup_seq_inv j n i j' : seq j n !! i = Some j' → j' = j + i ∧ i < n.
+  Proof.
+    destruct (le_lt_dec n i); [by rewrite lookup_seq_ge|].
+    rewrite lookup_seq by done. intuition congruence.
+  Qed.
+  Lemma NoDup_seq j n : NoDup (seq j n).
+  Proof. apply NoDup_ListNoDup, seq_NoDup. Qed.
+  Lemma seq_S_end_app j n : seq j (S n) = seq j n ++ [j + n].
+  Proof.
+    revert j. induction n as [|n IH]; intros j; simpl in *; f_equal; [done |].
+    rewrite IH. f_equal. f_equal. lia.
+  Qed.
+
+  Lemma Forall_seq (P : nat → Prop) i n :
+    Forall P (seq i n) ↔ ∀ j, i ≤ j < i + n → P j.
+  Proof.
+    rewrite Forall_lookup. split.
+    - intros H j [??]. apply (H (j - i)).
+      rewrite lookup_seq; auto with f_equal lia.
+    - intros H j x Hj. apply lookup_seq_inv in Hj.
+      destruct Hj; subst. auto with lia.
+  Qed.
+End seq.
+
 
 (** ** Properties of the [seqZ] function *)
 Section seqZ.
@@ -3683,6 +3711,9 @@ Section zip_with.
   Implicit Types l : list A.
   Implicit Types k : list B.
 
+  Global Instance zip_with_proper `{!Equiv A, !Equiv B, !Equiv C} :
+    Proper ((≡) ==> (≡) ==> (≡)) f → Proper ((≡) ==> (≡) ==> (≡)) (zip_with f).
+  Proof. induction 2; destruct 1; simpl; [constructor..|repeat f_equiv; auto]. Qed.
   Lemma zip_with_nil_r l : zip_with f l [] = [].
   Proof. by destruct l. Qed.
   Lemma zip_with_app l1 l2 k1 k2 :
