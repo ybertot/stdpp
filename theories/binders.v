@@ -82,6 +82,9 @@ Section binder_delete_insert.
     Proper ((≡) ==> (≡) ==> (≡@{M A})) (binder_insert b).
   Proof. destruct b; solve_proper. Qed.
 
+  Lemma binder_delete_empty {A} b : binder_delete b ∅ =@{M A} ∅.
+  Proof. destruct b; simpl; auto using delete_empty. Qed.
+
   Lemma lookup_binder_delete_None {A} (m : M A) b s :
     binder_delete b m !! s = None ↔ b = BNamed s ∨ m !! s = None.
   Proof. destruct b; simpl; by rewrite ?lookup_delete_None; naive_solver. Qed.
