@@ -34,6 +34,7 @@ theories/numbers.v
 theories/nmap.v
 theories/zmap.v
 theories/coPset.v
+theories/coGset.v
 theories/lexico.v
 theories/propset.v
 theories/decidable.v
