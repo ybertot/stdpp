@@ -562,6 +562,10 @@ Section semi_set.
     Proof. unfold_leibniz. by rewrite empty_union_list. Qed. 
   End leibniz.
 
+  Lemma not_elem_of_iff `{!RelDecision (∈@{C})} X Y x :
+    (x ∈ X ↔ x ∈ Y) ↔ (x ∉ X ↔ x ∉ Y).
+  Proof. destruct (decide (x ∈ X)), (decide (x ∈ Y)); tauto. Qed.
+
   Section dec.
     Context `{!RelDecision (≡@{C})}.
     Lemma set_subseteq_inv X Y : X ⊆ Y → X ⊂ Y ∨ X ≡ Y.
