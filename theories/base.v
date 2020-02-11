@@ -1047,6 +1047,17 @@ Notation "( m !!.)" := (λ i, m !! i) (only parsing) : stdpp_scope.
 Notation "(.!! i )" := (lookup i) (only parsing) : stdpp_scope.
 Arguments lookup _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
+(** The function [lookup_total] should be the total over-approximation
+of the partial [lookup] function. *)
+Class LookupTotal (K A M : Type) := lookup_total : K → M → A.
+Hint Mode LookupTotal - - ! : typeclass_instances.
+Instance: Params (@lookup_total) 4 := {}.
+Notation "m !!! i" := (lookup_total i m) (at level 20) : stdpp_scope.
+Notation "(!!!)" := lookup_total (only parsing) : stdpp_scope.
+Notation "( m !!!.)" := (λ i, m !!! i) (only parsing) : stdpp_scope.
+Notation "(.!!! i )" := (lookup_total i) (only parsing) : stdpp_scope.
+Arguments lookup_total _ _ _ _ !_ !_ / : simpl nomatch, assert.
+
 (** The singleton map *)
 Class SingletonM K A M := singletonM: K → A → M.
 Hint Mode SingletonM - - ! : typeclass_instances.

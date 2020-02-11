@@ -70,6 +70,15 @@ Instance list_lookup {A} : Lookup nat A (list A) :=
   | [] => None | x :: l => match i with 0 => Some x | S i => l !! i end
   end.
 
+(** The operation [l !!! i] is a total version of the lookup operation
+[l !! i]. *)
+Instance list_lookup_total `{!Inhabited A} : LookupTotal nat A (list A) :=
+  fix go i l {struct l} : A := let _ : LookupTotal _ _ _ := @go in
+  match l with
+  | [] => inhabitant
+  | x :: l => match i with 0 => x | S i => l !!! i end
+  end.
+
 (** The operation [alter f i l] applies the function [f] to the [i]th element
 of [l]. In case [i] is out of bounds, the list is returned unchanged. *)
 Instance list_alter {A} : Alter nat A (list A) := λ f,
@@ -541,6 +550,19 @@ Lemma nth_lookup_or_length l i d : {l !! i = Some (nth i l d)} + {length l ≤ i
 Proof.
   rewrite nth_lookup. destruct (l !! i) eqn:?; eauto using lookup_ge_None_1.
 Qed.
+
+Lemma list_lookup_total_alt `{!Inhabited A} l i :
+  l !!! i = default inhabitant (l !! i).
+Proof. revert i. induction l; intros []; naive_solver. Qed.
+Lemma list_lookup_total_correct `{!Inhabited A} l i x :
+  l !! i = Some x → l !!! i = x.
+Proof. rewrite list_lookup_total_alt. by intros ->. Qed.
+Lemma list_lookup_lookup_total `{!Inhabited A} l i :
+  is_Some (l !! i) → l !! i = Some (l !!! i).
+Proof. rewrite list_lookup_total_alt; by intros [x ->]. Qed.
+Lemma list_lookup_lookup_total_lt `{!Inhabited A} l i :
+  i < length l → l !! i = Some (l !!! i).
+Proof. intros ?. by apply list_lookup_lookup_total, lookup_lt_is_Some_2. Qed.
 
 Lemma list_insert_alter l i x : <[i:=x]>l = alter (λ _, x) i l.
 Proof. by revert i; induction l; intros []; intros; f_equal/=. Qed.
@@ -2966,6 +2988,10 @@ Section setoid.
   Proof. induction n; destruct 1; simpl; try constructor; auto. Qed.
   Global Instance list_lookup_proper i : Proper ((≡@{list A}) ==> (≡)) (lookup i).
   Proof. induction i; destruct 1; simpl; try constructor; auto. Qed.
+  Global Instance list_lookup_total_proper `{!Inhabited A} i :
+    Proper (≡) inhabitant →
+    Proper ((≡@{list A}) ==> (≡)) (lookup_total i).
+  Proof. intros ?. induction i; destruct 1; simpl; auto. Qed.
   Global Instance list_alter_proper f i :
     Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡@{list A})) (alter f i).
   Proof. intros. induction i; destruct 1; constructor; eauto. Qed.

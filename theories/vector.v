@@ -31,10 +31,26 @@ Notation "(+++)" := vapp (only parsing) : vector_scope.
 Notation "( v +++.)" := (vapp v) (only parsing) : vector_scope.
 Notation "(.+++ w )" := (λ v, vapp v w) (only parsing) : vector_scope.
 
+(** Similar to [fin], we provide an inversion principle that keeps the length
+fixed. We define a tactic [inv_vec v] to perform case analysis on [v], using
+this inversion principle. *)
+Notation vec_0_inv := Vector.case0.
+Definition vec_S_inv {A n} (P : vec A (S n) → Type)
+  (Hcons : ∀ x v, P (x ::: v)) v : P v.
+Proof.
+  revert P Hcons.
+  refine match v with [#] => tt | x ::: v => λ P Hcons, Hcons x v end.
+Defined.
+
 (** Notice that we cannot define [Vector.nth] as an instance of our [Lookup]
 type class, as it has a dependent type. *)
 Arguments Vector.nth {_ _} !_ !_%fin /.
-Infix "!!!" := Vector.nth (at level 20) : vector_scope.
+Instance vector_lookup_total A : ∀ m, LookupTotal (fin m) A (vec A m) :=
+  fix go m i {struct i} := let _ : ∀ m, LookupTotal _ _ _ := @go in
+  match i in fin m return vec A m → A with
+  | 0%fin => vec_S_inv (λ _, A) (λ x _, x)
+  | FS j => vec_S_inv (λ _, A) (λ _ v, v !!! j)
+  end.
 
 (** The tactic [vec_double_ind v1 v2] performs double induction on [v1] and [v2]
 provided that they have the same length. *)
@@ -69,17 +85,6 @@ Proof.
   (left _)
   (λ _ _ _ H x y, cast_if_and (dec x y) H));
   f_equal; eauto using vcons_inj_1, vcons_inj_2.
-Defined.
-
-(** Similar to [fin], we provide an inversion principle that keeps the length
-fixed. We define a tactic [inv_vec v] to perform case analysis on [v], using
-this inversion principle. *)
-Notation vec_0_inv := Vector.case0.
-Definition vec_S_inv {A n} (P : vec A (S n) → Type)
-  (Hcons : ∀ x v, P (x ::: v)) v : P v.
-Proof.
-  revert P Hcons.
-  refine match v with [#] => tt | x ::: v => λ P Hcons, Hcons x v end.
 Defined.
 
 Ltac inv_vec v :=
@@ -213,7 +218,7 @@ Notation vmap := Vector.map.
 
 Lemma vlookup_map `(f : A → B) {n} (v : vec A n) i :
   vmap f v !!! i = f (v !!! i).
-Proof. by apply Vector.nth_map. Qed.
+Proof. by induction v; inv_fin i; eauto. Qed.
 Lemma vec_to_list_map `(f : A → B) {n} (v : vec A n) :
   vec_to_list (vmap f v) = f <$> vec_to_list v.
 Proof. induction v; simpl. done. by rewrite IHv. Qed.
@@ -224,7 +229,12 @@ Notation vzip_with := Vector.map2.
 
 Lemma vlookup_zip_with `(f : A → B → C) {n} (v1 : vec A n) (v2 : vec B n) i :
   vzip_with f v1 v2 !!! i = f (v1 !!! i) (v2 !!! i).
-Proof. by apply Vector.nth_map2. Qed.
+Proof.
+  vec_double_ind v1 v2.
+  - intros i; inv_fin i.
+  - intros n v1 v2 IH a b i.
+    inv_fin i; eauto.
+Qed.
 Lemma vec_to_list_zip_with `(f : A → B → C) {n} (v1 : vec A n) (v2 : vec B n) :
   vec_to_list (vzip_with f v1 v2) =
     zip_with f (vec_to_list v1) (vec_to_list v2).

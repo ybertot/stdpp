@@ -19,6 +19,10 @@ Class FinMapDom K M D `{∀ A, Dom (M A) D, FMap M,
 Section fin_map_dom.
 Context `{FinMapDom K M D}.
 
+Lemma lookup_lookup_total_dom `{!Inhabited A} (m : M A) i :
+  i ∈ dom D m → m !! i = Some (m !!! i).
+Proof. rewrite elem_of_dom. apply lookup_lookup_total. Qed.
+
 Lemma dom_map_filter {A} (P : K * A → Prop) `{!∀ x, Decision (P x)} (m : M A) X :
   (∀ i, i ∈ X ↔ ∃ x, m !! i = Some x ∧ P (i, x)) →
   dom D (filter P m) ≡ X.
