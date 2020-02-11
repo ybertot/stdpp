@@ -144,6 +144,10 @@ Fixpoint map_seq `{Insert nat A M, Empty M} (start : nat) (xs : list A) : M :=
   | x :: xs => <[start:=x]> (map_seq (S start) xs)
   end.
 
+Instance finmap_lookup_total `{!Lookup K A (M A), !Inhabited A} : LookupTotal K A (M A) | 20 :=
+  λ i m, default inhabitant (m !! i).
+Typeclasses Opaque finmap_lookup_total.
+
 (** * Theorems *)
 Section theorems.
 Context `{FinMap K M}.
@@ -165,6 +169,13 @@ Section setoid.
   Qed.
   Global Instance lookup_proper (i : K) : Proper ((≡@{M A}) ==> (≡)) (lookup i).
   Proof. by intros m1 m2 Hm. Qed.
+  Global Instance lookup_total_proper (i : K) `{!Inhabited A} :
+    Proper (≡@{A}) inhabitant →
+    Proper ((≡@{M A}) ==> (≡)) (lookup_total i).
+  Proof.
+    intros ? m1 m2 Hm. unfold lookup_total, finmap_lookup_total.
+    apply from_option_proper; auto. by intros ??.
+  Qed.
   Global Instance partial_alter_proper :
     Proper (((≡) ==> (≡)) ==> (=) ==> (≡) ==> (≡@{M A})) partial_alter.
   Proof.
@@ -246,6 +257,15 @@ Proof.
   intros m1 m2; rewrite !map_subseteq_spec.
   intros; apply map_eq; intros i; apply option_eq; naive_solver.
 Qed.
+Lemma lookup_total_alt `{!Inhabited A} (m : M A) i :
+  m !!! i = default inhabitant (m !! i).
+Proof. reflexivity. Qed.
+Lemma lookup_total_correct `{!Inhabited A} (m : M A) i x :
+  m !! i = Some x → m !!! i = x.
+Proof. rewrite lookup_total_alt. by intros ->. Qed.
+Lemma lookup_lookup_total `{!Inhabited A} (m : M A) i :
+  is_Some (m !! i) → m !! i = Some (m !!! i).
+Proof. intros [x Hx]. by rewrite (lookup_total_correct m i x). Qed.
 Lemma lookup_weaken {A} (m1 m2 : M A) i x :
   m1 !! i = Some x → m1 ⊆ m2 → m2 !! i = Some x.
 Proof. rewrite !map_subseteq_spec. auto. Qed.
