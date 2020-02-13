@@ -368,6 +368,8 @@ Proof. intros n1 n2. apply Nat2Z.inj. Qed.
 Instance Z_eq_dec: EqDecision Z := Z.eq_dec.
 Instance Z_le_dec: RelDecision Z.le := Z_le_dec.
 Instance Z_lt_dec: RelDecision Z.lt := Z_lt_dec.
+Instance Z_ge_dec: RelDecision Z.ge := Z_ge_dec.
+Instance Z_gt_dec: RelDecision Z.gt := Z_gt_dec.
 Instance Z_inhabited: Inhabited Z := populate 1.
 Instance Z_lt_pi x y : ProofIrrel (x < y).
 Proof. unfold Z.lt. apply _. Qed.
