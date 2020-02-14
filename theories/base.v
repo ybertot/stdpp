@@ -413,6 +413,8 @@ Class TotalOrder {A} (R : relation A) : Prop := {
 }.
 
 (** * Logic *)
+Instance prop_inhabited : Inhabited Prop := populate True.
+
 Notation "(∧)" := and (only parsing) : stdpp_scope.
 Notation "( A ∧.)" := (and A) (only parsing) : stdpp_scope.
 Notation "(.∧ B )" := (λ A, A ∧ B) (only parsing) : stdpp_scope.
