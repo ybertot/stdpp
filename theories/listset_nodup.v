@@ -17,17 +17,17 @@ Section list_set.
 Context `{EqDecision A}.
 Notation C := (listset_nodup A).
 
-Instance listset_nodup_elem_of: ElemOf A C := λ x l, x ∈ listset_nodup_car l.
-Instance listset_nodup_empty: Empty C := ListsetNoDup [] (@NoDup_nil_2 _).
-Instance listset_nodup_singleton: Singleton A C := λ x,
+Global Instance listset_nodup_elem_of: ElemOf A C := λ x l, x ∈ listset_nodup_car l.
+Global Instance listset_nodup_empty: Empty C := ListsetNoDup [] (@NoDup_nil_2 _).
+Global Instance listset_nodup_singleton: Singleton A C := λ x,
   ListsetNoDup [x] (NoDup_singleton x).
-Instance listset_nodup_union: Union C :=
+Global Instance listset_nodup_union: Union C :=
   λ '(ListsetNoDup l Hl) '(ListsetNoDup k Hk),
     ListsetNoDup _ (NoDup_list_union _ _ Hl Hk).
-Instance listset_nodup_intersection: Intersection C :=
+Global Instance listset_nodup_intersection: Intersection C :=
   λ '(ListsetNoDup l Hl) '(ListsetNoDup k Hk),
     ListsetNoDup _ (NoDup_list_intersection _ k Hl).
-Instance listset_nodup_difference: Difference C :=
+Global Instance listset_nodup_difference: Difference C :=
   λ '(ListsetNoDup l Hl) '(ListsetNoDup k Hk),
     ListsetNoDup _ (NoDup_list_difference _ k Hl).
 
@@ -45,18 +45,3 @@ Global Instance listset_nodup_elems: Elements A C := listset_nodup_car.
 Global Instance listset_nodup_fin_set: FinSet A C.
 Proof. split. apply _. done. by intros [??]. Qed.
 End list_set.
-
-Hint Extern 1 (ElemOf _ (listset_nodup _)) =>
-  eapply @listset_nodup_elem_of : typeclass_instances.
-Hint Extern 1 (Empty (listset_nodup _)) =>
-  eapply @listset_nodup_empty : typeclass_instances.
-Hint Extern 1 (Singleton _ (listset_nodup _)) =>
-  eapply @listset_nodup_singleton : typeclass_instances.
-Hint Extern 1 (Union (listset_nodup _)) =>
-  eapply @listset_nodup_union : typeclass_instances.
-Hint Extern 1 (Intersection (listset_nodup _)) =>
-  eapply @listset_nodup_intersection : typeclass_instances.
-Hint Extern 1 (Difference (listset_nodup _)) =>
-  eapply @listset_nodup_difference : typeclass_instances.
-Hint Extern 1 (Elements _ (listset_nodup _)) =>
-  eapply @listset_nodup_elems : typeclass_instances.
