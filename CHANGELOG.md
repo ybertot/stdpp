@@ -11,6 +11,8 @@ API-breaking change is listed.
   example, change `(!! i)` into `(.!! x)` so that `!!` can also be used as a
   prefix, as done in VST. A sed script to perform the renaming can be found at:
   https://gitlab.mpi-sws.org/iris/stdpp/merge_requests/93
+- Add type class `TopSet` for sets with a `⊤` element. Provide instances for
+  `boolset`, `propset`, and `coPset`.
 
 ## std++ 1.2.1 (released 2019-08-29)
 
