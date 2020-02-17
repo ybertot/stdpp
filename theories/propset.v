@@ -21,18 +21,13 @@ Instance propset_intersection {A} : Intersection (propset A) := λ X1 X2,
   {[ x | x ∈ X1 ∧ x ∈ X2 ]}.
 Instance propset_difference {A} : Difference (propset A) := λ X1 X2,
   {[ x | x ∈ X1 ∧ x ∉ X2 ]}.
-Instance propset_set : Set_ A (propset A).
-Proof. split; [split | |]; by repeat intro. Qed.
+Instance propset_top_set {A} : TopSet A (propset A).
+Proof. split; [split; [split| |]|]; by repeat intro. Qed.
 
-Lemma elem_of_top {A} (x : A) : x ∈ (⊤ : propset A) ↔ True.
-Proof. done. Qed.
 Lemma elem_of_PropSet {A} (P : A → Prop) x : x ∈ {[ x | P x ]} ↔ P x.
 Proof. done. Qed.
 Lemma not_elem_of_PropSet {A} (P : A → Prop) x : x ∉ {[ x | P x ]} ↔ ¬P x.
 Proof. done. Qed.
-Lemma top_subseteq {A} (X : propset A) : X ⊆ ⊤.
-Proof. done. Qed.
-Hint Resolve top_subseteq : core.
 
 Definition set_to_propset `{ElemOf A C} (X : C) : propset A :=
   {[ x | x ∈ X ]}.
@@ -50,8 +45,6 @@ Instance propset_join : MJoin propset := λ A (XX : propset (propset A)),
 Instance propset_monad_set : MonadSet propset.
 Proof. by split; try apply _. Qed.
 
-Instance set_unfold_propset_top {A} (x : A) : SetUnfoldElemOf x (⊤ : propset A) True.
-Proof. by constructor. Qed.
 Instance set_unfold_PropSet {A} (P : A → Prop) x Q :
   SetUnfoldSimpl (P x) Q → SetUnfoldElemOf x (PropSet P) Q.
 Proof. intros HPQ. constructor. apply HPQ. Qed.

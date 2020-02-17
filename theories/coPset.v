@@ -169,9 +169,9 @@ Instance coPset_difference : Difference coPset := λ X Y,
   let (t1,Ht1) := X in let (t2,Ht2) := Y in
   (t1 ∩ coPset_opp_raw t2) ↾ coPset_intersection_wf _ _ Ht1 (coPset_opp_wf _).
 
-Instance coPset_set : Set_ positive coPset.
+Instance coPset_top_set : TopSet positive coPset.
 Proof.
-  split; [split| |].
+  split; [split; [split| |]|].
   - by intros ??.
   - intros p q. apply coPset_elem_of_singleton.
   - intros [t] [t'] p; unfold elem_of, coPset_elem_of, coPset_union; simpl.
@@ -181,6 +181,7 @@ Proof.
   - intros [t] [t'] p; unfold elem_of, coPset_elem_of, coPset_difference; simpl.
     by rewrite coPset_elem_of_intersection,
       coPset_elem_of_opp, andb_True, negb_True.
+  - done.
 Qed.
 
 Instance coPset_leibniz : LeibnizEquiv coPset.
@@ -203,11 +204,6 @@ Instance mapset_subseteq_dec : RelDecision (⊆@{coPset}).
 Proof.
  refine (λ X Y, cast_if (decide (X ∪ Y = Y))); abstract (by rewrite subseteq_union_L).
 Defined.
-
-(** * Top *)
-Lemma coPset_top_subseteq (X : coPset) : X ⊆ ⊤.
-Proof. done. Qed.
-Hint Resolve coPset_top_subseteq : core.
 
 (** * Finite sets *)
 Fixpoint coPset_finite (t : coPset_raw) : bool :=

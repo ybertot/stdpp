@@ -242,6 +242,10 @@ Section set_unfold.
   Qed.
 End set_unfold.
 
+Instance set_unfold_top `{TopSet A C} (x : A) :
+  SetUnfoldElemOf x (⊤ : C) True.
+Proof. constructor. split; [done|intros; apply elem_of_top']. Qed.
+
 Section set_unfold_monad.
   Context `{MonadSet M}.
 
@@ -791,6 +795,19 @@ Section set.
     Proof. unfold_leibniz. apply singleton_union_difference. Qed.
   End dec.
 End set.
+
+
+(** * Sets with [∪], [∩], [∖], [∅], [{[_]}], and [⊤] *)
+Section top_set.
+  Context `{TopSet A C}.
+  Implicit Types x y : A.
+  Implicit Types X Y : C.
+
+  Lemma elem_of_top x : x ∈@{C} ⊤ ↔ True.
+  Proof. split; [done|intros; apply elem_of_top']. Qed.
+  Lemma top_subseteq X : X ⊆ ⊤.
+  Proof. intros x. by rewrite elem_of_top. Qed.
+End top_set.
 
 
 (** * Conversion of option and list *)
