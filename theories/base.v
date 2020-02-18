@@ -1158,17 +1158,62 @@ Notation "<[ k := a ]{ Γ }>" := (insertE Γ k a)
 Arguments insertE _ _ _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 
 
+(** * Notations for lattices. *)
+(** SqSubsetEq registers the "canonical" partial order for a type, and is used
+for the \sqsubseteq symbol. *)
+Class SqSubsetEq A := sqsubseteq: relation A.
+Hint Mode SqSubsetEq ! : typeclass_instances.
+Instance: Params (@sqsubseteq) 2 := {}.
+Infix "⊑" := sqsubseteq (at level 70) : stdpp_scope.
+Notation "(⊑)" := sqsubseteq (only parsing) : stdpp_scope.
+Notation "( x ⊑.)" := (sqsubseteq x) (only parsing) : stdpp_scope.
+Notation "(.⊑ y )" := (λ x, sqsubseteq x y) (only parsing) : stdpp_scope.
+
+Infix "⊑@{ A }" := (@sqsubseteq A _) (at level 70, only parsing) : stdpp_scope.
+Notation "(⊑@{ A } )" := (@sqsubseteq A _) (only parsing) : stdpp_scope.
+
+Instance sqsubseteq_rewrite `{SqSubsetEq A} : RewriteRelation (⊑@{A}) := {}.
+
+Hint Extern 0 (_ ⊑ _) => reflexivity : core.
+
+Class Meet A := meet: A → A → A.
+Hint Mode Meet ! : typeclass_instances.
+Instance: Params (@meet) 2 := {}.
+Infix "⊓" := meet (at level 40) : stdpp_scope.
+Notation "(⊓)" := meet (only parsing) : stdpp_scope.
+Notation "( x ⊓.)" := (meet x) (only parsing) : stdpp_scope.
+Notation "(.⊓ y )" := (λ x, meet x y) (only parsing) : stdpp_scope.
+
+Class Join A := join: A → A → A.
+Hint Mode Join ! : typeclass_instances.
+Instance: Params (@join) 2 := {}.
+Infix "⊔" := join (at level 50) : stdpp_scope.
+Notation "(⊔)" := join (only parsing) : stdpp_scope.
+Notation "( x ⊔.)" := (join x) (only parsing) : stdpp_scope.
+Notation "(.⊔ y )" := (λ x, join x y) (only parsing) : stdpp_scope.
+
+Class Top A := top : A.
+Hint Mode Top ! : typeclass_instances.
+Notation "⊤" := top (format "⊤") : stdpp_scope.
+
+Class Bottom A := bottom : A.
+Hint Mode Bottom ! : typeclass_instances.
+Notation "⊥" := bottom (format "⊥") : stdpp_scope.
+
+
 (** * Axiomatization of sets *)
-(** The classes [SemiSet A C] and [Set_ A C] axiomatize sset of type [C] with
-elements of type [A]. The first class, [SemiSet] does not include intersection
-and difference. It is useful for the case of lists, where decidable equality
-is needed to implement intersection and difference, but not union.
+(** The classes [SemiSet A C], [Set_ A C], and [TopSet A C] axiomatize sets of
+type [C] with elements of type [A]. The first class, [SemiSet] does not include
+intersection and difference. It is useful for the case of lists, where decidable
+equality is needed to implement intersection and difference, but not union.
 
 Note that we cannot use the name [Set] since that is a reserved keyword. Hence
 we use [Set_]. *)
 Class SemiSet A C `{ElemOf A C,
     Empty C, Singleton A C, Union C} : Prop := {
-  not_elem_of_empty (x : A) : x ∉@{C} ∅;
+  not_elem_of_empty (x : A) : x ∉@{C} ∅; (* We prove
+  [elem_of_empty : x ∈@{C} ∅ ↔ False] in [sets.v], which is more convenient for
+  rewriting. *)
   elem_of_singleton (x y : A) : x ∈@{C} {[ y ]} ↔ x = y;
   elem_of_union (X Y : C) (x : A) : x ∈ X ∪ Y ↔ x ∈ X ∨ x ∈ Y
 }.
@@ -1177,6 +1222,12 @@ Class Set_ A C `{ElemOf A C, Empty C, Singleton A C,
   set_semi_set :> SemiSet A C;
   elem_of_intersection (X Y : C) (x : A) : x ∈ X ∩ Y ↔ x ∈ X ∧ x ∈ Y;
   elem_of_difference (X Y : C) (x : A) : x ∈ X ∖ Y ↔ x ∈ X ∧ x ∉ Y
+}.
+Class TopSet A C `{ElemOf A C, Empty C, Top C, Singleton A C,
+    Union C, Intersection C, Difference C} : Prop := {
+  top_set_set :> Set_ A C;
+  elem_of_top' (x : A) : x ∈@{C} ⊤; (* We prove [elem_of_top : x ∈@{C} ⊤ ↔ True]
+  in [sets.v], which is more convenient for rewriting. *)
 }.
 
 (** We axiomative a finite set as a set whose elements can be
@@ -1276,45 +1327,3 @@ Class Half A := half: A → A.
 Hint Mode Half ! : typeclass_instances.
 Notation "½" := half (format "½") : stdpp_scope.
 Notation "½*" := (fmap (M:=list) half) : stdpp_scope.
-
-(** * Notations for lattices. *)
-(** SqSubsetEq registers the "canonical" partial order for a type, and is used
-for the \sqsubseteq symbol. *)
-Class SqSubsetEq A := sqsubseteq: relation A.
-Hint Mode SqSubsetEq ! : typeclass_instances.
-Instance: Params (@sqsubseteq) 2 := {}.
-Infix "⊑" := sqsubseteq (at level 70) : stdpp_scope.
-Notation "(⊑)" := sqsubseteq (only parsing) : stdpp_scope.
-Notation "( x ⊑.)" := (sqsubseteq x) (only parsing) : stdpp_scope.
-Notation "(.⊑ y )" := (λ x, sqsubseteq x y) (only parsing) : stdpp_scope.
-
-Infix "⊑@{ A }" := (@sqsubseteq A _) (at level 70, only parsing) : stdpp_scope.
-Notation "(⊑@{ A } )" := (@sqsubseteq A _) (only parsing) : stdpp_scope.
-
-Instance sqsubseteq_rewrite `{SqSubsetEq A} : RewriteRelation (⊑@{A}) := {}.
-
-Hint Extern 0 (_ ⊑ _) => reflexivity : core.
-
-Class Meet A := meet: A → A → A.
-Hint Mode Meet ! : typeclass_instances.
-Instance: Params (@meet) 2 := {}.
-Infix "⊓" := meet (at level 40) : stdpp_scope.
-Notation "(⊓)" := meet (only parsing) : stdpp_scope.
-Notation "( x ⊓.)" := (meet x) (only parsing) : stdpp_scope.
-Notation "(.⊓ y )" := (λ x, meet x y) (only parsing) : stdpp_scope.
-
-Class Join A := join: A → A → A.
-Hint Mode Join ! : typeclass_instances.
-Instance: Params (@join) 2 := {}.
-Infix "⊔" := join (at level 50) : stdpp_scope.
-Notation "(⊔)" := join (only parsing) : stdpp_scope.
-Notation "( x ⊔.)" := (join x) (only parsing) : stdpp_scope.
-Notation "(.⊔ y )" := (λ x, join x y) (only parsing) : stdpp_scope.
-
-Class Top A := top : A.
-Hint Mode Top ! : typeclass_instances.
-Notation "⊤" := top (format "⊤") : stdpp_scope.
-
-Class Bottom A := bottom : A.
-Hint Mode Bottom ! : typeclass_instances.
-Notation "⊥" := bottom (format "⊥") : stdpp_scope.

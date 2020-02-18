@@ -80,6 +80,7 @@ Create HintDb ndisj.
 considering they are. *)
 Hint Resolve (subseteq_difference_r (A:=positive) (C:=coPset)) : ndisj.
 Hint Resolve (empty_subseteq (A:=positive) (C:=coPset)) : ndisj.
+Hint Resolve (top_subseteq (A:=positive) (C:=coPset)) : ndisj.
 Hint Resolve (union_least (A:=positive) (C:=coPset)) : ndisj.
 (** Fallback, loses lots of information but lets other rules make progress. *)
 Hint Resolve (subseteq_difference_l (A:=positive) (C:=coPset)) | 100 : ndisj.
