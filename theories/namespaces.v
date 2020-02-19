@@ -80,11 +80,14 @@ Create HintDb ndisj.
 considering they are. *)
 Hint Resolve (subseteq_difference_r (A:=positive) (C:=coPset)) : ndisj.
 Hint Resolve (empty_subseteq (A:=positive) (C:=coPset)) : ndisj.
-Hint Resolve (top_subseteq (A:=positive) (C:=coPset)) : ndisj.
 Hint Resolve (union_least (A:=positive) (C:=coPset)) : ndisj.
 (** Fallback, loses lots of information but lets other rules make progress. *)
 Hint Resolve (subseteq_difference_l (A:=positive) (C:=coPset)) | 100 : ndisj.
 Hint Resolve nclose_subseteq' | 100 : ndisj.
+
+(** Put this hint in [core] so that only only [solve_ndisj], but also [done] and
+friends, can solve trivial goals of the form [E ⊆ ⊤] that occur often. *)
+Hint Resolve (top_subseteq (A:=positive) (C:=coPset)) : core.
 
 (** Rules for goals of the form [_ ## _] *)
 (** The base rule that we want to ultimately get down to. *)
