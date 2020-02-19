@@ -159,6 +159,8 @@ Instance coPset_singleton : Singleton positive coPset := λ p,
 Instance coPset_elem_of : ElemOf positive coPset := λ p X, e_of p (`X).
 Instance coPset_empty : Empty coPset := coPLeaf false ↾ I.
 Instance coPset_top : Top coPset := coPLeaf true ↾ I.
+(** Iris and specifically [solve_ndisj] heavily rely on this hint. *)
+Hint Resolve (top_subseteq (A:=positive) (C:=coPset)) : core.
 Instance coPset_union : Union coPset := λ X Y,
   let (t1,Ht1) := X in let (t2,Ht2) := Y in
   (t1 ∪ t2) ↾ coPset_union_wf _ _ Ht1 Ht2.
