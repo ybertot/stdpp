@@ -85,10 +85,6 @@ Hint Resolve (union_least (A:=positive) (C:=coPset)) : ndisj.
 Hint Resolve (subseteq_difference_l (A:=positive) (C:=coPset)) | 100 : ndisj.
 Hint Resolve nclose_subseteq' | 100 : ndisj.
 
-(** Put this hint in [core] so that only only [solve_ndisj], but also [done] and
-friends, can solve trivial goals of the form [E ⊆ ⊤] that occur often. *)
-Hint Resolve (top_subseteq (A:=positive) (C:=coPset)) : core.
-
 (** Rules for goals of the form [_ ## _] *)
 (** The base rule that we want to ultimately get down to. *)
 Hint Extern 0 (_ ## _) => apply ndot_ne_disjoint; congruence : ndisj.
