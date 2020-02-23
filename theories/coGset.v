@@ -134,13 +134,13 @@ Section infinite.
 End infinite.
 
 (** * Pick elements from infinite sets *)
-Definition cogpick `{Countable A, Infinite A} (X : coGset A) : A :=
+Definition coGpick `{Countable A, Infinite A} (X : coGset A) : A :=
   fresh (match X with FinGSet _ => ∅ | CoFinGset X => X end).
 
-Lemma cogpick_elem_of `{Countable A, Infinite A} X :
-  ¬set_finite X → cogpick X ∈ X.
+Lemma coGpick_elem_of `{Countable A, Infinite A} X :
+  ¬set_finite X → coGpick X ∈ X.
 Proof.
-  unfold cogpick. destruct X as [X|X]; rewrite coGset_finite_spec; simpl.
+  unfold coGpick. destruct X as [X|X]; rewrite coGset_finite_spec; simpl.
   done. by intros _; apply is_fresh.
 Qed.
 
