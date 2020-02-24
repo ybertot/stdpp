@@ -170,6 +170,56 @@ Section leibniz.
   Lemma dom_fmap_L {A B} (f : A → B) (m : M A) : dom D (f <$> m) = dom D m.
   Proof. unfold_leibniz; apply dom_fmap. Qed.
 End leibniz.
+
+(** * Set solver instances *)
+Global Instance set_unfold_dom_empty {A} i : SetUnfoldElemOf i (dom D (∅:M A)) False.
+Proof. constructor. by rewrite dom_empty, elem_of_empty. Qed.
+Global Instance set_unfold_dom_alter {A} f i j (m : M A) Q :
+  SetUnfoldElemOf i (dom D m) Q →
+  SetUnfoldElemOf i (dom D (alter f j m)) Q.
+Proof. constructor. by rewrite dom_alter, (set_unfold_elem_of _ (dom _ _) _). Qed.
+Global Instance set_unfold_dom_insert {A} i j x (m : M A) Q :
+  SetUnfoldElemOf i (dom D m) Q →
+  SetUnfoldElemOf i (dom D (<[j:=x]> m)) (i = j ∨ Q).
+Proof.
+  constructor. by rewrite dom_insert, elem_of_union,
+    (set_unfold_elem_of _ (dom _ _) _), elem_of_singleton.
+Qed.
+Global Instance set_unfold_dom_delete {A} i j (m : M A) Q :
+  SetUnfoldElemOf i (dom D m) Q →
+  SetUnfoldElemOf i (dom D (delete j m)) (Q ∧ i ≠ j).
+Proof.
+  constructor. by rewrite dom_delete, elem_of_difference,
+    (set_unfold_elem_of _ (dom _ _) _), elem_of_singleton.
+Qed.
+Global Instance set_unfold_dom_singleton {A} i j :
+  SetUnfoldElemOf i (dom D ({[ j := x ]} : M A)) (i = j).
+Proof. constructor. by rewrite dom_singleton, elem_of_singleton. Qed.
+Global Instance set_unfold_dom_union {A} i (m1 m2 : M A) Q1 Q2 :
+  SetUnfoldElemOf i (dom D m1) Q1 → SetUnfoldElemOf i (dom D m2) Q2 →
+  SetUnfoldElemOf i (dom D (m1 ∪ m2)) (Q1 ∨ Q2).
+Proof.
+  constructor. by rewrite dom_union, elem_of_union,
+    !(set_unfold_elem_of _ (dom _ _) _).
+Qed.
+Global Instance set_unfold_dom_intersection {A} i (m1 m2 : M A) Q1 Q2 :
+  SetUnfoldElemOf i (dom D m1) Q1 → SetUnfoldElemOf i (dom D m2) Q2 →
+  SetUnfoldElemOf i (dom D (m1 ∩ m2)) (Q1 ∧ Q2).
+Proof.
+  constructor. by rewrite dom_intersection, elem_of_intersection,
+    !(set_unfold_elem_of _ (dom _ _) _).
+Qed.
+Global Instance set_unfold_dom_difference {A} i (m1 m2 : M A) Q1 Q2 :
+  SetUnfoldElemOf i (dom D m1) Q1 → SetUnfoldElemOf i (dom D m2) Q2 →
+  SetUnfoldElemOf i (dom D (m1 ∖ m2)) (Q1 ∧ ¬Q2).
+Proof.
+  constructor. by rewrite dom_difference, elem_of_difference,
+    !(set_unfold_elem_of _ (dom _ _) _).
+Qed.
+Global Instance set_unfold_dom_fmap {A B} (f : A → B) i (m : M A) Q :
+  SetUnfoldElemOf i (dom D m) Q →
+  SetUnfoldElemOf i (dom D (f <$> m)) Q.
+Proof. constructor. by rewrite dom_fmap, (set_unfold_elem_of _ (dom _ _) _). Qed.
 End fin_map_dom.
 
 Lemma dom_seq `{FinMapDom nat M D} {A} start (xs : list A) :
@@ -182,3 +232,7 @@ Qed.
 Lemma dom_seq_L `{FinMapDom nat M D, !LeibnizEquiv D} {A} start (xs : list A) :
   dom D (map_seq (M:=M A) start xs) = set_seq start (length xs).
 Proof. unfold_leibniz. apply dom_seq. Qed.
+
+Instance set_unfold_dom_seq `{FinMapDom nat M D} {A} start (xs : list A) :
+  SetUnfoldElemOf i (dom D (map_seq start (M:=M A) xs)) (start ≤ i < start + length xs).
+Proof. constructor. by rewrite dom_seq, elem_of_set_seq. Qed.
