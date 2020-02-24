@@ -123,7 +123,7 @@ Proof. done. Qed.
 Lemma vec_to_list_app {A n m} (v : vec A n) (w : vec A m) :
   vec_to_list (v +++ w) = vec_to_list v ++ vec_to_list w.
 Proof. by induction v; f_equal/=. Qed.
-Lemma vec_to_list_of_list {A} (l : list A): vec_to_list (list_to_vec l) = l.
+Lemma vec_to_list_to_vec {A} (l : list A): vec_to_list (list_to_vec l) = l.
 Proof. by induction l; f_equal/=. Qed.
 Lemma vec_to_list_length {A n} (v : vec A n) : length (vec_to_list v) = n.
 Proof. induction v; simpl; by f_equal. Qed.
@@ -153,11 +153,11 @@ Lemma vec_to_list_lookup_middle {A n} (v : vec A n) (l k : list A) x :
     ∃ i : fin n, l = take i v ∧ x = v !!! i ∧ k = drop (S i) v.
 Proof.
   intros H.
-  rewrite <-(vec_to_list_of_list l), <-(vec_to_list_of_list k) in H.
+  rewrite <-(vec_to_list_to_vec l), <-(vec_to_list_to_vec k) in H.
   rewrite <-vec_to_list_cons, <-vec_to_list_app in H.
   pose proof (vec_to_list_inj1 _ _ H); subst.
   apply vec_to_list_inj2 in H; subst. induction l. simpl.
-  - eexists 0%fin. simpl. by rewrite vec_to_list_of_list.
+  - eexists 0%fin. simpl. by rewrite vec_to_list_to_vec.
   - destruct IHl as [i ?]. exists (FS i). simpl. intuition congruence.
 Qed.
 Lemma vec_to_list_drop_lookup {A n} (v : vec A n) (i : fin n) :
