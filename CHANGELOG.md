@@ -14,7 +14,9 @@ API-breaking change is listed.
 - Add type class `TopSet` for sets with a `⊤` element. Provide instances for
   `boolset`, `propset`, and `coPset`.
 - Add `set_solver` support for `dom`.
-
+- Rename `vec_to_list_of_list` into `vec_to_list_to_vec`, and add new lemma
+  `list_to_vec_to_list` for the converse.
+- Add `Countable` instance for `vec`.
 
 ## std++ 1.2.1 (released 2019-08-29)
 

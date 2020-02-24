@@ -4,6 +4,7 @@
 (lists of fixed length). It uses the definitions from the standard library, but
 renames or changes their notations, so that it becomes more consistent with the
 naming conventions in this development. *)
+From stdpp Require Import countable.
 From stdpp Require Export fin list.
 Set Default Proof Using "Type".
 Open Scope vector_scope.
@@ -123,7 +124,7 @@ Proof. done. Qed.
 Lemma vec_to_list_app {A n m} (v : vec A n) (w : vec A m) :
   vec_to_list (v +++ w) = vec_to_list v ++ vec_to_list w.
 Proof. by induction v; f_equal/=. Qed.
-Lemma vec_to_list_of_list {A} (l : list A): vec_to_list (list_to_vec l) = l.
+Lemma vec_to_list_to_vec {A} (l : list A): vec_to_list (list_to_vec l) = l.
 Proof. by induction l; f_equal/=. Qed.
 Lemma vec_to_list_length {A n} (v : vec A n) : length (vec_to_list v) = n.
 Proof. induction v; simpl; by f_equal. Qed.
@@ -142,6 +143,13 @@ Proof.
   revert w. induction v; intros w; inv_vec w; intros;
     simplify_eq/=; f_equal; eauto.
 Qed.
+Lemma list_to_vec_to_list {A n} (v : vec A n) :
+  list_to_vec (vec_to_list v) = eq_rect _ _ v _ (eq_sym (vec_to_list_length v)).
+Proof.
+  apply vec_to_list_inj2. rewrite vec_to_list_to_vec.
+  by destruct (eq_sym (vec_to_list_length v)).
+Qed.
+
 Lemma vlookup_middle {A n m} (v : vec A n) (w : vec A m) x :
   ∃ i : fin (n + S m), x = (v +++ x ::: w) !!! i.
 Proof.
@@ -153,11 +161,11 @@ Lemma vec_to_list_lookup_middle {A n} (v : vec A n) (l k : list A) x :
     ∃ i : fin n, l = take i v ∧ x = v !!! i ∧ k = drop (S i) v.
 Proof.
   intros H.
-  rewrite <-(vec_to_list_of_list l), <-(vec_to_list_of_list k) in H.
+  rewrite <-(vec_to_list_to_vec l), <-(vec_to_list_to_vec k) in H.
   rewrite <-vec_to_list_cons, <-vec_to_list_app in H.
   pose proof (vec_to_list_inj1 _ _ H); subst.
   apply vec_to_list_inj2 in H; subst. induction l. simpl.
-  - eexists 0%fin. simpl. by rewrite vec_to_list_of_list.
+  - eexists 0%fin. simpl. by rewrite vec_to_list_to_vec.
   - destruct IHl as [i ?]. exists (FS i). simpl. intuition congruence.
 Qed.
 Lemma vec_to_list_drop_lookup {A n} (v : vec A n) (i : fin n) :
@@ -306,7 +314,17 @@ Lemma vmap_replicate {A B} (f : A → B) n (x : A) :
   vmap f (vreplicate n x) = vreplicate n (f x).
 Proof. induction n; f_equal/=; auto. Qed.
 
-(* Vectors can be inhabited. *)
+(** Vectors are inhabited and countable *)
 Global Instance vec_0_inhabited T : Inhabited (vec T 0) := populate [#].
 Global Instance vec_inhabited `{Inhabited T} n : Inhabited (vec T n) :=
   populate (vreplicate n inhabitant).
+
+Instance vec_countable `{Countable A} n : Countable (vec A n).
+Proof.
+  apply (inj_countable vec_to_list (λ l,
+    guard (n = length l) as H; Some (eq_rect _ _ (list_to_vec l) _ (eq_sym H)))).
+  intros v. case_option_guard as Hn.
+  - rewrite list_to_vec_to_list.
+    rewrite (proof_irrel (eq_sym _) Hn). by destruct Hn.
+  - by rewrite vec_to_list_length in Hn.
+Qed.
