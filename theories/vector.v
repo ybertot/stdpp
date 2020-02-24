@@ -142,6 +142,13 @@ Proof.
   revert w. induction v; intros w; inv_vec w; intros;
     simplify_eq/=; f_equal; eauto.
 Qed.
+Lemma list_to_vec_to_list {A n} (v : vec A n) :
+  list_to_vec (vec_to_list v) = eq_rect _ _ v _ (eq_sym (vec_to_list_length v)).
+Proof.
+  apply vec_to_list_inj2. rewrite vec_to_list_to_vec.
+  by destruct (eq_sym (vec_to_list_length v)).
+Qed.
+
 Lemma vlookup_middle {A n m} (v : vec A n) (w : vec A m) x :
   ∃ i : fin (n + S m), x = (v +++ x ::: w) !!! i.
 Proof.
