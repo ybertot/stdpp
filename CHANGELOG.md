@@ -13,6 +13,8 @@ API-breaking change is listed.
   https://gitlab.mpi-sws.org/iris/stdpp/merge_requests/93
 - Add type class `TopSet` for sets with a `⊤` element. Provide instances for
   `boolset`, `propset`, and `coPset`.
+- Add `set_solver` support for `dom`.
+
 
 ## std++ 1.2.1 (released 2019-08-29)
 
