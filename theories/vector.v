@@ -4,6 +4,7 @@
 (lists of fixed length). It uses the definitions from the standard library, but
 renames or changes their notations, so that it becomes more consistent with the
 naming conventions in this development. *)
+From stdpp Require Import countable.
 From stdpp Require Export fin list.
 Set Default Proof Using "Type".
 Open Scope vector_scope.
@@ -313,7 +314,17 @@ Lemma vmap_replicate {A B} (f : A → B) n (x : A) :
   vmap f (vreplicate n x) = vreplicate n (f x).
 Proof. induction n; f_equal/=; auto. Qed.
 
-(* Vectors can be inhabited. *)
+(** Vectors are inhabited and countable *)
 Global Instance vec_0_inhabited T : Inhabited (vec T 0) := populate [#].
 Global Instance vec_inhabited `{Inhabited T} n : Inhabited (vec T n) :=
   populate (vreplicate n inhabitant).
+
+Instance vec_countable `{Countable A} n : Countable (vec A n).
+Proof.
+  apply (inj_countable vec_to_list (λ l,
+    guard (n = length l) as H; Some (eq_rect _ _ (list_to_vec l) _ (eq_sym H)))).
+  intros v. case_option_guard as Hn.
+  - rewrite list_to_vec_to_list.
+    rewrite (proof_irrel (eq_sym _) Hn). by destruct Hn.
+  - by rewrite vec_to_list_length in Hn.
+Qed.
