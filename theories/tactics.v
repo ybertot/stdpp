@@ -84,9 +84,9 @@ Tactic Notation "etrans" := etransitivity.
 (** Tactics for splitting conjunctions:
 
 - [split_and] : split the goal if is syntactically of the shape [_ ∧ _]
-- [split_ands?] : split the goal repeatedly (perhaps zero times) while it is
+- [split_and?] : split the goal repeatedly (perhaps zero times) while it is
   of the shape [_ ∧ _].
-- [split_ands!] : works similarly, but at least one split should succeed. In
+- [split_and!] : works similarly, but at least one split should succeed. In
   order to do so, it will head normalize the goal first to possibly expose a
   conjunction.
 
