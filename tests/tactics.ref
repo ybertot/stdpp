@@ -1,0 +1,8 @@
+The command has indeed failed with message:
+Failed to progress.
+The command has indeed failed with message:
+Ltac call to "destruct_or !" failed.
+Failed to progress.
+The command has indeed failed with message:
+Ltac call to "destruct_and !" failed.
+Failed to progress.
