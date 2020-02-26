@@ -17,6 +17,13 @@ API-breaking change is listed.
 - Rename `vec_to_list_of_list` into `vec_to_list_to_vec`, and add new lemma
   `list_to_vec_to_list` for the converse.
 - Add `Countable` instance for `vec`.
+- Introduce `destruct_or{?,!}` to repeatedly destruct disjunctions in
+  assumptions. The tactic can also be provided an explicit assumption name;
+  `destruct_and{?,!}` has been generalized accordingly and now can also be
+  provided an explicit assumption name.
+  Slight breaking change: `destruct_and` no longer handle `False`;
+  `destruct_or` now handles `False` while `destruct_and` handles `True`,
+  as the respective units of disjunction and conjunction.
 
 ## std++ 1.2.1 (released 2019-08-29)
 
