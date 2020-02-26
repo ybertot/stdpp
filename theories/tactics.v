@@ -112,7 +112,7 @@ Tactic Notation "split_and" "!" := hnf; split_and; split_and?.
 
 Ltac destruct_and_go H :=
   try lazymatch type of H with
-  | False => destruct H
+  | True => clear H
   | _ ∧ _ =>
     let H1 := fresh in
     let H2 := fresh in
@@ -148,7 +148,7 @@ Tactic Notation "destruct_and" "!" :=
 *)
 Tactic Notation "destruct_or" "?" ident(H) :=
   repeat match type of H with
-  | True => clear H
+  | False => destruct H
   | _ ∨ _ => destruct H as [H|H]
   | Is_true (bool_decide _) => apply (bool_decide_unpack _) in H
   | Is_true (_ || _) => apply orb_True in H; destruct H as [H|H]
