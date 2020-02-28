@@ -84,14 +84,24 @@ Tactic Notation "etrans" := etransitivity.
 (** Tactics for splitting conjunctions:
 
 - [split_and] : split the goal if is syntactically of the shape [_ ∧ _]
-- [split_ands?] : split the goal repeatedly (perhaps zero times) while it is
+- [split_and?] : split the goal repeatedly (perhaps zero times) while it is
   of the shape [_ ∧ _].
-- [split_ands!] : works similarly, but at least one split should succeed. In
+- [split_and!] : works similarly, but at least one split should succeed. In
   order to do so, it will head normalize the goal first to possibly expose a
   conjunction.
 
 Note that [split_and] differs from [split] by only splitting conjunctions. The
-[split] tactic splits any inductive with one constructor. *)
+[split] tactic splits any inductive with one constructor.
+
+
+- [destruct_and? H] : destruct assumption [H] repeatedly (perhaps zero times)
+  while it is of the shape [_ ∧ _].
+- [destruct_and! H] : works similarly, but at least one destruct should succeed.
+  In order to do so, it will head normalize the goal first to possibly expose a
+  conjunction.
+- [destruct_and?] iterates [destruct_or? H] on every matching assumption [H].
+- [destruct_and!] works similarly, but at least one destruct should succeed.
+*)
 Tactic Notation "split_and" :=
   match goal with
   | |- _ ∧ _ => split
@@ -100,14 +110,56 @@ Tactic Notation "split_and" :=
 Tactic Notation "split_and" "?" := repeat split_and.
 Tactic Notation "split_and" "!" := hnf; split_and; split_and?.
 
-Tactic Notation "destruct_and" "?" :=
-  repeat match goal with
-  | H : False |- _ => destruct H
-  | H : _ ∧ _ |- _ => destruct H
-  | H : Is_true (bool_decide _) |- _ => apply (bool_decide_unpack _) in H
-  | H : Is_true (_ && _) |- _ => apply andb_True in H; destruct H
+Ltac destruct_and_go H :=
+  try lazymatch type of H with
+  | True => clear H
+  | _ ∧ _ =>
+    let H1 := fresh in
+    let H2 := fresh in
+    destruct H as [ H1 H2 ];
+    destruct_and_go H1; destruct_and_go H2
+  | Is_true (bool_decide _) =>
+    apply (bool_decide_unpack _) in H;
+    destruct_and_go H
+  | Is_true (_ && _) =>
+    apply andb_True in H;
+    destruct_and_go H
   end.
-Tactic Notation "destruct_and" "!" := progress (destruct_and?).
+
+Tactic Notation "destruct_and" "?" ident(H) :=
+  destruct_and_go H.
+Tactic Notation "destruct_and" "!" ident(H) :=
+  hnf in H; progress (destruct_and? H).
+
+Tactic Notation "destruct_and" "?" :=
+  repeat match goal with H : _ |- _ => progress (destruct_and? H) end.
+Tactic Notation "destruct_and" "!" :=
+  progress destruct_and?.
+
+(** Tactics for splitting disjunctions in an assumption:
+
+- [destruct_or? H] : destruct the assumption [H] repeatedly (perhaps zero times)
+  while it is of the shape [_ ∨ _].
+- [destruct_or! H] : works similarly, but at least one destruct should succeed.
+  In order to do so, it will head normalize the goal first to possibly
+  expose a disjunction.
+- [destruct_or?] iterates [destruct_or? H] on every matching assumption [H].
+- [destruct_or!] works similarly, but at least one destruct should succeed.
+*)
+Tactic Notation "destruct_or" "?" ident(H) :=
+  repeat match type of H with
+  | False => destruct H
+  | _ ∨ _ => destruct H as [H|H]
+  | Is_true (bool_decide _) => apply (bool_decide_unpack _) in H
+  | Is_true (_ || _) => apply orb_True in H; destruct H as [H|H]
+  end.
+Tactic Notation "destruct_or" "!" ident(H) := hnf in H; progress (destruct_or? H).
+
+Tactic Notation "destruct_or" "?" :=
+  repeat match goal with H : _ |- _ => progress (destruct_or? H) end.
+Tactic Notation "destruct_or" "!" :=
+  progress destruct_or?.
+
 
 (** The tactic [case_match] destructs an arbitrary match in the conclusion or
 assumptions, and generates a corresponding equality. This tactic is best used
