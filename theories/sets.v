@@ -1032,9 +1032,9 @@ Section pred_finite_infinite.
   Qed.
 
   Lemma pred_finite_le n : pred_finite (flip le n).
-  Proof. eapply pred_finite_impl; [apply (pred_finite_lt (S n))|]; simpl; lia. Qed.
+  Proof. eapply pred_finite_impl; [apply (pred_finite_lt (S n))|]; naive_solver lia. Qed.
   Lemma pred_infinite_le n : pred_infinite (le n).
-  Proof. eapply pred_infinite_impl; [apply (pred_infinite_lt (S n))|]; simpl; lia. Qed.
+  Proof. eapply pred_infinite_impl; [apply (pred_infinite_lt (S n))|]; naive_solver lia. Qed.
 End pred_finite_infinite.
 
 Section set_finite_infinite.
