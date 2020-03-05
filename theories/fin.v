@@ -31,7 +31,7 @@ Fixpoint fin_to_nat {n} (i : fin n) : nat :=
   match i with 0%fin => 0 | FS i => S (fin_to_nat i) end.
 Coercion fin_to_nat : fin >-> nat.
 
-Notation fin_of_nat := Fin.of_nat_lt.
+Notation nat_to_fin := Fin.of_nat_lt.
 Notation fin_rect2 := Fin.rect2.
 
 Instance fin_dec {n} : EqDecision (fin n).
@@ -81,12 +81,12 @@ Qed.
 
 Lemma fin_to_nat_lt {n} (i : fin n) : fin_to_nat i < n.
 Proof. induction i; simpl; lia. Qed.
-Lemma fin_to_of_nat n m (H : n < m) : fin_to_nat (fin_of_nat H) = n.
+Lemma fin_to_nat_to_fin n m (H : n < m) : fin_to_nat (nat_to_fin H) = n.
 Proof.
   revert m H. induction n; intros [|?]; simpl; auto; intros; exfalso; lia.
 Qed.
-Lemma fin_of_to_nat {n} (i : fin n) H : @fin_of_nat (fin_to_nat i) n H = i.
-Proof. apply (inj fin_to_nat), fin_to_of_nat. Qed.
+Lemma nat_to_fin_to_nat {n} (i : fin n) H : @nat_to_fin (fin_to_nat i) n H = i.
+Proof. apply (inj fin_to_nat), fin_to_nat_to_fin. Qed.
 
 Fixpoint fin_plus_inv {n1 n2} : ∀ (P : fin (n1 + n2) → Type)
     (H1 : ∀ i1 : fin n1, P (Fin.L n2 i1))

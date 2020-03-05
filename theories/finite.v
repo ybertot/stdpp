@@ -82,8 +82,8 @@ Qed.
 Lemma decode_encode_fin `{Finite A} (x : A) : decode_fin (encode_fin x) = x.
 Proof.
   unfold decode_fin, encode_fin. destruct (Some_dec _) as [[x' Hx]|Hx].
-  { by rewrite fin_to_of_nat, decode_encode_nat in Hx; simplify_eq. }
-  exfalso; by rewrite ->fin_to_of_nat, decode_encode_nat in Hx.
+  { by rewrite fin_to_nat_to_fin, decode_encode_nat in Hx; simplify_eq. }
+  exfalso; by rewrite ->fin_to_nat_to_fin, decode_encode_nat in Hx.
 Qed.
 
 Lemma fin_choice {n} {B : fin n → Type} (P : ∀ i, B i → Prop) :
