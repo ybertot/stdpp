@@ -221,6 +221,18 @@ Proof.
     intros ??? IH ?? H. constructor. apply (H 0%fin). apply IH, (λ i, H (FS i)).
 Qed.
 
+(** Given a function [fin n → A], we can construct a vector. *)
+Fixpoint fun_to_vec {A n} {struct n} : (fin n → A) → vec A n :=
+  match n with
+  | 0 => λ f, [#]
+  | S n => λ f, f 0%fin ::: fun_to_vec (f ∘ FS)
+  end.
+
+Lemma lookup_fun_to_vec {A n} (f : fin n → A) i : fun_to_vec f !!! i = f i.
+Proof.
+  revert f. induction i as [|n i IH]; intros f; simpl; [done|]. by rewrite IH.
+Qed.
+
 (** The function [vmap f v] applies a function [f] element wise to [v]. *)
 Notation vmap := Vector.map.
 
