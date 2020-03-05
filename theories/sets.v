@@ -1016,6 +1016,25 @@ Section pred_finite_infinite.
   Proof.
     intros xs. exists (fresh xs). split; [done|]. apply infinite_is_fresh.
   Qed.
+
+  Lemma pred_finite_lt n : pred_finite (flip lt n).
+  Proof.
+    exists (seq 0 n); intros i Hi. apply (elem_of_list_lookup_2 _ i).
+    by rewrite lookup_seq.
+  Qed.
+  Lemma pred_infinite_lt n : pred_infinite (lt n).
+  Proof.
+    intros l. exists (S (n `max` max_list l)). split.
+    - induction l; simpl; lia.
+    - assert (∀ n, n ∈ l → n ≤ max_list l) as help.
+      { induction 1; simpl; lia. }
+      intros H%help; lia.
+  Qed.
+
+  Lemma pred_finite_le n : pred_finite (flip le n).
+  Proof. eapply pred_finite_impl; [apply (pred_finite_lt (S n))|]; simpl; lia. Qed.
+  Lemma pred_infinite_le n : pred_infinite (le n).
+  Proof. eapply pred_infinite_impl; [apply (pred_infinite_lt (S n))|]; simpl; lia. Qed.
 End pred_finite_infinite.
 
 Section set_finite_infinite.
