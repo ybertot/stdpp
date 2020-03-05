@@ -16,6 +16,9 @@ API-breaking change is listed.
 - Add `set_solver` support for `dom`.
 - Rename `vec_to_list_of_list` into `vec_to_list_to_vec`, and add new lemma
   `list_to_vec_to_list` for the converse.
+- Rename `fin_of_nat` into `nat_to_fin`, `fin_to_of_nat` into
+  `fin_to_nat_to_fin`, and `fin_of_to_nat` into `nat_to_fin_to_nat`, to follow
+  the conventions.
 - Add `Countable` instance for `vec`.
 - Introduce `destruct_or{?,!}` to repeatedly destruct disjunctions in
   assumptions. The tactic can also be provided an explicit assumption name;

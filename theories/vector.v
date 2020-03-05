@@ -181,20 +181,20 @@ Proof.
   induction v as [|? ? v IH]; inv_fin i. simpl; split; congruence. done.
 Qed.
 Lemma vlookup_lookup' {A n} (v : vec A n) (i : nat) x :
-  (∃ H : i < n, v !!! (fin_of_nat H) = x) ↔ (v : list A) !! i = Some x.
+  (∃ H : i < n, v !!! nat_to_fin H = x) ↔ (v : list A) !! i = Some x.
 Proof.
   split.
-  - intros [Hlt ?]. rewrite <-(fin_to_of_nat i n Hlt). by apply vlookup_lookup.
+  - intros [Hlt ?]. rewrite <-(fin_to_nat_to_fin i n Hlt). by apply vlookup_lookup.
   - intros Hvix. assert (Hlt:=lookup_lt_Some _ _ _ Hvix).
     rewrite vec_to_list_length in Hlt. exists Hlt.
-    apply vlookup_lookup. by rewrite fin_to_of_nat.
+    apply vlookup_lookup. by rewrite fin_to_nat_to_fin.
 Qed.
 Lemma elem_of_vlookup {A n} (v : vec A n) x :
   x ∈ vec_to_list v ↔ ∃ i, v !!! i = x.
 Proof.
   rewrite elem_of_list_lookup. setoid_rewrite <-vlookup_lookup'.
   split; [by intros (?&?&?); eauto|]. intros [i Hx].
-  exists i, (fin_to_nat_lt _). by rewrite fin_of_to_nat.
+  exists i, (fin_to_nat_lt _). by rewrite nat_to_fin_to_nat.
 Qed.
 
 Lemma Forall_vlookup {A} (P : A → Prop) {n} (v : vec A n) :
