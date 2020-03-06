@@ -28,6 +28,8 @@ API-breaking change is listed.
   `destruct_or` now handles `False` while `destruct_and` handles `True`,
   as the respective units of disjunction and conjunction.
 - Add tactic `set_unfold in H`.
+- Set `Hint Mode` for `TCAnd`, `TCOr`, `TCForall`, `TCForall2`, `TCElemOf`,
+  `TCEq`, and `TCDiag`.
 
 ## std++ 1.2.1 (released 2019-08-29)
 

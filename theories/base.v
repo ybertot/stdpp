@@ -106,10 +106,12 @@ Inductive TCOr (P1 P2 : Prop) : Prop :=
 Existing Class TCOr.
 Existing Instance TCOr_l | 9.
 Existing Instance TCOr_r | 10.
+Hint Mode TCOr ! ! : typeclass_instances.
 
 Inductive TCAnd (P1 P2 : Prop) : Prop := TCAnd_intro : P1 → P2 → TCAnd P1 P2.
 Existing Class TCAnd.
 Existing Instance TCAnd_intro.
+Hint Mode TCAnd ! ! : typeclass_instances.
 
 Inductive TCTrue : Prop := TCTrue_intro : TCTrue.
 Existing Class TCTrue.
@@ -121,7 +123,11 @@ Inductive TCForall {A} (P : A → Prop) : list A → Prop :=
 Existing Class TCForall.
 Existing Instance TCForall_nil.
 Existing Instance TCForall_cons.
+Hint Mode TCForall ! ! ! : typeclass_instances.
 
+(** The class [TCForall2 P l k] is commonly used to transform an input list [l]
+into an output list [k], or the converse. Therefore there are two modes, either
+[l] input and [k] output, or [k] input and [l] input. *)
 Inductive TCForall2 {A B} (P : A → B → Prop) : list A → list B → Prop :=
   | TCForall2_nil : TCForall2 P [] []
   | TCForall2_cons x y xs ys :
@@ -129,6 +135,8 @@ Inductive TCForall2 {A B} (P : A → B → Prop) : list A → list B → Prop :=
 Existing Class TCForall2.
 Existing Instance TCForall2_nil.
 Existing Instance TCForall2_cons.
+Hint Mode TCForall2 ! ! ! ! - : typeclass_instances.
+Hint Mode TCForall2 ! ! ! - ! : typeclass_instances.
 
 Inductive TCElemOf {A} (x : A) : list A → Prop :=
   | TCElemOf_here xs : TCElemOf x (x :: xs)
@@ -136,15 +144,23 @@ Inductive TCElemOf {A} (x : A) : list A → Prop :=
 Existing Class TCElemOf.
 Existing Instance TCElemOf_here.
 Existing Instance TCElemOf_further.
+Hint Mode TCElemOf ! ! ! : typeclass_instances.
 
+(** Similarly to [TCForall2], we declare the modes of [TCEq x y] in both
+directions, i.e., either [x] input and [y] output, or [y] input and [x]
+output. *)
 Inductive TCEq {A} (x : A) : A → Prop := TCEq_refl : TCEq x x.
 Existing Class TCEq.
 Existing Instance TCEq_refl.
+Hint Mode TCEq ! ! - : typeclass_instances.
+Hint Mode TCEq ! - ! : typeclass_instances.
 
 Inductive TCDiag {A} (C : A → Prop) : A → A → Prop :=
   | TCDiag_diag x : C x → TCDiag C x x.
 Existing Class TCDiag.
 Existing Instance TCDiag_diag.
+Hint Mode TCDiag ! ! ! - : typeclass_instances.
+Hint Mode TCDiag ! ! - ! : typeclass_instances.
 
 (** Given a proposition [P] that is a type class, [tc_to_bool P] will return
 [true] iff there is an instance of [P]. It is often useful in Ltac programming,
