@@ -27,6 +27,7 @@ API-breaking change is listed.
   Slight breaking change: `destruct_and` no longer handle `False`;
   `destruct_or` now handles `False` while `destruct_and` handles `True`,
   as the respective units of disjunction and conjunction.
+- Add tactic `set_unfold in H`.
 
 ## std++ 1.2.1 (released 2019-08-29)
 
