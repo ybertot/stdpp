@@ -2131,6 +2131,14 @@ Section map_seq.
     rewrite map_seq_app, map_seq_singleton.
     by rewrite insert_union_singleton_r by (by rewrite map_seq_snoc_disjoint).
   Qed.
+
+  Lemma fmap_map_seq {B} (f : A → B) start xs :
+    f <$> map_seq start xs = map_seq start (f <$> xs).
+  Proof.
+    revert start. induction xs as [|x xs IH]; intros start; csimpl.
+    { by rewrite fmap_empty. }
+    by rewrite fmap_insert, IH.
+  Qed.
 End map_seq.
 
 (** * Tactics *)
