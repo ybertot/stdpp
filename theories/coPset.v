@@ -185,7 +185,8 @@ Proof.
 Qed.
 
 (** Iris and specifically [solve_ndisj] heavily rely on this hint. *)
-Hint Resolve (top_subseteq (A:=positive) (C:=coPset)) : core.
+Local Definition coPset_top_subseteq := top_subseteq (C:=coPset).
+Hint Resolve coPset_top_subseteq : core.
 
 Instance coPset_leibniz : LeibnizEquiv coPset.
 Proof.
