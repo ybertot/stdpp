@@ -146,14 +146,14 @@ Existing Instance TCElemOf_here.
 Existing Instance TCElemOf_further.
 Hint Mode TCElemOf ! ! ! : typeclass_instances.
 
-(** Similarly to [TCForall2], we declare the modes of [TCEq x y] in both
-directions, i.e., either [x] input and [y] output, or [y] input and [x]
-output. *)
+(** We declare both arguments [x] and [y] of [TCEq x y] as outputs, which means
+[TCEq] can also be used to unify evars. This is harmless: since the only
+instance of [TCEq] is [TCEq_refl] below, it can never cause loops. See
+https://gitlab.mpi-sws.org/iris/iris/merge_requests/391 for a use case. *)
 Inductive TCEq {A} (x : A) : A → Prop := TCEq_refl : TCEq x x.
 Existing Class TCEq.
 Existing Instance TCEq_refl.
-Hint Mode TCEq ! ! - : typeclass_instances.
-Hint Mode TCEq ! - ! : typeclass_instances.
+Hint Mode TCEq ! - - : typeclass_instances.
 
 Inductive TCDiag {A} (C : A → Prop) : A → A → Prop :=
   | TCDiag_diag x : C x → TCDiag C x x.
