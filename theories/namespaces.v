@@ -78,11 +78,15 @@ Create HintDb ndisj.
 (** Rules for goals of the form [_ ⊆ _] *)
 (** If-and-only-if rules. Well, not quite, but for the fragment we are
 considering they are. *)
-Hint Resolve (subseteq_difference_r (A:=positive) (C:=coPset)) : ndisj.
-Hint Resolve (empty_subseteq (A:=positive) (C:=coPset)) : ndisj.
-Hint Resolve (union_least (A:=positive) (C:=coPset)) : ndisj.
+Local Definition coPset_subseteq_difference_r := subseteq_difference_r (C:=coPset).
+Hint Resolve coPset_subseteq_difference_r : ndisj.
+Local Definition coPset_empty_subseteq := empty_subseteq (C:=coPset).
+Hint Resolve coPset_empty_subseteq : ndisj.
+Local Definition coPset_union_least := union_least (C:=coPset).
+Hint Resolve coPset_union_least : ndisj.
 (** Fallback, loses lots of information but lets other rules make progress. *)
-Hint Resolve (subseteq_difference_l (A:=positive) (C:=coPset)) | 100 : ndisj.
+Local Definition coPset_subseteq_difference_l := subseteq_difference_l (C:=coPset).
+Hint Resolve coPset_subseteq_difference_l | 100 : ndisj.
 Hint Resolve nclose_subseteq' | 100 : ndisj.
 
 (** Rules for goals of the form [_ ## _] *)
@@ -90,8 +94,10 @@ Hint Resolve nclose_subseteq' | 100 : ndisj.
 Hint Extern 0 (_ ## _) => apply ndot_ne_disjoint; congruence : ndisj.
 (** Fallback, loses lots of information but lets other rules make progress.
 Tests show trying [disjoint_difference_l1] first gives better performance. *)
-Hint Resolve (disjoint_difference_l1 (A:=positive) (C:=coPset)) | 50 : ndisj.
-Hint Resolve (disjoint_difference_l2 (A:=positive) (C:=coPset)) | 100 : ndisj.
+Local Definition coPset_disjoint_difference_l1 := disjoint_difference_l1 (C:=coPset).
+Hint Resolve coPset_disjoint_difference_l1 | 50 : ndisj.
+Local Definition coPset_disjoint_difference_l2 := disjoint_difference_l2 (C:=coPset).
+Hint Resolve coPset_disjoint_difference_l2 | 100 : ndisj.
 Hint Resolve ndot_preserve_disjoint_l ndot_preserve_disjoint_r | 100 : ndisj.
 
 Ltac solve_ndisj :=
