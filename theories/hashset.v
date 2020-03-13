@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file implements finite set using hash maps. Hash sets are represented
 using radix-2 search trees. Each hash bucket is thus indexed using an binary
 integer of type [Z], and contains an unordered list without duplicates. *)

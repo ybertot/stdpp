@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file collects general purpose definitions and theorems on the option
 data type that are not in the Coq standard library. *)
 From stdpp Require Export tactics.

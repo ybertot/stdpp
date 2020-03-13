@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file collects definitions and theorems on finite sets. Most
 importantly, it implements a fold and size function and some useful induction
 principles on finite sets . *)

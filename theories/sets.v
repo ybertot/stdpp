@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file collects definitions and theorems on sets. Most
 importantly, it implements some tactics to automatically solve goals involving
 sets. *)

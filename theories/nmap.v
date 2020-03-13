@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This files extends the implementation of finite over [positive] to finite
 maps whose keys range over Coq's data type of binary naturals [N]. *)
 From stdpp Require Import pmap mapset.

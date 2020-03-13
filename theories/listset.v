@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file implements finite set as unordered lists without duplicates
 removed. This implementation forms a monad. *)
 From stdpp Require Export sets list.

@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file collects general purpose definitions and theorems on the fin type
 (bounded naturals). It uses the definitions from the standard library, but
 renames or changes their notations, so that it becomes more consistent with the

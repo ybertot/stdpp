@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file collects theorems, definitions, tactics, related to propositions
 with a decidable equality. Such propositions are collected by the [Decision]
 type class. *)

@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file implements a type [binder] with elements [BAnon] for the
 anonymous binder, and [BNamed] for named binders. This type is isomorphic to
 [option string], but we use a special type so that we can define [BNamed] as
