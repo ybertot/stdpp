@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** Finite maps associate data to keys. This file defines an interface for
 finite maps and collects some theory on it. Most importantly, it proves useful
 induction principles for finite maps and implements the tactic

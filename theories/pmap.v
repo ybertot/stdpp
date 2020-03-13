@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This files implements an efficient implementation of finite maps whose keys
 range over Coq's data type of positive binary naturals [positive]. The
 implementation is based on Xavier Leroy's implementation of radix-2 search

@@ -1,5 +1,3 @@
-(* Copyright (c) 2020, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file implements the type [coGset A] of finite/cofinite sets
 of elements of any countable type [A].
 

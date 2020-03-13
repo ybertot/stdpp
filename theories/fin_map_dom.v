@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file provides an axiomatization of the domain function of finite
 maps. We provide such an axiomatization, instead of implementing the domain
 function in a generic way, to allow more efficient implementations. *)

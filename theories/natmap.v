@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This files implements a type [natmap A] of finite maps whose keys range
 over Coq's data type of unary natural numbers [nat]. The implementation equips
 a list with a proof of canonicity. *)

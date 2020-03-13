@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This file collects facts on proof irrelevant types/propositions. *)
 From stdpp Require Export base.
 Set Default Proof Using "Type".

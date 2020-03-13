@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 From Coq.QArith Require Import QArith_base Qcanon.
 From stdpp Require Export list numbers.
 Set Default Proof Using "Type".

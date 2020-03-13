@@ -1,5 +1,3 @@
-(* Copyright (c) 2012-2019, Coq-std++ developers. *)
-(* This file is distributed under the terms of the BSD license. *)
 (** This files implements an efficient implementation of finite maps whose keys
 range over Coq's data type of strings [string]. The implementation uses radix-2
 search trees (uncompressed Patricia trees) as implemented in the file [pmap]
