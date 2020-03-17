@@ -3615,8 +3615,13 @@ End imap.
 Section seq.
   Implicit Types m n i j : nat.
 
-  Lemma fmap_seq j n : S <$> seq j n = seq (S j) n.
-  Proof. revert j. induction n; intros; f_equal/=; auto. Qed.
+  Lemma fmap_add_seq j j' n : Nat.add j <$> seq j' n = seq (j + j') n.
+  Proof.
+    revert j'. induction n as [|n IH]; intros j'; csimpl; [reflexivity|].
+    by rewrite IH, Nat.add_succ_r.
+  Qed.
+  Lemma fmap_S_seq j n : S <$> seq j n = seq (S j) n.
+  Proof. apply (fmap_add_seq 1). Qed.
   Lemma imap_seq {A} (l : list A) (g : nat → A) i :
     imap (λ j _, g (i + j)) l = g <$> seq i (length l).
   Proof.
@@ -3627,38 +3632,37 @@ Section seq.
   Lemma imap_seq_0 {A} (l : list A) (g : nat → A) :
     imap (λ j _, g j) l = g <$> seq 0 (length l).
   Proof. rewrite (imap_ext _ (λ i o, g (0 + i))%nat); [|done]. apply imap_seq. Qed.
-  Lemma lookup_seq j n i : i < n → seq j n !! i = Some (j + i).
+  Lemma lookup_seq_lt j n i : i < n → seq j n !! i = Some (j + i).
   Proof.
     revert j i. induction n as [|n IH]; intros j [|i] ?; simpl; auto with lia.
     rewrite IH; auto with lia.
   Qed.
-  Lemma lookup_total_seq j n i : i < n → seq j n !!! i = j + i.
-  Proof. intros. by rewrite !list_lookup_total_alt, lookup_seq. Qed.
+  Lemma lookup_total_seq_lt j n i : i < n → seq j n !!! i = j + i.
+  Proof. intros. by rewrite !list_lookup_total_alt, lookup_seq_lt. Qed.
   Lemma lookup_seq_ge j n i : n ≤ i → seq j n !! i = None.
   Proof. revert j i. induction n; intros j [|i] ?; simpl; auto with lia. Qed.
   Lemma lookup_total_seq_ge j n i : n ≤ i → seq j n !!! i = inhabitant.
   Proof. intros. by rewrite !list_lookup_total_alt, lookup_seq_ge. Qed.
-  Lemma lookup_seq_inv j n i j' : seq j n !! i = Some j' → j' = j + i ∧ i < n.
+  Lemma lookup_seq j n i j' : seq j n !! i = Some j' ↔ j' = j + i ∧ i < n.
   Proof.
-    destruct (le_lt_dec n i); [by rewrite lookup_seq_ge|].
-    rewrite lookup_seq by done. intuition congruence.
+    destruct (le_lt_dec n i).
+    - rewrite lookup_seq_ge by done. naive_solver lia.
+    - rewrite lookup_seq_lt by done. naive_solver lia.
   Qed.
   Lemma NoDup_seq j n : NoDup (seq j n).
   Proof. apply NoDup_ListNoDup, seq_NoDup. Qed.
   Lemma seq_S_end_app j n : seq j (S n) = seq j n ++ [j + n].
   Proof.
     revert j. induction n as [|n IH]; intros j; simpl in *; f_equal; [done |].
-    rewrite IH. f_equal. f_equal. lia.
+    by rewrite IH, Nat.add_succ_r.
   Qed.
 
   Lemma Forall_seq (P : nat → Prop) i n :
     Forall P (seq i n) ↔ ∀ j, i ≤ j < i + n → P j.
   Proof.
     rewrite Forall_lookup. split.
-    - intros H j [??]. apply (H (j - i)).
-      rewrite lookup_seq; auto with f_equal lia.
-    - intros H j x Hj. apply lookup_seq_inv in Hj.
-      destruct Hj; subst. auto with lia.
+    - intros H j [??]. apply (H (j - i)), lookup_seq. lia.
+    - intros H j x [-> ?]%lookup_seq. auto with lia.
   Qed.
 End seq.
 
@@ -3667,18 +3671,19 @@ End seq.
 Section seqZ.
   Implicit Types (m n : Z) (i j : nat).
   Local Open Scope Z.
+
   Lemma seqZ_nil m n : n ≤ 0 → seqZ m n = [].
   Proof. by destruct n. Qed.
   Lemma seqZ_cons m n : 0 < n → seqZ m n = m :: seqZ (Z.succ m) (Z.pred n).
   Proof.
     intros H. unfold seqZ. replace n with (Z.succ (Z.pred n)) at 1 by lia.
     rewrite Z2Nat.inj_succ by lia. f_equal/=.
-    rewrite <-fmap_seq, <-list_fmap_compose.
+    rewrite <-fmap_S_seq, <-list_fmap_compose.
     apply map_ext; naive_solver lia.
   Qed.
   Lemma seqZ_length m n : length (seqZ m n) = Z.to_nat n.
   Proof. unfold seqZ; by rewrite fmap_length, seq_length. Qed.
-  Lemma seqZ_fmap m m' n : Z.add m <$> seqZ m' n = seqZ (m + m') n.
+  Lemma fmap_add_seqZ m m' n : Z.add m <$> seqZ m' n = seqZ (m + m') n.
   Proof.
     revert m'. induction n as [|n ? IH|] using (Z_succ_pred_induction 0); intros m'.
     - by rewrite seqZ_nil.
@@ -3686,17 +3691,17 @@ Section seqZ.
       f_equal/=. rewrite Z.pred_succ, IH; simpl. f_equal; lia.
     - by rewrite !seqZ_nil by lia.
   Qed.
-  Lemma seqZ_lookup_lt m n i : i < n → seqZ m n !! i = Some (m + i).
+  Lemma lookup_seqZ_lt m n i : i < n → seqZ m n !! i = Some (m + i).
   Proof.
-    revert m i.
-    induction n as [|n ? IH|] using (Z_succ_pred_induction 0); intros m i Hi; try lia.
+    revert m i. induction n as [|n ? IH|] using (Z_succ_pred_induction 0);
+      intros m i Hi; [lia| |lia].
     rewrite seqZ_cons by lia. destruct i as [|i]; simpl.
     - f_equal; lia.
     - rewrite Z.pred_succ, IH by lia. f_equal; lia.
   Qed.
-  Lemma seqZ_lookup_total_lt m n i : i < n → seqZ m n !!! i = m + i.
-  Proof. intros. by rewrite !list_lookup_total_alt, seqZ_lookup_lt. Qed.
-  Lemma seqZ_lookup_ge m n i : n ≤ i → seqZ m n !! i = None.
+  Lemma lookup_total_seqZ_lt m n i : i < n → seqZ m n !!! i = m + i.
+  Proof. intros. by rewrite !list_lookup_total_alt, lookup_seqZ_lt. Qed.
+  Lemma lookup_seqZ_ge m n i : n ≤ i → seqZ m n !! i = None.
   Proof.
     revert m i.
     induction n as [|n ? IH|] using (Z_succ_pred_induction 0); intros m i Hi; try lia.
@@ -3705,13 +3710,23 @@ Section seqZ.
       destruct i as [|i]; simpl; [lia|]. by rewrite Z.pred_succ, IH by lia.
     - by rewrite seqZ_nil by lia.
   Qed.
-  Lemma seqZ_lookup_total_ge m n i : n ≤ i → seqZ m n !!! i = inhabitant.
-  Proof. intros. by rewrite !list_lookup_total_alt, seqZ_lookup_ge. Qed.
-  Lemma seqZ_lookup m n i m' : seqZ m n !! i = Some m' ↔ m' = m + i ∧ i < n.
+  Lemma lookup_total_seqZ_ge m n i : n ≤ i → seqZ m n !!! i = inhabitant.
+  Proof. intros. by rewrite !list_lookup_total_alt, lookup_seqZ_ge. Qed.
+  Lemma lookup_seqZ m n i m' : seqZ m n !! i = Some m' ↔ m' = m + i ∧ i < n.
   Proof.
     destruct (Z_le_gt_dec n i).
-    { rewrite seqZ_lookup_ge by lia. naive_solver lia. }
-    rewrite seqZ_lookup_lt by lia. naive_solver lia.
+    - rewrite lookup_seqZ_ge by lia. naive_solver lia.
+    - rewrite lookup_seqZ_lt by lia. naive_solver lia.
+  Qed.
+  Lemma NoDup_seqZ m n : NoDup (seqZ m n).
+  Proof. apply NoDup_fmap_2, NoDup_seq. intros ???; lia. Qed.
+
+  Lemma Forall_seqZ (P : Z → Prop) m n :
+    Forall P (seqZ m n) ↔ ∀ m', m ≤ m' < m + n → P m'.
+  Proof.
+    rewrite Forall_lookup. split.
+    - intros H j [??]. apply (H (Z.to_nat (j - m))), lookup_seqZ. lia.
+    - intros H j x [-> ?]%lookup_seqZ. auto with lia.
   Qed.
 End seqZ.
 
