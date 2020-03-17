@@ -33,7 +33,9 @@ API-breaking change is listed.
 - Add type class `LookupTotal` with total lookup operation `(!!!) : M → K → A`.
   Provide instances for `list`, `fin_map`, and `vec`, as well as corresponding
   lemmas for the operations on these types. The instance for `vec` replaces the
-  ad-hoc `!!!` definition.
+  ad-hoc `!!!` definition. As a consequence, arguments of `!!!` are no longer
+  parsed in `vec_scope` and `fin_scope`, respectively. Moreover, since `!!!`
+  is overloaded, coercions around `!!!` no longer work.
 
 ## std++ 1.2.1 (released 2019-08-29)
 
