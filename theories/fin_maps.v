@@ -287,6 +287,8 @@ Lemma lookup_empty_is_Some {A} i : ¬is_Some ((∅ : M A) !! i).
 Proof. rewrite lookup_empty. by inversion 1. Qed.
 Lemma lookup_empty_Some {A} i (x : A) : ¬(∅ : M A) !! i = Some x.
 Proof. by rewrite lookup_empty. Qed.
+Lemma loopup_total_empty `{!Inhabited A} i : (∅ : M A) !!! i = inhabitant.
+Proof. by rewrite lookup_total_alt, lookup_empty. Qed.
 Lemma map_subset_empty {A} (m : M A) : m ⊄ ∅.
 Proof.
   intros [_ []]. rewrite map_subseteq_spec. intros ??. by rewrite lookup_empty.
@@ -419,8 +421,14 @@ Qed.
 (** ** Properties of the [delete] operation *)
 Lemma lookup_delete {A} (m : M A) i : delete i m !! i = None.
 Proof. apply lookup_partial_alter. Qed.
+Lemma lookup_total_delete `{!Inhabited A} (m : M A) i :
+  delete i m !!! i = inhabitant.
+Proof. by rewrite lookup_total_alt, lookup_delete. Qed.
 Lemma lookup_delete_ne {A} (m : M A) i j : i ≠ j → delete i m !! j = m !! j.
 Proof. apply lookup_partial_alter_ne. Qed.
+Lemma lookup_total_delete_ne `{!Inhabited A} (m : M A) i j :
+  i ≠ j → delete i m !!! j = m !!! j.
+Proof. intros. by rewrite lookup_total_alt, lookup_delete_ne. Qed.
 Lemma lookup_delete_Some {A} (m : M A) i j y :
   delete i m !! j = Some y ↔ i ≠ j ∧ m !! j = Some y.
 Proof.
@@ -486,10 +494,15 @@ Qed.
 (** ** Properties of the [insert] operation *)
 Lemma lookup_insert {A} (m : M A) i x : <[i:=x]>m !! i = Some x.
 Proof. unfold insert. apply lookup_partial_alter. Qed.
+Lemma lookup_total_insert `{!Inhabited A} (m : M A) i x : <[i:=x]>m !!! i = x.
+Proof. by rewrite lookup_total_alt, lookup_insert. Qed.
 Lemma lookup_insert_rev {A}  (m : M A) i x y : <[i:=x]>m !! i = Some y → x = y.
 Proof. rewrite lookup_insert. congruence. Qed.
 Lemma lookup_insert_ne {A} (m : M A) i j x : i ≠ j → <[i:=x]>m !! j = m !! j.
 Proof. unfold insert. apply lookup_partial_alter_ne. Qed.
+Lemma lookup_total_insert_ne `{!Inhabited A} (m : M A) i j x :
+  i ≠ j → <[i:=x]>m !!! j = m !!! j.
+Proof. intros. by rewrite lookup_total_alt, lookup_insert_ne. Qed.
 Lemma insert_insert {A} (m : M A) i x y : <[i:=x]>(<[i:=y]>m) = <[i:=x]>m.
 Proof. unfold insert, map_insert. by rewrite <-partial_alter_compose. Qed.
 Lemma insert_commute {A} (m : M A) i j x y :
@@ -595,9 +608,15 @@ Lemma lookup_singleton_None {A} i j (x : A) :
 Proof. rewrite <-insert_empty,lookup_insert_None, lookup_empty; tauto. Qed.
 Lemma lookup_singleton {A} i (x : A) : ({[i := x]} : M A) !! i = Some x.
 Proof. by rewrite lookup_singleton_Some. Qed.
+Lemma lookup_total_singleton `{!Inhabited A} i (x : A) :
+  ({[i := x]} : M A) !!! i = x.
+Proof. by rewrite lookup_total_alt, lookup_singleton. Qed.
 Lemma lookup_singleton_ne {A} i j (x : A) :
   i ≠ j → ({[i := x]} : M A) !! j = None.
 Proof. by rewrite lookup_singleton_None. Qed.
+Lemma lookup_total_singleton_ne `{!Inhabited A} i j (x : A) :
+  i ≠ j → ({[i := x]} : M A) !!! j = inhabitant.
+Proof. intros. by rewrite lookup_total_alt, lookup_singleton_ne. Qed.
 Lemma map_non_empty_singleton {A} i (x : A) : {[i := x]} ≠ (∅ : M A).
 Proof.
   intros Hix. apply (f_equal (.!! i)) in Hix.
