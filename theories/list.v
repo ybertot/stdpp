@@ -3725,7 +3725,8 @@ Section seqZ.
     Forall P (seqZ m n) ↔ ∀ m', m ≤ m' < m + n → P m'.
   Proof.
     rewrite Forall_lookup. split.
-    - intros H j [??]. apply (H (Z.to_nat (j - m))), lookup_seqZ. lia.
+    - intros H j [??]. apply (H (Z.to_nat (j - m))), lookup_seqZ.
+      rewrite !Z2Nat.id by lia. lia.
     - intros H j x [-> ?]%lookup_seqZ. auto with lia.
   Qed.
 End seqZ.

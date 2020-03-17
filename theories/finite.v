@@ -208,7 +208,7 @@ Section enc_finite.
     apply NoDup_alt. intros i j x. rewrite !list_lookup_fmap. intros Hi Hj.
     destruct (seq _ _ !! i) as [i'|] eqn:Hi',
       (seq _ _ !! j) as [j'|] eqn:Hj'; simplify_eq/=.
-    destruct (lookup_seq_inv _ _ _ _ Hi'), (lookup_seq_inv _ _ _ _ Hj'); subst.
+    apply lookup_seq in Hi' as  [-> ?]. apply lookup_seq in Hj' as [-> ?].
     rewrite <-(to_of_nat i), <-(to_of_nat j) by done. by f_equal.
   Qed.
   Next Obligation.
