@@ -36,6 +36,14 @@ API-breaking change is listed.
   ad-hoc `!!!` definition. As a consequence, arguments of `!!!` are no longer
   parsed in `vec_scope` and `fin_scope`, respectively. Moreover, since `!!!`
   is overloaded, coercions around `!!!` no longer work.
+- Make lemmas for `seq` and `seqZ` consistent:
+  + Rename `fmap_seq` → `fmap_S_seq`
+  + Add `fmap_add_seq`, and rename `seqZ_fmap` → `fmap_add_seqZ`
+  + Rename `lookup_seq` → `lookup_seq_lt`
+  + Rename `seqZ_lookup_lt` → `lookup_seqZ_lt`,
+    `seqZ_lookup_ge` → `lookup_seqZ_ge`, and `seqZ_lookup` → `lookup_seqZ`
+  + Rename `lookup_seq_inv` → `lookup_seq` and generalize it to a bi-implication
+  + Add `NoDup_seqZ` and `Forall_seqZ`
 
 ## std++ 1.2.1 (released 2019-08-29)
 
