@@ -30,6 +30,10 @@ API-breaking change is listed.
 - Add tactic `set_unfold in H`.
 - Set `Hint Mode` for `TCAnd`, `TCOr`, `TCForall`, `TCForall2`, `TCElemOf`,
   `TCEq`, and `TCDiag`.
+- Add type class `LookupTotal` with total lookup operation `(!!!) : M → K → A`.
+  Provide instances for `list`, `fin_map`, and `vec`, as well as corresponding
+  lemmas for the operations on these types. The instance for `vec` replaces the
+  ad-hoc `!!!` definition.
 
 ## std++ 1.2.1 (released 2019-08-29)
 
