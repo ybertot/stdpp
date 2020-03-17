@@ -401,9 +401,8 @@ used by [positives_flatten]. *)
 Definition positives_unflatten (p : positive) : option (list positive) :=
   positives_unflatten_go p [] 1.
 
-
 (** [seqZ m n] generates the sequence [m], [m + 1], ..., [m + n - 1] 
-over integers, provided [n >= 0]. If n < 0, then the range is empty. **)
+over integers, provided [0 ≤ n]. If [n < 0], then the range is empty. **)
 Definition seqZ (m len: Z) : list Z :=
   (λ i: nat, Z.add i m) <$> (seq 0 (Z.to_nat len)).
 Arguments seqZ : simpl never.
