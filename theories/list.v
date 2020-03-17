@@ -509,6 +509,7 @@ Lemma lookup_ge_None_1 l i : l !! i = None → length l ≤ i.
 Proof. by rewrite lookup_ge_None. Qed.
 Lemma lookup_ge_None_2 l i : length l ≤ i → l !! i = None.
 Proof. by rewrite lookup_ge_None. Qed.
+
 Lemma list_eq_same_length l1 l2 n :
   length l2 = n → length l1 = n →
   (∀ i x y, i < n → l1 !! i = Some x → l2 !! i = Some y → x = y) → l1 = l2.
@@ -594,8 +595,7 @@ Lemma list_insert_id l i x : l !! i = Some x → <[i:=x]>l = l.
 Proof. revert i. induction l; intros [|i] [=]; f_equal/=; auto. Qed.
 Lemma list_insert_ge l i x : length l ≤ i → <[i:=x]>l = l.
 Proof. revert i. induction l; intros [|i] ?; f_equal/=; auto with lia. Qed.
-Lemma list_insert_insert l i x y :
-  <[i:=x]> (<[i:=y]> l) = <[i:=x]> l.
+Lemma list_insert_insert l i x y : <[i:=x]> (<[i:=y]> l) = <[i:=x]> l.
 Proof. revert i. induction l; intros [|i]; f_equal/=; auto. Qed.
 
 Lemma list_lookup_other l i x :
@@ -605,6 +605,7 @@ Proof.
   - by exists 1, x1.
   - by exists 0, x0.
 Qed.
+
 Lemma alter_app_l f l1 l2 i :
   i < length l1 → alter f i (l1 ++ l2) = alter f i l1 ++ l2.
 Proof. revert i. induction l1; intros [|?] ?; f_equal/=; auto with lia. Qed.
@@ -3551,20 +3552,20 @@ End seq.
 
 (** ** Properties of the [seqZ] function *)
 Section seqZ.
-  Implicit Types (m n: Z) (i j: nat).
+  Implicit Types (m n : Z) (i j : nat).
   Local Open Scope Z.
-  Lemma seqZ_nil m n: n ≤ 0 → seqZ m n = [].
+  Lemma seqZ_nil m n : n ≤ 0 → seqZ m n = [].
   Proof. by destruct n. Qed.
-  Lemma seqZ_cons m n: 0 < n → seqZ m n = m :: seqZ (Z.succ m) (Z.pred n).
+  Lemma seqZ_cons m n : 0 < n → seqZ m n = m :: seqZ (Z.succ m) (Z.pred n).
   Proof.
     intros H. unfold seqZ. replace n with (Z.succ (Z.pred n)) at 1 by lia.
     rewrite Z2Nat.inj_succ by lia. f_equal/=.
     rewrite <-fmap_seq, <-list_fmap_compose.
     apply map_ext; naive_solver lia.
   Qed.
-  Lemma seqZ_length m n: length (seqZ m n) = Z.to_nat n.
+  Lemma seqZ_length m n : length (seqZ m n) = Z.to_nat n.
   Proof. unfold seqZ; by rewrite fmap_length, seq_length. Qed.
-  Lemma seqZ_fmap m m' n: Z.add m <$> seqZ m' n = seqZ (m + m') n.
+  Lemma seqZ_fmap m m' n : Z.add m <$> seqZ m' n = seqZ (m + m') n.
   Proof.
     revert m'. induction n as [|n ? IH|] using (Z_succ_pred_induction 0); intros m'.
     - by rewrite seqZ_nil.
@@ -3572,7 +3573,7 @@ Section seqZ.
       f_equal/=. rewrite Z.pred_succ, IH; simpl. f_equal; lia.
     - by rewrite !seqZ_nil by lia.
   Qed.
-  Lemma seqZ_lookup_lt m n i: i < n → seqZ m n !! i = Some (m + i).
+  Lemma seqZ_lookup_lt m n i : i < n → seqZ m n !! i = Some (m + i).
   Proof.
     revert m i.
     induction n as [|n ? IH|] using (Z_succ_pred_induction 0); intros m i Hi; try lia.
