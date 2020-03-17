@@ -491,9 +491,16 @@ Lemma nil_length_inv l : length l = 0 → l = [].
 Proof. by destruct l. Qed.
 Lemma lookup_cons_ne_0 l x i : i ≠ 0 → (x :: l) !! i = l !! pred i.
 Proof. by destruct i. Qed.
+Lemma lookup_total_cons_ne_0 `{!Inhabited A} l x i :
+  i ≠ 0 → (x :: l) !!! i = l !!! pred i.
+Proof. by destruct i. Qed.
 Lemma lookup_nil i : @nil A !! i = None.
 Proof. by destruct i. Qed.
+Lemma lookup_total_nil `{!Inhabited A} i : @nil A !!! i = inhabitant.
+Proof. by destruct i. Qed.
 Lemma lookup_tail l i : tail l !! i = l !! S i.
+Proof. by destruct l. Qed.
+Lemma lookup_total_tail `{!Inhabited A} l i : tail l !!! i = l !!! S i.
 Proof. by destruct l. Qed.
 Lemma lookup_lt_Some l i x : l !! i = Some x → i < length l.
 Proof. revert i. induction l; intros [|?] ?; naive_solver auto with arith. Qed.
@@ -520,26 +527,6 @@ Proof.
     rewrite Hy; f_equal; apply (Hl i); eauto using lookup_lt_Some.
   - by rewrite lookup_ge_None, Hlen, <-lookup_ge_None.
 Qed.
-Lemma lookup_app_l l1 l2 i : i < length l1 → (l1 ++ l2) !! i = l1 !! i.
-Proof. revert i. induction l1; intros [|?]; naive_solver auto with lia. Qed.
-Lemma lookup_app_l_Some l1 l2 i x : l1 !! i = Some x → (l1 ++ l2) !! i = Some x.
-Proof. intros. rewrite lookup_app_l; eauto using lookup_lt_Some. Qed.
-Lemma lookup_app_r l1 l2 i :
-  length l1 ≤ i → (l1 ++ l2) !! i = l2 !! (i - length l1).
-Proof. revert i. induction l1; intros [|?]; simpl; auto with lia. Qed.
-Lemma lookup_app_Some l1 l2 i x :
-  (l1 ++ l2) !! i = Some x ↔
-    l1 !! i = Some x ∨ length l1 ≤ i ∧ l2 !! (i - length l1) = Some x.
-Proof.
-  split.
-  - revert i. induction l1 as [|y l1 IH]; intros [|i] ?;
-      simplify_eq/=; auto with lia.
-    destruct (IH i) as [?|[??]]; auto with lia.
-  - intros [?|[??]]; auto using lookup_app_l_Some. by rewrite lookup_app_r.
-Qed.
-Lemma list_lookup_middle l1 l2 x n :
-  n = length l1 → (l1 ++ x :: l2) !! n = Some x.
-Proof. intros ->. by induction l1. Qed.
 
 Lemma nth_lookup l i d : nth i l d = default d (l !! i).
 Proof. revert i. induction l as [|x l IH]; intros [|i]; simpl; auto. Qed.
@@ -562,6 +549,42 @@ Proof. rewrite list_lookup_total_alt; by intros [x ->]. Qed.
 Lemma list_lookup_lookup_total_lt `{!Inhabited A} l i :
   i < length l → l !! i = Some (l !!! i).
 Proof. intros ?. by apply list_lookup_lookup_total, lookup_lt_is_Some_2. Qed.
+Lemma list_lookup_alt `{!Inhabited A} l i x :
+  l !! i = Some x ↔ i < length l ∧ l !!! i = x.
+Proof.
+  naive_solver eauto using list_lookup_lookup_total_lt,
+    list_lookup_total_correct, lookup_lt_Some.
+Qed.
+
+Lemma lookup_app_l l1 l2 i : i < length l1 → (l1 ++ l2) !! i = l1 !! i.
+Proof. revert i. induction l1; intros [|?]; naive_solver auto with lia. Qed.
+Lemma lookup_total_app_l `{!Inhabited A} l1 l2 i :
+  i < length l1 → (l1 ++ l2) !!! i = l1 !!! i.
+Proof. intros. by rewrite !list_lookup_total_alt, lookup_app_l. Qed.
+Lemma lookup_app_l_Some l1 l2 i x : l1 !! i = Some x → (l1 ++ l2) !! i = Some x.
+Proof. intros. rewrite lookup_app_l; eauto using lookup_lt_Some. Qed.
+Lemma lookup_app_r l1 l2 i :
+  length l1 ≤ i → (l1 ++ l2) !! i = l2 !! (i - length l1).
+Proof. revert i. induction l1; intros [|?]; simpl; auto with lia. Qed.
+Lemma lookup_total_app_r `{!Inhabited A} l1 l2 i :
+  length l1 ≤ i → (l1 ++ l2) !!! i = l2 !!! (i - length l1).
+Proof. intros. by rewrite !list_lookup_total_alt, lookup_app_r. Qed.
+Lemma lookup_app_Some l1 l2 i x :
+  (l1 ++ l2) !! i = Some x ↔
+    l1 !! i = Some x ∨ length l1 ≤ i ∧ l2 !! (i - length l1) = Some x.
+Proof.
+  split.
+  - revert i. induction l1 as [|y l1 IH]; intros [|i] ?;
+      simplify_eq/=; auto with lia.
+    destruct (IH i) as [?|[??]]; auto with lia.
+  - intros [?|[??]]; auto using lookup_app_l_Some. by rewrite lookup_app_r.
+Qed.
+Lemma list_lookup_middle l1 l2 x n :
+  n = length l1 → (l1 ++ x :: l2) !! n = Some x.
+Proof. intros ->. by induction l1. Qed.
+Lemma list_lookup_total_middle `{!Inhabited A} l1 l2 x n :
+  n = length l1 → (l1 ++ x :: l2) !!! n = x.
+Proof. intros. by rewrite !list_lookup_total_alt, list_lookup_middle. Qed.
 
 Lemma list_insert_alter l i x : <[i:=x]>l = alter (λ _, x) i l.
 Proof. by revert i; induction l; intros []; intros; f_equal/=. Qed.
@@ -571,12 +594,28 @@ Lemma insert_length l i x : length (<[i:=x]>l) = length l.
 Proof. revert i. by induction l; intros [|?]; f_equal/=. Qed.
 Lemma list_lookup_alter f l i : alter f i l !! i = f <$> l !! i.
 Proof. revert i. induction l. done. intros [|i]. done. apply (IHl i). Qed.
+Lemma list_lookup_total_alter `{!Inhabited A} f l i :
+  i < length l → alter f i l !!! i = f (l !!! i).
+Proof.
+  intros [x Hx]%lookup_lt_is_Some_2.
+  by rewrite !list_lookup_total_alt, list_lookup_alter, Hx.
+Qed.
 Lemma list_lookup_alter_ne f l i j : i ≠ j → alter f i l !! j = l !! j.
 Proof. revert i j. induction l; [done|]. intros [] []; naive_solver. Qed.
+Lemma list_lookup_total_alter_ne `{!Inhabited A} f l i j :
+  i ≠ j → alter f i l !!! j = l !!! j.
+Proof. intros. by rewrite !list_lookup_total_alt, list_lookup_alter_ne. Qed.
+
 Lemma list_lookup_insert l i x : i < length l → <[i:=x]>l !! i = Some x.
 Proof. revert i. induction l; intros [|?] ?; f_equal/=; auto with lia. Qed.
+Lemma list_lookup_total_insert `{!Inhabited A} l i x :
+  i < length l → <[i:=x]>l !!! i = x.
+Proof. intros. by rewrite !list_lookup_total_alt, list_lookup_insert. Qed.
 Lemma list_lookup_insert_ne l i j x : i ≠ j → <[i:=x]>l !! j = l !! j.
 Proof. revert i j. induction l; [done|]. intros [] []; naive_solver. Qed.
+Lemma list_lookup_total_insert_ne `{!Inhabited A} l i j x :
+  i ≠ j → <[i:=x]>l !!! j = l !!! j.
+Proof. intros. by rewrite !list_lookup_total_alt, list_lookup_insert_ne. Qed.
 Lemma list_lookup_insert_Some l i x j y :
   <[i:=x]>l !! j = Some y ↔
     i = j ∧ x = y ∧ j < length l ∨ i ≠ j ∧ l !! j = Some y.
@@ -658,18 +697,28 @@ Proof.
   rewrite list_lookup_insert_ne, IH by lia.
   by replace (j - i) with (S (j - S i)) by lia.
 Qed.
+Lemma list_lookup_total_inserts `{!Inhabited A} l i k j :
+  i ≤ j < i + length k → j < length l →
+  list_inserts i k l !!! j = k !!! (j - i).
+Proof. intros. by rewrite !list_lookup_total_alt, list_lookup_inserts. Qed.
 Lemma list_lookup_inserts_lt l i k j :
   j < i → list_inserts i k l !! j = l !! j.
 Proof.
   revert i j. induction k; intros i j ?; csimpl;
     rewrite ?list_lookup_insert_ne by lia; auto with lia.
 Qed.
+Lemma list_lookup_total_inserts_lt `{!Inhabited A}l i k j :
+  j < i → list_inserts i k l !!! j = l !!! j.
+Proof. intros. by rewrite !list_lookup_total_alt, list_lookup_inserts_lt. Qed.
 Lemma list_lookup_inserts_ge l i k j :
   i + length k ≤ j → list_inserts i k l !! j = l !! j.
 Proof.
   revert i j. induction k; csimpl; intros i j ?;
     rewrite ?list_lookup_insert_ne by lia; auto with lia.
 Qed.
+Lemma list_lookup_total_inserts_ge `{!Inhabited A} l i k j :
+  i + length k ≤ j → list_inserts i k l !!! j = l !!! j.
+Proof. intros. by rewrite !list_lookup_total_alt, list_lookup_inserts_ge. Qed.
 Lemma list_lookup_inserts_Some l i k j y :
   list_inserts i k l !! j = Some y ↔
     (j < i ∨ i + length k ≤ j) ∧ l !! j = Some y ∨
@@ -758,12 +807,26 @@ Proof.
   induction 1 as [|???? IH]; [by exists 0 |].
   destruct IH as [i ?]; auto. by exists (S i).
 Qed.
+Lemma elem_of_list_lookup_total_1 `{!Inhabited A} l x :
+  x ∈ l → ∃ i, i < length l ∧ l !!! i = x.
+Proof.
+  intros [i Hi]%elem_of_list_lookup_1.
+  eauto using lookup_lt_Some, list_lookup_total_correct.
+Qed.
 Lemma elem_of_list_lookup_2 l i x : l !! i = Some x → x ∈ l.
 Proof.
   revert i. induction l; intros [|i] ?; simplify_eq/=; constructor; eauto.
 Qed.
+Lemma elem_of_list_lookup_total_2 `{!Inhabited A} l i :
+  i < length l → l !!! i ∈ l.
+Proof. intros. by eapply elem_of_list_lookup_2, list_lookup_lookup_total_lt. Qed.
 Lemma elem_of_list_lookup l x : x ∈ l ↔ ∃ i, l !! i = Some x.
 Proof. firstorder eauto using elem_of_list_lookup_1, elem_of_list_lookup_2. Qed.
+Lemma elem_of_list_lookup_total `{!Inhabited A} l x :
+  x ∈ l ↔ ∃ i, i < length l ∧ l !!! i = x.
+Proof.
+  naive_solver eauto using elem_of_list_lookup_total_1, elem_of_list_lookup_total_2.
+Qed.
 Lemma elem_of_list_split_length l i x :
   l !! i = Some x → ∃ l1 l2, l = l1 ++ x :: l2 ∧ i = length l1.
 Proof.
@@ -1032,8 +1095,12 @@ Proof.
 Qed.
 Lemma lookup_take l n i : i < n → take n l !! i = l !! i.
 Proof. revert n i. induction l; intros [|n] [|i] ?; simpl; auto with lia. Qed.
+Lemma lookup_total_take `{!Inhabited A} l n i : i < n → take n l !!! i = l !!! i.
+Proof. intros. by rewrite !list_lookup_total_alt, lookup_take. Qed.
 Lemma lookup_take_ge l n i : n ≤ i → take n l !! i = None.
 Proof. revert n i. induction l; intros [|?] [|?] ?; simpl; auto with lia. Qed.
+Lemma lookup_total_take_ge `{!Inhabited A} l n i : n ≤ i → take n l !!! i = inhabitant.
+Proof. intros. by rewrite list_lookup_total_alt, lookup_take_ge. Qed.
 Lemma take_alter f l n i : n ≤ i → take n (alter f i l) = take n l.
 Proof.
   intros. apply list_eq. intros j. destruct (le_lt_dec n j).
@@ -1089,6 +1156,8 @@ Lemma drop_plus_app l k n m :
 Proof. intros <-. by rewrite <-drop_drop, drop_app. Qed.
 Lemma lookup_drop l n i : drop n l !! i = l !! (n + i).
 Proof. revert n i. induction l; intros [|i] ?; simpl; auto. Qed.
+Lemma lookup_total_drop `{!Inhabited A} l n i : drop n l !!! i = l !!! (n + i).
+Proof. by rewrite !list_lookup_total_alt, lookup_drop. Qed.
 Lemma drop_alter f l n i : i < n → drop n (alter f i l) = drop n l.
 Proof.
   intros. apply list_eq. intros j.
@@ -1143,6 +1212,9 @@ Lemma lookup_replicate_1 n x y i :
 Proof. by rewrite lookup_replicate. Qed.
 Lemma lookup_replicate_2 n x i : i < n → replicate n x !! i = Some x.
 Proof. by rewrite lookup_replicate. Qed.
+Lemma lookup_total_replicate_2 `{!Inhabited A} n x i :
+  i < n → replicate n x !!! i = x.
+Proof. intros. by rewrite list_lookup_total_alt, lookup_replicate_2. Qed.
 Lemma lookup_replicate_None n x i : n ≤ i ↔ replicate n x !! i = None.
 Proof.
   rewrite eq_None_not_Some, Nat.le_ngt. split.
@@ -1272,6 +1344,9 @@ Proof.
   - by rewrite resize_le, lookup_take by lia.
   - by rewrite resize_ge, lookup_app_l by lia.
 Qed.
+Lemma lookup_total_resize `{!Inhabited A} l n x i :
+  i < n → i < length l → resize n x l !!! i = l !!! i.
+Proof. intros. by rewrite !list_lookup_total_alt, lookup_resize. Qed.
 Lemma lookup_resize_new l n x i :
   length l ≤ i → i < n → resize n x l !! i = Some x.
 Proof.
@@ -1279,8 +1354,14 @@ Proof.
   replace i with (length l + (i - length l)) by lia.
   by rewrite lookup_app_r, lookup_replicate_2 by lia.
 Qed.
+Lemma lookup_total_resize_new `{!Inhabited A} l n x i :
+  length l ≤ i → i < n → resize n x l !!! i = x.
+Proof. intros. by rewrite !list_lookup_total_alt, lookup_resize_new. Qed.
 Lemma lookup_resize_old l n x i : n ≤ i → resize n x l !! i = None.
 Proof. intros ?. apply lookup_ge_None_2. by rewrite resize_length. Qed.
+Lemma lookup_total_resize_old `{!Inhabited A} l n x i :
+  n ≤ i → resize n x l !!! i = inhabitant.
+Proof. intros. by rewrite !list_lookup_total_alt, lookup_resize_old. Qed.
 
 (** ** Properties of the [reshape] function *)
 Lemma reshape_length szs l : length (reshape szs l) = length szs.
@@ -1536,8 +1617,14 @@ Proof.
 Qed.
 Lemma lookup_delete_lt l i j : j < i → delete i l !! j = l !! j.
 Proof. revert i j; induction l; intros [] []; naive_solver eauto with lia. Qed.
+Lemma lookup_total_delete_lt `{!Inhabited A} l i j :
+  j < i → delete i l !!! j = l !!! j.
+Proof. intros. by rewrite !list_lookup_total_alt, lookup_delete_lt. Qed.
 Lemma lookup_delete_ge l i j : i ≤ j → delete i l !! j = l !! S j.
 Proof. revert i j; induction l; intros [] []; naive_solver eauto with lia. Qed.
+Lemma lookup_total_delete_ge `{!Inhabited A} l i j :
+  i ≤ j → delete i l !!! j = l !!! S j.
+Proof. intros. by rewrite !list_lookup_total_alt, lookup_delete_ge. Qed.
 
 Lemma Permutation_inj l1 l2 :
   Permutation l1 l2 ↔
@@ -2321,21 +2408,24 @@ Section Forall_Exists.
   Proof. rewrite Forall_and; tauto. Qed.
   Lemma Forall_delete l i : Forall P l → Forall P (delete i l).
   Proof. intros H. revert i. by induction H; intros [|i]; try constructor. Qed.
+
   Lemma Forall_lookup l : Forall P l ↔ ∀ i x, l !! i = Some x → P x.
   Proof.
     rewrite Forall_forall. setoid_rewrite elem_of_list_lookup. naive_solver.
   Qed.
+  Lemma Forall_lookup_total `{!Inhabited A} l :
+    Forall P l ↔ ∀ i, i < length l → P (l !!! i).
+  Proof. rewrite Forall_lookup. setoid_rewrite list_lookup_alt. naive_solver. Qed.
   Lemma Forall_lookup_1 l i x : Forall P l → l !! i = Some x → P x.
   Proof. rewrite Forall_lookup. eauto. Qed.
+  Lemma Forall_lookup_total_1 `{!Inhabited A} l i :
+    Forall P l → i < length l → P (l !!! i).
+  Proof. rewrite Forall_lookup_total. eauto. Qed.
   Lemma Forall_lookup_2 l : (∀ i x, l !! i = Some x → P x) → Forall P l.
   Proof. by rewrite Forall_lookup. Qed.
-  Lemma Forall_reverse l : Forall P (reverse l) ↔ Forall P l.
-  Proof.
-    induction l as [|x l IH]; simpl; [done|].
-    rewrite reverse_cons, Forall_cons, Forall_app, Forall_singleton. naive_solver.
-  Qed.
-  Lemma Forall_tail l : Forall P l → Forall P (tail l).
-  Proof. destruct 1; simpl; auto. Qed.
+  Lemma Forall_lookup_total_2 `{!Inhabited A} l :
+    (∀ i, i < length l → P (l !!! i)) → Forall P l.
+  Proof. by rewrite Forall_lookup_total. Qed.
   Lemma Forall_nth d l : Forall P l ↔ ∀ i, i < length l → P (nth i l d).
   Proof.
     rewrite Forall_lookup. split.
@@ -2344,13 +2434,21 @@ Section Forall_Exists.
     - intros Hl i x Hl'. specialize (Hl _ (lookup_lt_Some _ _ _ Hl')).
       by rewrite (nth_lookup_Some _ _ _ _ Hl') in Hl.
   Qed.
+
+  Lemma Forall_reverse l : Forall P (reverse l) ↔ Forall P l.
+  Proof.
+    induction l as [|x l IH]; simpl; [done|].
+    rewrite reverse_cons, Forall_cons, Forall_app, Forall_singleton. naive_solver.
+  Qed.
+  Lemma Forall_tail l : Forall P l → Forall P (tail l).
+  Proof. destruct 1; simpl; auto. Qed.
   Lemma Forall_alter f l i :
-    Forall P l → (∀ x, l!!i = Some x → P x → P (f x)) → Forall P (alter f i l).
+    Forall P l → (∀ x, l !! i = Some x → P x → P (f x)) → Forall P (alter f i l).
   Proof.
     intros Hl. revert i. induction Hl; simpl; intros [|i]; constructor; auto.
   Qed.
   Lemma Forall_alter_inv f l i :
-    Forall P (alter f i l) → (∀ x, l!!i = Some x → P (f x) → P x) → Forall P l.
+    Forall P (alter f i l) → (∀ x, l !! i = Some x → P (f x) → P x) → Forall P l.
   Proof.
     revert i. induction l; intros [|?]; simpl;
       inversion_clear 1; constructor; eauto.
@@ -3148,6 +3246,12 @@ Section fmap.
   Proof. intros; induction l; f_equal/=; auto. Qed.
   Lemma list_lookup_fmap l i : (f <$> l) !! i = f <$> (l !! i).
   Proof. revert i. induction l; intros [|n]; by try revert n. Qed.
+  Lemma list_lookup_total_fmap `{!Inhabited A, !Inhabited B} l i :
+    i < length l → (f <$> l) !!! i = f (l !!! i).
+  Proof.
+    intros [x Hx]%lookup_lt_is_Some_2.
+    by rewrite !list_lookup_total_alt, list_lookup_fmap, Hx.
+  Qed.
   Lemma list_lookup_fmap_inv l i x :
     (f <$> l) !! i = Some x → ∃ y, x = f y ∧ l !! i = Some y.
   Proof.
@@ -3481,6 +3585,12 @@ Section imap.
     revert f i. induction l as [|x l IH]; intros f [|i]; f_equal/=; auto.
     by rewrite IH.
   Qed.
+  Lemma list_lookup_total_imap `{!Inhabited A, !Inhabited B} l i :
+    i < length l → imap f l !!! i = f i (l !!! i).
+  Proof.
+    intros [x Hx]%lookup_lt_is_Some_2.
+    by rewrite !list_lookup_total_alt, list_lookup_imap, Hx.
+  Qed.
 
   Lemma imap_length l : length (imap f l) = length l.
   Proof. revert f. induction l; simpl; eauto. Qed.
@@ -3523,8 +3633,12 @@ Section seq.
     revert j i. induction n as [|n IH]; intros j [|i] ?; simpl; auto with lia.
     rewrite IH; auto with lia.
   Qed.
+  Lemma lookup_total_seq j n i : i < n → seq j n !!! i = j + i.
+  Proof. intros. by rewrite !list_lookup_total_alt, lookup_seq. Qed.
   Lemma lookup_seq_ge j n i : n ≤ i → seq j n !! i = None.
   Proof. revert j i. induction n; intros j [|i] ?; simpl; auto with lia. Qed.
+  Lemma lookup_total_seq_ge j n i : n ≤ i → seq j n !!! i = inhabitant.
+  Proof. intros. by rewrite !list_lookup_total_alt, lookup_seq_ge. Qed.
   Lemma lookup_seq_inv j n i j' : seq j n !! i = Some j' → j' = j + i ∧ i < n.
   Proof.
     destruct (le_lt_dec n i); [by rewrite lookup_seq_ge|].
@@ -3581,6 +3695,8 @@ Section seqZ.
     - f_equal; lia.
     - rewrite Z.pred_succ, IH by lia. f_equal; lia.
   Qed.
+  Lemma seqZ_lookup_total_lt m n i : i < n → seqZ m n !!! i = m + i.
+  Proof. intros. by rewrite !list_lookup_total_alt, seqZ_lookup_lt. Qed.
   Lemma seqZ_lookup_ge m n i : n ≤ i → seqZ m n !! i = None.
   Proof.
     revert m i.
@@ -3590,6 +3706,8 @@ Section seqZ.
       destruct i as [|i]; simpl; [lia|]. by rewrite Z.pred_succ, IH by lia.
     - by rewrite seqZ_nil by lia.
   Qed.
+  Lemma seqZ_lookup_total_ge m n i : n ≤ i → seqZ m n !!! i = inhabitant.
+  Proof. intros. by rewrite !list_lookup_total_alt, seqZ_lookup_ge. Qed.
   Lemma seqZ_lookup m n i m' : seqZ m n !! i = Some m' ↔ m' = m + i ∧ i < n.
   Proof.
     destruct (Z_le_gt_dec n i).
@@ -3825,6 +3943,12 @@ Section zip_with.
   Proof.
     revert k i. induction l; intros [|??] [|?]; f_equal/=; auto.
     by destruct (_ !! _).
+  Qed.
+  Lemma lookup_total_zip_with `{!Inhabited A, !Inhabited B, !Inhabited C} l k i :
+    i < length l → i < length k → zip_with f l k !!! i = f (l !!! i) (k !!! i).
+  Proof.
+    intros [x Hx]%lookup_lt_is_Some_2 [y Hy]%lookup_lt_is_Some_2.
+    by rewrite !list_lookup_total_alt, lookup_zip_with, Hx, Hy.
   Qed.
   Lemma lookup_zip_with_Some l k i z :
     zip_with f l k !! i = Some z
