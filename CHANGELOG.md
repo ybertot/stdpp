@@ -1,7 +1,16 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## std++ master
+## std++ 1.3 (released 2020-03-18)
+
+Coq 8.11 is supported by this release.
+
+This release of std++ received contributions by Amin Timany, Armaël Guéneau,
+Dan Frumin, David Swasey, Jacques-Henri Jourdan, Michael Sammler, Paolo G.
+Giarrusso, Pierre-Marie Pédrot, Ralf Jung, Robbert Krebbers, Simon Friis Vindum,
+Tej Chajed, and William Mansky
+
+Noteworthy additions and changes:
 
 - Rename `dom_map_filter` into `dom_map_filter_subseteq` and repurpose
   `dom_map_filter` for the version with the equality. This follows the naming
