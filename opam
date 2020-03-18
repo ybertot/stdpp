@@ -7,9 +7,8 @@ homepage: "https://gitlab.mpi-sws.org/iris/stdpp"
 bug-reports: "https://gitlab.mpi-sws.org/iris/stdpp/issues"
 dev-repo: "git+https://gitlab.mpi-sws.org/iris/stdpp.git"
 
-synopsis: "This project contains an extended \"Standard Library\" for Coq called coq-std++"
+synopsis: "std++ is an extended \"Standard Library\" for Coq"
 description: """
-This project contains an extended "Standard Library" for Coq called coq-std++.
 The key features of this library are as follows:
 
 - It provides a great number of definitions and lemmas for common data
