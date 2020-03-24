@@ -153,6 +153,9 @@ Existing Class TCEq.
 Existing Instance TCEq_refl.
 Hint Mode TCEq ! - - : typeclass_instances.
 
+Lemma TCEq_eq {A} (x1 x2 : A) : TCEq x1 x2 ↔ x1 = x2.
+Proof. split; destruct 1; reflexivity. Qed.
+
 Inductive TCDiag {A} (C : A → Prop) : A → A → Prop :=
   | TCDiag_diag x : C x → TCDiag C x x.
 Existing Class TCDiag.

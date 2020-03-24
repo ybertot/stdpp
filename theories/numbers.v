@@ -121,6 +121,10 @@ Definition max_list_with {A} (f : A → nat) : list A → nat :=
   end.
 Notation max_list := (max_list_with id).
 
+Lemma max_list_elem_of_le n ns:
+  n ∈ ns → (n ≤ max_list ns)%nat.
+Proof. induction 1; simpl; lia. Qed.
+
 (** * Notations and properties of [positive] *)
 Local Open Scope positive_scope.
 
@@ -473,6 +477,10 @@ Lemma Z_succ_pred_induction y (P : Z → Prop) :
   (∀ x, x ≤ y → P x → P (Z.pred x)) →
   (∀ x, P x).
 Proof. intros H0 HS HP. by apply (Z.order_induction' _ _ y). Qed.
+Lemma Zmod_in_range q a c :
+  q * c ≤ a < (q + 1) * c →
+  a `mod` c = a - q * c.
+Proof. intros ?. symmetry. apply Z.mod_unique_pos with q; lia. Qed.
 
 Local Close Scope Z_scope.
 

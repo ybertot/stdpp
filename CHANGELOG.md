@@ -1,6 +1,10 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
+## std++ master
+
+- Rename `drop_length` into `drop_length_gt` and add `drop_length_le`.
+
 ## std++ 1.3 (released 2020-03-18)
 
 Coq 8.11 is supported by this release.
