@@ -791,9 +791,9 @@ Lemma not_elem_of_cons l x y : x ∉ y :: l ↔ x ≠ y ∧ x ∉ l.
 Proof. rewrite elem_of_cons. tauto. Qed.
 Lemma elem_of_app l1 l2 x : x ∈ l1 ++ l2 ↔ x ∈ l1 ∨ x ∈ l2.
 Proof.
-  induction l1.
-  - split; [by right|]. intros [Hx|]; [|done]. by destruct (elem_of_nil x).
-  - simpl. rewrite !elem_of_cons, IHl1. tauto.
+  induction l1 as [|y l1 IH]; simpl.
+  - rewrite elem_of_nil. naive_solver.
+  - rewrite !elem_of_cons, IH. naive_solver.
 Qed.
 Lemma not_elem_of_app l1 l2 x : x ∉ l1 ++ l2 ↔ x ∉ l1 ∧ x ∉ l2.
 Proof. rewrite elem_of_app. tauto. Qed.
