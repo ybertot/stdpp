@@ -58,7 +58,7 @@ Section namespace.
     intros Hxy a. unfold up_close. rewrite !nclose_eq, !ndot_eq.
     unfold nclose_def, ndot_def; rewrite !elem_coPset_suffixes.
     intros [qx ->] [qy Hqy].
-    revert Hqy. by intros [= ?%encode_inj]%positives_flatten_suffix_eq.
+    revert Hqy. by intros [= ?%(inj _)]%positives_flatten_suffix_eq.
   Qed.
 
   Lemma ndot_preserve_disjoint_l N E x : ↑N ## E → ↑N.@x ## E.
