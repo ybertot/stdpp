@@ -3276,6 +3276,86 @@ Section find.
     - intros HP [[i x] (?%elem_of_list_lookup_2&?&?)%list_find_Some]; naive_solver.
   Qed.
 
+  Lemma list_find_app_None l1 l2 :
+    list_find P (l1 ++ l2) = None ↔ list_find P l1 = None ∧ list_find P l2 = None.
+  Proof. by rewrite !list_find_None, Forall_app. Qed.
+
+  Lemma list_find_app_Some l1 l2 i x :
+    list_find P (l1 ++ l2) = Some (i,x) ↔
+      list_find P l1 = Some (i,x) ∨
+      length l1 ≤ i ∧ list_find P l1 = None ∧ list_find P l2 = Some (i - length l1,x).
+  Proof.
+    split.
+    - intros ([?|[??]]%lookup_app_Some&?&Hleast)%list_find_Some.
+      + left. apply list_find_Some; eauto using lookup_app_l_Some.
+      + right. split; [lia|]. split.
+        { apply list_find_None, Forall_lookup. intros j z ??.
+          assert (j < length l1) by eauto using lookup_lt_Some.
+          naive_solver eauto using lookup_app_l_Some with lia. }
+        apply list_find_Some. split_and!; [done..|].
+        intros j z ??. eapply (Hleast (length l1 + j)); [|lia].
+        by rewrite lookup_app_r, minus_plus by lia.
+    - intros [(?&?&Hleast)%list_find_Some|(?&Hl1&(?&?&Hleast)%list_find_Some)].
+      + apply list_find_Some. split_and!; [by auto using lookup_app_l_Some..|].
+        assert (i < length l1) by eauto using lookup_lt_Some.
+        intros j y ?%lookup_app_Some; naive_solver eauto with lia.
+      + rewrite list_find_Some, lookup_app_Some. split_and!; [by auto..|].
+        intros j y [?|?]%lookup_app_Some ?; [|naive_solver auto with lia].
+        by eapply (Forall_lookup_1 (not ∘ P) l1); [by apply list_find_None|..].
+  Qed.
+  Lemma list_find_app_l l1 l2 i x:
+    list_find P l1 = Some (i, x) → list_find P (l1 ++ l2) = Some (i, x).
+  Proof. rewrite list_find_app_Some. auto. Qed.
+  Lemma list_find_app_r l1 l2:
+    list_find P l1 = None →
+    list_find P (l1 ++ l2) = prod_map (λ x, x + length l1) id <$> list_find P l2.
+  Proof.
+    intros. apply option_eq; intros [j y]. rewrite list_find_app_Some. split.
+    - intros [?|(?&?&->)]; naive_solver auto with f_equal lia.
+    - intros ([??]&->&?)%fmap_Some; naive_solver auto with f_equal lia.
+  Qed.
+
+  Lemma list_find_insert_Some l i j x y :
+    list_find P (<[i:=x]> l) = Some (j,y) ↔
+      (j < i ∧ list_find P l = Some (j,y)) ∨
+      (i = j ∧ x = y ∧ j < length l ∧ P x ∧ ∀ k z, l !! k = Some z → k < i → ¬P z) ∨
+      (i < j ∧ ¬P x ∧ list_find P l = Some (j,y) ∧ ∀ z, l !! i = Some z → ¬P z) ∨
+      (∃ z, i < j ∧ ¬P x ∧ P y ∧ P z ∧ l !! i = Some z ∧ l !! j = Some y ∧
+            ∀ k z, l !! k = Some z → k ≠ i → k < j → ¬P z).
+   Proof.
+     split.
+     - intros ([(->&->&?)|[??]]%list_lookup_insert_Some&?&Hleast)%list_find_Some.
+       { right; left. split_and!; [done..|]. intros k z ??.
+         apply (Hleast k); [|lia]. by rewrite list_lookup_insert_ne by lia. }
+       assert (j < i ∨ i < j) as [?|?] by lia.
+       { left. rewrite list_find_Some. split_and!; [by auto..|]. intros k z ??.
+         apply (Hleast k); [|lia]. by rewrite list_lookup_insert_ne by lia. }
+       right; right. assert (j < length l) by eauto using lookup_lt_Some.
+       destruct (lookup_lt_is_Some_2 l i) as [z ?]; [lia|].
+       destruct (decide (P z)).
+       { right. exists z. split_and!; [done| |done..|].
+         + apply (Hleast i); [|done]. by rewrite list_lookup_insert by lia.
+         + intros k z' ???.
+           apply (Hleast k); [|lia]. by rewrite list_lookup_insert_ne by lia. }
+       left. split_and!; [done|..|naive_solver].
+       + apply (Hleast i); [|done]. by rewrite list_lookup_insert by lia.
+       + apply list_find_Some. split_and!; [by auto..|]. intros k z' ??.
+         destruct (decide (k = i)) as [->|]; [naive_solver|].
+         apply (Hleast k); [|lia]. by rewrite list_lookup_insert_ne by lia.
+     - intros [[? Hl]|[(->&->&?&?&Hleast)|[(?&?&Hl&Hnot)|(z&?&?&?&?&?&?&?Hleast)]]];
+         apply list_find_Some.
+       + apply list_find_Some in Hl as (?&?&Hleast).
+         rewrite list_lookup_insert_ne by lia. split_and!; [done..|].
+         intros k z [(->&->&?)|[??]]%list_lookup_insert_Some; eauto with lia.
+       + rewrite list_lookup_insert by done. split_and!; [by auto..|].
+         intros k z [(->&->&?)|[??]]%list_lookup_insert_Some; eauto with lia.
+       + apply list_find_Some in Hl as (?&?&Hleast).
+         rewrite list_lookup_insert_ne by lia. split_and!; [done..|].
+         intros k z [(->&->&?)|[??]]%list_lookup_insert_Some; eauto with lia.
+       + rewrite list_lookup_insert_ne by lia. split_and!; [done..|].
+         intros k z' [(->&->&?)|[??]]%list_lookup_insert_Some; eauto with lia.
+  Qed.
+
   Lemma list_find_fmap {B : Type} (f : B → A) (l : list B) :
     list_find P (f <$> l) = prod_map id f <$> list_find (P ∘ f) l.
   Proof.
