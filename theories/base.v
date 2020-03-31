@@ -1000,7 +1000,7 @@ Hint Mode UpClose - ! : typeclass_instances.
 Notation "↑ x" := (up_close x) (at level 20, format "↑ x").
 
 (** * Monadic operations *)
-(** We define operational type classes for the monadic operations bind, join 
+(** We define operational type classes for the monadic operations bind, join
 and fmap. We use these type classes merely for convenient overloading of
 notations and do not formalize any theory on monads (we do not even define a
 class with the monad laws). *)
@@ -1106,7 +1106,7 @@ Arguments alter {_ _ _ _} _ !_ !_ / : simpl nomatch, assert.
 
 (** The function [partial_alter f k m] should update the value at key [k] using the
 function [f], which is called with the original value at key [k] or [None]
-if [k] is not a member of [m]. The value at [k] should be deleted if [f] 
+if [k] is not a member of [m]. The value at [k] should be deleted if [f]
 yields [None]. *)
 Class PartialAlter (K A M : Type) :=
   partial_alter: (option A → option A) → K → M → M.

@@ -29,7 +29,7 @@ Proof.
   destruct X as [l]; split; [|by intros; simplify_eq/=].
   rewrite elem_of_equiv_empty; intros Hl.
   destruct l as [|x l]; [done|]. feed inversion (Hl x). left.
-Qed. 
+Qed.
 Global Instance listset_empty_dec (X : listset A) : Decision (X ≡ ∅).
 Proof.
  refine (cast_if (decide (listset_car X = [])));

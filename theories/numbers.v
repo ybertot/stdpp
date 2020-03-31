@@ -213,7 +213,7 @@ Proof.
   - by rewrite Preverse_xO, Preverse_app, IH.
   - reflexivity.
 Qed.
-    
+
 Instance Preverse_inj : Inj (=) (=) Preverse.
 Proof.
   intros p q eq.
@@ -571,7 +571,7 @@ Proof.
   by apply Qcplus_le_mono_l.
 Qed.
 Lemma Qcplus_nonneg_pos (x y : Qc) : 0 ≤ x → 0 < y → 0 < x + y.
-Proof. rewrite (Qcplus_comm x). auto using Qcplus_pos_nonneg. Qed. 
+Proof. rewrite (Qcplus_comm x). auto using Qcplus_pos_nonneg. Qed.
 Lemma Qcplus_pos_pos (x y : Qc) : 0 < x → 0 < y → 0 < x + y.
 Proof. auto using Qcplus_pos_nonneg, Qclt_le_weak. Qed.
 Lemma Qcplus_nonneg_nonneg (x y : Qc) : 0 ≤ x → 0 ≤ y → 0 ≤ x + y.

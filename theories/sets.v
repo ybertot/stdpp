@@ -564,7 +564,7 @@ Section semi_set.
     Lemma union_list_reverse_L Xs : ⋃ (reverse Xs) = ⋃ Xs.
     Proof. unfold_leibniz. apply union_list_reverse. Qed.
     Lemma empty_union_list_L Xs : ⋃ Xs = ∅ ↔ Forall (.= ∅) Xs.
-    Proof. unfold_leibniz. by rewrite empty_union_list. Qed. 
+    Proof. unfold_leibniz. by rewrite empty_union_list. Qed.
   End leibniz.
 
   Lemma not_elem_of_iff `{!RelDecision (∈@{C})} X Y x :
@@ -604,7 +604,7 @@ Section set.
 
   (** Intersection *)
   Lemma subseteq_intersection X Y : X ⊆ Y ↔ X ∩ Y ≡ X.
-  Proof. set_solver. Qed. 
+  Proof. set_solver. Qed.
   Lemma subseteq_intersection_1 X Y : X ⊆ Y → X ∩ Y ≡ X.
   Proof. apply subseteq_intersection. Qed.
   Lemma subseteq_intersection_2 X Y : X ∩ Y ≡ X → X ⊆ Y.

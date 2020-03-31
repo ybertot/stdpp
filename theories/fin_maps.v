@@ -41,7 +41,7 @@ Class FinMap K M `{FMap M, ∀ A, Lookup K A (M A), ∀ A, Empty (M A), ∀ A,
   elem_of_map_to_list {A} (m : M A) i x :
     (i,x) ∈ map_to_list m ↔ m !! i = Some x;
   lookup_omap {A B} (f : A → option B) (m : M A) i :
-    omap f m !! i = m !! i ≫= f; 
+    omap f m !! i = m !! i ≫= f;
   lookup_merge {A B C} (f : option A → option B → option C)
       `{!DiagNone f} (m1 : M A) (m2 : M B) i :
     merge f m1 m2 !! i = f (m1 !! i) (m2 !! i)
