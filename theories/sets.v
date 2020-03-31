@@ -1029,11 +1029,8 @@ Section pred_finite_infinite.
   Qed.
   Lemma pred_infinite_lt n : pred_infinite (lt n).
   Proof.
-    intros l. exists (S (n `max` max_list l)). split.
-    - induction l; simpl; lia.
-    - assert (∀ n, n ∈ l → n ≤ max_list l) as help.
-      { induction 1; simpl; lia. }
-      intros H%help; lia.
+    intros l. exists (S (n `max` max_list l)). split; [lia| ].
+    intros H%max_list_elem_of_le; lia.
   Qed.
 
   Lemma pred_finite_le n : pred_finite (flip le n).

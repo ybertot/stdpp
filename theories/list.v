@@ -629,8 +629,10 @@ Qed.
 Lemma list_insert_commute l i j x y :
   i ≠ j → <[i:=x]>(<[j:=y]>l) = <[j:=y]>(<[i:=x]>l).
 Proof. revert i j. by induction l; intros [|?] [|?] ?; f_equal/=; auto. Qed.
+Lemma list_insert_id' l i x : (i < length l → l !! i = Some x) → <[i:=x]>l = l.
+Proof. revert i. induction l; intros [|i] ?; f_equal/=; naive_solver lia. Qed.
 Lemma list_insert_id l i x : l !! i = Some x → <[i:=x]>l = l.
-Proof. revert i. induction l; intros [|i] [=]; f_equal/=; auto. Qed.
+Proof. intros ?. by apply list_insert_id'. Qed.
 Lemma list_insert_ge l i x : length l ≤ i → <[i:=x]>l = l.
 Proof. revert i. induction l; intros [|i] ?; f_equal/=; auto with lia. Qed.
 Lemma list_insert_insert l i x y : <[i:=x]> (<[i:=y]> l) = <[i:=x]> l.
@@ -1162,7 +1164,9 @@ Proof.
   intros. apply list_eq. intros j.
   by rewrite !lookup_drop, !list_lookup_alter_ne by lia.
 Qed.
-Lemma drop_insert l n i x : i < n → drop n (<[i:=x]>l) = drop n l.
+Lemma drop_insert_le l n i x : n ≤ i → drop n (<[i:=x]>l) = <[i-n:=x]>(drop n l).
+Proof. revert i n. induction l; intros [] []; naive_solver lia. Qed.
+Lemma drop_insert_gt l n i x : i < n → drop n (<[i:=x]>l) = drop n l.
 Proof.
   intros. apply list_eq. intros j.
   by rewrite !lookup_drop, !list_lookup_insert_ne by lia.
@@ -1258,6 +1262,8 @@ Proof.
 Qed.
 Lemma replicate_false βs n : length βs = n → replicate n false =.>* βs.
 Proof. intros <-. by induction βs; simpl; constructor. Qed.
+Lemma tail_replicate x n : tail (replicate n x) = replicate (pred n) x.
+Proof. by destruct n. Qed.
 
 (** ** Properties of the [resize] function *)
 Lemma resize_spec l n x : resize n x l = take n l ++ replicate (n - length l) x.
@@ -3631,7 +3637,7 @@ Section seq.
   Qed.
   Lemma imap_seq_0 {A} (l : list A) (g : nat → A) :
     imap (λ j _, g j) l = g <$> seq 0 (length l).
-  Proof. rewrite (imap_ext _ (λ i o, g (0 + i))%nat); [|done]. apply imap_seq. Qed.
+  Proof. rewrite (imap_ext _ (λ i o, g (0 + i))); [|done]. apply imap_seq. Qed.
   Lemma lookup_seq_lt j n i : i < n → seq j n !! i = Some (j + i).
   Proof.
     revert j i. induction n as [|n IH]; intros j [|i] ?; simpl; auto with lia.
@@ -3829,6 +3835,12 @@ Definition foldr_app := @fold_right_app.
 Lemma foldl_app {A B} (f : A → B → A) (l k : list B) (a : A) :
   foldl f a (l ++ k) = foldl f (foldl f a l) k.
 Proof. revert a. induction l; simpl; auto. Qed.
+Lemma foldr_fmap {A B C} (f : B → A → A) x (l : list C) g :
+  foldr f x (g <$> l) = foldr (λ b a, f (g b) a) x l.
+Proof. induction l; f_equal/=; auto. Qed.
+Lemma foldr_ext {A B} (f1 f2 : B → A → A) x1 x2 l1 l2 :
+  (∀ b a, f1 b a = f2 b a) → l1 = l2 → x1 = x2 → foldr f1 x1 l1 = foldr f2 x2 l2.
+Proof. intros Hf -> ->. induction l2 as [|x l2 IH]; f_equal/=; by rewrite Hf, IH. Qed.
 Lemma foldr_permutation {A B} (R : relation B) `{!PreOrder R}
     (f : A → B → B) (b : B) `{Hf : !∀ x, Proper (R ==> R) (f x)} (l1 l2 : list A) :
   (∀ j1 a1 j2 a2 b,
