@@ -29,7 +29,7 @@ Next Obligation.
 Qed.
 Global Program Instance hashset_union: Union (hashset hash) := λ m1 m2,
   let (m1,Hm1) := m1 in let (m2,Hm2) := m2 in
-  Hashset (union_with (λ l k, Some (list_union l k)) m1 m2) _. 
+  Hashset (union_with (λ l k, Some (list_union l k)) m1 m2) _.
 Next Obligation.
   intros _ _ m1 Hm1 m2 Hm2 n l'; rewrite lookup_union_with_Some.
   intros [[??]|[[??]|(l&k&?&?&?)]]; simplify_eq/=; auto.

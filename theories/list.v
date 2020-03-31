@@ -401,7 +401,7 @@ used by [positives_flatten]. *)
 Definition positives_unflatten (p : positive) : option (list positive) :=
   positives_unflatten_go p [] 1.
 
-(** [seqZ m n] generates the sequence [m], [m + 1], ..., [m + n - 1] 
+(** [seqZ m n] generates the sequence [m], [m + 1], ..., [m + n - 1]
 over integers, provided [0 ≤ n]. If [n < 0], then the range is empty. **)
 Definition seqZ (m len: Z) : list Z :=
   (λ i: nat, Z.add i m) <$> (seq 0 (Z.to_nat len)).
@@ -4144,7 +4144,7 @@ Section positives_flatten_unflatten.
       rewrite 2!(assoc_L (++)).
       reflexivity.
   Qed.
-  
+
   Lemma positives_unflatten_go_app p suffix xs acc :
     positives_unflatten_go (suffix ++ Preverse (Pdup p)) xs acc =
     positives_unflatten_go suffix xs (acc ++ p).
@@ -4161,7 +4161,7 @@ Section positives_flatten_unflatten.
       reflexivity.
     - reflexivity.
   Qed.
-  
+
   Lemma positives_unflatten_flatten_go suffix xs acc :
     positives_unflatten_go (suffix ++ positives_flatten_go xs 1) acc 1 =
     positives_unflatten_go suffix (xs ++ acc) 1.
@@ -4178,7 +4178,7 @@ Section positives_flatten_unflatten.
       rewrite (left_id_L 1 (++)).
       reflexivity.
   Qed.
-  
+
   Lemma positives_unflatten_flatten xs :
     positives_unflatten (positives_flatten xs) = Some xs.
   Proof.
@@ -4191,7 +4191,7 @@ Section positives_flatten_unflatten.
     rewrite (right_id_L [] (++)%list).
     reflexivity.
   Qed.
-  
+
   Lemma positives_flatten_app xs ys :
     positives_flatten (xs ++ ys) = positives_flatten xs ++ positives_flatten ys.
   Proof.
@@ -4205,7 +4205,7 @@ Section positives_flatten_unflatten.
       rewrite (assoc_L (++)).
       reflexivity.
   Qed.
-  
+
   Lemma positives_flatten_cons x xs :
     positives_flatten (x :: xs) = 1~1~0 ++ Preverse (Pdup x) ++ positives_flatten xs.
   Proof.
@@ -4214,7 +4214,7 @@ Section positives_flatten_unflatten.
     rewrite (assoc_L (++)).
     reflexivity.
   Qed.
-  
+
   Lemma positives_flatten_suffix (l k : list positive) :
     l `suffix_of` k → ∃ q, positives_flatten k = q ++ positives_flatten l.
   Proof.
@@ -4222,7 +4222,7 @@ Section positives_flatten_unflatten.
     exists (positives_flatten l').
     apply positives_flatten_app.
   Qed.
-  
+
   Lemma positives_flatten_suffix_eq p1 p2 (xs ys : list positive) :
     length xs = length ys →
     p1 ++ positives_flatten xs = p2 ++ positives_flatten ys →

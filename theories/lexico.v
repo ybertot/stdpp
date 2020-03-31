@@ -141,7 +141,7 @@ Instance sig_lexico_po `{Lexico A, !StrictOrder (@lexico A _)}
   (P : A → Prop) `{∀ x, ProofIrrel (P x)} : StrictOrder (@lexico (sig P) _).
 Proof.
   unfold lexico, sig_lexico. split.
-  - intros [x ?] ?. by apply (irreflexivity lexico x). 
+  - intros [x ?] ?. by apply (irreflexivity lexico x).
   - intros [x1 ?] [x2 ?] [x3 ?] ??. by trans x2.
 Qed.
 Instance sig_lexico_trichotomy `{Lexico A, tA : !TrichotomyT (@lexico A _)}

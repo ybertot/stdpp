@@ -50,7 +50,7 @@ Section definitions.
 
   Global Instance gmultiset_dom : Dom (gmultiset A) (gset A) := λ X,
     let (X) := X in dom _ X.
-End definitions. 
+End definitions.
 
 Typeclasses Opaque gmultiset_elem_of gmultiset_subseteq.
 Typeclasses Opaque gmultiset_elements gmultiset_size gmultiset_empty.
