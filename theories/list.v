@@ -3246,20 +3246,20 @@ Section find.
 
   Lemma list_find_Some l i x  :
     list_find P l = Some (i,x) ↔
-      l !! i = Some x ∧ P x ∧ ∀ j, j < i → ∃ y, l !! j = Some y ∧ ¬P y.
+      l !! i = Some x ∧ P x ∧ ∀ j y, l !! j = Some y → j < i → ¬P y.
   Proof.
     revert i. induction l as [|y l IH]; intros i; csimpl; [naive_solver|].
     case_decide.
     - split; [naive_solver lia|]. intros (Hi&HP&Hlt).
       destruct i as [|i]; simplify_eq/=; [done|].
-      destruct (Hlt 0); naive_solver lia.
+      destruct (Hlt 0 y); naive_solver lia.
     - split.
       + intros ([i' x']&Hl&?)%fmap_Some; simplify_eq/=.
         apply IH in Hl as (?&?&Hlt). split_and!; [done..|].
         intros [|j] ?; naive_solver lia.
       + intros (?&?&Hlt). destruct i as [|i]; simplify_eq/=; [done|].
         rewrite (proj2 (IH i)); [done|]. split_and!; [done..|].
-        intros j ?. destruct (Hlt (S j)); naive_solver lia.
+        intros j z ???. destruct (Hlt (S j) z); naive_solver lia.
   Qed.
 
   Lemma list_find_elem_of l x : x ∈ l → P x → is_Some (list_find P l).
