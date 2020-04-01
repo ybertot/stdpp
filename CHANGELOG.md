@@ -3,7 +3,7 @@ API-breaking change is listed.
 
 ## std++ master
 
-- Rename `drop_length` into `drop_length_gt` and add `drop_length_le`.
+- Rename `drop_insert` into `drop_insert_gt` and add `drop_insert_le`.
 
 ## std++ 1.3 (released 2020-03-18)
 
