@@ -58,6 +58,25 @@ Noteworthy additions and changes:
   + Rename `lookup_seq_inv` → `lookup_seq` and generalize it to a bi-implication
   + Add `NoDup_seqZ` and `Forall_seqZ`
 
+The following `sed` script should perform most of the renaming
+(on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
+```
+sed '
+s/\bdom_map_filter\b/dom_map_filter_subseteq/g
+s/\bfmap_seq\b/fmap_S_seq/g
+s/\bseqZ_fmap\b/fmap_add_seqZ/g
+s/\blookup_seq\b/lookup_seq_lt/g
+s/\blookup_seq_inv\b/lookup_seq/g
+s/\bseqZ_lookup_lt\b/lookup_seqZ_lt/g
+s/\bseqZ_lookup_ge\b/lookup_seqZ_ge/g
+s/\bseqZ_lookup\b/lookup_seqZ/g
+s/\bvec_to_list_of_list\b/vec_to_list_to_vec/g
+s/\bfin_of_nat\b/nat_to_fin/g
+s/\bfin_to_of_nat\b/fin_to_nat_to_fin/g
+s/\bfin_of_to_nat\b/nat_to_fin_to_nat/g
+' $(find theories -name "*.v")
+```
+
 ## std++ 1.2.1 (released 2019-08-29)
 
 This release of std++ received contributions by Dan Frumin, Michael Sammler,
