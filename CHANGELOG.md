@@ -3,6 +3,11 @@ API-breaking change is listed.
 
 ## std++ master
 
+- Extracted `list_numbers.v` from `list.v` and `numbers.v` for
+  functions, which operate on lists of numbers (`seq`, `seqZ`,
+  `sum_list(_with)` and `max_list(_with)`). `list_numbers.v` is
+  exported by the prelude. This is a breaking change if one only
+  imports `list.v`, but not the prelude.
 - Rename `drop_insert` into `drop_insert_gt` and add `drop_insert_le`.
 
 ## std++ 1.3 (released 2020-03-18)
