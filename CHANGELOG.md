@@ -54,9 +54,10 @@ Noteworthy additions and changes:
   + Rename `lookup_seq_inv` → `lookup_seq` and generalize it to a bi-implication
   + Add `NoDup_seqZ` and `Forall_seqZ`
 
-The following `sed` script should perform most of the renaming:
+The following `sed` script should perform most of the renaming
+(on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
 ```
-sed -i~ '
+sed '
 s/\bdom_map_filter\b/dom_map_filter_subseteq/g
 s/\bfmap_seq\b/fmap_S_seq/g
 s/\bseqZ_fmap\b/fmap_add_seqZ/g
