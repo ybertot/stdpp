@@ -184,7 +184,7 @@ Section setoid.
   Global Instance insert_proper (i : K) :
     Proper ((≡) ==> (≡) ==> (≡@{M A})) (insert i).
   Proof. by intros ???; apply partial_alter_proper; [constructor|]. Qed.
-  Global Instance singleton_proper k : Proper ((≡) ==> (≡@{M A})) (singletonM k).
+  Global Instance singletonM_proper k : Proper ((≡) ==> (≡@{M A})) (singletonM k).
   Proof.
     intros ???; apply insert_proper; [done|].
     intros ?. rewrite lookup_empty; constructor.

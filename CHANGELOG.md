@@ -57,6 +57,8 @@ Noteworthy additions and changes:
     `seqZ_lookup_ge` → `lookup_seqZ_ge`, and `seqZ_lookup` → `lookup_seqZ`
   + Rename `lookup_seq_inv` → `lookup_seq` and generalize it to a bi-implication
   + Add `NoDup_seqZ` and `Forall_seqZ`
+- Rename `fin_maps.singleton_proper` into `singletonM_proper` since it concerns
+  `singletonM` and to avoid overlap with `sets.singleton_proper`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
