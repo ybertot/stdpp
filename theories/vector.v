@@ -41,9 +41,6 @@ Proof.
   refine match v with [#] => tt | x ::: v => λ P Hcons, Hcons x v end.
 Defined.
 
-(** Notice that we cannot define [Vector.nth] as an instance of our [Lookup]
-type class, as it has a dependent type. *)
-Arguments Vector.nth {_ _} !_ !_%fin /.
 Instance vector_lookup_total A : ∀ m, LookupTotal (fin m) A (vec A m) :=
   fix go m i {struct i} := let _ : ∀ m, LookupTotal _ _ _ := @go in
   match i in fin m return vec A m → A with
