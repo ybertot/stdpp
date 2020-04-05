@@ -710,7 +710,7 @@ Proof. intros x y z; apply Qp_eq, Qcplus_assoc. Qed.
 Instance Qp_plus_comm : Comm (=) Qp_plus.
 Proof. intros x y; apply Qp_eq, Qcplus_comm. Qed.
 Instance Qp_plus_inj_r p : Inj (=) (=) (Qp_plus p).
-Proof. intros q1 q2. rewrite !Qp_eq; simpl. apply (inj _). Qed.
+Proof. intros q1 q2. rewrite !Qp_eq; simpl. apply (inj (Qcplus p)). Qed.
 Instance Qp_plus_inj_l p : Inj (=) (=) (λ q, q + p)%Qp.
 Proof. intros q1 q2. rewrite !Qp_eq; simpl. apply (inj (λ q, q + p)%Qc). Qed.
 
@@ -794,9 +794,9 @@ Proof.
     destruct (Qclt_le_dec a c) as [?|[?| ->%Qp_eq]%Qcle_lt_or_eq].
     - auto.
     - destruct (help c d a b); [done..|]. naive_solver.
-    - apply (inj _) in H as ->. destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).
+    - apply (inj (Qp_plus a)) in H as ->. destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).
       eauto 10 using (comm_L Qp_plus). }
-  intros a b c d [e ->]%Qp_lt_sum. rewrite <-(assoc_L _). intros ->%(inj _).
+  intros a b c d [e ->]%Qp_lt_sum. rewrite <-(assoc_L _). intros ->%(inj (Qp_plus a)).
   destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).
   eexists a', q, (q + e)%Qp, d'; split_and?; auto using (comm_L Qp_plus).
   - by rewrite (assoc_L _), (comm_L Qp_plus e).

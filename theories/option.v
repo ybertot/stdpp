@@ -189,8 +189,8 @@ Lemma fmap_Some_equiv {A B} `{Equiv B} `{!Equivalence (≡@{B})} (f : A → B) m
   f <$> mx ≡ Some y ↔ ∃ x, mx = Some x ∧ y ≡ f x.
 Proof.
   destruct mx; simpl; split.
-  - intros ?%(inj _). eauto.
-  - intros (? & ->%(inj _) & ?). constructor. done.
+  - intros ?%(inj Some). eauto.
+  - intros (? & ->%(inj Some) & ?). constructor. done.
   - intros ?%symmetry%equiv_None. done.
   - intros (? & ? & ?). done.
 Qed.
