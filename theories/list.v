@@ -2232,7 +2232,7 @@ Qed.
 Lemma submseteq_app_inv_l l1 l2 k : k ++ l1 ⊆+ k ++ l2 → l1 ⊆+ l2.
 Proof.
   induction k as [|y k IH]; simpl; [done |]. rewrite submseteq_cons_l.
-  intros (?&E%(inj _)&?). apply IH. by rewrite E.
+  intros (?&E%(inj (cons y))&?). apply IH. by rewrite E.
 Qed.
 Lemma submseteq_app_inv_r l1 l2 k : l1 ++ k ⊆+ l2 ++ k → l1 ⊆+ l2.
 Proof.

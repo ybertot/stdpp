@@ -222,7 +222,7 @@ Proof.
   rewrite !multiplicity_disj_union. lia.
 Qed.
 Global Instance gmultiset_disj_union_inj_2 X : Inj (=) (=) (.⊎ X).
-Proof. intros Y1 Y2. rewrite <-!(comm_L _ X). apply (inj _). Qed.
+Proof. intros Y1 Y2. rewrite <-!(comm_L _ X). apply (inj (X ⊎.)). Qed.
 
 Lemma gmultiset_disj_union_intersection_l X Y Z : X ⊎ (Y ∩ Z) = (X ⊎ Y) ∩ (X ⊎ Z).
 Proof.
