@@ -63,7 +63,7 @@ Noteworthy additions and changes:
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
 ```
-sed '
+sed -i '
 s/\bdom_map_filter\b/dom_map_filter_subseteq/g
 s/\bfmap_seq\b/fmap_S_seq/g
 s/\bseqZ_fmap\b/fmap_add_seqZ/g
