@@ -288,7 +288,7 @@ Section properties.
   Proof.
     induction 1 as [x _ IH]. destruct (decide (red R x)) as [[x' ?]|?].
     - destruct (IH x') as (y&?&?); eauto using wn_step.
-    - by apply nf_wf.
+    - by apply nf_wn.
   Qed.
 
   Lemma all_loop_red x : all_loop R x → red R x.
