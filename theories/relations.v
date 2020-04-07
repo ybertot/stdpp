@@ -280,6 +280,10 @@ Section properties.
   Lemma wn_step_rtc x y : wn R y → rtc R x y → wn R x.
   Proof. induction 2; eauto using wn_step. Qed.
 
+  (** The following theorem requires that [red R] is decidable. The intuition
+  for this requirement is that [wn R] is a very "positive" statement as it
+  points out a particular trace. In contrast, [sn R] just says "this also holds
+  for all successors", there is no "data"/"trace" there. *)
   Lemma sn_wn `{!∀ y, Decision (red R y)} x : sn R x → wn R x.
   Proof.
     induction 1 as [x _ IH]. destruct (decide (red R x)) as [[x' ?]|?].
