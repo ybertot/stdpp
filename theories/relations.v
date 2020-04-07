@@ -57,7 +57,9 @@ End definitions.
 (** The reflexive transitive symmetric closure. *)
 Definition rtsc {A} (R : relation A) := rtc (sc R).
 
-(** Strongly normalizing elements. *)
+(** Weakly and strongly normalizing elements. *)
+Definition wn {A} (R : relation A) (x : A) := ∃ y, rtc R x y ∧ nf R y.
+
 Notation sn R := (Acc (flip R)).
 
 (** The various kinds of "confluence" properties. Any relation that has the
@@ -271,8 +273,23 @@ Section properties.
 
   Hint Constructors rtc nsteps bsteps tc : core.
 
-  Lemma acc_not_ex_loop x : Acc (flip R) x → ¬ex_loop R x.
-  Proof. unfold not. induction 1; destruct 1; eauto. Qed.
+  Lemma nf_wn x : nf R x → wn R x.
+  Proof. intros. exists x; eauto. Qed.
+  Lemma wn_step x y : wn R y → R x y → wn R x.
+  Proof. intros (z & ? & ?) ?. exists z; eauto. Qed.
+  Lemma wn_step_rtc x y : wn R y → rtc R x y → wn R x.
+  Proof. induction 2; eauto using wn_step. Qed.
+
+  (** The following theorem requires that [red R] is decidable. The intuition
+  for this requirement is that [wn R] is a very "positive" statement as it
+  points out a particular trace. In contrast, [sn R] just says "this also holds
+  for all successors", there is no "data"/"trace" there. *)
+  Lemma sn_wn `{!∀ y, Decision (red R y)} x : sn R x → wn R x.
+  Proof.
+    induction 1 as [x _ IH]. destruct (decide (red R x)) as [[x' ?]|?].
+    - destruct (IH x') as (y&?&?); eauto using wn_step.
+    - by apply nf_wf.
+  Qed.
 
   Lemma all_loop_red x : all_loop R x → red R x.
   Proof. destruct 1; auto. Qed.
@@ -287,6 +304,11 @@ Section properties.
     intros H. cut (∀ z, rtc R x z → all_loop R z); [eauto|].
     cofix FIX. constructor; eauto using rtc_r.
   Qed.
+
+  Lemma wn_not_all_loop x : wn R x → ¬all_loop R x.
+  Proof. intros (z&?&?). rewrite all_loop_alt. eauto. Qed.
+  Lemma sn_not_ex_loop x : sn R x → ¬ex_loop R x.
+  Proof. unfold not. induction 1; destruct 1; eauto. Qed.
 
   (** An alternative definition of confluence; also known as the Church-Rosser
   property. *)

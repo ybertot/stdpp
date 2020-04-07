@@ -59,6 +59,7 @@ Noteworthy additions and changes:
   + Add `NoDup_seqZ` and `Forall_seqZ`
 - Rename `fin_maps.singleton_proper` into `singletonM_proper` since it concerns
   `singletonM` and to avoid overlap with `sets.singleton_proper`.
+- Add `wn R` for weakly normalizing elements w.r.t. a relation `R`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
