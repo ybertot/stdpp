@@ -14,6 +14,10 @@ Set Default Proof Using "Type".
 Export ListNotations.
 From Coq.Program Require Export Basics Syntax.
 
+(** TODO: This hack should be removed once we drop support for Coq 8.10. It is
+needed for the transitive export/import bug that is fixed in Coq 8.11. *)
+Notation length := Datatypes.length.
+
 (** * Enable implicit generalization. *)
 (** This option enables implicit generalization in arguments of the form
    `{...} (i.e., anonymous arguments).  Unfortunately, it also enables
