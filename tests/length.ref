@@ -1,0 +1,18 @@
+length : ∀ A : Type, list A → nat
+
+length is not universe polymorphic
+Arguments length {A}%type_scope _%list_scope
+length is transparent
+Expands to: Constant Coq.Init.Datatypes.length
+length : ∀ A : Type, list A → nat
+
+length is not universe polymorphic
+Arguments length {A}%type_scope _%list_scope
+length is transparent
+Expands to: Constant Coq.Init.Datatypes.length
+length : ∀ A : Type, list A → nat
+
+length is not universe polymorphic
+Arguments length {A}%type_scope _%list_scope
+length is transparent
+Expands to: Constant Coq.Init.Datatypes.length

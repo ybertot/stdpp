@@ -3,7 +3,12 @@ that are used throughout the whole development. Most importantly it contains
 abstract interfaces for ordered structures, sets, and various other data
 structures. *)
 
-From Coq Require Export Morphisms RelationClasses List Bool Utf8 Setoid.
+(** The order of this [Require Export] is important: The definition of [length]
+in [List] should shadow the definition of [length] in [String]. We also need
+to export [Datatypes] because [List] contains a [parsing only] notation for
+[length], not the actual definition of [length], which is in [Datatypes]. *)
+From Coq Require Export String Datatypes List.
+From Coq Require Export Morphisms RelationClasses Bool Utf8 Setoid.
 From Coq Require Import Permutation.
 Set Default Proof Using "Type".
 Export ListNotations.
