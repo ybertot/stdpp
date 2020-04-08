@@ -300,6 +300,10 @@ Section set_unfold_list.
     constructor. rewrite elem_of_list_fmap. f_equiv; intros y.
     by rewrite (set_unfold_elem_of y l (P y)).
   Qed.
+  Global Instance set_unfold_rotate x l P n:
+    SetUnfoldElemOf x l P → SetUnfoldElemOf x (rotate n l) P.
+  Proof. constructor. by rewrite elem_of_rotate, (set_unfold_elem_of x l P). Qed.
+
 End set_unfold_list.
 
 Tactic Notation "set_unfold" :=
