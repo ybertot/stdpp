@@ -432,9 +432,9 @@ Ltac intros_revert tac :=
   | |- _ => tac
   end.
 
-(** Given a tactic [tac2] generating a list of terms, [iter tac1 tac2]
-runs [tac x] for each element [x] until [tac x] succeeds. If it does not
-suceed for any element of the generated list, the whole tactic wil fail. *)
+(** The tactic [iter tac l] runs [tac x] for each element [x ∈ l] until [tac x]
+succeeds. If it does not suceed for any element of the generated list, the whole
+tactic wil fail. *)
 Tactic Notation "iter" tactic(tac) tactic(l) :=
   let rec go l :=
   match l with ?x :: ?l => tac x || go l end in go l.
