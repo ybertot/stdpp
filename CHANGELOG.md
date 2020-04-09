@@ -3,6 +3,8 @@ API-breaking change is listed.
 
 ## std++ master
 
+- Added the `select` and `revert select` tactics for selecting and
+  reverting a hypothesis based on a pattern.
 - Extracted `list_numbers.v` from `list.v` and `numbers.v` for
   functions, which operate on lists of numbers (`seq`, `seqZ`,
   `sum_list(_with)` and `max_list(_with)`). `list_numbers.v` is
