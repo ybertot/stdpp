@@ -9,6 +9,13 @@ Set Default Proof Using "Type".
 Export ListNotations.
 From Coq.Program Require Export Basics Syntax.
 
+(** This notation is necessary to prevent [length] from being printed
+as [strings.length] if strings.v is imported and later base.v. See
+also strings.v and
+https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/144 and
+https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/129. *)
+Notation length := Datatypes.length.
+
 (** * Enable implicit generalization. *)
 (** This option enables implicit generalization in arguments of the form
    [`{...}] (i.e., anonymous arguments).  Unfortunately, it also enables
