@@ -60,6 +60,8 @@ Noteworthy additions and changes:
 - Rename `fin_maps.singleton_proper` into `singletonM_proper` since it concerns
   `singletonM` and to avoid overlap with `sets.singleton_proper`.
 - Add `wn R` for weakly normalizing elements w.r.t. a relation `R`.
+- Add `encode_Z`/`decode_Z` functions to encode elements of a countable type
+  as integers `Z`, in analogy with `encode_nat`/`decode_nat`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
