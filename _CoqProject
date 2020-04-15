@@ -39,6 +39,7 @@ theories/lexico.v
 theories/propset.v
 theories/decidable.v
 theories/list.v
+theories/list_numbers.v
 theories/functions.v
 theories/hlist.v
 theories/sorting.v

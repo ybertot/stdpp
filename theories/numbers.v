@@ -105,25 +105,6 @@ Lemma Nat_iter_ind {A} (P : A → Prop) f x k :
   P x → (∀ y, P y → P (f y)) → P (Nat.iter k f x).
 Proof. induction k; simpl; auto. Qed.
 
-Definition sum_list_with {A} (f : A → nat) : list A → nat :=
-  fix go l :=
-  match l with
-  | [] => 0
-  | x :: l => f x + go l
-  end.
-Notation sum_list := (sum_list_with id).
-
-Definition max_list_with {A} (f : A → nat) : list A → nat :=
-  fix go l :=
-  match l with
-  | [] => 0
-  | x :: l => f x `max` go l
-  end.
-Notation max_list := (max_list_with id).
-
-Lemma max_list_elem_of_le n ns:
-  n ∈ ns → (n ≤ max_list ns)%nat.
-Proof. induction 1; simpl; lia. Qed.
 
 (** * Notations and properties of [positive] *)
 Local Open Scope positive_scope.
