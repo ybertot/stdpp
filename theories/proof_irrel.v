@@ -8,6 +8,8 @@ Instance True_pi: ProofIrrel True.
 Proof. intros [] []; reflexivity. Qed.
 Instance False_pi: ProofIrrel False.
 Proof. intros []. Qed.
+Instance unit_pi: ProofIrrel ().
+Proof. intros [] []; reflexivity. Qed.
 Instance and_pi (A B : Prop) :
   ProofIrrel A → ProofIrrel B → ProofIrrel (A ∧ B).
 Proof. intros ?? [??] [??]. f_equal; trivial. Qed.
