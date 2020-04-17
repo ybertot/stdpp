@@ -1656,6 +1656,13 @@ Section filter.
   Lemma filter_cons_False x l : ¬P x → filter P (x :: l) = filter P l.
   Proof. intros. by rewrite filter_cons, decide_False. Qed.
 
+  Lemma filter_app l1 l2 : filter P (l1 ++ l2) = filter P l1 ++ filter P l2.
+  Proof.
+    induction l1 as [|x l1 IH]; simpl; [done| ].
+    case_decide; [|done].
+    by rewrite IH.
+  Qed.
+
   Lemma elem_of_list_filter l x : x ∈ filter P l ↔ P x ∧ x ∈ l.
   Proof.
     induction l; simpl; repeat case_decide;
