@@ -2184,7 +2184,7 @@ Ltac decompose_map_disjoint := repeat
 
 (** To prove a disjointness property, we first decompose all hypotheses, and
 then use an auto database to prove the required property. *)
-Create HintDb map_disjoint.
+Create HintDb map_disjoint discriminated.
 Ltac solve_map_disjoint :=
   solve [decompose_map_disjoint; auto with map_disjoint].
 
@@ -2258,7 +2258,7 @@ Tactic Notation "simpl_map" "by" tactic3(tac) := repeat
     rewrite E; clear E
   end.
 
-Create HintDb simpl_map.
+Create HintDb simpl_map discriminated.
 Tactic Notation "simpl_map" := simpl_map by eauto with simpl_map map_disjoint.
 
 Hint Extern 80 ((_ ∪ _) !! _ = Some _) => apply lookup_union_Some_l : simpl_map.
