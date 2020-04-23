@@ -38,14 +38,14 @@ Section seq.
   Qed.
   Lemma fmap_S_seq j n : S <$> seq j n = seq (S j) n.
   Proof. apply (fmap_add_seq 1). Qed.
-  Lemma imap_seq {A} (l : list A) (g : nat → A) i :
+  Lemma imap_seq {A B} (l : list A) (g : nat → B) i :
     imap (λ j _, g (i + j)) l = g <$> seq i (length l).
   Proof.
     revert i. induction l as [|x l IH]; [done|].
     csimpl. intros n. rewrite <-IH, <-plus_n_O. f_equal.
     apply imap_ext; simpl; auto with lia.
   Qed.
-  Lemma imap_seq_0 {A} (l : list A) (g : nat → A) :
+  Lemma imap_seq_0 {A B} (l : list A) (g : nat → B) :
     imap (λ j _, g j) l = g <$> seq 0 (length l).
   Proof. rewrite (imap_ext _ (λ i o, g (0 + i))); [|done]. apply imap_seq. Qed.
   Lemma lookup_seq_lt j n i : i < n → seq j n !! i = Some (j + i).
