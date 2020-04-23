@@ -73,7 +73,7 @@ of the forms:
 - [N1 ## N2]
 - [↑N1 ⊆ E ∖ ↑N2 ∖ .. ∖ ↑Nn]
 - [E1 ∖ ↑N1 ⊆ E2 ∖ ↑N2 ∖ .. ∖ ↑Nn] *)
-Create HintDb ndisj.
+Create HintDb ndisj discriminated.
 
 (** Rules for goals of the form [_ ⊆ _] *)
 (** If-and-only-if rules. Well, not quite, but for the fragment we are
