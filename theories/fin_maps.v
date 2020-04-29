@@ -142,8 +142,8 @@ Fixpoint map_seq `{Insert nat A M, Empty M} (start : nat) (xs : list A) : M :=
   | x :: xs => <[start:=x]> (map_seq (S start) xs)
   end.
 
-Instance finmap_lookup_total `{!Lookup K A (M A), !Inhabited A} : LookupTotal K A (M A) | 20 :=
-  λ i m, default inhabitant (m !! i).
+Instance finmap_lookup_total `{!Lookup K A (M A), !Inhabited A} :
+  LookupTotal K A (M A) | 20 := λ i m, default inhabitant (m !! i).
 Typeclasses Opaque finmap_lookup_total.
 
 (** * Theorems *)
