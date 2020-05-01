@@ -11,6 +11,7 @@ API-breaking change is listed.
   exported by the prelude. This is a breaking change if one only
   imports `list.v`, but not the prelude.
 - Rename `drop_insert` into `drop_insert_gt` and add `drop_insert_le`.
+- Added `Countable` instance for `Ascii.ascii`.
 
 ## std++ 1.3 (released 2020-03-18)
 

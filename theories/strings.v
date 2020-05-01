@@ -115,3 +115,7 @@ Program Instance string_countable : Countable string := {|
   encode := string_to_pos; decode p := Some (string_of_pos p)
 |}.
 Solve Obligations with naive_solver eauto using string_of_to_pos with f_equal.
+Lemma ascii_of_to_digits a : ascii_of_digits (ascii_to_digits a) = a.
+Proof. by destruct a as [[][][][][][][][]]. Qed.
+Instance ascii_countable : Countable ascii :=
+  inj_countable' ascii_to_digits ascii_of_digits ascii_of_to_digits.
