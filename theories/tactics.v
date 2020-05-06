@@ -531,7 +531,7 @@ matching hypotheses.
 [select] is written in CPS and does not return the name of the
 hypothesis due to limitations in the Ltac1 tactic runtime (see
 https://gitter.im/coq/coq?at=5e96c82f85b01628f04bbb89). *)
-Tactic Notation "select" open_constr(pat) tactic(tac) :=
+Tactic Notation "select" open_constr(pat) tactic3(tac) :=
   lazymatch goal with
   (* The [unify] is necessary, otherwise holes in [pat] stay as side-conditions *)
   | H : pat |- _ => let T := (type of H) in unify T pat; tac H
