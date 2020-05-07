@@ -1234,6 +1234,9 @@ Proof.
 Qed.
 Lemma map_Forall_delete m i : map_Forall P m → map_Forall P (delete i m).
 Proof. intros Hm j x; rewrite lookup_delete_Some. naive_solver. Qed.
+Lemma map_Forall_lookup m i x :
+  m !! i = Some x → map_Forall P m → P i x.
+Proof. intros Hlk Hm. by apply Hm. Qed.
 Lemma map_Forall_foldr_delete m is :
   map_Forall P m → map_Forall P (foldr delete m is).
 Proof. induction is; eauto using map_Forall_delete. Qed.
