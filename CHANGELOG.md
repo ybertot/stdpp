@@ -3,6 +3,10 @@ API-breaking change is listed.
 
 ## std++ master
 
+- Rename `Z2Nat_inj_div` and `Z2Nat_inj_mod` to `Nat2Z_inj_div` and
+  `Nat2Z_inj_mod` to follow the naming convention of `Nat2Z` and
+  `Z2Nat`. The names `Z2Nat_inj_div` and `Z2Nat_inj_mod` have been
+  repurposed for be the lemmas they should actually be.
 - Added `rotate` and `rotate_take` functions for accessing a list with
   wrap-around. Also added `rotate_nat_add` and `rotate_nat_sub` for
   computing indicies into a rotated list.
