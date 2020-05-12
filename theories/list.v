@@ -143,6 +143,20 @@ Fixpoint replicate {A} (n : nat) (x : A) : list A :=
   match n with 0 => [] | S n => x :: replicate n x end.
 Instance: Params (@replicate) 2 := {}.
 
+(** The function [rotate n l] rotates the list [l] by [n], e.g., [rotate 1
+[x0; x1; ...; xm]] becomes [x1; ...; xm; x0]. Rotating by a multiple of
+[length l] is the identity function. **)
+Definition rotate {A} (n : nat) (l : list A) : list A :=
+  drop (Z.to_nat (n `mod` length l)%Z) l ++ take (Z.to_nat (n `mod` length l)%Z) l.
+Instance: Params (@rotate) 2 := {}.
+
+(** The function [rotate_take s e l] returns the range between the
+indices [s] (inclusive) and [e] (exclusive) of [l]. If [e ≤ s], all
+elements after [s] and before [e] are returned. *)
+Definition rotate_take {A} (s e : nat) (l : list A) : list A :=
+  take (rotate_nat_sub s e (length l)) (rotate s l).
+Instance: Params (@rotate_take) 3 := {}.
+
 (** The function [reverse l] returns the elements of [l] in reverse order. *)
 Definition reverse {A} (l : list A) : list A := rev_append l [].
 Instance: Params (@reverse) 1 := {}.
@@ -1353,6 +1367,97 @@ Proof. intros ?. apply lookup_ge_None_2. by rewrite resize_length. Qed.
 Lemma lookup_total_resize_old `{!Inhabited A} l n x i :
   n ≤ i → resize n x l !!! i = inhabitant.
 Proof. intros. by rewrite !list_lookup_total_alt, lookup_resize_old. Qed.
+
+(** ** Properties of the [rotate] function *)
+Lemma rotate_replicate n1 n2 x:
+  rotate n1 (replicate n2 x) = replicate n2 x.
+Proof.
+  unfold rotate. rewrite drop_replicate, take_replicate, <-replicate_plus.
+  f_equal. lia.
+Qed.
+
+Lemma rotate_length l n:
+  length (rotate n l) = length l.
+Proof. unfold rotate. rewrite app_length, drop_length, take_length. lia. Qed.
+
+Lemma lookup_rotate_r l n i:
+  i < length l →
+  rotate n l !! i = l !! rotate_nat_add n i (length l).
+Proof.
+  intros Hlen. destruct (Z_mod_lt n (length l)) as [??];[lia|].
+  assert (Z.to_nat (n `mod` length l) < length l) as Hr.
+  { apply Nat2Z.inj_lt. rewrite Z2Nat.id; lia. }
+  unfold rotate. rewrite rotate_nat_add_add_mod, rotate_nat_add_alt by done.
+  remember (Z.to_nat (n `mod` length l)) as n'.
+  case_decide.
+  - by rewrite lookup_app_l, lookup_drop by (rewrite drop_length; lia).
+  - rewrite lookup_app_r, lookup_take, drop_length by (rewrite drop_length; lia).
+    f_equal. lia.
+Qed.
+
+Lemma lookup_rotate_r_Some l n i x:
+  rotate n l !! i = Some x ↔
+  l !! rotate_nat_add n i (length l) = Some x ∧ i < length l.
+Proof.
+  split.
+  - intros Hl. pose proof (lookup_lt_Some _ _ _ Hl) as Hlen.
+    rewrite rotate_length in Hlen. by rewrite <-lookup_rotate_r.
+  - intros [??]. by rewrite lookup_rotate_r.
+Qed.
+
+Lemma lookup_rotate_l l n i:
+  i < length l → rotate n l !! rotate_nat_sub n i (length l) = l !! i.
+Proof.
+  intros ?. rewrite lookup_rotate_r, rotate_nat_add_sub;[done..|].
+  apply rotate_nat_sub_lt. lia.
+Qed.
+
+Lemma elem_of_rotate l n x:
+  x ∈ rotate n l ↔ x ∈ l.
+Proof.
+  unfold rotate. rewrite <-(take_drop (Z.to_nat (n `mod` length l)) l) at 5.
+  rewrite !elem_of_app. naive_solver.
+Qed.
+
+Lemma rotate_insert_l l n i x:
+  i < length l →
+  rotate n (<[rotate_nat_add n i (length l):=x]> l) = <[i:=x]> (rotate n l).
+Proof.
+  intros Hlen. destruct (Z_mod_lt n (length l)) as [Hn1 Hn2];[lia|].
+  assert (Z.to_nat (n `mod` length l) < length l) as Hr.
+  { apply Nat2Z.inj_lt. rewrite Z2Nat.id; lia. } unfold rotate.
+  rewrite insert_length, rotate_nat_add_add_mod, rotate_nat_add_alt by done.
+  remember (Z.to_nat (n `mod` length l)) as n'.
+  case_decide.
+  - rewrite take_insert, drop_insert_le, insert_app_l
+      by (rewrite ?drop_length; lia). do 2 f_equal. lia.
+  - rewrite take_insert_lt, drop_insert_gt, insert_app_r_alt, drop_length
+      by (rewrite ?drop_length; lia). do 2 f_equal. lia.
+Qed.
+
+Lemma rotate_insert_r l n i x:
+  i < length l →
+  rotate n (<[i:=x]> l) = <[rotate_nat_sub n i (length l):=x]> (rotate n l).
+Proof.
+  intros ?. rewrite <-rotate_insert_l, rotate_nat_add_sub;[done..|].
+  apply rotate_nat_sub_lt. lia.
+Qed.
+
+(** ** Properties of the [rotate_take] function *)
+Lemma rotate_take_insert l s e i x:
+  i < length l →
+  rotate_take s e (<[i:=x]>l) =
+  if decide (rotate_nat_sub s i (length l) < rotate_nat_sub s e (length l)) then
+    <[rotate_nat_sub s i (length l):=x]> (rotate_take s e l) else rotate_take s e l.
+Proof.
+  intros ?. unfold rotate_take. rewrite rotate_insert_r, insert_length by done.
+  case_decide; [rewrite take_insert_lt | rewrite take_insert]; naive_solver lia.
+Qed.
+
+Lemma rotate_take_add l b i :
+  i < length l →
+  rotate_take b (rotate_nat_add b i (length l)) l = take i (rotate b l).
+Proof. intros ?. unfold rotate_take. by rewrite rotate_nat_sub_add. Qed.
 
 (** ** Properties of the [reshape] function *)
 Lemma reshape_length szs l : length (reshape szs l) = length szs.
@@ -2793,6 +2898,19 @@ Section Forall2.
     P x y → Forall2 P (replicate n x) (replicate n y).
   Proof. induction n; simpl; constructor; auto. Qed.
 
+  Lemma Forall2_rotate n l k :
+    Forall2 P l k → Forall2 P (rotate n l) (rotate n k).
+  Proof.
+    intros HAll. unfold rotate. rewrite (Forall2_length _ _ HAll).
+    eauto using Forall2_app, Forall2_take, Forall2_drop.
+  Qed.
+  Lemma Forall2_rotate_take s e l k :
+    Forall2 P l k → Forall2 P (rotate_take s e l) (rotate_take s e k).
+  Proof.
+    intros HAll. unfold rotate_take. rewrite (Forall2_length _ _ HAll).
+    eauto using Forall2_take, Forall2_rotate.
+  Qed.
+
   Lemma Forall2_reverse l k : Forall2 P l k → Forall2 P (reverse l) (reverse k).
   Proof.
     induction 1; rewrite ?reverse_nil, ?reverse_cons; eauto using Forall2_app.
@@ -2943,6 +3061,10 @@ Section Forall2_proper.
 
   Global Instance: Proper (R ==> Forall2 R) (replicate n).
   Proof. repeat intro. eauto using Forall2_replicate. Qed.
+  Global Instance: Proper (Forall2 R ==> Forall2 R) (rotate n).
+  Proof. repeat intro. eauto using Forall2_rotate. Qed.
+  Global Instance: Proper (Forall2 R ==> Forall2 R) (rotate_take s e).
+  Proof. repeat intro. eauto using Forall2_rotate_take. Qed.
   Global Instance: Proper (Forall2 R ==> Forall2 R) reverse.
   Proof. repeat intro. eauto using Forall2_reverse. Qed.
   Global Instance: Proper (Forall2 R ==> option_Forall2 R) last.
@@ -3101,6 +3223,10 @@ Section setoid.
   Proof. intros ???. rewrite !equiv_Forall2. by apply Forall2_filter. Qed.
   Global Instance replicate_proper n : Proper ((≡@{A}) ==> (≡)) (replicate n).
   Proof. induction n; constructor; auto. Qed.
+  Global Instance rotate_proper n : Proper ((≡@{list A}) ==> (≡)) (rotate n).
+  Proof. intros ??. rewrite !equiv_Forall2. by apply Forall2_rotate. Qed.
+  Global Instance rotate_take_proper s e : Proper ((≡@{list A}) ==> (≡)) (rotate_take s e).
+  Proof. intros ??. rewrite !equiv_Forall2. by apply Forall2_rotate_take. Qed.
   Global Instance reverse_proper : Proper ((≡) ==> (≡@{list A})) reverse.
   Proof.
     induction 1; rewrite ?reverse_cons; simpl; [constructor|].

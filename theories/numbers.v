@@ -452,6 +452,22 @@ Proof.
     apply Nat.mod_bound_pos; lia. }
   by rewrite <-Nat2Z.inj_mul, <-Nat2Z.inj_add, <-Nat.div_mod.
 Qed.
+Lemma Nat2Z_inj_div x y :
+  0 ≤ x → 0 ≤ y →
+  Z.to_nat (x `div` y) = (Z.to_nat x `div` Z.to_nat y)%nat.
+Proof.
+  intros. destruct (decide (y = 0%nat)); [by subst; destruct x|].
+  pose proof (Z.div_pos x y).
+  apply (inj Z.of_nat). by rewrite Z2Nat_inj_div, !Z2Nat.id by lia.
+Qed.
+Lemma Nat2Z_inj_mod x y :
+  0 ≤ x → 0 ≤ y →
+  Z.to_nat (x `mod` y) = (Z.to_nat x `mod` Z.to_nat y)%nat.
+Proof.
+  intros. destruct (decide (y = 0%nat)); [by subst; destruct x|].
+  pose proof (Z_mod_pos x y).
+  apply (inj Z.of_nat). by rewrite Z2Nat_inj_mod, !Z2Nat.id by lia.
+Qed.
 Lemma Z_succ_pred_induction y (P : Z → Prop) :
   P y →
   (∀ x, y ≤ x → P x → P (Z.succ x)) →
@@ -808,3 +824,122 @@ Qed.
 
 Lemma Qp_ge_0 (q: Qp): (0 ≤ q)%Qc.
 Proof. apply Qclt_le_weak, Qp_prf. Qed.
+
+(** * Helper for working with accessing lists with wrap-around
+    See also [rotate] and [rotate_take] in [list.v] *)
+(** [rotate_nat_add base offset len] computes [(base + offset) `mod`
+len]. This is useful in combination with the [rotate] function on
+lists, since the index [i] of [rotate n l] corresponds to the index
+[rotate_nat_add n i (length i)] of the original list. The definition
+uses [Z] for consistency with [rotate_nat_sub]. **)
+Definition rotate_nat_add (base offset len : nat) : nat :=
+  Z.to_nat ((base + offset) `mod` len)%Z.
+(** [rotate_nat_sub base offset len] is the inverse of [rotate_nat_add
+base offset len]. The definition needs to use modulo on [Z] instead of
+on nat since otherwise we need the sidecondition [base < len] on
+[rotate_nat_sub_add]. **)
+Definition rotate_nat_sub (base offset len : nat) : nat :=
+  Z.to_nat ((len + offset - base) `mod` len)%Z.
+
+Lemma rotate_nat_add_len_0 base offset:
+  rotate_nat_add base offset 0 = 0.
+Proof. unfold rotate_nat_add. by rewrite Zmod_0_r. Qed.
+Lemma rotate_nat_sub_len_0 base offset:
+  rotate_nat_sub base offset 0 = 0.
+Proof. unfold rotate_nat_sub. by rewrite Zmod_0_r. Qed.
+
+Lemma rotate_nat_add_add_mod base offset len:
+  rotate_nat_add base offset len =
+  rotate_nat_add (Z.to_nat (base `mod` len)%Z) offset len.
+Proof.
+  destruct len as [|i];[ by rewrite !rotate_nat_add_len_0|].
+  pose proof (Z_mod_lt base (S i)) as Hlt. unfold rotate_nat_add.
+  rewrite !Z2Nat.id by lia. by rewrite Zplus_mod_idemp_l.
+Qed.
+
+Lemma rotate_nat_add_alt base offset len:
+  base < len → offset < len →
+  rotate_nat_add base offset len =
+  if decide (base + offset < len) then base + offset else base + offset - len.
+Proof.
+  unfold rotate_nat_add. intros ??. case_decide.
+  - rewrite Z.mod_small by lia. by rewrite <-Nat2Z.inj_add, Nat2Z.id.
+  - rewrite (Zmod_in_range 1) by lia.
+    by rewrite Z.mul_1_l, <-Nat2Z.inj_add, <-Nat2Z.inj_sub,Nat2Z.id by lia.
+Qed.
+Lemma rotate_nat_sub_alt base offset len:
+  base < len → offset < len →
+  rotate_nat_sub base offset len =
+  if decide (offset < base) then len + offset - base else offset - base.
+Proof.
+  unfold rotate_nat_sub. intros ??. case_decide.
+  - rewrite Z.mod_small by lia.
+    by rewrite <-Nat2Z.inj_add, <-Nat2Z.inj_sub, Nat2Z.id by lia.
+  - rewrite (Zmod_in_range 1) by lia.
+    rewrite Z.mul_1_l, <-Nat2Z.inj_add, <-!Nat2Z.inj_sub,Nat2Z.id; lia.
+Qed.
+
+Lemma rotate_nat_add_0 base len :
+  base < len → rotate_nat_add base 0 len = base.
+Proof.
+  intros ?. unfold rotate_nat_add.
+  rewrite Z.mod_small by lia. by rewrite Z.add_0_r, Nat2Z.id.
+Qed.
+Lemma rotate_nat_sub_0 base len :
+  base < len → rotate_nat_sub base base len = 0.
+Proof. intros ?. rewrite rotate_nat_sub_alt by done. case_decide; lia. Qed.
+
+Lemma rotate_nat_add_lt base offset len :
+  0 < len → rotate_nat_add base offset len < len.
+Proof.
+  unfold rotate_nat_add. intros ?.
+  pose proof (Nat.mod_upper_bound (base + offset) len).
+  rewrite Nat2Z_inj_mod, Z2Nat.inj_add, !Nat2Z.id; lia.
+Qed.
+Lemma rotate_nat_sub_lt base offset len :
+  0 < len → rotate_nat_sub base offset len < len.
+Proof.
+  unfold rotate_nat_sub. intros ?.
+  pose proof (Z_mod_lt (len + offset - base) len).
+  apply Nat2Z.inj_lt. rewrite Z2Nat.id; lia.
+Qed.
+
+Lemma rotate_nat_add_sub base len offset:
+  offset < len →
+  rotate_nat_add base (rotate_nat_sub base offset len) len = offset.
+Proof.
+  intros ?. unfold rotate_nat_add, rotate_nat_sub.
+  rewrite Z2Nat.id by (apply Z_mod_pos; lia). rewrite Zplus_mod_idemp_r.
+  replace (base + (len + offset - base))%Z with (len + offset)%Z by lia.
+  rewrite (Zmod_in_range 1) by lia.
+  rewrite Z.mul_1_l, <-Nat2Z.inj_add, <-!Nat2Z.inj_sub,Nat2Z.id; lia.
+Qed.
+
+Lemma rotate_nat_sub_add base len offset:
+  offset < len →
+  rotate_nat_sub base (rotate_nat_add base offset len) len = offset.
+Proof.
+  intros ?. unfold rotate_nat_add, rotate_nat_sub.
+  rewrite Z2Nat.id by (apply Z_mod_pos; lia).
+  assert (∀ n, (len + n - base) = ((len - base) + n))%Z as -> by naive_solver lia.
+  rewrite Zplus_mod_idemp_r.
+  replace (len - base + (base + offset))%Z with (len + offset)%Z by lia.
+  rewrite (Zmod_in_range 1) by lia.
+  rewrite Z.mul_1_l, <-Nat2Z.inj_add, <-!Nat2Z.inj_sub,Nat2Z.id; lia.
+Qed.
+
+Lemma rotate_nat_add_add base offset len n:
+  0 < len →
+  rotate_nat_add base (offset + n) len =
+  (rotate_nat_add base offset len + n) `mod` len.
+Proof.
+  intros ?. unfold rotate_nat_add.
+  rewrite !Nat2Z_inj_mod, !Z2Nat.inj_add, !Nat2Z.id by lia.
+  by rewrite plus_assoc, Nat.add_mod_idemp_l by lia.
+Qed.
+
+Lemma rotate_nat_add_S base offset len:
+  0 < len →
+  rotate_nat_add base (S offset) len =
+  S (rotate_nat_add base offset len) `mod` len.
+Proof. intros ?. by rewrite <-Nat.add_1_r, rotate_nat_add_add, Nat.add_1_r. Qed.

@@ -3,6 +3,9 @@ API-breaking change is listed.
 
 ## std++ master
 
+- Added `rotate` and `rotate_take` functions for accessing a list with
+  wrap-around. Also added `rotate_nat_add` and `rotate_nat_sub` for
+  computing indicies into a rotated list.
 - Added the `select` and `revert select` tactics for selecting and
   reverting a hypothesis based on a pattern.
 - Extracted `list_numbers.v` from `list.v` and `numbers.v` for
