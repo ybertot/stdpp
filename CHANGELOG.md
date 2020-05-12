@@ -14,8 +14,7 @@ API-breaking change is listed.
   exported by the prelude. This is a breaking change if one only
   imports `list.v`, but not the prelude.
 - Rename `drop_insert` into `drop_insert_gt` and add `drop_insert_le`.
-- Added `Countable` instances for `Ascii.ascii` and `Byte.byte` from the Coq
-  standard library.
+- Added `Countable` instance for `Ascii.ascii`.
 - Make lemma `list_find_Some` more apply friendly.
 
 ## std++ 1.3 (released 2020-03-18)
