@@ -1,4 +1,5 @@
 From Coq Require Import Ascii.
+From Coq Require Import Init.Byte.
 From Coq Require Export String.
 From stdpp Require Export list.
 From stdpp Require Import countable.
@@ -18,6 +19,7 @@ Arguments String.append : simpl never.
 
 (** * Decision of equality *)
 Instance ascii_eq_dec : EqDecision ascii := ascii_dec.
+Instance byte_eq_dec : EqDecision byte := Byte.byte_eq_dec.
 Instance string_eq_dec : EqDecision string.
 Proof. solve_decision. Defined.
 Instance string_app_inj : Inj (=) (=) (String.append s1).
@@ -119,3 +121,5 @@ Lemma ascii_of_to_digits a : ascii_of_digits (ascii_to_digits a) = a.
 Proof. by destruct a as [[][][][][][][][]]. Qed.
 Instance ascii_countable : Countable ascii :=
   inj_countable' ascii_to_digits ascii_of_digits ascii_of_to_digits.
+Instance byte_countable : Countable byte :=
+  inj_countable Byte.to_N Byte.of_N Byte.of_to_N.
