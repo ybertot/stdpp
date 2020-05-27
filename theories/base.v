@@ -190,6 +190,11 @@ embedded logics. *)
 Notation "'True'" := True (format "True") : type_scope.
 Notation "'False'" := False (format "False") : type_scope.
 
+(** Change [forall] into a notation in order to enable overloading. *)
+Notation "'forall' x .. y , P" := (forall x, .. (forall y, P%type) ..)
+  (at level 200, x binder, y binder, right associativity,
+   only parsing) : type_scope.
+
 
 (** * Equality *)
 (** Introduce some Haskell style like notations. *)
