@@ -3470,7 +3470,7 @@ Section fmap.
     - exists y. split; [done | by left].
     - destruct IH as [z [??]]. done. exists z. split; [done | by right].
   Qed.
-  Lemma elem_of_list_fmap l x : x ∈ f <$> l ↔ ∃ y, x = f y ∧ y ∈  l.
+  Lemma elem_of_list_fmap l x : x ∈ f <$> l ↔ ∃ y, x = f y ∧ y ∈ l.
   Proof.
     naive_solver eauto using elem_of_list_fmap_1_alt, elem_of_list_fmap_2.
   Qed.
