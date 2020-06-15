@@ -154,10 +154,10 @@ Lemma finite_bijective A `{Finite A} B `{Finite B} :
 Proof.
   split.
   - intros; destruct (proj1 (finite_inj A B)) as [f ?]; auto with lia.
-    exists f; auto using (finite_inj_surj f).
+    exists f; eauto using finite_inj_surj.
   - intros (f&?&?). apply (anti_symm (≤)); apply finite_inj.
     + by exists f.
-    + destruct (surj_cancel f) as (g&?); eauto using cancel_inj.
+    + destruct (surj_cancel f) as (g&?). exists g. apply cancel_inj.
 Qed.
 Lemma inj_card `{Finite A} `{Finite B} (f : A → B)
   `{!Inj (=) (=) f} : card A ≤ card B.
@@ -274,7 +274,7 @@ Next Obligation.
 Qed.
 Next Obligation.
   intros ?????? [x|y]; rewrite elem_of_app, !elem_of_list_fmap;
-    eauto using @elem_of_enum.
+    eauto using elem_of_enum.
 Qed.
 Lemma sum_card `{Finite A, Finite B} : card (A + B) = card A + card B.
 Proof. unfold card. simpl. by rewrite app_length, !fmap_length. Qed.
@@ -297,7 +297,7 @@ Next Obligation.
 Qed.
 Next Obligation.
   intros ?????? [x y]. induction (elem_of_enum x); simpl.
-  - rewrite elem_of_app, !elem_of_list_fmap. eauto using @elem_of_enum.
+  - rewrite elem_of_app, !elem_of_list_fmap. eauto using elem_of_enum.
   - rewrite elem_of_app; eauto.
 Qed.
 Lemma prod_card `{Finite A} `{Finite B} : card (A * B) = card A * card B.

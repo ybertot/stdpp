@@ -792,10 +792,10 @@ Proof.
     - auto.
     - destruct (help c d a b); [done..|]. naive_solver.
     - apply (inj (Qp_plus a)) in H as ->. destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).
-      eauto 10 using (comm_L Qp_plus). }
+      exists a', q, q, d'. repeat split; done || by rewrite (comm_L Qp_plus). }
   intros a b c d [e ->]%Qp_lt_sum. rewrite <-(assoc_L _). intros ->%(inj (Qp_plus a)).
   destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).
-  eexists a', q, (q + e)%Qp, d'; split_and?; auto using (comm_L Qp_plus).
+  eexists a', q, (q + e)%Qp, d'; split_and?; [by rewrite (comm_L Qp_plus)|..|done].
   - by rewrite (assoc_L _), (comm_L Qp_plus e).
   - by rewrite (assoc_L _), (comm_L Qp_plus a').
 Qed.

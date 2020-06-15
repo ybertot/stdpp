@@ -124,9 +124,9 @@ Proof.
 Qed.
 Lemma dom_finite {A} (m : M A) : set_finite (dom D m).
 Proof.
-  induction m using map_ind; rewrite ?dom_empty, ?dom_insert;
-    eauto using (empty_finite (C:=D)), (union_finite (C:=D)),
-    (singleton_finite (C:=D)).
+  induction m using map_ind; rewrite ?dom_empty, ?dom_insert.
+  - by apply empty_finite.
+  - apply union_finite; [apply singleton_finite|done].
 Qed.
 Global Instance dom_proper `{!Equiv A} : Proper ((≡@{M A}) ==> (≡)) (dom D).
 Proof.

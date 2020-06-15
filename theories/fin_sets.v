@@ -260,9 +260,9 @@ Proof.
   { destruct IH as (x' & Hx' & Hmin); [set_solver|].
     destruct (decide (R x x')).
     - exists x; split; [set_solver|].
-      eauto using (union_minimal (C:=C)), (singleton_minimal (C:=C)), minimal_weaken.
+      eapply union_minimal; [eapply singleton_minimal|by eapply minimal_weaken].
     - exists x'; split; [set_solver|].
-      eauto using (union_minimal (C:=C)), (singleton_minimal_not_above (C:=C)). }
+      by eapply union_minimal; [apply singleton_minimal_not_above|]. }
   exists x; split; [set_solver|].
   rewrite HX, (right_id _ (∪)). apply singleton_minimal.
 Qed.

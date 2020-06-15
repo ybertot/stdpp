@@ -795,7 +795,7 @@ Lemma list_to_map_inj {A} (l1 l2 : list (K * A)) :
   NoDup (l1.*1) → NoDup (l2.*1) →
   (list_to_map l1 : M A) = list_to_map l2 → l1 ≡ₚ l2.
 Proof.
-  intros ?? Hl1l2. apply NoDup_Permutation; auto using (NoDup_fmap_1 fst).
+  intros ?? Hl1l2. apply NoDup_Permutation; [by eauto using NoDup_fmap_1..|].
   intros [i x]. by rewrite !elem_of_list_to_map, Hl1l2.
 Qed.
 Lemma list_to_map_to_list {A} (m : M A) : list_to_map (map_to_list m) = m.
@@ -842,7 +842,7 @@ Lemma map_to_list_insert {A} (m : M A) i x :
 Proof.
   intros. apply list_to_map_inj; csimpl.
   - apply NoDup_fst_map_to_list.
-  - constructor; auto using NoDup_fst_map_to_list.
+  - constructor; [|by auto using NoDup_fst_map_to_list].
     rewrite elem_of_list_fmap. intros [[??] [? Hlookup]]; subst; simpl in *.
     rewrite elem_of_map_to_list in Hlookup. congruence.
   - by rewrite !list_to_map_to_list.
@@ -851,13 +851,13 @@ Lemma map_to_list_singleton {A} i (x : A) :
   map_to_list ({[i:=x]} : M A) = [(i,x)].
 Proof.
   apply Permutation_singleton. unfold singletonM, map_singleton.
-  by rewrite map_to_list_insert, map_to_list_empty by auto using lookup_empty.
+  by rewrite map_to_list_insert, map_to_list_empty by eauto using lookup_empty.
 Qed.
 
 Lemma map_to_list_submseteq {A} (m1 m2 : M A) :
   m1 ⊆ m2 → map_to_list m1 ⊆+ map_to_list m2.
 Proof.
-  intros; apply NoDup_submseteq; auto using NoDup_map_to_list.
+  intros; apply NoDup_submseteq; [by eauto using NoDup_map_to_list|].
   intros [i x]. rewrite !elem_of_map_to_list; eauto using lookup_weaken.
 Qed.
 Lemma map_to_list_fmap {A B} (f : A → B) (m : M A) :
@@ -1755,13 +1755,13 @@ Lemma map_union_cancel_l {A} (m1 m2 m3 : M A) :
   m1 ##ₘ m3 → m2 ##ₘ m3 → m3 ∪ m1 = m3 ∪ m2 → m1 = m2.
 Proof.
   intros. apply (anti_symm (⊆)); apply map_union_reflecting_l with m3;
-    auto using (reflexive_eq (R:=(⊆@{M A}))).
+    by try apply reflexive_eq.
 Qed.
 Lemma map_union_cancel_r {A} (m1 m2 m3 : M A) :
   m1 ##ₘ m3 → m2 ##ₘ m3 → m1 ∪ m3 = m2 ∪ m3 → m1 = m2.
 Proof.
   intros. apply (anti_symm (⊆)); apply map_union_reflecting_r with m3;
-    auto using (reflexive_eq (R:=(⊆@{M A}))).
+    by try apply reflexive_eq.
 Qed.
 Lemma map_disjoint_union_l {A} (m1 m2 m3 : M A) :
   m1 ∪ m2 ##ₘ m3 ↔ m1 ##ₘ m3 ∧ m2 ##ₘ m3.
