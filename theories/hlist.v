@@ -14,9 +14,9 @@ Fixpoint tapp (As Bs : tlist) : tlist :=
 Fixpoint happ {As Bs} (xs : hlist As) (ys : hlist Bs) : hlist (tapp As Bs) :=
   match xs with hnil => ys | hcons x xs => hcons x (happ xs ys) end.
 
-Fixpoint hhead {A As} (xs : hlist (tcons A As)) : A :=
+Definition hhead {A As} (xs : hlist (tcons A As)) : A :=
   match xs with hnil => () | hcons x _ => x end.
-Fixpoint htail {A As} (xs : hlist (tcons A As)) : hlist As :=
+Definition htail {A As} (xs : hlist (tcons A As)) : hlist As :=
   match xs with hnil => () | hcons _ xs => xs end.
 
 Fixpoint hheads {As Bs} : hlist (tapp As Bs) → hlist As :=

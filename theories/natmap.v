@@ -258,7 +258,7 @@ Instance natmap_dom {A} : Dom (natmap A) natset := mapset_dom.
 Instance: FinMapDom nat natmap natset := mapset_dom_spec.
 
 (* Fixpoint avoids this definition from being unfolded *)
-Fixpoint bools_to_natset (βs : list bool) : natset :=
+Definition bools_to_natset (βs : list bool) : natset :=
   let f (β : bool) := if β then Some () else None in
   Mapset $ list_to_natmap $ f <$> βs.
 Definition natset_to_bools (sz : nat) (X : natset) : list bool :=
