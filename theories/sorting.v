@@ -182,7 +182,8 @@ Section merge_sort_correct.
     intros Hl1. revert l2. induction Hl1 as [|x1 l1 IH1];
       induction 1 as [|x2 l2 IH2]; rewrite ?list_merge_cons; simpl;
       repeat case_decide;
-      constructor; eauto using HdRel_list_merge, HdRel_cons, total_not.
+      repeat match goal with H : ¬R _ _ |- _ => apply total_not in H end;
+      constructor; eauto using HdRel_list_merge, HdRel_cons.
   Qed.
   Lemma merge_Permutation l1 l2 : list_merge R l1 l2 ≡ₚ l1 ++ l2.
   Proof.
