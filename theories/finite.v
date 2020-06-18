@@ -361,3 +361,39 @@ Next Obligation.
 Qed.
 Lemma fin_card n : card (fin n) = n.
 Proof. unfold card; simpl. induction n; simpl; rewrite ?fmap_length; auto. Qed.
+
+Section sig_finite.
+  Context {A} (P : A → Prop) `{∀ x, Decision (P x)}.
+
+  Fixpoint list_filter_sig (l : list A) : list (sig P) :=
+    match l with
+    | [] => []
+    | x :: l => match decide (P x) with
+              | left H => x ↾ H :: list_filter_sig l
+              | _ => list_filter_sig l
+              end
+    end.
+  Lemma list_filter_sig_filter (l : list A) :
+    proj1_sig <$> list_filter_sig l = filter P l.
+  Proof.
+    induction l as [| a l IH]; [done |].
+    simpl; rewrite filter_cons.
+    destruct (decide _); csimpl; by rewrite IH.
+  Qed.
+
+  Context `{Finite A} `{∀ x, ProofIrrel (P x)}.
+
+  Global Program Instance sig_finite : Finite (sig P) :=
+    {| enum := list_filter_sig (enum A) |}.
+  Next Obligation.
+    eapply NoDup_fmap_1. rewrite list_filter_sig_filter.
+    apply NoDup_filter, NoDup_enum.
+  Qed.
+  Next Obligation.
+    intros p. apply (elem_of_list_fmap_2_inj proj1_sig).
+    rewrite list_filter_sig_filter, elem_of_list_filter.
+    split; [by destruct p | apply elem_of_enum].
+  Qed.
+  Lemma sig_card : card (sig P) = length (filter P (enum A)).
+  Proof. by rewrite <-list_filter_sig_filter, fmap_length. Qed.
+End sig_finite.

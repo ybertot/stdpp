@@ -38,6 +38,9 @@ Proof.
   destruct x as [x Hx], y as [y Hy]; simpl; intros; subst.
   f_equal. apply proof_irrel.
 Qed.
+Instance proj1_sig_inj `(P : A → Prop) `{∀ x, ProofIrrel (P x)} :
+  Inj (=) (=) (proj1_sig (P:=P)).
+Proof. intros ??. apply (sig_eq_pi P). Qed.
 Lemma exists_proj1_pi `(P : A → Prop) `{∀ x, ProofIrrel (P x)}
   (x : sig P) p : `x ↾ p = x.
 Proof. apply (sig_eq_pi _); reflexivity. Qed.
