@@ -3474,6 +3474,14 @@ Section fmap.
   Proof.
     naive_solver eauto using elem_of_list_fmap_1_alt, elem_of_list_fmap_2.
   Qed.
+  Lemma elem_of_list_fmap_2_inj `{!Inj (=) (=) f} l x : f x ∈ f <$> l → x ∈ l.
+  Proof.
+    intros (y, (E, I))%elem_of_list_fmap_2. by rewrite (inj f) in I.
+  Qed.
+  Lemma elem_of_list_fmap_inj `{!Inj (=) (=) f} l x : f x ∈ f <$> l ↔ x ∈ l.
+  Proof.
+    naive_solver eauto using elem_of_list_fmap_1, elem_of_list_fmap_2_inj.
+  Qed.
 
   Lemma NoDup_fmap_1 l : NoDup (f <$> l) → NoDup l.
   Proof.
