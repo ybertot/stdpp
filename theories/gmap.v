@@ -265,6 +265,13 @@ Section gset.
     rewrite lookup_insert_Some, !lookup_gset_to_gmap_Some, elem_of_union,
       elem_of_singleton; destruct (decide (i = j)); intuition.
   Qed.
+  Lemma gset_to_gmap_difference_singleton {A} (x : A) i Y :
+    gset_to_gmap x (Y ∖ {[i]}) = delete i (gset_to_gmap x Y).
+  Proof.
+    apply map_eq; intros j; apply option_eq; intros y.
+    rewrite lookup_delete_Some, !lookup_gset_to_gmap_Some, elem_of_difference,
+      elem_of_singleton; destruct (decide (i = j)); intuition.
+  Qed.
 
   Lemma fmap_gset_to_gmap {A B} (f : A → B) (X : gset K) (x : A) :
     f <$> gset_to_gmap x X = gset_to_gmap (f x) X.
