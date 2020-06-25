@@ -1046,9 +1046,8 @@ Notation "(≫=)" := (λ m f, mbind f m) (only parsing) : stdpp_scope.
 Notation "x ← y ; z" := (y ≫= (λ x : _, z))
   (at level 20, y at level 100, z at level 200, only parsing) : stdpp_scope.
 
-Notation "' x1 .. xn ← y ; z" := (y ≫= (λ x1, .. (λ xn, z) .. ))
-  (at level 20, x1 binder, xn binder, y at level 100, z at level 200,
-   only parsing, right associativity) : stdpp_scope.
+Notation "' x ← y ; z" := (y ≫= (λ x : _, z))
+  (at level 20, x pattern, y at level 100, z at level 200, only parsing) : stdpp_scope.
 
 Infix "<$>" := fmap (at level 61, left associativity) : stdpp_scope.
 
