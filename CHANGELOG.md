@@ -20,6 +20,7 @@ API-breaking change is listed.
 - Rename `drop_insert` into `drop_insert_gt` and add `drop_insert_le`.
 - Added `Countable` instance for `Ascii.ascii`.
 - Make lemma `list_find_Some` more apply friendly.
+- Add tactic `multiset_solver` for solving goals involving multisets.
 
 ## std++ 1.3 (released 2020-03-18)
 
