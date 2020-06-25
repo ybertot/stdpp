@@ -15,4 +15,6 @@ Section test.
     {[z]} ⊎ X = {[y]} ⊎ Y →
     {[x]} ⊎ ({[z]} ⊎ X) = {[y]} ⊎ ({[x]} ⊎ Y).
   Proof. multiset_solver. Qed.
+  Lemma test5 X x : X ⊎ ∅ = {[x]} → X ⊎ ∅ ≠@{gmultiset A} ∅.
+  Proof. multiset_solver. Qed.
 End test.

@@ -163,8 +163,9 @@ singleton [{[ y ]}] since the singleton receives special treatment in step (3).
 Step (3) is achieved using the tactic [multiset_instantiate], which instantiates
 universally quantified hypotheses [H : ∀ x : A, P x] in two ways:
 
-- If [P] contains a multiset singleton [{[ y ]}] it creates the hypothesis [H y].
-- If the goal contains [multiplicity y X] it creates the hypothesis [H y].
+- If [P] contains a multiset singleton [{[ y ]}] it adds the hypothesis [H y].
+- If the goal or some hypothesis contains [multiplicity y X] it adds the
+  hypothesis [H y].
 *)
 Class MultisetUnfold `{Countable A} (x : A) (X : gmultiset A) (n : nat) :=
   { multiset_unfold : multiplicity x X = n }.
@@ -233,6 +234,10 @@ Ltac multiset_instantiate :=
         already exists. *)
         unify y e'; unless (P y) by assumption; pose proof (H y)
      end
+  | H : (∀ x : ?A, @?P x), _ : context [multiplicity ?y _] |- _ =>
+     (* Use [unless] to avoid creating a new hypothesis [H y : P y] if [P y]
+     already exists. *)
+     unless (P y) by assumption; pose proof (H y)
   | H : (∀ x : ?A, @?P x) |- context [multiplicity ?y _] =>
      (* Use [unless] to avoid creating a new hypothesis [H y : P y] if [P y]
      already exists. *)
