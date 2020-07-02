@@ -3,6 +3,8 @@ API-breaking change is listed.
 
 ## std++ master
 
+Coq 8.7 is no longer supported by this release.
+
 - Rename `Z2Nat_inj_div` and `Z2Nat_inj_mod` to `Nat2Z_inj_div` and
   `Nat2Z_inj_mod` to follow the naming convention of `Nat2Z` and
   `Z2Nat`. The names `Z2Nat_inj_div` and `Z2Nat_inj_mod` have been
