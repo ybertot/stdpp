@@ -1,5 +1,14 @@
 (** This file implements finite maps and finite sets with keys of any countable
-type. The implementation is based on [Pmap]s, radix-2 search trees. *)
+type. The implementation is based on [Pmap]s, radix-2 search trees.
+
+Computations on [gmap] or [gset], even concrete ones, are prevented from
+reducing with [simpl] or [cbv] (by marking [gmap_empty] as [Opaque]), because
+[simpl] reduces too eagerly.
+To compute concrete results, you need to both:
+- project in the end to some concrete data structure that, unlike
+  [gmap]/[gset], does not contain proofs, say via [map_to_list] or [!!]; and
+- use [vm_compute] to run the computation, because it ignores opacity.
+*)
 From stdpp Require Export countable infinite fin_maps fin_map_dom.
 From stdpp Require Import pmap mapset propset.
 (* Set Default Proof Using "Type". *)
@@ -31,6 +40,13 @@ Defined.
 Instance gmap_lookup `{Countable K} {A} : Lookup K A (gmap K A) :=
   λ i '(GMap m _), m !! encode i.
 Instance gmap_empty `{Countable K} {A} : Empty (gmap K A) := GMap ∅ I.
+(** Block reduction, even on concrete [gmap]s.
+Marking [gmap_empty] as [simpl never] would not be enough, because of
+https://github.com/coq/coq/issues/2972 and
+https://github.com/coq/coq/issues/2986.
+And marking [gmap] consumers as [simpl never] does not work either, see:
+https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/171#note_53216
+*)
 Global Opaque gmap_empty.
 Lemma gmap_partial_alter_wf `{Countable K} {A} (f : option A → option A) m i :
   gmap_wf K m → gmap_wf K (partial_alter f (encode (A:=K) i) m).
