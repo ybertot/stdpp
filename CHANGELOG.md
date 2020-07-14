@@ -3,26 +3,34 @@ API-breaking change is listed.
 
 ## std++ master
 
-Coq 8.7 is no longer supported by this release.
+Coq 8.12 is newly supported by this release, and Coq 8.7 is no longer supported.
 
 - Rename `Z2Nat_inj_div` and `Z2Nat_inj_mod` to `Nat2Z_inj_div` and
   `Nat2Z_inj_mod` to follow the naming convention of `Nat2Z` and
-  `Z2Nat`. The names `Z2Nat_inj_div` and `Z2Nat_inj_mod` have been
-  repurposed for be the lemmas they should actually be.
-- Added `rotate` and `rotate_take` functions for accessing a list with
-  wrap-around. Also added `rotate_nat_add` and `rotate_nat_sub` for
+  `Z2Nat`. Re-purpose the names `Z2Nat_inj_div` and `Z2Nat_inj_mod` for be the
+  lemmas they should actually be.
+- Add `rotate` and `rotate_take` functions for accessing a list with
+  wrap-around. Also add `rotate_nat_add` and `rotate_nat_sub` for
   computing indicies into a rotated list.
-- Added the `select` and `revert select` tactics for selecting and
+- Add the `select` and `revert select` tactics for selecting and
   reverting a hypothesis based on a pattern.
-- Extracted `list_numbers.v` from `list.v` and `numbers.v` for
+- Extract `list_numbers.v` from `list.v` and `numbers.v` for
   functions, which operate on lists of numbers (`seq`, `seqZ`,
   `sum_list(_with)` and `max_list(_with)`). `list_numbers.v` is
   exported by the prelude. This is a breaking change if one only
   imports `list.v`, but not the prelude.
 - Rename `drop_insert` into `drop_insert_gt` and add `drop_insert_le`.
-- Added `Countable` instance for `Ascii.ascii`.
+- Add `Countable` instance for `Ascii.ascii`.
 - Make lemma `list_find_Some` more apply friendly.
+- Add `filter_app` lemma.
 - Add tactic `multiset_solver` for solving goals involving multisets.
+- Rename `fin_maps.singleton_proper` into `singletonM_proper` since it concerns
+  `singletonM` and to avoid overlap with `sets.singleton_proper`.
+- Add `wn R` for weakly normalizing elements w.r.t. a relation `R`.
+- Add `encode_Z`/`decode_Z` functions to encode elements of a countable type
+  as integers `Z`, in analogy with `encode_nat`/`decode_nat`.
+- Fix list `Datatypes.length` and string `strings.length` shadowing (`length`
+  should now always be `Datatypes.length`).
 
 ## std++ 1.3 (released 2020-03-18)
 
@@ -76,11 +84,6 @@ Noteworthy additions and changes:
     `seqZ_lookup_ge` → `lookup_seqZ_ge`, and `seqZ_lookup` → `lookup_seqZ`
   + Rename `lookup_seq_inv` → `lookup_seq` and generalize it to a bi-implication
   + Add `NoDup_seqZ` and `Forall_seqZ`
-- Rename `fin_maps.singleton_proper` into `singletonM_proper` since it concerns
-  `singletonM` and to avoid overlap with `sets.singleton_proper`.
-- Add `wn R` for weakly normalizing elements w.r.t. a relation `R`.
-- Add `encode_Z`/`decode_Z` functions to encode elements of a countable type
-  as integers `Z`, in analogy with `encode_nat`/`decode_nat`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
