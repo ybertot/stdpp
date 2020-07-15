@@ -5,6 +5,10 @@ API-breaking change is listed.
 
 Coq 8.12 is newly supported by this release, and Coq 8.7 is no longer supported.
 
+This release of std++ received contributions by Gregory Malecha, Michael
+Sammler, Olivier Laurent, Paolo G. Giarrusso, Ralf Jung, Robbert Krebbers,
+sarahzrf, and Tej Chajed.
+
 - Rename `Z2Nat_inj_div` and `Z2Nat_inj_mod` to `Nat2Z_inj_div` and
   `Nat2Z_inj_mod` to follow the naming convention of `Nat2Z` and
   `Z2Nat`. Re-purpose the names `Z2Nat_inj_div` and `Z2Nat_inj_mod` for be the
