@@ -1791,6 +1791,17 @@ Section filter.
   Qed.
 End filter.
 
+Lemma list_filter_iff (P1 P2 : A → Prop)
+    `{!∀ x, Decision (P1 x), !∀ x, Decision (P2 x)} (l : list A) :
+  (∀ x, P1 x ↔ P2 x) →
+  filter P1 l = filter P2 l.
+Proof.
+  intros HPiff. induction l as [|a l IH]; [done|].
+  destruct (decide (P1 a)).
+  - rewrite !filter_cons_True by naive_solver. by rewrite IH.
+  - rewrite !filter_cons_False by naive_solver. by rewrite IH.
+Qed.
+
 (** ** Properties of the [prefix] and [suffix] predicates *)
 Global Instance: PreOrder (@prefix A).
 Proof.
