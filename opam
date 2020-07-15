@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "coq-stdpp"
 maintainer: "Ralf Jung <jung@mpi-sws.org>"
-authors: "Robbert Krebbers, Jacques-Henri Jourdan, Ralf Jung"
+authors: "The std++ team"
 license: "BSD"
 homepage: "https://gitlab.mpi-sws.org/iris/stdpp"
 bug-reports: "https://gitlab.mpi-sws.org/iris/stdpp/issues"
