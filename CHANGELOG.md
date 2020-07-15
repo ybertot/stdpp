@@ -35,6 +35,8 @@ sarahzrf, and Tej Chajed.
   as integers `Z`, in analogy with `encode_nat`/`decode_nat`.
 - Fix list `Datatypes.length` and string `strings.length` shadowing (`length`
   should now always be `Datatypes.length`).
+- Change the notation for pattern matching monadic bind into `'pat ← x; y`. It
+  was `''pat ← x; y` (with double `'`) due to a shortcoming of Coq ≤8.7.
 
 ## std++ 1.3 (released 2020-03-18)
 
