@@ -1,7 +1,7 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## std++ 1.4 (released 2020-07-15)
+## std++ 1.4.0 (released 2020-07-15)
 
 Coq 8.12 is newly supported by this release, and Coq 8.7 is no longer supported.
 
@@ -38,7 +38,7 @@ sarahzrf, and Tej Chajed.
 - Change the notation for pattern matching monadic bind into `'pat ← x; y`. It
   was `''pat ← x; y` (with double `'`) due to a shortcoming of Coq ≤8.7.
 
-## std++ 1.3 (released 2020-03-18)
+## std++ 1.3.0 (released 2020-03-18)
 
 Coq 8.11 is supported by this release.
 
