@@ -3483,16 +3483,27 @@ Section fmap.
     naive_solver eauto using elem_of_list_fmap_1, elem_of_list_fmap_2_inj.
   Qed.
 
+  (** A version of [NoDup_fmap_2] that does not require [f] to be injective for
+      *all* inputs. *)
+  Lemma NoDup_fmap_2_strong l :
+    (∀ x y, x ∈ l → y ∈ l → f x = f y → x = y) →
+    NoDup l →
+    NoDup (f <$> l).
+  Proof.
+    intros Hinj. induction 1 as [|x l ?? IH]; simpl; constructor.
+    - intros [y [Hxy ?]]%elem_of_list_fmap.
+      apply Hinj in Hxy; [by subst|by constructor..].
+    - apply IH. clear- Hinj.
+      intros x' y Hx' Hy. apply Hinj; by constructor.
+  Qed.
+
   Lemma NoDup_fmap_1 l : NoDup (f <$> l) → NoDup l.
   Proof.
     induction l; simpl; inversion_clear 1; constructor; auto.
     rewrite elem_of_list_fmap in *. naive_solver.
   Qed.
   Lemma NoDup_fmap_2 `{!Inj (=) (=) f} l : NoDup l → NoDup (f <$> l).
-  Proof.
-    induction 1; simpl; constructor; trivial. rewrite elem_of_list_fmap.
-    intros [y [Hxy ?]]. apply (inj f) in Hxy. by subst.
-  Qed.
+  Proof. apply NoDup_fmap_2_strong. intros ?? _ _. apply (inj f). Qed.
   Lemma NoDup_fmap `{!Inj (=) (=) f} l : NoDup (f <$> l) ↔ NoDup l.
   Proof. split; auto using NoDup_fmap_1, NoDup_fmap_2. Qed.
 
