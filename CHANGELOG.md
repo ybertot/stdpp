@@ -1,6 +1,11 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
+## std++ master
+
+- Rename `dom_map filter` → `dom_filter`, `dom_map_filter_L` → `dom_filter_L`,
+  and `dom_map_filter_subseteq` → `dom_filter_subseteq` for consistency's sake.
+
 ## std++ 1.4.0 (released 2020-07-15)
 
 Coq 8.12 is newly supported by this release, and Coq 8.7 is no longer supported.
