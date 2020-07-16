@@ -35,6 +35,20 @@ Proof.
   destruct 1 as [?[Eq _]%map_filter_lookup_Some]. by eexists.
 Qed.
 
+Lemma dom_imap_subseteq {A B} (f: K → A → option B) (m: M A) :
+  dom D (map_imap f m) ⊆ dom D m.
+Proof.
+  intros k. rewrite 2!elem_of_dom, map_lookup_imap.
+  destruct 1 as [?[?[Eq _]]%bind_Some]. by eexists.
+Qed.
+Lemma dom_imap {A B} (f: K → A → option B) (m: M A) X :
+  (∀ i, i ∈ X ↔ ∃ x, m !! i = Some x ∧ is_Some (f i x)) →
+  dom D (map_imap f m) ≡ X.
+Proof.
+  intros HX k. rewrite elem_of_dom, HX, map_lookup_imap.
+  unfold is_Some. setoid_rewrite bind_Some. naive_solver.
+Qed.
+
 Lemma elem_of_dom_2 {A} (m : M A) i x : m !! i = Some x → i ∈ dom D m.
 Proof. rewrite elem_of_dom; eauto. Qed.
 Lemma not_elem_of_dom {A} (m : M A) i : i ∉ dom D m ↔ m !! i = None.
@@ -167,6 +181,10 @@ Section leibniz.
   Proof. unfold_leibniz; apply dom_difference. Qed.
   Lemma dom_fmap_L {A B} (f : A → B) (m : M A) : dom D (f <$> m) = dom D m.
   Proof. unfold_leibniz; apply dom_fmap. Qed.
+  Lemma dom_imap_L {A B} (f: K → A → option B) (m: M A) X :
+    (∀ i, i ∈ X ↔ ∃ x, m !! i = Some x ∧ is_Some (f i x)) →
+    dom D (map_imap f m) = X.
+  Proof. unfold_leibniz; apply dom_imap. Qed.
 End leibniz.
 
 (** * Set solver instances *)

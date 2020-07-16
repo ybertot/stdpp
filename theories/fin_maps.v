@@ -944,6 +944,16 @@ Proof.
       by rewrite map_lookup_imap.
 Qed.
 
+Lemma map_imap_delete {A B} (f : K → A → option B) (m : M A) (i : K) :
+  map_imap f (delete i m) = delete i (map_imap f m).
+Proof.
+  apply map_eq. intros k. rewrite map_lookup_imap.
+  destruct (decide (k = i)) as [->|Hk_not_i].
+  - by rewrite !lookup_delete.
+  - rewrite !lookup_delete_ne by done.
+    by rewrite map_lookup_imap.
+Qed.
+
 Lemma map_imap_ext {A1 A2 B} (f1 : K → A1 → option B)
     (f2 : K → A2 → option B) (m1 : M A1) (m2 : M A2) :
   (∀ k, f1 k <$> (m1 !! k) = f2 k <$> (m2 !! k)) →
@@ -952,6 +962,17 @@ Proof.
   intros HExt. apply map_eq. intros i. rewrite !map_lookup_imap.
   specialize (HExt i). destruct (m1 !! i), (m2 !! i); naive_solver.
 Qed.
+
+Lemma map_imap_compose {A1 A2 B} (f1 : K → A1 → option B)
+    (f2 : K → A2 → option A1) (m : M A2) :
+  map_imap f1 (map_imap f2 m) = map_imap (λ k x, f2 k x ≫= f1 k) m.
+Proof.
+  apply map_eq. intros i. rewrite !map_lookup_imap. by destruct (m !! i).
+Qed.
+
+Lemma map_imap_empty {A B} (f : K → A → option B) :
+  map_imap f ∅ =@{M B} ∅.
+Proof. unfold map_imap. by rewrite map_to_list_empty. Qed.
 
 (** ** Properties of the size operation *)
 Lemma map_size_empty {A} : size (∅ : M A) = 0.
