@@ -21,14 +21,14 @@ Lemma lookup_lookup_total_dom `{!Inhabited A} (m : M A) i :
   i ∈ dom D m → m !! i = Some (m !!! i).
 Proof. rewrite elem_of_dom. apply lookup_lookup_total. Qed.
 
-Lemma dom_map_filter {A} (P : K * A → Prop) `{!∀ x, Decision (P x)} (m : M A) X :
+Lemma dom_filter {A} (P : K * A → Prop) `{!∀ x, Decision (P x)} (m : M A) X :
   (∀ i, i ∈ X ↔ ∃ x, m !! i = Some x ∧ P (i, x)) →
   dom D (filter P m) ≡ X.
 Proof.
   intros HX i. rewrite elem_of_dom, HX.
   unfold is_Some. by setoid_rewrite map_filter_lookup_Some.
 Qed.
-Lemma dom_map_filter_subseteq {A} (P : K * A → Prop) `{!∀ x, Decision (P x)} (m : M A):
+Lemma dom_filter_subseteq {A} (P : K * A → Prop) `{!∀ x, Decision (P x)} (m : M A):
   dom D (filter P m) ⊆ dom D m.
 Proof.
   intros ?. rewrite 2!elem_of_dom.
@@ -156,10 +156,10 @@ Proof. intros ???. unfold_leibniz. by apply dom_proper. Qed.
 
 Section leibniz.
   Context `{!LeibnizEquiv D}.
-  Lemma dom_map_filter_L {A} (P : K * A → Prop) `{!∀ x, Decision (P x)} (m : M A) X :
+  Lemma dom_filter_L {A} (P : K * A → Prop) `{!∀ x, Decision (P x)} (m : M A) X :
     (∀ i, i ∈ X ↔ ∃ x, m !! i = Some x ∧ P (i, x)) →
     dom D (filter P m) = X.
-  Proof. unfold_leibniz. apply dom_map_filter. Qed.
+  Proof. unfold_leibniz. apply dom_filter. Qed.
   Lemma dom_empty_L {A} : dom D (@empty (M A) _) = ∅.
   Proof. unfold_leibniz; apply dom_empty. Qed.
   Lemma dom_empty_inv_L {A} (m : M A) : dom D m = ∅ → m = ∅.
