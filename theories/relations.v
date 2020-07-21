@@ -280,8 +280,8 @@ Section properties.
   Lemma wn_step_rtc x y : wn R y → rtc R x y → wn R x.
   Proof. induction 2; eauto using wn_step. Qed.
 
-  (** An acyclic relation that can only take finitely many steps is strongly
-  normalizing *)
+  (** An acyclic relation that can only take finitely many steps (sometimes
+  called "globally finite") is strongly normalizing *)
   Lemma tc_finite_sn x : Irreflexive (tc R) → pred_finite (tc R x) → sn R x.
   Proof.
     intros Hirr [xs Hfin]. remember (length xs) as n eqn:Hn.
