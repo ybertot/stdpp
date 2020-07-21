@@ -280,6 +280,13 @@ Section properties.
   Lemma wn_step_rtc x y : wn R y → rtc R x y → wn R x.
   Proof. induction 2; eauto using wn_step. Qed.
 
+  Lemma nf_sn x : nf R x → sn R x.
+  Proof. intros Hnf. constructor; intros y Hxy. destruct Hnf; eauto. Qed.
+  Lemma sn_step x y : sn R x → R x y → sn R y.
+  Proof. induction 1; eauto. Qed.
+  Lemma sn_step_rtc x y : sn R x → rtc R x y → sn R y.
+  Proof. induction 2; eauto using sn_step. Qed.
+
   (** An acyclic relation that can only take finitely many steps (sometimes
   called "globally finite") is strongly normalizing *)
   Lemma tc_finite_sn x : Irreflexive (tc R) → pred_finite (tc R x) → sn R x.
