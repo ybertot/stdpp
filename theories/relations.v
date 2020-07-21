@@ -2,7 +2,7 @@
 These are particularly useful as we define the operational semantics as a
 small step semantics. *)
 From Coq Require Import Wf_nat.
-From stdpp Require Export tactics base.
+From stdpp Require Export sets.
 Set Default Proof Using "Type".
 
 (** * Definitions *)
@@ -279,6 +279,22 @@ Section properties.
   Proof. intros (z & ? & ?) ?. exists z; eauto. Qed.
   Lemma wn_step_rtc x y : wn R y → rtc R x y → wn R x.
   Proof. induction 2; eauto using wn_step. Qed.
+
+  (** An acyclic relation that can only take finitely many steps is strongly
+  normalizing *)
+  Lemma tc_finite_sn x : Irreflexive (tc R) → pred_finite (tc R x) → sn R x.
+  Proof.
+    intros Hirr [xs Hfin]. remember (length xs) as n eqn:Hn.
+    revert x xs Hn Hfin.
+    induction (lt_wf n) as [n _ IH]; intros x xs -> Hfin.
+    constructor; simpl; intros x' Hxx'.
+    assert (x' ∈ xs) as (xs1&xs2&->)%elem_of_list_split by eauto using tc_once.
+    refine (IH (length xs1 + length xs2) _ _ (xs1 ++ xs2) _ _);
+      [rewrite app_length; simpl; lia..|].
+    intros x'' Hx'x''. feed pose proof (Hfin x'') as Hx''; [by econstructor|].
+    cut (x' ≠ x''); [set_solver|].
+    intros ->. by apply (Hirr x'').
+  Qed.
 
   (** The following theorem requires that [red R] is decidable. The intuition
   for this requirement is that [wn R] is a very "positive" statement as it
