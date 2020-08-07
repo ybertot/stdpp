@@ -449,6 +449,10 @@ Section semi_set.
   Proof. set_solver. Qed.
   Lemma not_elem_of_singleton x y : x ∉ ({[ y ]} : C) ↔ x ≠ y.
   Proof. by rewrite elem_of_singleton. Qed.
+  Lemma not_elem_of_singleton_1 x y : x ∉ ({[ y ]} : C) → x ≠ y.
+  Proof. apply not_elem_of_singleton. Qed.
+  Lemma not_elem_of_singleton_2 x y : x ≠ y → x ∉ ({[ y ]} : C).
+  Proof. apply not_elem_of_singleton. Qed.
 
   (** Disjointness *)
   Lemma elem_of_disjoint X Y : X ## Y ↔ ∀ x, x ∈ X → x ∈ Y → False.
