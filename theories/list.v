@@ -752,13 +752,13 @@ Qed.
 Lemma list_inserts_app_l l1 l2 l3 i :
   list_inserts i (l1 ++ l2) l3 = list_inserts (length l1 + i) l2 (list_inserts i l1 l3).
 Proof.
-  revert l1 i; induction l1 as [|x l1 IH]; [done|].
+  revert i; induction l1 as [|x l1 IH]; [done|].
   intro i. simpl. rewrite IH, Nat.add_succ_r. apply list_insert_inserts_lt. lia.
 Qed.
 Lemma list_inserts_app_r l1 l2 l3 i :
   list_inserts (length l2 + i) l1 (l2 ++ l3) = l2 ++ list_inserts i l1 l3.
 Proof.
-  revert l1 i; induction l1 as [|x l1 IH]; [done|].
+  revert i; induction l1 as [|x l1 IH]; [done|].
   intros i. simpl. by rewrite plus_n_Sm, IH, insert_app_r.
 Qed.
 Lemma list_inserts_nil l1 i : list_inserts i l1 [] = [].
@@ -964,7 +964,7 @@ Section list_set.
       clear IH. revert Hx. generalize (list_intersection_with f l k).
       induction k; simpl; [by auto|].
       case_match; setoid_rewrite elem_of_cons; naive_solver.
-    - intros (x1&x2&Hx1&Hx2&Hx). induction Hx1 as [x1|x1 ? l ? IH]; simpl.
+    - intros (x1&x2&Hx1&Hx2&Hx). induction Hx1 as [x1 l|x1 ? l ? IH]; simpl.
       + generalize (list_intersection_with f l k).
         induction Hx2; simpl; [by rewrite Hx; left |].
         case_match; simpl; try setoid_rewrite elem_of_cons; auto.
@@ -1661,7 +1661,7 @@ Global Instance: ∀ x : A, Inj (≡ₚ) (≡ₚ) (x ::.).
 Proof. red. eauto using Permutation_cons_inv. Qed.
 Global Instance: ∀ k : list A, Inj (≡ₚ) (≡ₚ) (k ++.).
 Proof.
-  red. induction k as [|x k IH]; intros l1 l2; simpl; auto.
+  intros k. induction k as [|x k IH]; intros l1 l2; simpl; auto.
   intros. by apply IH, (inj (x ::.)).
 Qed.
 Global Instance: ∀ k : list A, Inj (≡ₚ) (≡ₚ) (.++ k).
@@ -2135,7 +2135,7 @@ Proof.
     + intros ?. rewrite sublist_cons_l. intros (?&?&?&?); subst.
       eauto using sublist_inserts_l, sublist_cons.
   - intros l1 l2 Hl12 Hl21. apply sublist_length in Hl21.
-    induction Hl12; f_equal/=; auto with arith.
+    induction Hl12 as [| |??? Hl12]; f_equal/=; auto with arith.
     apply sublist_length in Hl12. lia.
 Qed.
 Lemma sublist_take l i : take i l `sublist_of` l.
@@ -3707,7 +3707,7 @@ Section mapM.
   Context {A B : Type} (f : A → option B).
 
   Lemma mapM_ext (g : A → option B) l : (∀ x, f x = g x) → mapM f l = mapM g l.
-  Proof. intros Hfg. by induction l; simpl; rewrite ?Hfg, ?IHl. Qed.
+  Proof. intros Hfg. by induction l as [|?? IHl]; simpl; rewrite ?Hfg, ?IHl. Qed.
   Global Instance mapM_proper `{!Equiv A, !Equiv B} :
     Proper ((≡) ==> (≡)) f → Proper ((≡) ==> (≡)) (mbind f).
   Proof. induction 2; simpl; [solve_proper|constructor]. Qed.
@@ -4342,7 +4342,7 @@ Section positives_flatten_unflatten.
     revert p1 p2 ys; induction xs as [|x xs IH];
       intros p1 p2 [|y ys] ?; simplify_eq/=; auto.
     rewrite !positives_flatten_cons, !(assoc _); intros Hl.
-    assert (xs = ys) as <- by eauto; clear IH H; f_equal.
+    assert (xs = ys) as <- by eauto; clear IH; f_equal.
     apply (inj (.++ positives_flatten xs)) in Hl.
     rewrite 2!Preverse_Pdup in Hl.
     apply (Pdup_suffix_eq _ _ p1 p2) in Hl.
