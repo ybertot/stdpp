@@ -1230,8 +1230,7 @@ Lemma insert_replicate_lt x y n i :
   i < n →
   <[i:=y]>(replicate n x) = replicate i x ++ y :: replicate (n - S i) x.
 Proof.
-  revert i. induction n as [|n IH]; [ by lia | ].
-  intros [|i] Hi; simpl.
+  revert i. induction n as [|n IH]; intros [|i] Hi; simpl; [lia..| |].
   - by rewrite Nat.sub_0_r.
   - by rewrite IH by lia.
 Qed.
