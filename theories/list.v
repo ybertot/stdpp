@@ -600,7 +600,7 @@ Proof. revert i. by induction l; intros [|?]; f_equal/=. Qed.
 Lemma insert_length l i x : length (<[i:=x]>l) = length l.
 Proof. revert i. by induction l; intros [|?]; f_equal/=. Qed.
 Lemma list_lookup_alter f l i : alter f i l !! i = f <$> l !! i.
-Proof. revert i. induction l. done. intros [|i]. done. apply (IHl i). Qed.
+Proof. revert i. induction l as [|?? IHl]. done. intros [|i]. done. apply (IHl i). Qed.
 Lemma list_lookup_total_alter `{!Inhabited A} f l i :
   i < length l → alter f i l !!! i = f (l !!! i).
 Proof.

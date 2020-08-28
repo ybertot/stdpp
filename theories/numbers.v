@@ -787,11 +787,11 @@ Proof.
   intros H <-. revert a b c d H. cut (∀ a b c d : Qp,
     (a < c)%Qc → a + b = c + d →
     ∃ ac ad bc bd, ac + ad = a ∧ bc + bd = b ∧ ac + bc = c ∧ ad + bd = d)%Qp.
-  { intros help a b c d ?.
+  { intros help a b c d Habcd.
     destruct (Qclt_le_dec a c) as [?|[?| ->%Qp_eq]%Qcle_lt_or_eq].
     - auto.
     - destruct (help c d a b); [done..|]. naive_solver.
-    - apply (inj (Qp_plus a)) in H as ->. destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).
+    - apply (inj (Qp_plus a)) in Habcd as ->. destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).
       exists a', q, q, d'. repeat split; done || by rewrite (comm_L Qp_plus). }
   intros a b c d [e ->]%Qp_lt_sum. rewrite <-(assoc_L _). intros ->%(inj (Qp_plus a)).
   destruct (Qp_lower_bound a d) as (q&a'&d'&->&->).

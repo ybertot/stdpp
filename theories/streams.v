@@ -49,6 +49,6 @@ Global Instance shead_proper : Proper ((≡) ==> (=@{A})) shead.
 Proof. by intros ?? [??]. Qed.
 Global Instance stail_proper : Proper ((≡) ==> (≡@{stream A})) stail.
 Proof. by intros ?? [??]. Qed.
-Global Instance slookup_proper : Proper ((≡@{stream A}) ==> (=)) (slookup i).
+Global Instance slookup_proper i : Proper ((≡@{stream A}) ==> (=)) (slookup i).
 Proof. by induction i as [|i IH]; intros s1 s2 Hs; simpl; rewrite Hs. Qed.
 End stream_properties.
