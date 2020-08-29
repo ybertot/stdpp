@@ -202,7 +202,7 @@ Section closure.
   Proof.
     cut (∀ m y z, bsteps R m y z → ∀ n,
       bsteps R n x y → (∀ m', n ≤ m' ∧ m' ≤ n + m → P m' y) → P (n + m) z).
-    { intros help ?. change n with (0 + n). eauto. }
+    { intros help n. change n with (0 + n). eauto. }
     induction 1 as [|m x' y z p2 p3 IH]; [by eauto with arith|].
     intros n p1 H. rewrite <-plus_n_Sm.
     apply (IH (S n)); [by eauto using bsteps_r |].
@@ -422,7 +422,7 @@ Proof.
   cut (∀ y, Acc R2 y → ∀ x, y = f x → Acc R1 x).
   { intros aux x. apply (aux (f x)); auto. }
   induction 1 as [y _ IH]. intros x ?. subst.
-  constructor. intros. apply (IH (f y)); auto.
+  constructor. intros y ?. apply (IH (f y)); auto.
 Qed.
 
 Lemma Fix_F_proper `{R : relation A} (B : A → Type) (E : ∀ x, relation (B x))

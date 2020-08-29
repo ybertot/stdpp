@@ -155,7 +155,7 @@ Proof.
 Qed.
 Lemma size_1_elem_of X : size X = 1 → ∃ x, X ≡ {[ x ]}.
 Proof.
-  intros E. destruct (size_pos_elem_of X); auto with lia.
+  intros E. destruct (size_pos_elem_of X) as [x ?]; auto with lia.
   exists x. apply elem_of_equiv. split.
   - rewrite elem_of_singleton. eauto using size_singleton_inv.
   - set_solver.
@@ -283,7 +283,7 @@ Section filter.
   Global Instance set_unfold_filter X Q :
     SetUnfoldElemOf x X Q → SetUnfoldElemOf x (filter P X) (P x ∧ Q).
   Proof.
-    intros ??; constructor. by rewrite elem_of_filter, (set_unfold_elem_of x X Q).
+    intros x ?; constructor. by rewrite elem_of_filter, (set_unfold_elem_of x X Q).
   Qed.
 
   Lemma filter_empty : filter P (∅:C) ≡ ∅.

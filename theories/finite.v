@@ -282,7 +282,7 @@ Proof. unfold card. simpl. by rewrite app_length, !fmap_length. Qed.
 Program Instance prod_finite `{Finite A, Finite B} : Finite (A * B)%type :=
   {| enum := foldr (λ x, (pair x <$> enum B ++.)) [] (enum A) |}.
 Next Obligation.
-  intros ??????. induction (NoDup_enum A) as [|x xs Hx Hxs IH]; simpl.
+  intros A ?????. induction (NoDup_enum A) as [|x xs Hx Hxs IH]; simpl.
   { constructor. }
   apply NoDup_app; split_and?.
   - by apply (NoDup_fmap_2 _), NoDup_enum.
@@ -316,7 +316,7 @@ Definition list_enum {A} (l : list A) : ∀ n, list { l : list A | length l = n 
 Program Instance list_finite `{Finite A} n : Finite { l : list A | length l = n } :=
   {| enum := list_enum (enum A) n |}.
 Next Obligation.
-  intros ????. induction n as [|n IH]; simpl; [apply NoDup_singleton |].
+  intros A ?? n. induction n as [|n IH]; simpl; [apply NoDup_singleton |].
   revert IH. generalize (list_enum (enum A) n). intros l Hl.
   induction (NoDup_enum A) as [|x xs Hx Hxs IH]; simpl; auto; [constructor |].
   apply NoDup_app; split_and?.
@@ -329,8 +329,8 @@ Next Obligation.
   - apply IH.
 Qed.
 Next Obligation.
-  intros ???? [l Hl]. revert l Hl.
-  induction n as [|n IH]; intros [|x l] ?; simpl; simplify_eq.
+  intros A ?? n [l Hl]. revert l Hl.
+  induction n as [|n IH]; intros [|x l] Hl; simpl; simplify_eq.
   { apply elem_of_list_singleton. by apply (sig_eq_pi _). }
   revert IH. generalize (list_enum (enum A) n). intros k Hk.
   induction (elem_of_enum x) as [x xs|x xs]; simpl in *.

@@ -1053,7 +1053,7 @@ Proof.
   intros ? Hins. cut (∀ l, NoDup (l.*1) → ∀ m, map_to_list m ≡ₚ l → P m).
   { intros help m.
     apply (help (map_to_list m)); auto using NoDup_fst_map_to_list. }
-  induction l as [|[i x] l IH]; intros Hnodup m Hml.
+  intros l. induction l as [|[i x] l IH]; intros Hnodup m Hml.
   { apply map_to_list_empty_inv_alt in Hml. by subst. }
   inversion_clear Hnodup.
   apply map_to_list_insert_inv in Hml; subst m. apply Hins.
@@ -1703,7 +1703,7 @@ Proof. by apply (partial_alter_merge _). Qed.
 Lemma foldr_delete_union_with (m1 m2 : M A) is :
   foldr delete (union_with f m1 m2) is =
     union_with f (foldr delete m1 is) (foldr delete m2 is).
-Proof. induction is; simpl. done. by rewrite IHis, delete_union_with. Qed.
+Proof. induction is as [|?? IHis]; simpl. done. by rewrite IHis, delete_union_with. Qed.
 Lemma insert_union_with m1 m2 i x y z :
   f x y = Some z →
   <[i:=z]>(union_with f m1 m2) = union_with f (<[i:=x]>m1) (<[i:=y]>m2).
@@ -1971,7 +1971,7 @@ Qed.
 Lemma foldr_delete_insert_ne {A} (m : M A) is j x :
   j ∉ is → foldr delete (<[j:=x]>m) is = <[j:=x]>(foldr delete m is).
 Proof.
-  induction is; simpl; [done |]. rewrite elem_of_cons. intros.
+  induction is as [|?? IHis]; simpl; [done |]. rewrite elem_of_cons. intros.
   rewrite IHis, delete_insert_ne; intuition.
 Qed.
 Lemma map_disjoint_foldr_delete_l {A} (m1 m2 : M A) is :
@@ -2065,7 +2065,7 @@ Proof. by apply (partial_alter_merge _). Qed.
 Lemma foldr_delete_intersection_with (m1 m2 : M A) is :
   foldr delete (intersection_with f m1 m2) is =
     intersection_with f (foldr delete m1 is) (foldr delete m2 is).
-Proof. induction is; simpl. done. by rewrite IHis, delete_intersection_with. Qed.
+Proof. induction is as [|?? IHis]; simpl. done. by rewrite IHis, delete_intersection_with. Qed.
 Lemma insert_intersection_with m1 m2 i x y z :
   f x y = Some z →
   <[i:=z]>(intersection_with f m1 m2) = intersection_with f (<[i:=x]>m1) (<[i:=y]>m2).
