@@ -1,5 +1,7 @@
 From stdpp Require Import tactics telescopes.
 
+Local Unset Mangle Names. (* for stable goal printing *)
+
 Section accessor.
 (* This is like Iris' accessors, but in Prop.  Just to play with telescopes. *)
 Definition accessor {X : tele} (α β γ : X → Prop) : Prop :=

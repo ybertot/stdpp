@@ -53,7 +53,7 @@ Section choice.
     intros [x Hx]. cut (∀ i p,
       i ≤ encode x → 1 + encode x = p + i → Acc choose_step p).
     { intros help. by apply (help (encode x)). }
-    induction i as [|i IH] using Pos.peano_ind; intros p ??.
+    intros i. induction i as [|i IH] using Pos.peano_ind; intros p ??.
     { constructor. intros j. assert (p = encode x) by lia; subst.
       inversion 1 as [? Hd|?? Hd]; subst;
         rewrite decode_encode in Hd; congruence. }

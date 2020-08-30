@@ -62,7 +62,7 @@ Proof. intros ss1 ss2 Hss. destruct b; csimpl; by rewrite Hss. Qed.
 Instance app_binder_Permutation : Proper ((≡ₚ) ==> (≡ₚ) ==> (≡ₚ)) app_binder.
 Proof.
   assert (∀ bs, Proper ((≡ₚ) ==> (≡ₚ)) (app_binder bs)).
-  { induction bs as [|[]]; intros ss1 ss2; simpl; by intros ->. }
+  { intros bs. induction bs as [|[]]; intros ss1 ss2; simpl; by intros ->. }
   induction 1 as [|[]|[] []|]; intros ss1 ss2 Hss; simpl;
     first [by eauto using perm_trans|by rewrite 1?perm_swap, Hss].
 Qed.

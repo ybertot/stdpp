@@ -41,15 +41,15 @@ Proof.
   - unfold singleton, elem_of, mapset_singleton, mapset_elem_of.
     simpl. by split; intros; simplify_map_eq.
   - unfold union, elem_of, mapset_union, mapset_elem_of.
-    intros [m1] [m2] ?. simpl. rewrite lookup_union_Some_raw.
+    intros [m1] [m2] x. simpl. rewrite lookup_union_Some_raw.
     destruct (m1 !! x) as [[]|]; tauto.
   - unfold intersection, elem_of, mapset_intersection, mapset_elem_of.
-    intros [m1] [m2] ?. simpl. rewrite lookup_intersection_Some.
+    intros [m1] [m2] x. simpl. rewrite lookup_intersection_Some.
     assert (is_Some (m2 !! x) ↔ m2 !! x = Some ()).
     { split; eauto. by intros [[] ?]. }
     naive_solver.
   - unfold difference, elem_of, mapset_difference, mapset_elem_of.
-    intros [m1] [m2] ?. simpl. rewrite lookup_difference_Some.
+    intros [m1] [m2] x. simpl. rewrite lookup_difference_Some.
     destruct (m2 !! x) as [[]|]; intuition congruence.
 Qed.
 Global Instance mapset_leibniz : LeibnizEquiv (mapset M).
