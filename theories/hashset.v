@@ -104,6 +104,7 @@ Proof.
     intros (l&?&?). exists (hash x, l); simpl. by rewrite elem_of_map_to_list.
   - unfold elements, hashset_elements. intros [m Hm]; simpl.
     rewrite map_Forall_to_list in Hm. generalize (NoDup_fst_map_to_list m).
+    (* FIXME: trailing [?] works around Coq bug #12944. *)
     induction Hm as [|[n l] m' [??] Hm ?];
       csimpl; inversion_clear 1 as [|?? Hn]; [constructor|].
     apply NoDup_app; split_and?; eauto.
