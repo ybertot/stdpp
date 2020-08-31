@@ -5,6 +5,8 @@ API-breaking change is listed.
 
 - Rename `dom_map filter` → `dom_filter`, `dom_map_filter_L` → `dom_filter_L`,
   and `dom_map_filter_subseteq` → `dom_filter_subseteq` for consistency's sake.
+- Add `max` and `min` operations for `Qp`.
+- Add additional lemmas for `Qp`.
 
 ## std++ 1.4.0 (released 2020-07-15)
 

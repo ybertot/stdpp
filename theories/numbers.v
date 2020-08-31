@@ -664,6 +664,9 @@ Delimit Scope Qp_scope with Qp.
 Bind Scope Qp_scope with Qp.
 Arguments Qp_car _%Qp : assert.
 
+Local Open Scope Qc_scope.
+Local Open Scope Qp_scope.
+
 Definition Qp_one : Qp := mk_Qp 1 eq_refl.
 Program Definition Qp_plus (x y : Qp) : Qp := mk_Qp (x + y) _.
 Next Obligation. by intros x y; apply Qcplus_pos_pos. Qed.
@@ -681,10 +684,15 @@ Next Obligation.
     <-Qcmult_assoc, Qcmult_inv_l, Qcmult_1_r.
 Qed.
 
+Definition Qp_max (q p : Qp) : Qp := if decide (q ≤ p) then p else q.
+Definition Qp_min (q p : Qp) : Qp := if decide (q ≤ p) then q else p.
+
 Infix "+" := Qp_plus : Qp_scope.
 Infix "-" := Qp_minus : Qp_scope.
 Infix "*" := Qp_mult : Qp_scope.
 Infix "/" := Qp_div : Qp_scope.
+Infix "`max`" := Qp_max (at level 35) : Qp_scope.
+Infix "`min`" := Qp_min (at level 35) : Qp_scope.
 Notation "1" := Qp_one : Qp_scope.
 Notation "2" := (1 + 1)%Qp : Qp_scope.
 Notation "3" := (1 + 2)%Qp : Qp_scope.
@@ -824,6 +832,123 @@ Qed.
 
 Lemma Qp_ge_0 (q: Qp): (0 ≤ q)%Qc.
 Proof. apply Qclt_le_weak, Qp_prf. Qed.
+
+Lemma Qp_le_plus_r (q p : Qp) : p ≤ q + p.
+Proof.
+  apply (Qcplus_le_mono_l _ _ (-p)%Qc). rewrite Qcplus_comm, Qcplus_opp_r.
+  rewrite Qcplus_comm, <- Qcplus_assoc, Qcplus_opp_r, Qcplus_0_r. apply Qp_ge_0.
+Qed.
+
+Lemma Qp_le_plus_l (q p : Qp) : q ≤ q + p.
+Proof. rewrite Qcplus_comm. apply Qp_le_plus_r. Qed.
+
+Lemma Qp_le_plus_compat (q p n m : Qp) : q ≤ n → p ≤ m → q + p ≤ n + m.
+Proof.
+  intros. eapply Qcle_trans. by apply Qcplus_le_mono_l. by apply Qcplus_le_mono_r.
+Qed.
+
+Lemma Qp_plus_weak_r (q p o : Qp) : q + p ≤ o → q ≤ o.
+Proof. intros Le. eapply Qcle_trans. apply Qp_le_plus_l. apply Le. Qed.
+
+Lemma Qp_plus_weak_l (q p o : Qp) : q + p ≤ o → p ≤ o.
+Proof. rewrite Qcplus_comm. apply Qp_plus_weak_r. Qed.
+
+Lemma Qp_plus_weak_2_r (q p o : Qp) : q ≤ o → q ≤ p + o.
+Proof. intros Le. eapply Qcle_trans; [apply Le| apply Qp_le_plus_r]. Qed.
+
+Lemma Qp_plus_weak_2_l (q p o : Qp) : q ≤ p → q ≤ p + o.
+Proof. rewrite Qcplus_comm. apply Qp_plus_weak_2_r. Qed.
+
+Lemma Qp_max_spec (q p : Qp) : (q < p ∧ q `max` p = p) ∨ (p ≤ q ∧ q `max` p = q).
+Proof.
+  unfold Qp_max. destruct (decide (q ≤ p)).
+  - destruct (Qcle_lt_or_eq _ _ q0) as [? | ->%Qp_eq]; [left|right]; done.
+  - right. split; [|done]. by apply Qclt_le_weak, Qcnot_le_lt.
+Qed.
+
+Lemma Qp_max_spec_le (q p : Qp) : (q ≤ p ∧ q `max` p = p) ∨ (p ≤ q ∧ q `max` p = q).
+Proof. destruct (Qp_max_spec q p) as [[?%Qclt_le_weak?]|]; [left|right]; done. Qed.
+
+Instance Qc_max_assoc : Assoc (=) Qp_max.
+Proof.
+  intros q p o. unfold Qp_max. destruct (decide (q ≤ p)), (decide (p ≤ o));
+    eauto using decide_True, Qcle_trans.
+  rewrite decide_False by done.
+  by rewrite decide_False by (eapply Qclt_not_le, Qclt_trans; by apply Qclt_nge).
+Qed.
+Instance Qc_max_comm : Comm (=) Qp_max.
+Proof.
+  intros q p. apply Qp_eq.
+  destruct (Qp_max_spec_le q p) as [[?->]|[?->]], (Qp_max_spec_le p q) as [[?->]|[?->]];
+    eauto using Qcle_antisym.
+Qed.
+
+Lemma Qp_max_id q : q `max` q = q.
+Proof. by destruct (Qp_max_spec q q) as [[_->]|[_->]]. Qed.
+
+Lemma Qc_le_max_l (q p : Qp) : q ≤ q `max` p.
+Proof. unfold Qp_max. by destruct (decide (q ≤ p)). Qed.
+
+Lemma Qc_le_max_r (q p : Qp) : p ≤ q `max` p.
+Proof. rewrite (comm _ q). apply Qc_le_max_l. Qed.
+
+Lemma Qp_max_plus (q p : Qp) : q `max` p ≤ q + p.
+Proof.
+  unfold Qp_max. destruct (decide (q ≤ p)). apply Qp_le_plus_r. apply Qp_le_plus_l.
+Qed.
+
+Lemma Qp_max_lub_l (q p o : Qp) : q `max` p ≤ o → q ≤ o.
+Proof.
+  unfold Qp_max. destruct (decide (q ≤ p)); [by apply Qcle_trans | done].
+Qed.
+
+Lemma Qp_max_lub_r (q p o : Qp) : q `max` p ≤ o → p ≤ o.
+Proof. rewrite (comm _ q). apply Qp_max_lub_l. Qed.
+
+Lemma Qp_min_spec (q p : Qp) : (q < p ∧ q `min` p = q) ∨ (p ≤ q ∧ q `min` p = p).
+Proof.
+  unfold Qp_min. destruct (decide (q ≤ p)).
+  - destruct (Qcle_lt_or_eq _ _ q0) as [?| ->%Qp_eq]; [left|right]; done.
+  - right. split; [|done]. by apply Qclt_le_weak, Qcnot_le_lt.
+Qed.
+
+Lemma Qp_min_spec_le (q p : Qp) : (q ≤ p ∧ q `min` p = q) ∨ (p ≤ q ∧ q `min` p = p).
+Proof. destruct (Qp_min_spec q p) as [[?%Qclt_le_weak?]|]; [left|right]; done. Qed.
+
+Instance Qc_min_assoc : Assoc (=) Qp_min.
+Proof.
+  intros q p o. unfold Qp_min.
+  destruct (decide (q ≤ p)), (decide (p ≤ o)); eauto using decide_False.
+  - rewrite decide_True by done. by rewrite decide_True by (eapply Qcle_trans; done).
+  - by rewrite (decide_False _ _) by (eapply Qclt_not_le, Qclt_trans; by apply Qclt_nge).
+Qed.
+Instance Qc_min_comm : Comm (=) Qp_min.
+Proof.
+  intros q p. apply Qp_eq.
+  destruct (Qp_min_spec_le q p) as [[?->]|[?->]], (Qp_min_spec_le p q) as [[? ->]|[? ->]];
+    eauto using Qcle_antisym.
+Qed.
+
+Lemma Qp_min_id (q : Qp) : q `min` q = q.
+Proof. by destruct (Qp_min_spec q q) as [[_->]|[_->]]. Qed.
+
+Lemma Qp_le_min_r (q p : Qp) : q `min` p ≤ p.
+Proof. by destruct (Qp_min_spec_le q p) as [[?->]|[?->]]. Qed.
+
+Lemma Qp_le_min_l (p q : Qp) : p `min` q ≤ p.
+Proof. rewrite (comm _ p). apply Qp_le_min_r. Qed.
+
+Lemma Qp_min_l_iff (q p : Qp) : q `min` p = q ↔ q ≤ p.
+Proof.
+  destruct (Qp_min_spec_le q p) as [[?->]|[?->]]; [done|].
+  split; [by intros ->|]. intros. by apply Qp_eq, Qcle_antisym.
+Qed.
+
+Lemma Qp_min_r_iff (q p : Qp) : q `min` p = p ↔ p ≤ q.
+Proof. rewrite (comm _ q). apply Qp_min_l_iff. Qed.
+
+Local Close Scope Qp_scope.
+Local Close Scope Qc_scope.
 
 (** * Helper for working with accessing lists with wrap-around
     See also [rotate] and [rotate_take] in [list.v] *)
