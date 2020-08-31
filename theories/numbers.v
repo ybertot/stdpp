@@ -861,9 +861,9 @@ Proof. rewrite Qcplus_comm. apply Qp_plus_weak_2_r. Qed.
 
 Lemma Qp_max_spec (q p : Qp) : (q < p ∧ q `max` p = p) ∨ (p ≤ q ∧ q `max` p = q).
 Proof.
-  unfold Qp_max. destruct (decide (q ≤ p)).
-  - destruct (Qcle_lt_or_eq _ _ q0) as [? | ->%Qp_eq]; [left|right]; done.
-  - right. split; [|done]. by apply Qclt_le_weak, Qcnot_le_lt.
+  unfold Qp_max.
+  destruct (decide (q ≤ p)) as [[?| ->%Qp_eq]%Qcle_lt_or_eq|?]; [by auto..|].
+  right. split; [|done]. by apply Qclt_le_weak, Qcnot_le_lt.
 Qed.
 
 Lemma Qp_max_spec_le (q p : Qp) : (q ≤ p ∧ q `max` p = p) ∨ (p ≤ q ∧ q `max` p = q).
@@ -907,9 +907,9 @@ Proof. rewrite (comm _ q). apply Qp_max_lub_l. Qed.
 
 Lemma Qp_min_spec (q p : Qp) : (q < p ∧ q `min` p = q) ∨ (p ≤ q ∧ q `min` p = p).
 Proof.
-  unfold Qp_min. destruct (decide (q ≤ p)).
-  - destruct (Qcle_lt_or_eq _ _ q0) as [?| ->%Qp_eq]; [left|right]; done.
-  - right. split; [|done]. by apply Qclt_le_weak, Qcnot_le_lt.
+  unfold Qp_min.
+  destruct (decide (q ≤ p)) as [[?| ->%Qp_eq]%Qcle_lt_or_eq|?]; [by auto..|].
+  right. split; [|done]. by apply Qclt_le_weak, Qcnot_le_lt.
 Qed.
 
 Lemma Qp_min_spec_le (q p : Qp) : (q ≤ p ∧ q `min` p = q) ∨ (p ≤ q ∧ q `min` p = p).
