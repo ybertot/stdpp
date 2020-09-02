@@ -6,7 +6,9 @@ structures. *)
 (* We want to ensure that [le] and [lt] refer to operations on [nat].
 These two functions being defined both in [Coq.Bool] and in [Coq.Peano],
 we must export [Coq.Peano] later than any export of [Coq.Bool]. *)
-From Coq Require Export Morphisms RelationClasses List Bool Utf8 Setoid Peano.
+(* We also want to ensure that notations from [Coq.Utf8] take precedence
+over the ones of [Coq.Peano] (see Coq PR#12950), so we import [Utf8] last. *)
+From Coq Require Export Morphisms RelationClasses List Bool Setoid Peano Utf8.
 From Coq Require Import Permutation.
 Set Default Proof Using "Type".
 Export ListNotations.
