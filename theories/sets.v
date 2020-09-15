@@ -159,7 +159,7 @@ Section set_unfold_simple.
   Implicit Types X Y : C.
 
   Global Instance set_unfold_empty x : SetUnfoldElemOf x (∅ : C) False.
-  Proof. constructor. split. apply not_elem_of_empty. done. Qed.
+  Proof. constructor. split; [|done]. apply not_elem_of_empty. Qed.
   Global Instance set_unfold_singleton x y : SetUnfoldElemOf x ({[ y ]} : C) (x = y).
   Proof. constructor; apply elem_of_singleton. Qed.
   Global Instance set_unfold_union x X Y P Q :
@@ -366,7 +366,7 @@ Section semi_set.
   Proof. intros ??. set_solver. Qed.
 
   Global Instance set_subseteq_preorder: PreOrder (⊆@{C}).
-  Proof. split. by intros ??. intros ???; set_solver. Qed.
+  Proof. split; [by intros ??|]. intros ???; set_solver. Qed.
 
   Lemma subseteq_union X Y : X ⊆ Y ↔ X ∪ Y ≡ Y.
   Proof. set_solver. Qed.
@@ -506,7 +506,7 @@ Section semi_set.
   Proof.
     split.
     - induction Xs; simpl; rewrite ?empty_union; intuition.
-    - induction 1 as [|?? E1 ? E2]; simpl. done. by apply empty_union.
+    - induction 1 as [|?? E1 ? E2]; simpl; [done|]. by apply empty_union.
   Qed.
 
   Section leibniz.
@@ -519,7 +519,7 @@ Section semi_set.
 
     (** Subset relation *)
     Global Instance set_subseteq_partialorder : PartialOrder (⊆@{C}).
-    Proof. split. apply _. intros ??. unfold_leibniz. apply (anti_symm _). Qed.
+    Proof. split; [apply _|]. intros ??. unfold_leibniz. apply (anti_symm _). Qed.
 
     Lemma subseteq_union_L X Y : X ⊆ Y ↔ X ∪ Y = Y.
     Proof. unfold_leibniz. apply subseteq_union. Qed.

@@ -138,8 +138,9 @@ Definition coGpick `{Countable A, Infinite A} (X : coGset A) : A :=
 Lemma coGpick_elem_of `{Countable A, Infinite A} X :
   ¬set_finite X → coGpick X ∈ X.
 Proof.
-  unfold coGpick. destruct X as [X|X]; rewrite coGset_finite_spec; simpl.
-  done. by intros _; apply is_fresh.
+  unfold coGpick.
+  destruct X as [X|X]; rewrite coGset_finite_spec; simpl; [done|].
+  by intros _; apply is_fresh.
 Qed.
 
 (** * Conversion to and from gset *)
@@ -168,8 +169,8 @@ Definition coGset_to_coPset (X : coGset positive) : coPset :=
 Lemma elem_of_coGset_to_coPset X x : x ∈ coGset_to_coPset X ↔ x ∈ X.
 Proof.
   destruct X as [X|X]; simpl.
-  by rewrite elem_of_gset_to_coPset.
-  by rewrite elem_of_difference, elem_of_gset_to_coPset, (left_id True (∧)).
+  - by rewrite elem_of_gset_to_coPset.
+  - by rewrite elem_of_difference, elem_of_gset_to_coPset, (left_id True (∧)).
 Qed.
 
 (** * Inefficient conversion to arbitrary sets with a top element *)

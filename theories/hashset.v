@@ -144,7 +144,9 @@ Qed.
 Lemma NoDup_remove_dups_fast l : NoDup (remove_dups_fast l).
 Proof.
   unfold remove_dups_fast; destruct l as [|x1 [|x2 l]].
-  apply NoDup_nil_2. apply NoDup_singleton. apply NoDup_elements.
+  - apply NoDup_nil_2.
+  - apply NoDup_singleton.
+  - apply NoDup_elements.
 Qed.
 Definition listset_normalize (X : listset A) : listset A :=
   let (l) := X in Listset (remove_dups_fast l).

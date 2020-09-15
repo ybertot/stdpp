@@ -33,7 +33,7 @@ Instance sig_lexico `{Lexico A} (P : A → Prop) `{∀ x, ProofIrrel (P x)} :
 
 Lemma prod_lexico_irreflexive `{Lexico A, Lexico B, !Irreflexive (@lexico A _)}
   (x : A) (y : B) : complement lexico y y → complement lexico (x,y) (x,y).
-Proof. intros ? [?|[??]]. by apply (irreflexivity lexico x). done. Qed.
+Proof. intros ? [?|[??]]; [|done]. by apply (irreflexivity lexico x). Qed.
 Lemma prod_lexico_transitive `{Lexico A, Lexico B, !Transitive (@lexico A _)}
     (x1 x2 x3 : A) (y1 y2 y3 : B) :
   lexico (x1,y1) (x2,y2) → lexico (x2,y2) (x3,y3) →
@@ -66,7 +66,11 @@ Proof.
 Defined.
 
 Instance bool_lexico_po : StrictOrder (@lexico bool _).
-Proof. split. by intros [] ?. by intros [] [] [] ??. Qed.
+Proof.
+  split.
+  - by intros [] ?.
+  - by intros [] [] [] ??.
+Qed.
 Instance bool_lexico_trichotomy: TrichotomyT (@lexico bool _).
 Proof.
  red; refine (λ b1 b2,
@@ -118,7 +122,7 @@ Instance list_lexico_po `{Lexico A, !StrictOrder (@lexico A _)} :
   StrictOrder (@lexico (list A) _).
 Proof.
   split.
-  - intros l. induction l. by intros ?. by apply prod_lexico_irreflexive.
+  - intros l. induction l; [by intros ? | by apply prod_lexico_irreflexive].
   - intros l1. induction l1 as [|x1 l1]; intros [|x2 l2] [|x3 l3] ??; try done.
     eapply prod_lexico_transitive; eauto.
 Qed.

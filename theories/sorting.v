@@ -143,8 +143,8 @@ Section sorted.
   Proof.
     induction 1 as [|y l Hsort IH Hhd]; intros Htl; simpl.
     { repeat constructor. }
-    constructor. apply IH.
-    - inversion Htl as [|? [|??]]; simplify_list_eq; by constructor.
+    constructor.
+    - apply IH. inversion Htl as [|? [|??]]; simplify_list_eq; by constructor.
     - destruct Hhd; constructor; [|done].
       inversion Htl as [|? [|??]]; by try discriminate_list.
   Qed.

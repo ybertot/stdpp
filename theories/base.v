@@ -254,7 +254,7 @@ Hint Mode LeibnizEquiv ! - : typeclass_instances.
 
 Lemma leibniz_equiv_iff `{LeibnizEquiv A, !Reflexive (≡@{A})} (x y : A) :
   x ≡ y ↔ x = y.
-Proof. split. apply leibniz_equiv. intros ->; reflexivity. Qed.
+Proof. split; [apply leibniz_equiv|]. intros ->; reflexivity. Qed.
 
 Ltac fold_leibniz := repeat
   match goal with
@@ -1009,7 +1009,10 @@ Section disjoint_list.
   Lemma disjoint_list_nil  : ##@{A} [] ↔ True.
   Proof. split; constructor. Qed.
   Lemma disjoint_list_cons X Xs : ## (X :: Xs) ↔ X ## ⋃ Xs ∧ ## Xs.
-  Proof. split. inversion_clear 1; auto. intros [??]. constructor; auto. Qed.
+  Proof.
+    split; [inversion_clear 1; auto |].
+    intros [??]. constructor; auto.
+  Qed.
 End disjoint_list.
 
 Class Filter A B := filter: ∀ (P : A → Prop) `{∀ x, Decision (P x)}, B → B.

@@ -37,7 +37,8 @@ Proof.
   rewrite Nat2Pos.id by done; simpl.
   destruct (list_find _ xs) as [[i y]|] eqn:HE; simpl.
   - apply list_find_Some in HE as (?&?&?); eauto using lookup_lt_Some.
-  - destruct xs; simpl. exfalso; eapply not_elem_of_nil, (HA x). lia.
+  - destruct xs; simpl; [|lia].
+    exfalso; eapply not_elem_of_nil, (HA x).
 Qed.
 Lemma encode_decode A `{finA: Finite A} i :
   i < card A → ∃ x : A, decode_nat i = Some x ∧ encode_nat x = i.
@@ -258,9 +259,9 @@ Proof. done. Qed.
 
 Program Instance bool_finite : Finite bool := {| enum := [true; false] |}.
 Next Obligation.
-  constructor. by rewrite elem_of_list_singleton. apply NoDup_singleton.
+  constructor; [ by rewrite elem_of_list_singleton | apply NoDup_singleton ].
 Qed.
-Next Obligation. intros [|]. left. right; left. Qed.
+Next Obligation. intros [|]; [ left | right; left ]. Qed.
 Lemma bool_card : card bool = 2.
 Proof. done. Qed.
 
@@ -292,7 +293,7 @@ Next Obligation.
     rewrite elem_of_app, elem_of_list_fmap.
     intros [(?&?&?)|?]; simplify_eq.
     + destruct Hx. by left.
-    + destruct IH. by intro; destruct Hx; right. auto.
+    + destruct IH; [ | by auto ]. by intro; destruct Hx; right.
   - done.
 Qed.
 Next Obligation.
@@ -335,7 +336,7 @@ Next Obligation.
   revert IH. generalize (list_enum (enum A) n). intros k Hk.
   induction (elem_of_enum x) as [x xs|x xs]; simpl in *.
   - rewrite elem_of_app, elem_of_list_fmap. left. injection Hl. intros Hl'.
-    eexists (l↾Hl'). split. by apply (sig_eq_pi _). done.
+    eexists (l↾Hl'). split; [|done]. by apply (sig_eq_pi _).
   - rewrite elem_of_app. eauto.
 Qed.
 

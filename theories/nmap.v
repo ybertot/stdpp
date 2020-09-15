@@ -53,7 +53,7 @@ Proof.
   - intros ? f [? t] [|i]; simpl; [done |]. apply lookup_partial_alter.
   - intros ? f [? t] [|i] [|j]; simpl; try intuition congruence.
     intros. apply lookup_partial_alter_ne. congruence.
-  - intros ??? [??] []; simpl. done. apply lookup_fmap.
+  - intros ??? [??] []; simpl; [done|]. apply lookup_fmap.
   - intros ? [[x|] t]; unfold map_to_list; simpl.
     + constructor.
       * rewrite elem_of_list_fmap. by intros [[??] [??]].

@@ -159,7 +159,7 @@ Proof.
   rewrite <-(vec_to_list_to_vec l), <-(vec_to_list_to_vec k) in H.
   rewrite <-vec_to_list_cons, <-vec_to_list_app in H.
   pose proof (vec_to_list_inj1 _ _ H); subst.
-  apply vec_to_list_inj2 in H; subst. induction l as [|?? IHl]. simpl.
+  apply vec_to_list_inj2 in H; subst. induction l as [|?? IHl]; simpl.
   - eexists 0%fin. simpl. by rewrite vec_to_list_to_vec.
   - destruct IHl as [i ?]. exists (FS i). simpl. intuition congruence.
 Qed.
@@ -173,7 +173,9 @@ Proof. rewrite <-(take_drop i v) at 1. by rewrite vec_to_list_drop_lookup. Qed.
 Lemma vlookup_lookup {A n} (v : vec A n) (i : fin n) x :
   v !!! i = x ↔ (v : list A) !! (i : nat) = Some x.
 Proof.
-  induction v as [|? ? v IH]; inv_fin i. simpl; split; congruence. done.
+  induction v as [|? ? v IH]; inv_fin i.
+  - simpl; split; congruence.
+  - done.
 Qed.
 Lemma vlookup_lookup' {A n} (v : vec A n) (i : nat) x :
   (∃ H : i < n, v !!! nat_to_fin H = x) ↔ (v : list A) !! i = Some x.
@@ -213,7 +215,9 @@ Proof.
     intros n v1 v2 IH a b; simpl. inversion_clear 1.
     intros i. inv_fin i; simpl; auto.
   - vec_double_ind v1 v2; [constructor|].
-    intros ??? IH ?? H. constructor. apply (H 0%fin). apply IH, (λ i, H (FS i)).
+    intros ??? IH ?? H. constructor.
+    + apply (H 0%fin).
+    + apply IH, (λ i, H (FS i)).
 Qed.
 
 (** Given a function [fin n → A], we can construct a vector. *)
@@ -236,7 +240,7 @@ Lemma vlookup_map `(f : A → B) {n} (v : vec A n) i :
 Proof. by induction v; inv_fin i; eauto. Qed.
 Lemma vec_to_list_map `(f : A → B) {n} (v : vec A n) :
   vec_to_list (vmap f v) = f <$> vec_to_list v.
-Proof. induction v as [|??? IHv]; simpl. done. by rewrite IHv. Qed.
+Proof. induction v as [|??? IHv]; simpl; [done|]. by rewrite IHv. Qed.
 
 (** The function [vzip_with f v w] combines the vectors [v] and [w] element
 wise using the function [f]. *)
@@ -268,7 +272,7 @@ Fixpoint vinsert {A n} (i : fin n) (x : A) : vec A n → vec A n :=
 
 Lemma vec_to_list_insert {A n} i x (v : vec A n) :
   vec_to_list (vinsert i x v) = insert (fin_to_nat i) x (vec_to_list v).
-Proof. induction v as [|??? IHv]; inv_fin i. done. simpl. intros. by rewrite IHv. Qed.
+Proof. induction v as [|??? IHv]; inv_fin i; [done|]. simpl. intros. by rewrite IHv. Qed.
 
 Lemma vlookup_insert {A n} i x (v : vec A n) : vinsert i x v !!! i = x.
 Proof. by induction i; inv_vec v. Qed.

@@ -27,7 +27,7 @@ Proof.
     eq_trans (eq_sym (f x (eq_refl x))) (f z H) = H) as help.
   { intros ? []. destruct (f x eq_refl); tauto. }
   intros p q. rewrite <-(help _ p), <-(help _ q).
-  unfold f at 2 4. destruct (decide _). reflexivity. exfalso; tauto.
+  unfold f at 2 4. destruct (decide _); [reflexivity|]. exfalso; tauto.
 Qed.
 Instance Is_true_pi (b : bool) : ProofIrrel (Is_true b).
 Proof. destruct b; simpl; apply _. Qed.

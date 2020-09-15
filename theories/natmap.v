@@ -195,7 +195,7 @@ Lemma natmap_map_wf {A B} (f : A → B) l :
   natmap_wf l → natmap_wf (natmap_map_raw f l).
 Proof.
   unfold natmap_map_raw, natmap_wf. rewrite fmap_last.
-  destruct (last l). by apply fmap_is_Some. done.
+  destruct (last l); [|done]. by apply fmap_is_Some.
 Qed.
 Lemma natmap_lookup_map_raw {A B} (f : A → B) i l :
   mjoin (natmap_map_raw f l !! i) = f <$> mjoin (l !! i).
@@ -215,8 +215,10 @@ Proof.
     + by specialize (E 0).
     + destruct (natmap_wf_lookup (None :: l2)) as (i&?&?); auto with congruence.
     + by specialize (E 0).
-    + f_equal. apply (E 0). apply IH; eauto using natmap_wf_inv.
-      intros i. apply (E (S i)).
+    + f_equal.
+      * apply (E 0).
+      * apply IH; eauto using natmap_wf_inv.
+        intros i. apply (E (S i)).
     + by specialize (E 0).
     + destruct (natmap_wf_lookup (None :: l1)) as (i&?&?); auto with congruence.
     + by specialize (E 0).
