@@ -22,8 +22,8 @@ Proof.
   split; [split; [split| |]|].
   - by intros x ?.
   - by intros x y; rewrite <-(bool_decide_spec (x = y)).
-  - split. apply orb_prop_elim. apply orb_prop_intro.
-  - split. apply andb_prop_elim. apply andb_prop_intro.
+  - split; [apply orb_prop_elim | apply orb_prop_intro].
+  - split; [apply andb_prop_elim | apply andb_prop_intro].
   - intros X Y x; unfold elem_of, boolset_elem_of; simpl.
     destruct (boolset_car X x), (boolset_car Y x); simpl; tauto.
   - done.

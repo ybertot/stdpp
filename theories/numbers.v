@@ -64,7 +64,7 @@ Instance nat_lt_pi: ∀ x y : nat, ProofIrrel (x < y).
 Proof. unfold lt. apply _. Qed.
 
 Lemma nat_le_sum (x y : nat) : x ≤ y ↔ ∃ z, y = x + z.
-Proof. split. exists (y - x); lia. intros [z ->]; lia. Qed.
+Proof. split; [exists (y - x); lia | intros [z ->]; lia]. Qed.
 
 Lemma Nat_lt_succ_succ n : n < S (S n).
 Proof. auto with arith. Qed.
@@ -309,7 +309,7 @@ Proof. unfold N.lt. apply _. Qed.
 
 Instance N_le_po: PartialOrder (≤)%N.
 Proof.
-  repeat split; red. apply N.le_refl. apply N.le_trans. apply N.le_antisymm.
+  repeat split; red; [apply N.le_refl | apply N.le_trans | apply N.le_antisymm].
 Qed.
 Instance N_le_total: Total (≤)%N.
 Proof. repeat intro; lia. Qed.
@@ -359,21 +359,22 @@ Proof. unfold Z.lt. apply _. Qed.
 
 Instance Z_le_po : PartialOrder (≤).
 Proof.
-  repeat split; red. apply Z.le_refl. apply Z.le_trans. apply Z.le_antisymm.
+  repeat split; red; [apply Z.le_refl | apply Z.le_trans | apply Z.le_antisymm].
 Qed.
 Instance Z_le_total: Total Z.le.
 Proof. repeat intro; lia. Qed.
 
 Lemma Z_pow_pred_r n m : 0 < m → n * n ^ (Z.pred m) = n ^ m.
 Proof.
-  intros. rewrite <-Z.pow_succ_r, Z.succ_pred. done. by apply Z.lt_le_pred.
+  intros. rewrite <-Z.pow_succ_r, Z.succ_pred; [done|]. by apply Z.lt_le_pred.
 Qed.
 Lemma Z_quot_range_nonneg k x y : 0 ≤ x < k → 0 < y → 0 ≤ x `quot` y < k.
 Proof.
   intros [??] ?.
   destruct (decide (y = 1)); subst; [rewrite Z.quot_1_r; auto |].
   destruct (decide (x = 0)); subst; [rewrite Z.quot_0_l; auto with lia |].
-  split. apply Z.quot_pos; lia. trans x; auto. apply Z.quot_lt; lia.
+  split; [apply Z.quot_pos; lia|].
+  trans x; auto. apply Z.quot_lt; lia.
 Qed.
 
 Arguments Z.pred : simpl never.
@@ -525,11 +526,12 @@ Proof. unfold Qclt. apply _. Qed.
 
 Instance Qc_le_po: PartialOrder (≤).
 Proof.
-  repeat split; red. apply Qcle_refl. apply Qcle_trans. apply Qcle_antisym.
+  repeat split; red; [apply Qcle_refl | apply Qcle_trans | apply Qcle_antisym].
 Qed.
 Instance Qc_lt_strict: StrictOrder (<).
 Proof.
-  split; red. intros x Hx. by destruct (Qclt_not_eq x x). apply Qclt_trans.
+  split; red; [|apply Qclt_trans].
+  intros x Hx. by destruct (Qclt_not_eq x x).
 Qed.
 Instance Qc_le_total: Total Qcle.
 Proof. intros x y. destruct (Qclt_le_dec x y); auto using Qclt_le_weak. Qed.
@@ -637,7 +639,7 @@ Proof. by apply Qc_is_canon. Qed.
 Lemma Z2Qc_inj n m : Qc_of_Z n = Qc_of_Z m → n = m.
 Proof. by injection 1. Qed.
 Lemma Z2Qc_inj_iff n m : Qc_of_Z n = Qc_of_Z m ↔ n = m.
-Proof. split. auto using Z2Qc_inj. by intros ->. Qed.
+Proof. split; [ auto using Z2Qc_inj | by intros -> ]. Qed.
 Lemma Z2Qc_inj_le n m : (n ≤ m)%Z ↔ Qc_of_Z n ≤ Qc_of_Z m.
 Proof. by rewrite Zle_Qle. Qed.
 Lemma Z2Qc_inj_lt n m : (n < m)%Z ↔ Qc_of_Z n < Qc_of_Z m.
@@ -844,11 +846,12 @@ Proof. rewrite Qcplus_comm. apply Qp_le_plus_r. Qed.
 
 Lemma Qp_le_plus_compat (q p n m : Qp) : q ≤ n → p ≤ m → q + p ≤ n + m.
 Proof.
-  intros. eapply Qcle_trans. by apply Qcplus_le_mono_l. by apply Qcplus_le_mono_r.
+  intros. eapply Qcle_trans; [by apply Qcplus_le_mono_l
+                             |by apply Qcplus_le_mono_r].
 Qed.
 
 Lemma Qp_plus_weak_r (q p o : Qp) : q + p ≤ o → q ≤ o.
-Proof. intros Le. eapply Qcle_trans. apply Qp_le_plus_l. apply Le. Qed.
+Proof. intros Le. eapply Qcle_trans; [ apply Qp_le_plus_l | apply Le ]. Qed.
 
 Lemma Qp_plus_weak_l (q p o : Qp) : q + p ≤ o → p ≤ o.
 Proof. rewrite Qcplus_comm. apply Qp_plus_weak_r. Qed.
@@ -894,7 +897,9 @@ Proof. rewrite (comm _ q). apply Qc_le_max_l. Qed.
 
 Lemma Qp_max_plus (q p : Qp) : q `max` p ≤ q + p.
 Proof.
-  unfold Qp_max. destruct (decide (q ≤ p)). apply Qp_le_plus_r. apply Qp_le_plus_l.
+  unfold Qp_max. destruct (decide (q ≤ p)).
+  - apply Qp_le_plus_r.
+  - apply Qp_le_plus_l.
 Qed.
 
 Lemma Qp_max_lub_l (q p o : Qp) : q `max` p ≤ o → q ≤ o.

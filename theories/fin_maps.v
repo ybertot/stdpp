@@ -234,7 +234,7 @@ End setoid.
 
 (** ** General properties *)
 Lemma map_eq_iff {A} (m1 m2 : M A) : m1 = m2 ↔ ∀ i, m1 !! i = m2 !! i.
-Proof. split. by intros ->. apply map_eq. Qed.
+Proof. split; [by intros ->|]. apply map_eq. Qed.
 Lemma map_subseteq_spec {A} (m1 m2 : M A) :
   m1 ⊆ m2 ↔ ∀ i x, m1 !! i = Some x → m2 !! i = Some x.
 Proof.
@@ -450,7 +450,9 @@ Lemma delete_empty {A} i : delete i (∅ : M A) = ∅.
 Proof. rewrite <-(partial_alter_self ∅) at 2. by rewrite lookup_empty. Qed.
 Lemma delete_commute {A} (m : M A) i j :
   delete i (delete j m) = delete j (delete i m).
-Proof. destruct (decide (i = j)). by subst. by apply partial_alter_commute. Qed.
+Proof.
+  destruct (decide (i = j)) as [->|]; [done|]. by apply partial_alter_commute.
+Qed.
 Lemma delete_insert_ne {A} (m : M A) i j x :
   i ≠ j → delete i (<[j:=x]>m) = <[j:=x]>(delete i m).
 Proof. intro. by apply partial_alter_commute. Qed.
@@ -591,7 +593,7 @@ Lemma insert_subset_inv {A} (m1 m2 : M A) i x :
   ∃ m2', m2 = <[i:=x]>m2' ∧ m1 ⊂ m2' ∧ m2' !! i = None.
 Proof.
   intros Hi Hm1m2. exists (delete i m2). split_and?.
-  - rewrite insert_delete, insert_id. done.
+  - rewrite insert_delete, insert_id; [done|].
     eapply lookup_weaken, strict_include; eauto. by rewrite lookup_insert.
   - eauto using insert_delete_subset.
   - by rewrite lookup_delete.
@@ -876,7 +878,7 @@ Lemma map_to_list_empty_inv {A} (m : M A) : map_to_list m = [] → m = ∅.
 Proof. intros Hm. apply map_to_list_empty_inv_alt. by rewrite Hm. Qed.
 Lemma map_to_list_empty' {A} (m : M A) : map_to_list m = [] ↔ m = ∅.
 Proof.
-  split. apply map_to_list_empty_inv. intros ->. apply map_to_list_empty.
+  split; [apply map_to_list_empty_inv|]. intros ->. apply map_to_list_empty.
 Qed.
 
 Lemma map_to_list_insert_inv {A} (m : M A) l i x :
@@ -982,7 +984,10 @@ Proof.
   unfold size, map_size. by rewrite length_zero_iff_nil, map_to_list_empty'.
 Qed.
 Lemma map_size_empty_iff {A} (m : M A) : size m = 0 ↔ m = ∅.
-Proof. split. apply map_size_empty_inv. by intros ->; rewrite map_size_empty. Qed.
+Proof.
+  split; [apply map_size_empty_inv|].
+  by intros ->; rewrite map_size_empty.
+Qed.
 Lemma map_size_non_empty_iff {A} (m : M A) : size m ≠ 0 ↔ m ≠ ∅.
 Proof. by rewrite map_size_empty_iff. Qed.
 
@@ -1703,7 +1708,7 @@ Proof. by apply (partial_alter_merge _). Qed.
 Lemma foldr_delete_union_with (m1 m2 : M A) is :
   foldr delete (union_with f m1 m2) is =
     union_with f (foldr delete m1 is) (foldr delete m2 is).
-Proof. induction is as [|?? IHis]; simpl. done. by rewrite IHis, delete_union_with. Qed.
+Proof. induction is as [|?? IHis]; simpl; [done|]. by rewrite IHis, delete_union_with. Qed.
 Lemma insert_union_with m1 m2 i x y z :
   f x y = Some z →
   <[i:=z]>(union_with f m1 m2) = union_with f (<[i:=x]>m1) (<[i:=y]>m2).
@@ -2065,7 +2070,7 @@ Proof. by apply (partial_alter_merge _). Qed.
 Lemma foldr_delete_intersection_with (m1 m2 : M A) is :
   foldr delete (intersection_with f m1 m2) is =
     intersection_with f (foldr delete m1 is) (foldr delete m2 is).
-Proof. induction is as [|?? IHis]; simpl. done. by rewrite IHis, delete_intersection_with. Qed.
+Proof. induction is as [|?? IHis]; simpl; [done|]. by rewrite IHis, delete_intersection_with. Qed.
 Lemma insert_intersection_with m1 m2 i x y z :
   f x y = Some z →
   <[i:=z]>(intersection_with f m1 m2) = intersection_with f (<[i:=x]>m1) (<[i:=y]>m2).

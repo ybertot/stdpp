@@ -95,7 +95,7 @@ Section closure.
      See Coq bug https://github.com/coq/coq/issues/7916 and the test
      [tests.typeclasses.test_setoid_rewrite]. *)
   Global Instance rtc_po : PreOrder (rtc R) | 10.
-  Proof. split. exact (@rtc_refl A R). exact rtc_transitive. Qed.
+  Proof. split; [exact (@rtc_refl A R) | exact rtc_transitive]. Qed.
 
   (* Not an instance, related to the issue described above, this sometimes makes
   [setoid_rewrite] queries loop. *)
@@ -133,7 +133,7 @@ Section closure.
   Proof. revert z. apply rtc_ind_r; eauto. Qed.
 
   Lemma rtc_nf x y : rtc R x y → nf R x → x = y.
-  Proof. destruct 1 as [x|x y1 y2]. done. intros []; eauto. Qed.
+  Proof. destruct 1 as [x|x y1 y2]; [done|]. intros []; eauto. Qed.
 
   Lemma rtc_congruence {B} (f : A → B) (R' : relation B) x y :
     (∀ x y, R x y → R' (f x) (f y)) → rtc R x y → rtc R' (f x) (f y).

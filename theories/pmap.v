@@ -294,7 +294,9 @@ Proof.
     intros ??. by rewrite elem_of_nil.
   - intros ? [??] i x; unfold map_to_list, Pto_list.
     rewrite Pelem_of_to_list, elem_of_nil.
-    split. by intros [(?&->&?)|]. by left; exists i.
+    split.
+    + by intros [(?&->&?)|].
+    + by left; exists i.
   - intros ?? ? [??] ?. by apply Pomap_lookup.
   - intros ??? ?? [??] [??] ?. by apply Pmerge_lookup.
 Qed.

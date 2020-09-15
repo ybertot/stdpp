@@ -125,7 +125,7 @@ Proof.
   by rewrite (nil_length_inv (elements X)), ?elem_of_nil.
 Qed.
 Lemma size_empty_iff (X : C) : size X = 0 ↔ X ≡ ∅.
-Proof. split. apply size_empty_inv. by intros ->; rewrite size_empty. Qed.
+Proof. split; [apply size_empty_inv|]. by intros ->; rewrite size_empty. Qed.
 Lemma size_non_empty_iff (X : C) : size X ≠ 0 ↔ X ≢ ∅.
 Proof. by rewrite size_empty_iff. Qed.
 
@@ -198,7 +198,7 @@ Proof.
   { apply set_wf. }
   intros X IH. destruct (set_choose_or_empty X) as [[x ?]|HX].
   - rewrite (union_difference {[ x ]} X) by set_solver.
-    apply Hadd. set_solver. apply IH; set_solver.
+    apply Hadd; [set_solver|]. apply IH; set_solver.
   - by rewrite HX.
 Qed.
 Lemma set_ind_L `{!LeibnizEquiv C} (P : C → Prop) :
@@ -217,10 +217,10 @@ Proof.
     symmetry. apply elem_of_elements. }
   induction 1 as [|x l ?? IH]; simpl.
   - intros X HX. setoid_rewrite elem_of_nil in HX.
-    rewrite equiv_empty. done. set_solver.
+    rewrite equiv_empty; [done|]. set_solver.
   - intros X HX. setoid_rewrite elem_of_cons in HX.
     rewrite (union_difference {[ x ]} X) by set_solver.
-    apply Hadd. set_solver. apply IH. set_solver.
+    apply Hadd; [set_solver|]. apply IH; set_solver.
 Qed.
 Lemma set_fold_ind_L `{!LeibnizEquiv C}
     {B} (P : B → C → Prop) (f : A → B → B) (b : B) :
