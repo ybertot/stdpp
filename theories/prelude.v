@@ -12,8 +12,4 @@ From stdpp Require Export
   list
   list_numbers
   lexico.
-
-(* "Fake" import to whitelist this file for the check that ensures we import
-this file everywhere.
 From stdpp Require Import options.
-*)
