@@ -2,6 +2,9 @@
 are not in the Coq standard library. *)
 From Coq Require Export Permutation.
 From stdpp Require Export numbers base option.
+From stdpp Require Import options.
+
+(* Pick up extra assumptions from section parameters. *)
 Set Default Proof Using "Type*".
 
 Arguments length {_} _ : assert.

@@ -1,5 +1,5 @@
 From stdpp Require Export base tactics.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Section definitions.
   Context {A T : Type} `{EqDecision A}.

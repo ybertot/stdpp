@@ -1,5 +1,5 @@
 From stdpp Require Export countable coPset.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Definition namespace := list positive.
 Instance namespace_eq_dec : EqDecision namespace := _.

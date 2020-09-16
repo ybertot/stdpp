@@ -10,7 +10,7 @@ we must export [Coq.Peano] later than any export of [Coq.Bool]. *)
 over the ones of [Coq.Peano] (see Coq PR#12950), so we import [Utf8] last. *)
 From Coq Require Export Morphisms RelationClasses List Bool Setoid Peano Utf8.
 From Coq Require Import Permutation.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 Export ListNotations.
 From Coq.Program Require Export Basics Syntax.
 

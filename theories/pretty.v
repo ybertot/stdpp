@@ -1,7 +1,7 @@
 From stdpp Require Export strings.
 From stdpp Require Import relations numbers.
 From Coq Require Import Ascii.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Class Pretty A := pretty : A → string.
 Definition pretty_N_char (x : N) : ascii :=

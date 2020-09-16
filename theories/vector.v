@@ -4,7 +4,7 @@ renames or changes their notations, so that it becomes more consistent with the
 naming conventions in this development. *)
 From stdpp Require Import countable.
 From stdpp Require Export fin list.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 Open Scope vector_scope.
 
 (** The type [vec n] represents lists of consisting of exactly [n] elements.

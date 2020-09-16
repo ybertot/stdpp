@@ -1,7 +1,7 @@
 (** This file collects general purpose definitions and theorems on
 lists of numbers that are not in the Coq standard library. *)
 From stdpp Require Export list.
-Set Default Proof Using "Type*".
+From stdpp Require Import options.
 
 (** * Definitions *)
 (** [seqZ m n] generates the sequence [m], [m + 1], ..., [m + n - 1]

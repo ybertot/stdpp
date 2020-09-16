@@ -5,6 +5,10 @@ real-all: $(if $(NO_TEST),,test)
 TESTFILES=$(wildcard tests/*.v)
 
 test: $(TESTFILES:.v=.vo)
+# Make sure everything imports the options.
+	$(HIDE)for FILE in $(VFILES); do \
+	  if ! fgrep -q 'From stdpp Require Import options.' "$$FILE"; then echo "ERROR: $$FILE does not import 'options'."; echo; exit 1; fi \
+	done
 .PHONY: test
 
 COQ_TEST=$(COQTOP) $(COQDEBUG) -batch -test-mode

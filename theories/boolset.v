@@ -1,6 +1,6 @@
 (** This file implements boolsets as functions into Prop. *)
 From stdpp Require Export prelude.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Record boolset (A : Type) : Type := BoolSet { boolset_car : A → bool }.
 Arguments BoolSet {_} _ : assert.

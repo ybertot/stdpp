@@ -11,7 +11,11 @@ To compute concrete results, you need to both:
 *)
 From stdpp Require Export countable infinite fin_maps fin_map_dom.
 From stdpp Require Import pmap mapset propset.
-(* Set Default Proof Using "Type". *)
+From stdpp Require Import options.
+
+(* FIXME: This file needs a 'Proof Using' hint, but they need to be set
+locally (or things moved out of sections) as no default works well enough. *)
+Unset Default Proof Using.
 
 (** * The data structure *)
 (** We pack a [Pmap] together with a proof that ensures that all keys correspond

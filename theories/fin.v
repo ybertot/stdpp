@@ -3,7 +3,7 @@
 renames or changes their notations, so that it becomes more consistent with the
 naming conventions in this development. *)
 From stdpp Require Export base tactics.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 (** * The fin type *)
 (** The type [fin n] represents natural numbers [i] with [0 ≤ i < n]. We

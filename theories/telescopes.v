@@ -1,5 +1,5 @@
 From stdpp Require Import base tactics.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Local Set Universe Polymorphism.
 
