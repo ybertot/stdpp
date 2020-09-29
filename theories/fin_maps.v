@@ -677,6 +677,14 @@ Proof.
   - by rewrite lookup_omap, !lookup_insert.
   - by rewrite lookup_omap, !lookup_insert_ne, lookup_omap by done.
 Qed.
+Lemma omap_insert_None {A B} (f : A → option B) m i x :
+  f x = None → omap f (<[i:=x]>m) = delete i (omap f m).
+Proof.
+  intros; apply map_eq; intros i'; destruct (decide (i' = i)) as [->|].
+  - by rewrite lookup_omap, lookup_insert, lookup_delete.
+  - by rewrite lookup_omap, lookup_insert_ne,
+     lookup_delete_ne, lookup_omap by done.
+Qed.
 Lemma map_fmap_singleton {A B} (f : A → B) i x : f <$> {[i := x]} = {[i := f x]}.
 Proof.
   by unfold singletonM, map_singleton; rewrite fmap_insert, map_fmap_empty.
