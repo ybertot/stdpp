@@ -2,8 +2,11 @@
 importantly, it implements some tactics to automatically solve goals involving
 sets. *)
 From stdpp Require Export orders list list_numbers.
-(* FIXME: This file needs a 'Proof Using' hint, but the default we use
-   everywhere makes for lots of extra ssumptions. *)
+From stdpp Require Import options.
+
+(* FIXME: This file needs a 'Proof Using' hint, but they need to be set
+locally (or things moved out of sections) as no default works well enough. *)
+Unset Default Proof Using.
 
 (* Higher precedence to make sure these instances are not used for other types
 with an [ElemOf] instance, such as lists. *)

@@ -1,5 +1,5 @@
 From stdpp Require Export countable vector.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Class Finite A `{EqDecision A} := {
   enum : list A;

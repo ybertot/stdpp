@@ -2,7 +2,11 @@
 elements of the unit type. Since maps enjoy extensional equality, the
 constructed finite sets do so as well. *)
 From stdpp Require Export countable fin_map_dom.
-(* FIXME: This file needs a 'Proof Using' hint. *)
+From stdpp Require Import options.
+
+(* FIXME: This file needs a 'Proof Using' hint, but they need to be set
+locally (or things moved out of sections) as no default works well enough. *)
+Unset Default Proof Using.
 
 Record mapset (M : Type → Type) : Type :=
   Mapset { mapset_car: M (unit : Type) }.

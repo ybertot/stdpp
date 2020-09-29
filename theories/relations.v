@@ -3,7 +3,7 @@ These are particularly useful as we define the operational semantics as a
 small step semantics. *)
 From Coq Require Import Wf_nat.
 From stdpp Require Export sets.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 (** * Definitions *)
 Section definitions.

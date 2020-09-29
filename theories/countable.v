@@ -1,6 +1,6 @@
 From Coq.QArith Require Import QArith_base Qcanon.
 From stdpp Require Export list numbers list_numbers.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 Local Open Scope positive.
 
 Class Countable A `{EqDecision A} := {

@@ -2,7 +2,7 @@
 standard library, but without using the module system. *)
 From Coq Require Export Sorted.
 From stdpp Require Export orders list.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Section merge_sort.
   Context {A} (R : relation A) `{∀ x y, Decision (R x y)}.

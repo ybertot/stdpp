@@ -1,6 +1,6 @@
 (** This file collects facts on proof irrelevant types/propositions. *)
 From stdpp Require Export base.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Hint Extern 200 (ProofIrrel _) => progress (lazy beta) : typeclass_instances.
 

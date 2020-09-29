@@ -1,5 +1,9 @@
 From stdpp Require Export list.
 From stdpp Require Import relations pretty.
+From stdpp Require Import options.
+
+(* Pick up extra assumptions from section parameters. *)
+Set Default Proof Using "Type*".
 
 (** * Generic constructions *)
 (** If [A] is infinite, and there is an injection from [A] to [B], then [B] is
@@ -24,12 +28,15 @@ The construction then finds the first string starting with [s] followed by a
 number that's not in the input list. For example, given [["H", "H1", "H4"]] and
 [s := "H"], it would find ["H2"]. *)
 Section search_infinite.
-  Context {B} (f : nat → B) `{!Inj (=) (=) f, !EqDecision B}.
+  Context {B} (f : nat → B).
 
   Let R (xs : list B) (n1 n2 : nat) :=
     n2 < n1 ∧ (f (n1 - 1)) ∈ xs.
   Lemma search_infinite_step xs n : f n ∈ xs → R xs (1 + n) n.
   Proof. split; [lia|]. replace (1 + n - 1) with n by lia; eauto. Qed.
+
+  Context `{!Inj (=) (=) f, !EqDecision B}.
+
   Lemma search_infinite_R_wf xs : wf (R xs).
   Proof.
     revert xs. assert (help : ∀ xs n n',

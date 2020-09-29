@@ -4,7 +4,7 @@ notations. *)
 From Coq Require Export EqdepFacts PArith NArith ZArith NPeano.
 From Coq Require Import QArith Qcanon.
 From stdpp Require Export base decidable option.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 Local Open Scope nat_scope.
 
 Coercion Z.of_nat : nat >-> Z.

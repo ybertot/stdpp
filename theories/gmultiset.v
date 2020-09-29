@@ -1,6 +1,6 @@
 From stdpp Require Export countable.
 From stdpp Require Import gmap.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Record gmultiset A `{Countable A} := GMultiSet { gmultiset_car : gmap A nat }.
 Arguments GMultiSet {_ _ _} _ : assert.

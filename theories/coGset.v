@@ -6,7 +6,10 @@ Note that [coGset positive] cannot represent all elements of [coPset]
 infinite sets that cannot be represented). *)
 From stdpp Require Export sets countable.
 From stdpp Require Import decidable finite gmap coPset.
-(* Set Default Proof Using "Type". *)
+From stdpp Require Import options.
+
+(* Pick up extra assumptions from section parameters. *)
+Set Default Proof Using "Type*".
 
 Inductive coGset `{Countable A} :=
   | FinGSet (X : gset A)
@@ -149,13 +152,16 @@ Definition coGset_to_gset `{Countable A} (X : coGset A) : gset A :=
 Definition gset_to_coGset `{Countable A} : gset A → coGset A := FinGSet.
 
 Section to_gset.
-  Context `{Countable A, Infinite A}.
+  Context `{Countable A}.
+
+  Lemma elem_of_gset_to_coGset (X : gset A) x : x ∈ gset_to_coGset X ↔ x ∈ X.
+  Proof. done. Qed.
+
+  Context `{Infinite A}.
 
   Lemma elem_of_coGset_to_gset (X : coGset A) x :
     set_finite X → x ∈ coGset_to_gset X ↔ x ∈ X.
   Proof. rewrite coGset_finite_spec. by destruct X. Qed.
-  Lemma elem_of_gset_to_coGset (X : gset A) x : x ∈ gset_to_coGset X ↔ x ∈ X.
-  Proof. done. Qed.
   Lemma gset_to_coGset_finite (X : gset A) : set_finite (gset_to_coGset X).
   Proof. by rewrite coGset_finite_spec. Qed.
 End to_gset.

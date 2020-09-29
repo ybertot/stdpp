@@ -8,7 +8,7 @@ Leibniz equality to become extensional. *)
 From Coq Require Import PArith.
 From stdpp Require Import mapset countable.
 From stdpp Require Export fin_maps.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 Local Open Scope positive_scope.
 Local Hint Extern 0 (_ =@{positive} _) => congruence : core.

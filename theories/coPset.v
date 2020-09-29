@@ -11,7 +11,7 @@ Since [positive]s are bitstrings, we encode [coPset]s as trees that correspond
 to the decision function that map bitstrings to bools. *)
 From stdpp Require Export sets.
 From stdpp Require Import pmap gmap mapset.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 Local Open Scope positive_scope.
 
 (** * The tree data structure *)

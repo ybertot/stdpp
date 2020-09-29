@@ -1,5 +1,5 @@
 From stdpp Require Export tactics.
-Set Default Proof Using "Type".
+From stdpp Require Import options.
 
 CoInductive stream (A : Type) : Type := scons : A → stream A → stream A.
 Arguments scons {_} _ _ : assert.

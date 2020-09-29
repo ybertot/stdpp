@@ -1,4 +1,5 @@
 From stdpp Require Import numbers.
+From stdpp Require Import options.
 
 (** The class [NatCancel m n m' n'] is a simple canceler for natural numbers
 implemented using type classes.
