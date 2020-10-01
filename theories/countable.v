@@ -1,5 +1,5 @@
 From Coq.QArith Require Import QArith_base Qcanon.
-From stdpp Require Export list numbers list_numbers.
+From stdpp Require Export list numbers list_numbers fin.
 From stdpp Require Import options.
 Local Open Scope positive.
 
@@ -259,7 +259,7 @@ Next Obligation.
   by intros x; lazy beta; rewrite decode_encode; csimpl; rewrite Nat2N.id.
 Qed.
 
-Global Program Instance Qc_countable : Countable Qc :=
+Program Instance Qc_countable : Countable Qc :=
   inj_countable
     (λ p : Qc, let 'Qcmake (x # y) _ := p return _ in (x,y))
     (λ q : Z * positive, let '(x,y) := q return _ in Some (Q2Qc (x # y))) _.
@@ -267,13 +267,23 @@ Next Obligation.
   intros [[x y] Hcan]. f_equal. apply Qc_is_canon. simpl. by rewrite Hcan.
 Qed.
 
-Global Program Instance Qp_countable : Countable Qp :=
+Program Instance Qp_countable : Countable Qp :=
   inj_countable
     Qp_car
     (λ p : Qc, guard (0 < p)%Qc as Hp; Some (mk_Qp p Hp)) _.
 Next Obligation.
   intros [p Hp]. unfold mguard, option_guard; simpl.
   case_match; [|done]. f_equal. by apply Qp_eq.
+Qed.
+
+Program Instance fin_countable n : Countable (fin n) :=
+  inj_countable
+    fin_to_nat
+    (λ m : nat, guard (m < n)%nat as Hm; Some (nat_to_fin Hm)) _.
+Next Obligation.
+  intros n i; simplify_option_eq.
+  - by rewrite nat_to_fin_to_nat.
+  - by pose proof (fin_to_nat_lt i).
 Qed.
 
 (** ** Generic trees *)
