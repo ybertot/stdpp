@@ -790,6 +790,12 @@ Proof.
   apply Qp_eq; simpl. unfold Qcdiv. ring.
 Qed.
 
+Lemma Qp_lower_bound_lt (q1 q2 : Qp) : ∃ q : Qp, q < q1 ∧ q < q2.
+Proof.
+  destruct (Qp_lower_bound q1 q2) as (qmin & q1' & q2' & [-> ->]).
+  exists qmin. split; eapply Qp_lt_sum; eauto.
+Qed.
+
 Lemma Qp_cross_split p a b c d :
   (a + b = p → c + d = p →
   ∃ ac ad bc bd, ac + ad = a ∧ bc + bd = b ∧ ac + bc = c ∧ ad + bd = d)%Qp.
