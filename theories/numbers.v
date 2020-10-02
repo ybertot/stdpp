@@ -838,9 +838,6 @@ Proof.
   apply Hle, Qp_prf.
 Qed.
 
-Lemma Qp_not_plus_q_ge_1 (q: Qp) : ¬ (1 + q)%Qp ≤ 1%Qp.
-Proof. apply Qp_not_plus_ge. Qed.
-
 Lemma Qp_ge_0 (q: Qp): (0 ≤ q)%Qc.
 Proof. apply Qclt_le_weak, Qp_prf. Qed.
 

@@ -7,6 +7,15 @@ API-breaking change is listed.
   and `dom_map_filter_subseteq` → `dom_filter_subseteq` for consistency's sake.
 - Add `max` and `min` operations for `Qp`.
 - Add additional lemmas for `Qp`.
+- Remove the lemma `Qp_not_plus_q_ge_1` in favor of `Qp_not_plus_ge`.
+
+The following `sed` script should perform most of the renaming
+(on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
+```
+sed -i '
+s/\bQp_not_plus_q_ge_1\b/Qp_not_plus_ge/g
+' $(find theories -name "*.v")
+```
 
 ## std++ 1.4.0 (released 2020-07-15)
 
