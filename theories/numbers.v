@@ -860,7 +860,7 @@ Proof.
 Qed.
 
 Lemma Qp_plus_id_free q p : q + p = q → False.
-Proof. intro Heq. eapply (Qp_not_plus_ge q p). rewrite Heq. done. Qed.
+Proof. intro Heq. apply (Qp_not_plus_ge q p). by rewrite Heq.  Qed.
 
 Lemma Qp_plus_weak_r (q p o : Qp) : q + p ≤ o → q ≤ o.
 Proof. intros Le. eapply Qcle_trans; [ apply Qp_le_plus_l | apply Le ]. Qed.
