@@ -733,62 +733,59 @@ Infix "`min`" := Qp_min : Qp_scope.
 
 Hint Extern 0 (_ ≤ _)%Qp => reflexivity : core.
 
-Lemma Qp_eq p q : p = q ↔ Qp_to_Qc p = Qp_to_Qc q.
+Lemma Qp_to_Qc_inj_iff p q : Qp_to_Qc p = Qp_to_Qc q ↔ p = q.
 Proof.
-  split; [by intros ->|].
+  split; [|by intros ->].
   destruct p, q; intros; simplify_eq/=; f_equal; apply (proof_irrel _).
 Qed.
 
 Instance Qp_eq_dec : EqDecision Qp.
 Proof.
-  refine (λ p q, cast_if (decide (Qp_to_Qc p = Qp_to_Qc q))); by rewrite Qp_eq.
+  refine (λ p q, cast_if (decide (Qp_to_Qc p = Qp_to_Qc q)));
+    by rewrite <-Qp_to_Qc_inj_iff.
 Defined.
 
 Instance Qp_inhabited : Inhabited Qp := populate 1%Qp.
 
 Instance Qp_plus_assoc : Assoc (=) Qp_plus.
-Proof. intros [p ?] [q ?] [r ?]; apply Qp_eq, Qcplus_assoc. Qed.
+Proof. intros [p ?] [q ?] [r ?]; apply Qp_to_Qc_inj_iff, Qcplus_assoc. Qed.
 Instance Qp_plus_comm : Comm (=) Qp_plus.
-Proof. intros [p ?] [q ?]; apply Qp_eq, Qcplus_comm. Qed.
+Proof. intros [p ?] [q ?]; apply Qp_to_Qc_inj_iff, Qcplus_comm. Qed.
 Instance Qp_plus_inj_r p : Inj (=) (=) (Qp_plus p).
 Proof.
   destruct p as [p ?].
-  intros [q1 ?] [q2 ?]. rewrite !Qp_eq; simpl. apply (inj (Qcplus p)).
+  intros [q1 ?] [q2 ?]. rewrite <-!Qp_to_Qc_inj_iff; simpl. apply (inj (Qcplus p)).
 Qed.
 Instance Qp_plus_inj_l p : Inj (=) (=) (λ q, q + p)%Qp.
 Proof.
   destruct p as [p ?].
-  intros [q1 ?] [q2 ?]. rewrite !Qp_eq; simpl. apply (inj (λ q, q + p)%Qc).
+  intros [q1 ?] [q2 ?]. rewrite <-!Qp_to_Qc_inj_iff; simpl. apply (inj (λ q, q + p)%Qc).
 Qed.
 
 Instance Qp_mult_assoc : Assoc (=) Qp_mult.
-Proof. intros [p ?] [q ?] [r ?]. apply Qp_eq, Qcmult_assoc. Qed.
+Proof. intros [p ?] [q ?] [r ?]. apply Qp_to_Qc_inj_iff, Qcmult_assoc. Qed.
 Instance Qp_mult_comm : Comm (=) Qp_mult.
-Proof. intros [p ?] [q ?]; apply Qp_eq, Qcmult_comm. Qed.
+Proof. intros [p ?] [q ?]; apply Qp_to_Qc_inj_iff, Qcmult_comm. Qed.
 Lemma Qp_mult_plus_distr_r p q r : p * (q + r) = p * q + p * r.
-Proof.
-  destruct p as [p ?], q as [q ?], r as [r ?]. apply Qp_eq, Qcmult_plus_distr_r.
-Qed.
+Proof. destruct p, q, r; by apply Qp_to_Qc_inj_iff, Qcmult_plus_distr_r. Qed.
 Lemma Qp_mult_plus_distr_l p q r : (p + q) * r = p * r + q * r.
-Proof.
-  destruct p as [p ?], q as [q ?], r as [r ?]. apply Qp_eq, Qcmult_plus_distr_l.
-Qed.
+Proof. destruct p, q, r; by apply Qp_to_Qc_inj_iff, Qcmult_plus_distr_l. Qed.
 Lemma Qp_mult_1_l p : 1 * p = p.
-Proof. destruct p; apply Qp_eq, Qcmult_1_l. Qed.
+Proof. destruct p; apply Qp_to_Qc_inj_iff, Qcmult_1_l. Qed.
 Lemma Qp_mult_1_r p : p * 1 = p.
-Proof. destruct p; apply Qp_eq, Qcmult_1_r. Qed.
+Proof. destruct p; apply Qp_to_Qc_inj_iff, Qcmult_1_r. Qed.
 
 Lemma Qp_plus_diag p : p + p = (2 * p).
 Proof. by rewrite Qp_mult_plus_distr_l, !Qp_mult_1_l. Qed.
 
 Lemma Qp_div_1 p : p / 1 = p.
 Proof.
-  destruct p as [p ?]. apply Qp_eq; simpl.
+  destruct p as [p ?]. apply Qp_to_Qc_inj_iff; simpl.
   rewrite <-(Qcmult_div_r p 1) at 2 by done. by rewrite Qcmult_1_l.
 Qed.
 Lemma Qp_div_S p y : p / (2 * y) + p / (2 * y) = p / y.
 Proof.
-  destruct p as [p ?]. apply Qp_eq; simpl. unfold Qcdiv.
+  destruct p as [p ?]. apply Qp_to_Qc_inj_iff; simpl. unfold Qcdiv.
   rewrite <-Qcmult_plus_distr_l, Pos2Z.inj_mul, Z2Qc_inj_mul, Z2Qc_inj_2.
   rewrite Qcplus_diag. by field_simplify.
 Qed.
@@ -808,7 +805,7 @@ Proof.
   unfold Qp_le. split; [split|].
   - by intros p.
   - intros p q r ??. by etrans.
-  - intros p q ??. by apply Qp_eq, Qcle_antisym.
+  - intros p q ??. by apply Qp_to_Qc_inj_iff, Qcle_antisym.
 Qed.
 Instance Qp_lt_strict : StrictOrder (<)%Qp.
 Proof.
@@ -822,7 +819,7 @@ Proof. intros p q. apply (total Qcle). Qed.
 Lemma Qp_lt_le_weak p q : p < q → p ≤ q.
 Proof. apply Qclt_le_weak. Qed.
 Lemma Qp_le_lt_or_eq p q : p ≤ q → p < q ∨ p = q.
-Proof. intros [? | ->%Qp_eq]%Qcle_lt_or_eq; auto. Qed.
+Proof. intros [? | ->%Qp_to_Qc_inj_iff]%Qcle_lt_or_eq; auto. Qed.
 Lemma Qp_lt_le_dec p q : {p < q} + {q ≤ p}.
 Proof. apply Qclt_le_dec. Defined.
 Lemma Qp_le_lt_trans p q r : p ≤ q → q < r → p < r.
@@ -895,22 +892,22 @@ Proof. rewrite (comm_L Qp_plus). apply Qp_plus_weak_2_r. Qed.
 Lemma Qc_minus_Some p q r : p - q = Some r ↔ p = q + r.
 Proof.
   destruct p as [p Hp], q as [q Hq], r as [r Hr].
-  unfold Qp_minus, Qp_plus; simpl; rewrite Qp_eq; simpl. split.
+  unfold Qp_minus, Qp_plus; simpl; rewrite <-Qp_to_Qc_inj_iff; simpl. split.
   - intros; simplify_option_eq. unfold Qcminus.
     by rewrite (Qcplus_comm p), Qcplus_assoc, Qcplus_opp_r, Qcplus_0_l.
   - intros ->. unfold Qcminus.
     rewrite <-Qcplus_assoc, (Qcplus_comm r), Qcplus_assoc.
     rewrite Qcplus_opp_r, Qcplus_0_l. simplify_option_eq; [|done].
-    f_equal. by apply Qp_eq.
+    f_equal. by apply Qp_to_Qc_inj_iff.
 Qed.
 Lemma Qp_lt_sum p q : p < q ↔ ∃ r, q = p + r.
 Proof.
   destruct p as [p Hp], q as [q Hq]. unfold Qp_lt; simpl.
   split.
   - intros Hlt%Qclt_minus_iff. exists (mk_Qp (q - p) Hlt).
-    apply Qp_eq; simpl. unfold Qcminus.
+    apply Qp_to_Qc_inj_iff; simpl. unfold Qcminus.
     by rewrite (Qcplus_comm q), Qcplus_assoc, Qcplus_opp_r, Qcplus_0_l.
-  - intros [[r ?] ?%Qp_eq]; simplify_eq/=.
+  - intros [[r ?] ?%Qp_to_Qc_inj_iff]; simplify_eq/=.
     rewrite <-(Qcplus_0_r p) at 1. by apply Qcplus_lt_mono_l.
 Qed.
 
