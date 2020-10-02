@@ -831,12 +831,15 @@ Proof.
     + by rewrite Qp_div_2.
 Qed.
 
-Lemma Qp_not_plus_q_ge_1 (q: Qp): ¬ ((1 + q)%Qp ≤ 1%Qp)%Qc.
+Lemma Qp_not_plus_ge (q p : Qp) : ¬ (q + p)%Qp ≤ q.
 Proof.
-  intros Hle.
-  apply (Qcplus_le_mono_l q 0 1) in Hle.
-  apply Qcle_ngt in Hle. apply Hle, Qp_prf.
+  rewrite <- (Qcplus_0_r q).
+  intros Hle%(Qcplus_le_mono_l p 0 q)%Qcle_ngt.
+  apply Hle, Qp_prf.
 Qed.
+
+Lemma Qp_not_plus_q_ge_1 (q: Qp) : ¬ (1 + q)%Qp ≤ 1%Qp.
+Proof. apply Qp_not_plus_ge. Qed.
 
 Lemma Qp_ge_0 (q: Qp): (0 ≤ q)%Qc.
 Proof. apply Qclt_le_weak, Qp_prf. Qed.
@@ -855,6 +858,9 @@ Proof.
   intros. eapply Qcle_trans; [by apply Qcplus_le_mono_l
                              |by apply Qcplus_le_mono_r].
 Qed.
+
+Lemma Qp_plus_id_free q p : q + p = q → False.
+Proof. intro Heq. eapply (Qp_not_plus_ge q p). rewrite Heq. done. Qed.
 
 Lemma Qp_plus_weak_r (q p o : Qp) : q + p ≤ o → q ≤ o.
 Proof. intros Le. eapply Qcle_trans; [ apply Qp_le_plus_l | apply Le ]. Qed.
@@ -878,14 +884,14 @@ Qed.
 Lemma Qp_max_spec_le (q p : Qp) : (q ≤ p ∧ q `max` p = p) ∨ (p ≤ q ∧ q `max` p = q).
 Proof. destruct (Qp_max_spec q p) as [[?%Qclt_le_weak?]|]; [left|right]; done. Qed.
 
-Instance Qc_max_assoc : Assoc (=) Qp_max.
+Instance Qp_max_assoc : Assoc (=) Qp_max.
 Proof.
   intros q p o. unfold Qp_max. destruct (decide (q ≤ p)), (decide (p ≤ o));
     eauto using decide_True, Qcle_trans.
   rewrite decide_False by done.
   by rewrite decide_False by (eapply Qclt_not_le, Qclt_trans; by apply Qclt_nge).
 Qed.
-Instance Qc_max_comm : Comm (=) Qp_max.
+Instance Qp_max_comm : Comm (=) Qp_max.
 Proof.
   intros q p. apply Qp_eq.
   destruct (Qp_max_spec_le q p) as [[?->]|[?->]], (Qp_max_spec_le p q) as [[?->]|[?->]];
@@ -895,11 +901,11 @@ Qed.
 Lemma Qp_max_id q : q `max` q = q.
 Proof. by destruct (Qp_max_spec q q) as [[_->]|[_->]]. Qed.
 
-Lemma Qc_le_max_l (q p : Qp) : q ≤ q `max` p.
+Lemma Qp_le_max_l (q p : Qp) : q ≤ q `max` p.
 Proof. unfold Qp_max. by destruct (decide (q ≤ p)). Qed.
 
-Lemma Qc_le_max_r (q p : Qp) : p ≤ q `max` p.
-Proof. rewrite (comm _ q). apply Qc_le_max_l. Qed.
+Lemma Qp_le_max_r (q p : Qp) : p ≤ q `max` p.
+Proof. rewrite (comm _ q). apply Qp_le_max_l. Qed.
 
 Lemma Qp_max_plus (q p : Qp) : q `max` p ≤ q + p.
 Proof.
@@ -926,14 +932,14 @@ Qed.
 Lemma Qp_min_spec_le (q p : Qp) : (q ≤ p ∧ q `min` p = q) ∨ (p ≤ q ∧ q `min` p = p).
 Proof. destruct (Qp_min_spec q p) as [[?%Qclt_le_weak?]|]; [left|right]; done. Qed.
 
-Instance Qc_min_assoc : Assoc (=) Qp_min.
+Instance Qp_min_assoc : Assoc (=) Qp_min.
 Proof.
   intros q p o. unfold Qp_min.
   destruct (decide (q ≤ p)), (decide (p ≤ o)); eauto using decide_False.
   - rewrite decide_True by done. by rewrite decide_True by (eapply Qcle_trans; done).
   - by rewrite (decide_False _ _) by (eapply Qclt_not_le, Qclt_trans; by apply Qclt_nge).
 Qed.
-Instance Qc_min_comm : Comm (=) Qp_min.
+Instance Qp_min_comm : Comm (=) Qp_min.
 Proof.
   intros q p. apply Qp_eq.
   destruct (Qp_min_spec_le q p) as [[?->]|[?->]], (Qp_min_spec_le p q) as [[? ->]|[? ->]];
