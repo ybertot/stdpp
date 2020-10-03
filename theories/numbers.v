@@ -685,8 +685,6 @@ Proof.
     by rewrite <-Qp_to_Qc_inj_iff.
 Defined.
 
-Definition Qp_one : Qp := mk_Qp 1 eq_refl.
-
 Definition Qp_plus (p q : Qp) : Qp :=
   let 'mk_Qp p Hp := p in let 'mk_Qp q Hq := q in
   mk_Qp (p + q) (Qcplus_pos_pos _ _ Hp Hq).
@@ -718,10 +716,14 @@ Infix "*" := Qp_mult : Qp_scope.
 Notation "/ q" := (Qp_inv q) : Qp_scope.
 Infix "/" := Qp_div : Qp_scope.
 
-Notation "1" := Qp_one : Qp_scope.
-Notation "2" := (1 + 1)%Qp : Qp_scope.
-Notation "3" := (1 + 2)%Qp : Qp_scope.
-Notation "4" := (1 + 3)%Qp : Qp_scope.
+Program Definition pos_to_Qp (n : positive) : Qp := mk_Qp (Z.pos n) _.
+Next Obligation. intros n. by rewrite <-Z2Qc_inj_0, <-Z2Qc_inj_lt. Qed.
+Arguments pos_to_Qp : simpl never.
+
+Notation "1" := (pos_to_Qp 1) : Qp_scope.
+Notation "2" := (pos_to_Qp 2) : Qp_scope.
+Notation "3" := (pos_to_Qp 3) : Qp_scope.
+Notation "4" := (pos_to_Qp 4) : Qp_scope.
 
 Definition Qp_le (p q : Qp) : Prop :=
   let 'mk_Qp p _ := p in let 'mk_Qp q _ := q in (p ≤ q)%Qc.
@@ -764,10 +766,6 @@ Definition Qp_min (q p : Qp) : Qp := if decide (q ≤ p) then q else p.
 Infix "`max`" := Qp_max : Qp_scope.
 Infix "`min`" := Qp_min : Qp_scope.
 
-Program Definition pos_to_Qp (n : positive) : Qp := mk_Qp (Z.pos n) _.
-Next Obligation. intros n. by rewrite <-Z2Qc_inj_0, <-Z2Qc_inj_lt. Qed.
-Arguments pos_to_Qp : simpl never.
-
 Instance Qp_inhabited : Inhabited Qp := populate 1.
 
 Instance Qp_plus_assoc : Assoc (=) Qp_plus.
@@ -809,13 +807,15 @@ Proof. destruct p; apply Qp_to_Qc_inj_iff, Qcmult_1_l. Qed.
 Lemma Qp_mult_1_r p : p * 1 = p.
 Proof. destruct p; apply Qp_to_Qc_inj_iff, Qcmult_1_r. Qed.
 
+Lemma Qp_one_one : 1 + 1 = 2.
+Proof. apply (bool_decide_unpack _); by compute. Qed.
 Lemma Qp_plus_diag p : p + p = (2 * p).
-Proof. by rewrite Qp_mult_plus_distr_l, !Qp_mult_1_l. Qed.
+Proof. by rewrite <-Qp_one_one, Qp_mult_plus_distr_l, !Qp_mult_1_l. Qed.
 
 Lemma Qp_mult_inv_l p : /p * p = 1.
 Proof.
-  destruct p as [p ?].
-  by apply Qp_to_Qc_inj_iff, Qcmult_inv_l, not_symmetry, Qclt_not_eq.
+  destruct p as [p ?]; apply Qp_to_Qc_inj_iff; simpl.
+  by rewrite Qcmult_inv_l, Z2Qc_inj_1 by (by apply not_symmetry, Qclt_not_eq).
 Qed.
 Lemma Qp_mult_inv_r p : p * /p = 1.
 Proof. by rewrite (comm_L Qp_mult), Qp_mult_inv_l. Qed.
