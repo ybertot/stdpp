@@ -627,6 +627,12 @@ Proof.
   by apply Qcmult_le_mono_nonneg_r.
 Qed.
 
+Lemma Qcinv_pos x : 0 < x → 0 < /x.
+Proof.
+  intros. assert (0 ≠ x) by (by apply Qclt_not_eq).
+  by rewrite (Qcmult_lt_mono_pos_r _ _ x), Qcmult_0_l, Qcmult_inv_l by done.
+Qed.
+
 Lemma inject_Z_Qred n : Qred (inject_Z n) = inject_Z n.
 Proof. apply Qred_identity; auto using Z.gcd_1_r. Qed.
 Coercion Qc_of_Z (n : Z) : Qc := Qcmake _ (inject_Z_Qred n).
@@ -697,21 +703,21 @@ Definition Qp_mult (p q : Qp) : Qp :=
   mk_Qp (p * q) (Qcmult_pos_pos _ _ Hp Hq).
 Arguments Qp_mult : simpl never.
 
-Program Definition Qp_div (p : Qp) (y : positive) : Qp :=
-  let 'mk_Qp p Hp := p return _ in
-  mk_Qp (p / Zpos y)%Qc _.
-Next Obligation.
-  intros _ y p Hp. unfold Qcdiv. assert (0 < Zpos y)%Qc.
-  { apply (Z2Qc_inj_lt 0%Z (Zpos y)), Pos2Z.is_pos. }
-  by rewrite (Qcmult_lt_mono_pos_r _ _ (Zpos y)%Z), Qcmult_0_l,
-    <-Qcmult_assoc, Qcmult_inv_l, Qcmult_1_r.
-Qed.
+Definition Qp_inv (q : Qp) : Qp :=
+  let 'mk_Qp q Hq := q return _ in
+  mk_Qp (/ q)%Qc (Qcinv_pos _ Hq).
+Arguments Qp_inv : simpl never.
+
+Definition Qp_div (p q : Qp) : Qp := Qp_mult p (Qp_inv q).
+Typeclasses Opaque Qp_div.
 Arguments Qp_div : simpl never.
 
 Infix "+" := Qp_plus : Qp_scope.
 Infix "-" := Qp_minus : Qp_scope.
 Infix "*" := Qp_mult : Qp_scope.
+Notation "/ q" := (Qp_inv q) : Qp_scope.
 Infix "/" := Qp_div : Qp_scope.
+
 Notation "1" := Qp_one : Qp_scope.
 Notation "2" := (1 + 1)%Qp : Qp_scope.
 Notation "3" := (1 + 2)%Qp : Qp_scope.
@@ -769,7 +775,7 @@ Proof.
   destruct p as [p ?].
   intros [q1 ?] [q2 ?]. rewrite <-!Qp_to_Qc_inj_iff; simpl. apply (inj (Qcplus p)).
 Qed.
-Instance Qp_plus_inj_l p : Inj (=) (=) (λ q, q + p)%Qp.
+Instance Qp_plus_inj_l p : Inj (=) (=) (λ q, q + p).
 Proof.
   destruct p as [p ?].
   intros [q1 ?] [q2 ?]. rewrite <-!Qp_to_Qc_inj_iff; simpl. apply (inj (λ q, q + p)%Qc).
@@ -779,6 +785,17 @@ Instance Qp_mult_assoc : Assoc (=) Qp_mult.
 Proof. intros [p ?] [q ?] [r ?]. apply Qp_to_Qc_inj_iff, Qcmult_assoc. Qed.
 Instance Qp_mult_comm : Comm (=) Qp_mult.
 Proof. intros [p ?] [q ?]; apply Qp_to_Qc_inj_iff, Qcmult_comm. Qed.
+Instance Qp_mult_inj_r p : Inj (=) (=) (Qp_mult p).
+Proof.
+  destruct p as [p ?]. intros [q1 ?] [q2 ?]. rewrite <-!Qp_to_Qc_inj_iff; simpl.
+  intros Hpq.
+  apply (anti_symm _); apply (Qcmult_le_mono_pos_l _ _ p); by rewrite ?Hpq.
+Qed.
+Instance Qp_mult_inj_l p : Inj (=) (=) (λ q, q * p).
+Proof.
+  intros q1 q2 Hpq. apply (inj (Qp_mult p)). by rewrite !(comm_L Qp_mult p).
+Qed.
+
 Lemma Qp_mult_plus_distr_r p q r : p * (q + r) = p * q + p * r.
 Proof. destruct p, q, r; by apply Qp_to_Qc_inj_iff, Qcmult_plus_distr_r. Qed.
 Lemma Qp_mult_plus_distr_l p q r : (p + q) * r = p * r + q * r.
@@ -791,27 +808,70 @@ Proof. destruct p; apply Qp_to_Qc_inj_iff, Qcmult_1_r. Qed.
 Lemma Qp_plus_diag p : p + p = (2 * p).
 Proof. by rewrite Qp_mult_plus_distr_l, !Qp_mult_1_l. Qed.
 
+Lemma Qp_mult_inv_l p : /p * p = 1.
+Proof.
+  destruct p as [p ?].
+  by apply Qp_to_Qc_inj_iff, Qcmult_inv_l, not_symmetry, Qclt_not_eq.
+Qed.
+Lemma Qp_mult_inv_r p : p * /p = 1.
+Proof. by rewrite (comm_L Qp_mult), Qp_mult_inv_l. Qed.
+Lemma Qp_inv_mult_distr p q : /(p * q) = /p * /q.
+Proof.
+  apply (inj (Qp_mult (p * q))).
+  rewrite Qp_mult_inv_r, (comm_L Qp_mult p), <-(assoc_L _), (assoc_L Qp_mult p).
+  by rewrite Qp_mult_inv_r, Qp_mult_1_l, Qp_mult_inv_r.
+Qed.
+Lemma Qp_inv_involutive p : / /p = p.
+Proof.
+  rewrite <-(Qp_mult_1_l (/ /p)), <-(Qp_mult_inv_r p), <-(assoc_L _).
+  by rewrite Qp_mult_inv_r, Qp_mult_1_r.
+Qed.
+Instance Qp_inv_inj : Inj (=) (=) Qp_inv.
+Proof.
+  intros p1 p2 Hp. apply (inj (Qp_mult (/p1))).
+  by rewrite Qp_mult_inv_l, Hp, Qp_mult_inv_l.
+Qed.
+Lemma Qp_inv_1 : /1 = 1.
+Proof. apply (bool_decide_unpack _); by compute. Qed.
+Lemma Qp_inv_half_half : /2 + /2 = 1.
+Proof. apply (bool_decide_unpack _); by compute. Qed.
+
+Lemma Qp_div_diag p : p / p = 1.
+Proof. apply Qp_mult_inv_r. Qed.
+Lemma Qp_mult_div_l p q : (p / q) * q = p.
+Proof. unfold Qp_div. by rewrite <-(assoc_L _), Qp_mult_inv_l, Qp_mult_1_r. Qed.
+Lemma Qp_mult_div_r p q : q * (p / q) = p.
+Proof. by rewrite (comm_L Qp_mult q), Qp_mult_div_l. Qed.
+Lemma Qp_div_plus_distr p q r : (p + q) / r = p / r + q / r.
+Proof. apply Qp_mult_plus_distr_l. Qed.
+Lemma Qp_div_div p q r : (p / q) / r = p / (q * r).
+Proof. unfold Qp_div. by rewrite Qp_inv_mult_distr, (assoc_L _). Qed.
+Lemma Qp_div_mult_cancel_l p q r : (r * p) / (r * q) = p / q.
+Proof.
+  rewrite <-Qp_div_div. f_equiv. unfold Qp_div.
+  by rewrite (comm_L Qp_mult r), <-(assoc_L _), Qp_mult_inv_r, Qp_mult_1_r.
+Qed.
+Lemma Qp_div_mult_cancel_r p q r : (p * r) / (q * r) = p / q.
+Proof. by rewrite <-!(comm_L Qp_mult r), Qp_div_mult_cancel_l. Qed.
 Lemma Qp_div_1 p : p / 1 = p.
-Proof.
-  destruct p as [p ?]. apply Qp_to_Qc_inj_iff; simpl.
-  rewrite <-(Qcmult_div_r p 1) at 2 by done. by rewrite Qcmult_1_l.
-Qed.
-Lemma Qp_div_S p y : p / (2 * y) + p / (2 * y) = p / y.
-Proof.
-  destruct p as [p ?]. apply Qp_to_Qc_inj_iff; simpl. unfold Qcdiv.
-  rewrite <-Qcmult_plus_distr_l, Pos2Z.inj_mul, Z2Qc_inj_mul, Z2Qc_inj_2.
-  rewrite Qcplus_diag. by field_simplify.
-Qed.
+Proof. by rewrite <-(Qp_mult_1_r (p / 1)), Qp_mult_div_l. Qed.
 Lemma Qp_div_2 p : p / 2 + p / 2 = p.
 Proof.
-  change 2%positive with (2 * 1)%positive. by rewrite Qp_div_S, Qp_div_1.
+  rewrite <-Qp_div_plus_distr, Qp_plus_diag.
+  rewrite <-(Qp_mult_1_r 2) at 2. by rewrite Qp_div_mult_cancel_l, Qp_div_1.
 Qed.
+Lemma Qp_div_S p q : p / (2 * q) + p / (2 * q) = p / q.
+Proof. by rewrite <-Qp_div_plus_distr, Qp_plus_diag, Qp_div_mult_cancel_l. Qed.
 Lemma Qp_half_half : 1 / 2 + 1 / 2 = 1.
 Proof. apply (bool_decide_unpack _); by compute. Qed.
 Lemma Qp_quarter_three_quarter : 1 / 4 + 3 / 4 = 1.
 Proof. apply (bool_decide_unpack _); by compute. Qed.
 Lemma Qp_three_quarter_quarter : 3 / 4 + 1 / 4 = 1.
 Proof. apply (bool_decide_unpack _); by compute. Qed.
+Instance Qp_div_inj_r p : Inj (=) (=) (Qp_div p).
+Proof. unfold Qp_div; apply _. Qed.
+Instance Qp_div_inj_l p : Inj (=) (=) (λ q, q / p)%Qp.
+Proof. unfold Qp_div; apply _. Qed.
 
 Instance Qp_le_po : PartialOrder (≤)%Qp.
 Proof.
@@ -878,12 +938,12 @@ Qed.
 Lemma Qp_mult_le_mono_r p q r : p ≤ q ↔ p * r ≤ q * r.
 Proof. rewrite !(comm_L Qp_mult _ r). apply Qp_mult_le_mono_l. Qed.
 
-Lemma Qcmult_lt_mono_l p q r : p < q ↔ r * p < r * q.
+Lemma Qp_mult_lt_mono_l p q r : p < q ↔ r * p < r * q.
 Proof.
   rewrite !Qp_to_Qc_inj_lt. destruct p, q, r; by apply Qcmult_lt_mono_pos_l.
 Qed.
-Lemma Qcmult_lt_mono_r p q r : p < q ↔ p * r < q * r.
-Proof. rewrite !(comm_L Qp_mult _ r). apply Qcmult_lt_mono_l. Qed.
+Lemma Qp_mult_lt_mono_r p q r : p < q ↔ p * r < q * r.
+Proof. rewrite !(comm_L Qp_mult _ r). apply Qp_mult_lt_mono_l. Qed.
 
 Lemma Qp_lt_plus_r q p : p < q + p.
 Proof.
@@ -945,19 +1005,31 @@ Proof. by apply Qc_minus_None. Qed.
 Lemma Qp_plus_minus p q : (p + q) - p = Some q.
 Proof. by apply Qc_minus_Some. Qed.
 
-Lemma Qp_div_lt q y : (1 < y)%positive → q / y < q.
+Lemma Qp_inv_lt_mono p q : p < q ↔ /q < /p.
 Proof.
-  intros. destruct q as [q Hq]. apply Qp_to_Qc_inj_lt; unfold Qp_minus; simpl.
-  apply (Qcmult_lt_mono_pos_l _ _ (Z.pos y)); [done|].
-  rewrite Qcmult_div_r by done. rewrite <- (Qcmult_1_l q) at 1.
-  apply Qcmult_lt_mono_pos_r; [done|]. by rewrite <-Z2Qc_inj_1, <-Z2Qc_inj_lt.
+  revert p q. cut (∀ p q, p < q → / q < / p).
+  { intros help p q. split; [apply help|]. intros.
+    rewrite <-(Qp_inv_involutive p), <-(Qp_inv_involutive q). by apply help. }
+  intros p q Hpq. apply (Qp_mult_lt_mono_l _ _ q). rewrite Qp_mult_inv_r.
+  apply (Qp_mult_lt_mono_r _ _ p). rewrite <-(assoc_L _), Qp_mult_inv_l.
+  by rewrite Qp_mult_1_l, Qp_mult_1_r.
 Qed.
-Lemma Qp_div_le q y : q / y ≤ q.
-Proof.
-  destruct (Pos.lt_total y 1) as [[]%Pos.nlt_1_r|[->|?]].
-  - by rewrite Qp_div_1.
-  - by apply Qp_lt_le_weak, Qp_div_lt.
-Qed.
+Lemma Qp_inv_le_mono p q : p ≤ q ↔ /q ≤ /p.
+Proof. by rewrite !Qp_le_ngt, Qp_inv_lt_mono. Qed.
+
+Lemma Qp_div_le_mono_l p q r : q ≤ p ↔ r / p ≤ r / q.
+Proof. unfold Qp_div. by rewrite <-Qp_mult_le_mono_l, Qp_inv_le_mono. Qed.
+Lemma Qp_div_le_mono_r p q r : p ≤ q ↔ p / r ≤ q / r.
+Proof. apply Qp_mult_le_mono_r. Qed.
+Lemma Qp_div_lt_mono_l p q r : q < p ↔ r / p < r / q.
+Proof. unfold Qp_div. by rewrite <-Qp_mult_lt_mono_l, Qp_inv_lt_mono. Qed.
+Lemma Qp_div_lt_mono_r p q r : p < q ↔ p / r < q / r.
+Proof. apply Qp_mult_lt_mono_r. Qed.
+
+Lemma Qp_div_lt p q : 1 < q → p / q < p.
+Proof. by rewrite (Qp_div_lt_mono_l _ _ p), Qp_div_1. Qed.
+Lemma Qp_div_le p q : 1 ≤ q → p / q ≤ p.
+Proof. by rewrite (Qp_div_le_mono_l _ _ p), Qp_div_1. Qed.
 
 Lemma Qp_lower_bound q1 q2 : ∃ q q1' q2', q1 = q + q1' ∧ q2 = q + q2'.
 Proof.
@@ -1004,7 +1076,7 @@ Proof.
   destruct (Qp_lt_le_dec r p) as [[q ->]%Qp_lt_sum|?].
   { by exists r, q. }
   exists (p / 2)%Qp, (p / 2)%Qp; split.
-  + trans p; [|done]. apply Qp_div_le.
+  + trans p; [|done]. by apply Qp_div_le.
   + by rewrite Qp_div_2.
 Qed.
 
