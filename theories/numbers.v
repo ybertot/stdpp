@@ -764,6 +764,10 @@ Definition Qp_min (q p : Qp) : Qp := if decide (q ≤ p) then q else p.
 Infix "`max`" := Qp_max : Qp_scope.
 Infix "`min`" := Qp_min : Qp_scope.
 
+Program Definition pos_to_Qp (n : positive) : Qp := mk_Qp (Z.pos n) _.
+Next Obligation. intros n. by rewrite <-Z2Qc_inj_0, <-Z2Qc_inj_lt. Qed.
+Arguments pos_to_Qp : simpl never.
+
 Instance Qp_inhabited : Inhabited Qp := populate 1.
 
 Instance Qp_plus_assoc : Assoc (=) Qp_plus.
@@ -1162,6 +1166,21 @@ Proof.
 Qed.
 Lemma Qp_min_r_iff q p : q `min` p = p ↔ p ≤ q.
 Proof. rewrite (comm_L Qp_min q). apply Qp_min_l_iff. Qed.
+
+Lemma pos_to_Qp_1 : pos_to_Qp 1 = 1.
+Proof. apply (bool_decide_unpack _); by compute. Qed.
+Lemma pos_to_Qp_inj n m : pos_to_Qp n = pos_to_Qp m → n = m.
+Proof. by injection 1. Qed.
+Lemma pos_to_Qp_inj_iff n m : pos_to_Qp n = pos_to_Qp m ↔ n = m.
+Proof. split; [apply pos_to_Qp_inj|by intros ->]. Qed.
+Lemma pos_to_Qp_inj_le n m : (n ≤ m)%positive ↔ pos_to_Qp n ≤ pos_to_Qp m.
+Proof. rewrite Qp_to_Qc_inj_le; simpl. by rewrite <-Z2Qc_inj_le. Qed.
+Lemma pos_to_Qp_inj_lt n m : (n < m)%positive ↔ pos_to_Qp n < pos_to_Qp m.
+Proof. by rewrite Pos.lt_nle, Qp_lt_nge, <-pos_to_Qp_inj_le. Qed.
+Lemma pos_to_Qp_plus x y : pos_to_Qp x + pos_to_Qp y = pos_to_Qp (x + y).
+Proof. apply Qp_to_Qc_inj_iff; simpl. by rewrite Pos2Z.inj_add, Z2Qc_inj_add. Qed.
+Lemma pos_to_Qp_mult x y : pos_to_Qp x * pos_to_Qp y = pos_to_Qp (x * y).
+Proof. apply Qp_to_Qc_inj_iff; simpl. by rewrite Pos2Z.inj_mul, Z2Qc_inj_mul. Qed.
 
 Local Close Scope Qp_scope.
 
