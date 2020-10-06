@@ -1,5 +1,4 @@
 opam-version: "2.0"
-name: "coq-stdpp"
 maintainer: "Ralf Jung <jung@mpi-sws.org>"
 authors: "The std++ team"
 license: "BSD-3-Clause"

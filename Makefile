@@ -30,8 +30,7 @@ BUILDDEPFILES=$(addsuffix -builddep.opam, $(addprefix builddep/,$(basename $(OPA
 builddep/%-builddep.opam: %.opam Makefile
 	@echo "# Creating builddep package for $<."
 	@mkdir -p builddep
-	@sed <$< -E 's/^(build|install|remove):.*/\1: []/; s/^name: *"(.*)" */name: "\1-builddep"/; s/"(.*)"(.*= *version.*)$$/"\1-builddep"\2/;' >$@
-	@fgrep builddep $@ >/dev/null || (echo "sed failed to fix the package name" && exit 1) # sanity check
+	@sed <$< -E 's/^(build|install|remove):.*/\1: []/; s/"(.*)"(.*= *version.*)$$/"\1-builddep"\2/;' >$@
 
 builddep-opamfiles: $(BUILDDEPFILES)
 .PHONY: builddep-opamfiles
