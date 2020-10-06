@@ -1,12 +1,14 @@
 From stdpp Require Export tactics.
 From stdpp Require Import options.
 
+Declare Scope stream_scope.
+Delimit Scope stream_scope with stream.
+Open Scope stream_scope.
+
 CoInductive stream (A : Type) : Type := scons : A → stream A → stream A.
 Arguments scons {_} _ _ : assert.
-Delimit Scope stream_scope with stream.
-Bind Scope stream_scope with stream.
-Open Scope stream_scope.
 Infix ":.:" := scons (at level 60, right associativity) : stream_scope.
+Bind Scope stream_scope with stream.
 
 Definition shead {A} (s : stream A) : A := match s with x :.: _ => x end.
 Definition stail {A} (s : stream A) : stream A := match s with _ :.: s => s end.

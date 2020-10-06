@@ -12,9 +12,11 @@ From stdpp Require Import options.
 (* Pick up extra assumptions from section parameters. *)
 Set Default Proof Using "Type*".
 
+Declare Scope binder_scope.
+Delimit Scope binder_scope with binder.
+
 Inductive binder := BAnon | BNamed :> string → binder.
 Bind Scope binder_scope with binder.
-Delimit Scope binder_scope with binder.
 Notation "<>" := BAnon : binder_scope.
 
 Instance binder_dec_eq : EqDecision binder.

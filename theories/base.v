@@ -183,6 +183,7 @@ Definition tc_to_bool (P : Prop)
 
 (** Throughout this development we use [stdpp_scope] for all general purpose
 notations that do not belong to a more specific scope. *)
+Declare Scope stdpp_scope.
 Delimit Scope stdpp_scope with stdpp.
 Global Open Scope stdpp_scope.
 
