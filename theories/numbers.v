@@ -798,9 +798,9 @@ Proof.
   intros q1 q2 Hpq. apply (inj (Qp_mul p)). by rewrite !(comm_L Qp_mul p).
 Qed.
 
-Lemma Qp_mul_add_distr_r p q r : p * (q + r) = p * q + p * r.
+Lemma Qp_mul_add_distr_l p q r : p * (q + r) = p * q + p * r.
 Proof. destruct p, q, r; by apply Qp_to_Qc_inj_iff, Qcmult_plus_distr_r. Qed.
-Lemma Qp_mul_add_distr_l p q r : (p + q) * r = p * r + q * r.
+Lemma Qp_mul_add_distr_r p q r : (p + q) * r = p * r + q * r.
 Proof. destruct p, q, r; by apply Qp_to_Qc_inj_iff, Qcmult_plus_distr_l. Qed.
 Lemma Qp_mul_1_l p : 1 * p = p.
 Proof. destruct p; apply Qp_to_Qc_inj_iff, Qcmult_1_l. Qed.
@@ -809,8 +809,8 @@ Proof. destruct p; apply Qp_to_Qc_inj_iff, Qcmult_1_r. Qed.
 
 Lemma Qp_one_one : 1 + 1 = 2.
 Proof. apply (bool_decide_unpack _); by compute. Qed.
-Lemma Qp_add_diag p : p + p = (2 * p).
-Proof. by rewrite <-Qp_one_one, Qp_mul_add_distr_l, !Qp_mul_1_l. Qed.
+Lemma Qp_add_diag p : p + p = 2 * p.
+Proof. by rewrite <-Qp_one_one, Qp_mul_add_distr_r, !Qp_mul_1_l. Qed.
 
 Lemma Qp_mul_inv_l p : /p * p = 1.
 Proof.
@@ -847,7 +847,7 @@ Proof. unfold Qp_div. by rewrite <-(assoc_L _), Qp_mul_inv_l, Qp_mul_1_r. Qed.
 Lemma Qp_mul_div_r p q : q * (p / q) = p.
 Proof. by rewrite (comm_L Qp_mul q), Qp_mul_div_l. Qed.
 Lemma Qp_div_add_distr p q r : (p + q) / r = p / r + q / r.
-Proof. apply Qp_mul_add_distr_l. Qed.
+Proof. apply Qp_mul_add_distr_r. Qed.
 Lemma Qp_div_div p q r : (p / q) / r = p / (q * r).
 Proof. unfold Qp_div. by rewrite Qp_inv_mul_distr, (assoc_L _). Qed.
 Lemma Qp_div_mul_cancel_l p q r : (r * p) / (r * q) = p / q.
@@ -893,14 +893,15 @@ Qed.
 Instance Qp_le_total: Total (≤)%Qp.
 Proof. intros p q. rewrite !Qp_to_Qc_inj_le. apply (total Qcle). Qed.
 
-Lemma Qp_lt_le_weak p q : p < q → p ≤ q.
+Lemma Qp_lt_le_incl p q : p < q → p ≤ q.
 Proof. rewrite Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le. apply Qclt_le_weak. Qed.
-Lemma Qp_le_lt_or_eq p q : p ≤ q → p < q ∨ p = q.
+Lemma Qp_le_lteq p q : p ≤ q ↔ p < q ∨ p = q.
 Proof.
-  rewrite Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le.
-  intros [? | ->%Qp_to_Qc_inj_iff]%Qcle_lt_or_eq; auto.
+  rewrite Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le, <-Qp_to_Qc_inj_iff. split.
+  - intros [?| ->]%Qcle_lt_or_eq; auto.
+  - intros [?| ->]; auto using Qclt_le_weak.
 Qed.
-Lemma Qp_lt_le_dec p q : {p < q} + {q ≤ p}.
+Lemma Qp_lt_ge_cases p q : {p < q} + {q ≤ p}.
 Proof.
   refine (cast_if (Qclt_le_dec (Qp_to_Qc p) (Qp_to_Qc q)%Qc));
     [by apply Qp_to_Qc_inj_lt|by apply Qp_to_Qc_inj_le].
@@ -910,30 +911,30 @@ Proof. rewrite !Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le. apply Qcle_lt_trans. Qed.
 Lemma Qp_lt_le_trans p q r : p < q → q ≤ r → p < r.
 Proof. rewrite !Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le. apply Qclt_le_trans. Qed.
 
-Lemma Qp_le_not_lt p q : p ≤ q → ¬q < p.
-Proof. rewrite !Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le. apply Qcle_not_lt. Qed.
-Lemma Qp_not_lt_le p q : ¬p < q → q ≤ p.
-Proof. rewrite !Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le. apply Qcnot_lt_le. Qed.
-Lemma Qp_lt_not_le p q : p < q → ¬q ≤ p.
-Proof. rewrite !Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le. apply Qclt_not_le. Qed.
-Lemma Qp_not_le_lt p q : ¬p ≤ q →q < p.
-Proof. rewrite !Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le. apply Qcnot_le_lt. Qed.
 Lemma Qp_le_ngt p q : p ≤ q ↔ ¬q < p.
-Proof. split; auto using Qp_le_not_lt, Qp_not_lt_le. Qed.
+Proof.
+  rewrite !Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le.
+  split; auto using Qcle_not_lt, Qcnot_lt_le.
+Qed.
 Lemma Qp_lt_nge p q : p < q ↔ ¬q ≤ p.
-Proof. split; auto using Qp_lt_not_le, Qp_not_le_lt. Qed.
+Proof.
+  rewrite !Qp_to_Qc_inj_lt, Qp_to_Qc_inj_le.
+  split; auto using Qclt_not_le, Qcnot_le_lt.
+Qed.
 
 Lemma Qp_add_le_mono_l p q r : p ≤ q ↔ r + p ≤ r + q.
 Proof. rewrite !Qp_to_Qc_inj_le. destruct p, q, r; apply Qcplus_le_mono_l. Qed.
 Lemma Qp_add_le_mono_r p q r : p ≤ q ↔ p + r ≤ q + r.
 Proof. rewrite !(comm_L Qp_add _ r). apply Qp_add_le_mono_l. Qed.
-Lemma Qp_le_add_compat q p n m : q ≤ n → p ≤ m → q + p ≤ n + m.
+Lemma Qp_add_le_mono q p n m : q ≤ n → p ≤ m → q + p ≤ n + m.
 Proof. intros. etrans; [by apply Qp_add_le_mono_l|by apply Qp_add_le_mono_r]. Qed.
 
 Lemma Qp_add_lt_mono_l p q r : p < q ↔ r + p < r + q.
 Proof. by rewrite !Qp_lt_nge, <-Qp_add_le_mono_l. Qed.
 Lemma Qp_add_lt_mono_r p q r : p < q ↔ p + r < q + r.
 Proof. by rewrite !Qp_lt_nge, <-Qp_add_le_mono_r. Qed.
+Lemma Qp_add_lt_mono q p n m : q < n → p < m → q + p < n + m.
+Proof. intros. etrans; [by apply Qp_add_lt_mono_l|by apply Qp_add_lt_mono_r]. Qed.
 
 Lemma Qp_mul_le_mono_l p q r : p ≤ q ↔ r * p ≤ r * q.
 Proof.
@@ -941,6 +942,8 @@ Proof.
 Qed.
 Lemma Qp_mul_le_mono_r p q r : p ≤ q ↔ p * r ≤ q * r.
 Proof. rewrite !(comm_L Qp_mul _ r). apply Qp_mul_le_mono_l. Qed.
+Lemma Qp_mul_le_mono q p n m : q ≤ n → p ≤ m → q * p ≤ n * m.
+Proof. intros. etrans; [by apply Qp_mul_le_mono_l|by apply Qp_mul_le_mono_r]. Qed.
 
 Lemma Qp_mul_lt_mono_l p q r : p < q ↔ r * p < r * q.
 Proof.
@@ -948,32 +951,34 @@ Proof.
 Qed.
 Lemma Qp_mul_lt_mono_r p q r : p < q ↔ p * r < q * r.
 Proof. rewrite !(comm_L Qp_mul _ r). apply Qp_mul_lt_mono_l. Qed.
+Lemma Qp_mul_lt_mono q p n m : q < n → p < m → q * p < n * m.
+Proof. intros. etrans; [by apply Qp_mul_lt_mono_l|by apply Qp_mul_lt_mono_r]. Qed.
 
-Lemma Qp_lt_add_r q p : p < q + p.
+Lemma Qp_lt_add_l q p : p < q + p.
 Proof.
   destruct p as [p ?], q as [q ?]. apply Qp_to_Qc_inj_lt; simpl.
   rewrite <- (Qcplus_0_l p) at 1. by rewrite <-Qcplus_lt_mono_r.
 Qed.
-Lemma Qp_lt_add_l q p : q < q + p.
-Proof. rewrite (comm_L Qp_add). apply Qp_lt_add_r. Qed.
+Lemma Qp_lt_add_r q p : q < q + p.
+Proof. rewrite (comm_L Qp_add). apply Qp_lt_add_l. Qed.
 
 Lemma Qp_not_add_ge q p : ¬(q + p ≤ q).
-Proof. apply Qp_lt_not_le, Qp_lt_add_l. Qed.
+Proof. apply Qp_lt_nge, Qp_lt_add_r. Qed.
 Lemma Qp_add_id_free q p : q + p ≠ q.
 Proof. intro Heq. apply (Qp_not_add_ge q p). by rewrite Heq. Qed.
 
-Lemma Qp_le_add_r q p : p ≤ q + p.
-Proof. apply Qp_lt_le_weak, Qp_lt_add_r. Qed.
-Lemma Qp_le_add_l q p : q ≤ q + p.
-Proof. apply Qp_lt_le_weak, Qp_lt_add_l. Qed.
+Lemma Qp_le_add_l q p : p ≤ q + p.
+Proof. apply Qp_lt_le_incl, Qp_lt_add_l. Qed.
+Lemma Qp_le_add_r q p : q ≤ q + p.
+Proof. apply Qp_lt_le_incl, Qp_lt_add_r. Qed.
 
 Lemma Qp_add_weak_r q p o : q + p ≤ o → q ≤ o.
-Proof. intros. etrans; [apply Qp_le_add_l|done]. Qed.
+Proof. intros. etrans; [apply Qp_le_add_r|done]. Qed.
 Lemma Qp_add_weak_l q p o : q + p ≤ o → p ≤ o.
 Proof. rewrite (comm_L Qp_add). apply Qp_add_weak_r. Qed.
 
 Lemma Qp_add_weak_2_r q p o : q ≤ o → q ≤ p + o.
-Proof. intros. etrans; [done|apply Qp_le_add_r]. Qed.
+Proof. intros. etrans; [done|apply Qp_le_add_l]. Qed.
 Lemma Qp_add_weak_2_l q p o : q ≤ p → q ≤ p + o.
 Proof. rewrite (comm_L Qp_add). apply Qp_add_weak_2_r. Qed.
 
@@ -1006,8 +1011,8 @@ Proof.
 Qed.
 Lemma Qp_sub_diag p : p - p = None.
 Proof. by apply Qp_sub_None. Qed.
-Lemma Qp_add_minus p q : (p + q) - p = Some q.
-Proof. by apply Qp_sub_Some. Qed.
+Lemma Qp_add_sub p q : (p + q) - q = Some p.
+Proof. apply Qp_sub_Some. by rewrite (comm_L Qp_add). Qed.
 
 Lemma Qp_inv_lt_mono p q : p < q ↔ /q < /p.
 Proof.
@@ -1040,8 +1045,8 @@ Proof.
   revert q1 q2. cut (∀ q1 q2 : Qp, q1 ≤ q2 →
     ∃ q q1' q2', q1 = q + q1' ∧ q2 = q + q2').
   { intros help q1 q2.
-    destruct (Qp_le_dec q1 q2) as [LE|LE%Qp_lt_nge%Qp_lt_le_weak]; [by eauto|].
-    destruct (help q2 q1) as (q&q1'&q2'&?&?); eauto. }
+    destruct (Qp_lt_ge_cases q2 q1) as [Hlt|Hle]; eauto.
+    destruct (help q2 q1) as (q&q1'&q2'&?&?); eauto using Qp_lt_le_incl. }
   intros q1 q2 Hq. exists (q1 / 2)%Qp, (q1 / 2)%Qp.
   assert (q1 / 2 < q2) as [q2' ->]%Qp_lt_sum.
   { eapply Qp_lt_le_trans, Hq. by apply Qp_div_lt. }
@@ -1062,7 +1067,7 @@ Proof.
     a < c → a + b = c + d →
     ∃ ac ad bc bd, ac + ad = a ∧ bc + bd = b ∧ ac + bc = c ∧ ad + bd = d)%Qp.
   { intros help a b c d Habcd.
-    destruct (Qp_lt_le_dec a c) as [?|[?| ->]%Qp_le_lt_or_eq].
+    destruct (Qp_lt_ge_cases a c) as [?|[?| ->]%Qp_le_lteq].
     - auto.
     - destruct (help c d a b); [done..|]. naive_solver.
     - apply (inj (Qp_add a)) in Habcd as ->.
@@ -1077,7 +1082,7 @@ Qed.
 
 Lemma Qp_bounded_split p r : ∃ q1 q2 : Qp, q1 ≤ r ∧ p = q1 + q2.
 Proof.
-  destruct (Qp_lt_le_dec r p) as [[q ->]%Qp_lt_sum|?].
+  destruct (Qp_lt_ge_cases r p) as [[q ->]%Qp_lt_sum|?].
   { by exists r, q. }
   exists (p / 2)%Qp, (p / 2)%Qp; split.
   + trans p; [|done]. by apply Qp_div_le.
@@ -1087,19 +1092,19 @@ Qed.
 Lemma Qp_max_spec q p : (q < p ∧ q `max` p = p) ∨ (p ≤ q ∧ q `max` p = q).
 Proof.
   unfold Qp_max.
-  destruct (decide (q ≤ p)) as [[?| ->]%Qp_le_lt_or_eq|?]; [by auto..|].
-  right. split; [|done]. by apply Qp_lt_le_weak, Qp_not_le_lt.
+  destruct (decide (q ≤ p)) as [[?| ->]%Qp_le_lteq|?]; [by auto..|].
+  right. split; [|done]. by apply Qp_lt_le_incl, Qp_lt_nge.
 Qed.
 
 Lemma Qp_max_spec_le q p : (q ≤ p ∧ q `max` p = p) ∨ (p ≤ q ∧ q `max` p = q).
-Proof. destruct (Qp_max_spec q p) as [[?%Qp_lt_le_weak?]|]; [left|right]; done. Qed.
+Proof. destruct (Qp_max_spec q p) as [[?%Qp_lt_le_incl?]|]; [left|right]; done. Qed.
 
 Instance Qp_max_assoc : Assoc (=) Qp_max.
 Proof.
   intros q p o. unfold Qp_max. destruct (decide (q ≤ p)), (decide (p ≤ o));
     try by rewrite ?decide_True by (by etrans).
   rewrite decide_False by done.
-  by rewrite decide_False by (apply Qp_lt_not_le; etrans; by apply Qp_lt_nge).
+  by rewrite decide_False by (apply Qp_lt_nge; etrans; by apply Qp_lt_nge).
 Qed.
 Instance Qp_max_comm : Comm (=) Qp_max.
 Proof.
@@ -1116,10 +1121,10 @@ Proof. unfold Qp_max. by destruct (decide (q ≤ p)). Qed.
 Lemma Qp_le_max_r q p : p ≤ q `max` p.
 Proof. rewrite (comm_L Qp_max q). apply Qp_le_max_l. Qed.
 
-Lemma Qp_max_plus q p : q `max` p ≤ q + p.
+Lemma Qp_max_add q p : q `max` p ≤ q + p.
 Proof.
   unfold Qp_max.
-  destruct (decide (q ≤ p)); [apply Qp_le_add_r|apply Qp_le_add_l].
+  destruct (decide (q ≤ p)); [apply Qp_le_add_l|apply Qp_le_add_r].
 Qed.
 
 Lemma Qp_max_lub_l q p o : q `max` p ≤ o → q ≤ o.
@@ -1130,19 +1135,19 @@ Proof. rewrite (comm _ q). apply Qp_max_lub_l. Qed.
 Lemma Qp_min_spec q p : (q < p ∧ q `min` p = q) ∨ (p ≤ q ∧ q `min` p = p).
 Proof.
   unfold Qp_min.
-  destruct (decide (q ≤ p)) as [[?| ->]%Qp_le_lt_or_eq|?]; [by auto..|].
-  right. split; [|done]. by apply Qp_lt_le_weak, Qp_not_le_lt.
+  destruct (decide (q ≤ p)) as [[?| ->]%Qp_le_lteq|?]; [by auto..|].
+  right. split; [|done]. by apply Qp_lt_le_incl, Qp_lt_nge.
 Qed.
 
 Lemma Qp_min_spec_le q p : (q ≤ p ∧ q `min` p = q) ∨ (p ≤ q ∧ q `min` p = p).
-Proof. destruct (Qp_min_spec q p) as [[?%Qp_lt_le_weak?]|]; [left|right]; done. Qed.
+Proof. destruct (Qp_min_spec q p) as [[?%Qp_lt_le_incl ?]|]; [left|right]; done. Qed.
 
 Instance Qp_min_assoc : Assoc (=) Qp_min.
 Proof.
   intros q p o. unfold Qp_min.
   destruct (decide (q ≤ p)), (decide (p ≤ o)); eauto using decide_False.
   - by rewrite !decide_True by (by etrans).
-  - by rewrite decide_False by (apply Qp_lt_not_le; etrans; by apply Qp_lt_nge).
+  - by rewrite decide_False by (apply Qp_lt_nge; etrans; by apply Qp_lt_nge).
 Qed.
 Instance Qp_min_comm : Comm (=) Qp_min.
 Proof.
