@@ -17,5 +17,5 @@ Makefile.coq
 Makefile.coq.conf
 *.crashcoqide
 html/
-build-dep/
+builddep/
 _opam
