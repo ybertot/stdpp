@@ -839,6 +839,8 @@ Lemma Qp_inv_1 : /1 = 1.
 Proof. apply (bool_decide_unpack _); by compute. Qed.
 Lemma Qp_inv_half_half : /2 + /2 = 1.
 Proof. apply (bool_decide_unpack _); by compute. Qed.
+Lemma Qp_inv_quarter_quarter : /4 + /4 = /2.
+Proof. apply (bool_decide_unpack _); by compute. Qed.
 
 Lemma Qp_div_diag p : p / p = 1.
 Proof. apply Qp_mul_inv_r. Qed.
@@ -867,6 +869,8 @@ Qed.
 Lemma Qp_div_S p q : p / (2 * q) + p / (2 * q) = p / q.
 Proof. by rewrite <-Qp_div_add_distr, Qp_add_diag, Qp_div_mul_cancel_l. Qed.
 Lemma Qp_half_half : 1 / 2 + 1 / 2 = 1.
+Proof. apply (bool_decide_unpack _); by compute. Qed.
+Lemma Qp_quarter_quarter : 1 / 4 + 1 / 4 = 1 / 2.
 Proof. apply (bool_decide_unpack _); by compute. Qed.
 Lemma Qp_quarter_three_quarter : 1 / 4 + 3 / 4 = 1.
 Proof. apply (bool_decide_unpack _); by compute. Qed.
