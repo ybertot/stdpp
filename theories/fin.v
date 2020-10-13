@@ -15,6 +15,7 @@ ambiguity. *)
 Notation fin := Fin.t.
 Notation FS := Fin.FS.
 
+Declare Scope fin_scope.
 Delimit Scope fin_scope with fin.
 Arguments Fin.FS _ _%fin : assert.
 

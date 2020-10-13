@@ -658,13 +658,15 @@ Qed.
 Local Close Scope Qc_scope.
 
 (** * Positive rationals *)
+Declare Scope Qp_scope.
+Delimit Scope Qp_scope with Qp.
+
 (** The theory of positive rationals is very incomplete. We merely provide
 some operations and theorems that are relevant for fractional permissions. *)
 Record Qp := mk_Qp { Qp_car :> Qc ; Qp_prf : (0 < Qp_car)%Qc }.
 Hint Resolve Qp_prf : core.
-Delimit Scope Qp_scope with Qp.
-Bind Scope Qp_scope with Qp.
 Arguments Qp_car _%Qp : assert.
+Bind Scope Qp_scope with Qp.
 
 Local Open Scope Qc_scope.
 Local Open Scope Qp_scope.
