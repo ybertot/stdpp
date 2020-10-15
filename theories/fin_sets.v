@@ -283,10 +283,10 @@ Section filter.
     unfold filter, set_filter.
     by rewrite elem_of_list_to_set, elem_of_list_filter, elem_of_elements.
   Qed.
-  Global Instance set_unfold_filter X Q :
+  Global Instance set_unfold_filter X Q x :
     SetUnfoldElemOf x X Q → SetUnfoldElemOf x (filter P X) (P x ∧ Q).
   Proof.
-    intros x ?; constructor. by rewrite elem_of_filter, (set_unfold_elem_of x X Q).
+    intros ?; constructor. by rewrite elem_of_filter, (set_unfold_elem_of x X Q).
   Qed.
 
   Lemma filter_empty : filter P (∅:C) ≡ ∅.
@@ -321,9 +321,9 @@ Section map.
     unfold set_map. rewrite elem_of_list_to_set, elem_of_list_fmap.
     by setoid_rewrite elem_of_elements.
   Qed.
-  Global Instance set_unfold_map (f : A → B) (X : C) (P : A → Prop) :
-    (∀ y, SetUnfoldElemOf y X (P y)) →
-    SetUnfoldElemOf x (set_map (D:=D) f X) (∃ y, x = f y ∧ P y).
+  Global Instance set_unfold_map (f : A → B) (X : C) (P : A → Prop) y :
+    (∀ x, SetUnfoldElemOf x X (P x)) →
+    SetUnfoldElemOf y (set_map (D:=D) f X) (∃ x, y = f x ∧ P x).
   Proof. constructor. rewrite elem_of_map; naive_solver. Qed.
 
   Global Instance set_map_proper :

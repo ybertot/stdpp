@@ -482,43 +482,43 @@ Lemma exist_proper {A} (P Q : A → Prop) :
   (∀ x, P x ↔ Q x) → (∃ x, P x) ↔ (∃ x, Q x).
 Proof. firstorder. Qed.
 
-Instance: Comm (↔) (=@{A}).
+Instance eq_comm {A} : Comm (↔) (=@{A}).
 Proof. red; intuition. Qed.
-Instance: Comm (↔) (λ x y, y =@{A} x).
+Instance flip_eq_comm {A} : Comm (↔) (λ x y, y =@{A} x).
 Proof. red; intuition. Qed.
-Instance: Comm (↔) (↔).
+Instance iff_comm : Comm (↔) (↔).
 Proof. red; intuition. Qed.
-Instance: Comm (↔) (∧).
+Instance and_comm : Comm (↔) (∧).
 Proof. red; intuition. Qed.
-Instance: Assoc (↔) (∧).
+Instance and_assoc : Assoc (↔) (∧).
 Proof. red; intuition. Qed.
-Instance: IdemP (↔) (∧).
+Instance and_idemp : IdemP (↔) (∧).
 Proof. red; intuition. Qed.
-Instance: Comm (↔) (∨).
+Instance or_comm : Comm (↔) (∨).
 Proof. red; intuition. Qed.
-Instance: Assoc (↔) (∨).
+Instance or_assoc : Assoc (↔) (∨).
 Proof. red; intuition. Qed.
-Instance: IdemP (↔) (∨).
+Instance or_idemp : IdemP (↔) (∨).
 Proof. red; intuition. Qed.
-Instance: LeftId (↔) True (∧).
+Instance True_and : LeftId (↔) True (∧).
 Proof. red; intuition. Qed.
-Instance: RightId (↔) True (∧).
+Instance and_True : RightId (↔) True (∧).
 Proof. red; intuition. Qed.
-Instance: LeftAbsorb (↔) False (∧).
+Instance False_and : LeftAbsorb (↔) False (∧).
 Proof. red; intuition. Qed.
-Instance: RightAbsorb (↔) False (∧).
+Instance and_False : RightAbsorb (↔) False (∧).
 Proof. red; intuition. Qed.
-Instance: LeftId (↔) False (∨).
+Instance False_or : LeftId (↔) False (∨).
 Proof. red; intuition. Qed.
-Instance: RightId (↔) False (∨).
+Instance or_False : RightId (↔) False (∨).
 Proof. red; intuition. Qed.
-Instance: LeftAbsorb (↔) True (∨).
+Instance True_or : LeftAbsorb (↔) True (∨).
 Proof. red; intuition. Qed.
-Instance: RightAbsorb (↔) True (∨).
+Instance or_True : RightAbsorb (↔) True (∨).
 Proof. red; intuition. Qed.
-Instance: LeftId (↔) True impl.
+Instance True_impl : LeftId (↔) True impl.
 Proof. unfold impl. red; intuition. Qed.
-Instance: RightAbsorb (↔) True impl.
+Instance impl_True : RightAbsorb (↔) True impl.
 Proof. unfold impl. red; intuition. Qed.
 
 
@@ -670,7 +670,7 @@ Instance prod_inhabited {A B} (iA : Inhabited A)
     (iB : Inhabited B) : Inhabited (A * B) :=
   match iA, iB with populate x, populate y => populate (x,y) end.
 
-Instance pair_inj : Inj2 (=) (=) (=) (@pair A B).
+Instance pair_inj {A B} : Inj2 (=) (=) (=) (@pair A B).
 Proof. injection 1; auto. Qed.
 Instance prod_map_inj {A A' B B'} (f : A → A') (g : B → B') :
   Inj (=) (=) f → Inj (=) (=) g → Inj (=) (=) (prod_map f g).
@@ -727,9 +727,9 @@ Instance sum_inhabited_l {A B} (iA : Inhabited A) : Inhabited (A + B) :=
 Instance sum_inhabited_r {A B} (iB : Inhabited A) : Inhabited (A + B) :=
   match iB with populate y => populate (inl y) end.
 
-Instance inl_inj : Inj (=) (=) (@inl A B).
+Instance inl_inj {A B} : Inj (=) (=) (@inl A B).
 Proof. injection 1; auto. Qed.
-Instance inr_inj : Inj (=) (=) (@inr A B).
+Instance inr_inj {A B} : Inj (=) (=) (@inr A B).
 Proof. injection 1; auto. Qed.
 
 Instance sum_map_inj {A A' B B'} (f : A → A') (g : B → B') :

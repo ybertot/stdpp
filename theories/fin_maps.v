@@ -252,7 +252,7 @@ Proof.
   destruct (m1 !! i), (m2 !! i), (m3 !! i); simplify_eq/=;
     done || etrans; eauto.
 Qed.
-Global Instance map_subseteq_po : PartialOrder (⊆@{M A}).
+Global Instance map_subseteq_po {A} : PartialOrder (⊆@{M A}).
 Proof.
   split; [apply _|].
   intros m1 m2; rewrite !map_subseteq_spec.
@@ -1600,8 +1600,8 @@ Proof.
   split; [|naive_solver].
   intros [i[(x&y&?&?&?)|[(x&?&?&[])|(y&?&?&[])]]]; naive_solver.
 Qed.
-Global Instance map_disjoint_sym : Symmetric (map_disjoint : relation (M A)).
-Proof. intros A m1 m2. rewrite !map_disjoint_spec. naive_solver. Qed.
+Global Instance map_disjoint_sym {A} : Symmetric (map_disjoint : relation (M A)).
+Proof. intros m1 m2. rewrite !map_disjoint_spec. naive_solver. Qed.
 Lemma map_disjoint_empty_l {A} (m : M A) : ∅ ##ₘ m.
 Proof. rewrite !map_disjoint_spec. intros i x y. by rewrite lookup_empty. Qed.
 Lemma map_disjoint_empty_r {A} (m : M A) : m ##ₘ ∅.
@@ -1739,16 +1739,16 @@ Qed.
 End union_with.
 
 (** ** Properties of the [union] operation *)
-Global Instance: LeftId (=@{M A}) ∅ (∪) := _.
-Global Instance: RightId (=@{M A}) ∅ (∪) := _.
-Global Instance: Assoc (=@{M A}) (∪).
+Global Instance map_empty_union {A} : LeftId (=@{M A}) ∅ (∪) := _.
+Global Instance map_union_empty {A} : RightId (=@{M A}) ∅ (∪) := _.
+Global Instance map_union_assoc {A} : Assoc (=@{M A}) (∪).
 Proof.
-  intros A m1 m2 m3. unfold union, map_union, union_with, map_union_with.
+  intros m1 m2 m3. unfold union, map_union, union_with, map_union_with.
   apply (merge_assoc _). intros i.
   by destruct (m1 !! i), (m2 !! i), (m3 !! i).
 Qed.
-Global Instance: IdemP (=@{M A}) (∪).
-Proof. intros A ?. by apply union_with_idemp. Qed.
+Global Instance map_union_idemp {A} : IdemP (=@{M A}) (∪).
+Proof. intros ?. by apply union_with_idemp. Qed.
 Lemma lookup_union {A} (m1 m2 : M A) i :
   (m1 ∪ m2) !! i = union_with (λ x _, Some x) (m1 !! i) (m2 !! i).
 Proof. apply lookup_union_with. Qed.
@@ -2089,17 +2089,17 @@ Proof. by intros; apply (partial_alter_merge _). Qed.
 End intersection_with.
 
 (** ** Properties of the [intersection] operation *)
-Global Instance: LeftAbsorb (=@{M A}) ∅ (∩) := _.
-Global Instance: RightAbsorb (=@{M A}) ∅ (∩) := _.
-Global Instance: Assoc (=@{M A}) (∩).
+Global Instance map_empty_interaction {A} : LeftAbsorb (=@{M A}) ∅ (∩) := _.
+Global Instance map_interaction_empty {A} : RightAbsorb (=@{M A}) ∅ (∩) := _.
+Global Instance map_interaction_assoc {A} : Assoc (=@{M A}) (∩).
 Proof.
-  intros A m1 m2 m3.
+  intros m1 m2 m3.
   unfold intersection, map_intersection, intersection_with, map_intersection_with.
   apply (merge_assoc _). intros i.
   by destruct (m1 !! i), (m2 !! i), (m3 !! i).
 Qed.
-Global Instance: IdemP (=@{M A}) (∩).
-Proof. intros A ?. by apply intersection_with_idemp. Qed.
+Global Instance map_intersection_idemp {A} : IdemP (=@{M A}) (∩).
+Proof. intros ?. by apply intersection_with_idemp. Qed.
 
 Lemma lookup_intersection_Some {A} (m1 m2 : M A) i x :
   (m1 ∩ m2) !! i = Some x ↔ m1 !! i = Some x ∧ is_Some (m2 !! i).
