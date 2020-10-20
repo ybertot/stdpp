@@ -1935,6 +1935,14 @@ Proof.
   rewrite lookup_union_Some, !map_filter_lookup_Some by apply map_disjoint_filter.
   destruct (decide (P (i,x))); naive_solver.
 Qed.
+Lemma map_fmap_union {A B} (f : A → B) (m1 m2 : M A) :
+  f <$> (m1 ∪ m2) = (f <$> m1) ∪ (f <$> m2).
+Proof.
+  apply map_eq; intros i. apply option_eq; intros x.
+  rewrite lookup_fmap, !lookup_union, !lookup_fmap.
+  destruct (m1 !! i), (m2 !! i); auto.
+Qed.
+
 
 (** ** Properties of the [union_list] operation *)
 Lemma map_disjoint_union_list_l {A} (ms : list (M A)) (m : M A) :
