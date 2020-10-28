@@ -10,6 +10,11 @@ Coq 8.8 and 8.9 are no longer supported.
 - Add `max` and `min` operations for `Qp`.
 - Add additional lemmas for `Qp`.
 - Remove the lemma `Qp_not_plus_q_ge_1` in favor of `Qp_not_plus_ge`.
+- Remove unused notations `∪**`, `∪*∪**`, `∖**`, `∖*∖**`, `⊆**`, `⊆1*`, `⊆2*`,
+  `⊆1**`, `⊆2**"`, `##**`, `##1*`, `##2*`, `##1**`, `##2**` for nested
+  `zip_with` and `Forall2` versions of `∪`, `∖`, and `##`.
+- Remove unused type classes `DisjointE`, `DisjointList`, `LookupE`, and
+  `InsertE`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
