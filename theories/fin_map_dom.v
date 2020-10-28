@@ -90,6 +90,7 @@ Proof.
   destruct (decide (i = j)); set_solver.
 Qed.
 Lemma dom_insert_lookup {A} (m : M A) i x :
+  is_Some (m !! i) → dom D (<[i:=x]>m) ≡ dom D m.
 Proof. intros Hindom%elem_of_dom. rewrite dom_insert. set_solver. Qed.
 Lemma dom_insert_subseteq {A} (m : M A) i x : dom D m ⊆ dom D (<[i:=x]>m).
 Proof. rewrite (dom_insert _). set_solver. Qed.
