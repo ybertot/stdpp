@@ -2,7 +2,7 @@
 importantly, it implements some tactics to automatically solve goals involving
 sets. *)
 From stdpp Require Export orders list list_numbers.
-From stdpp Require Import options.
+From stdpp Require Import options finite.
 
 (* FIXME: This file needs a 'Proof Using' hint, but they need to be set
 locally (or things moved out of sections) as no default works well enough. *)
@@ -872,6 +872,18 @@ Section option_and_list_to_set.
   Global Instance list_to_set_perm_L : Proper ((≡ₚ) ==> (=)) (list_to_set (C:=C)).
   Proof. induction 1; set_solver. Qed.
 End option_and_list_to_set.
+
+(** * Finite types to sets. *)
+Definition fin_to_set (A : Type) `{SemiSet A C, Finite A} : C :=
+  list_to_set (enum A).
+
+Section fin_to_set.
+  Context `{SemiSet A C, Finite A}.
+  Implicit Types a : A.
+
+  Lemma elem_of_fin_to_set a : a ∈ fin_to_set A.
+  Proof. apply elem_of_list_to_set, elem_of_enum. Qed.
+End fin_to_set.
 
 
 (** * Guard *)
