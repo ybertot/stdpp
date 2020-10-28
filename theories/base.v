@@ -827,10 +827,6 @@ Notation "( x ∪.)" := (union x) (only parsing) : stdpp_scope.
 Notation "(.∪ x )" := (λ y, union y x) (only parsing) : stdpp_scope.
 Infix "∪*" := (zip_with (∪)) (at level 50, left associativity) : stdpp_scope.
 Notation "(∪*)" := (zip_with (∪)) (only parsing) : stdpp_scope.
-Infix "∪**" := (zip_with (zip_with (∪)))
-  (at level 50, left associativity) : stdpp_scope.
-Infix "∪*∪**" := (zip_with (prod_zip (∪) (∪*)))
-  (at level 50, left associativity) : stdpp_scope.
 
 Definition union_list `{Empty A} `{Union A} : list A → A := fold_right (∪) ∅.
 Arguments union_list _ _ _ !_ / : assert.
@@ -861,10 +857,6 @@ Notation "( x ∖.)" := (difference x) (only parsing) : stdpp_scope.
 Notation "(.∖ x )" := (λ y, difference y x) (only parsing) : stdpp_scope.
 Infix "∖*" := (zip_with (∖)) (at level 40, left associativity) : stdpp_scope.
 Notation "(∖*)" := (zip_with (∖)) (only parsing) : stdpp_scope.
-Infix "∖**" := (zip_with (zip_with (∖)))
-  (at level 40, left associativity) : stdpp_scope.
-Infix "∖*∖**" := (zip_with (prod_zip (∖) (∖*)))
-  (at level 50, left associativity) : stdpp_scope.
 
 Class Singleton A B := singleton: A → B.
 Hint Mode Singleton - ! : typeclass_instances.
@@ -895,15 +887,9 @@ Notation "(⊆@{ A } )" := (@subseteq A _) (only parsing) : stdpp_scope.
 
 Infix "⊆*" := (Forall2 (⊆)) (at level 70) : stdpp_scope.
 Notation "(⊆*)" := (Forall2 (⊆)) (only parsing) : stdpp_scope.
-Infix "⊆**" := (Forall2 (⊆*)) (at level 70) : stdpp_scope.
-Infix "⊆1*" := (Forall2 (λ p q, p.1 ⊆ q.1)) (at level 70) : stdpp_scope.
-Infix "⊆2*" := (Forall2 (λ p q, p.2 ⊆ q.2)) (at level 70) : stdpp_scope.
-Infix "⊆1**" := (Forall2 (λ p q, p.1 ⊆* q.1)) (at level 70) : stdpp_scope.
-Infix "⊆2**" := (Forall2 (λ p q, p.2 ⊆* q.2)) (at level 70) : stdpp_scope.
 
 Hint Extern 0 (_ ⊆ _) => reflexivity : core.
 Hint Extern 0 (_ ⊆* _) => reflexivity : core.
-Hint Extern 0 (_ ⊆** _) => reflexivity : core.
 
 Infix "⊂" := (strict (⊆)) (at level 70) : stdpp_scope.
 Notation "(⊂)" := (strict (⊆)) (only parsing) : stdpp_scope.
@@ -966,55 +952,9 @@ Notation "(##@{ A } )" := (@disjoint A _) (only parsing) : stdpp_scope.
 
 Infix "##*" := (Forall2 (##)) (at level 70) : stdpp_scope.
 Notation "(##*)" := (Forall2 (##)) (only parsing) : stdpp_scope.
-Infix "##**" := (Forall2 (##*)) (at level 70) : stdpp_scope.
-Infix "##1*" := (Forall2 (λ p q, p.1 ## q.1)) (at level 70) : stdpp_scope.
-Infix "##2*" := (Forall2 (λ p q, p.2 ## q.2)) (at level 70) : stdpp_scope.
-Infix "##1**" := (Forall2 (λ p q, p.1 ##* q.1)) (at level 70) : stdpp_scope.
-Infix "##2**" := (Forall2 (λ p q, p.2 ##* q.2)) (at level 70) : stdpp_scope.
+
 Hint Extern 0 (_ ## _) => symmetry; eassumption : core.
 Hint Extern 0 (_ ##* _) => symmetry; eassumption : core.
-
-Class DisjointE E A := disjointE : E → A → A → Prop.
-Hint Mode DisjointE - ! : typeclass_instances.
-Instance: Params (@disjointE) 4 := {}.
-Notation "X ##{ Γ } Y" := (disjointE Γ X Y)
-  (at level 70, format "X  ##{ Γ }  Y") : stdpp_scope.
-Notation "(##{ Γ } )" := (disjointE Γ) (only parsing, Γ at level 1) : stdpp_scope.
-Notation "Xs ##{ Γ }* Ys" := (Forall2 (##{Γ}) Xs Ys)
-  (at level 70, format "Xs  ##{ Γ }*  Ys") : stdpp_scope.
-Notation "(##{ Γ }* )" := (Forall2 (##{Γ}))
-  (only parsing, Γ at level 1) : stdpp_scope.
-Notation "X ##{ Γ1 , Γ2 , .. , Γ3 } Y" := (disjoint (pair .. (Γ1, Γ2) .. Γ3) X Y)
-  (at level 70, format "X  ##{ Γ1 , Γ2 , .. , Γ3 }  Y") : stdpp_scope.
-Notation "Xs ##{ Γ1 , Γ2 , .. , Γ3 }* Ys" :=
-  (Forall2 (disjoint (pair .. (Γ1, Γ2) .. Γ3)) Xs Ys)
-  (at level 70, format "Xs  ##{ Γ1 ,  Γ2 , .. , Γ3 }*  Ys") : stdpp_scope.
-Hint Extern 0 (_ ##{_} _) => symmetry; eassumption : core.
-
-Class DisjointList A := disjoint_list : list A → Prop.
-Hint Mode DisjointList ! : typeclass_instances.
-Instance: Params (@disjoint_list) 2 := {}.
-Notation "## Xs" := (disjoint_list Xs) (at level 20, format "##  Xs") : stdpp_scope.
-Notation "##@{ A } Xs" :=
-  (@disjoint_list A _ Xs) (at level 20, only parsing) : stdpp_scope.
-
-Section disjoint_list.
-  Context `{Disjoint A, Union A, Empty A}.
-  Implicit Types X : A.
-
-  Inductive disjoint_list_default : DisjointList A :=
-    | disjoint_nil_2 : ##@{A} []
-    | disjoint_cons_2 (X : A) (Xs : list A) : X ## ⋃ Xs → ## Xs → ## (X :: Xs).
-  Global Existing Instance disjoint_list_default.
-
-  Lemma disjoint_list_nil  : ##@{A} [] ↔ True.
-  Proof. split; constructor. Qed.
-  Lemma disjoint_list_cons X Xs : ## (X :: Xs) ↔ X ## ⋃ Xs ∧ ## Xs.
-  Proof.
-    split; [inversion_clear 1; auto |].
-    intros [??]. constructor; auto.
-  Qed.
-End disjoint_list.
 
 Class Filter A B := filter: ∀ (P : A → Prop) `{∀ x, Decision (P x)}, B → B.
 Hint Mode Filter - ! : typeclass_instances.
@@ -1178,22 +1118,6 @@ Arguments difference_with {_ _ _} _ !_ !_ / : simpl nomatch, assert.
 Definition intersection_with_list `{IntersectionWith A M}
   (f : A → A → option A) : M → list M → M := fold_right (intersection_with f).
 Arguments intersection_with_list _ _ _ _ _ !_ / : assert.
-
-Class LookupE (E K A M : Type) := lookupE: E → K → M → option A.
-Hint Mode LookupE - - - ! : typeclass_instances.
-Instance: Params (@lookupE) 6 := {}.
-Notation "m !!{ Γ } i" := (lookupE Γ i m)
-  (at level 20, format "m  !!{ Γ }  i") : stdpp_scope.
-Notation "(!!{ Γ } )" := (lookupE Γ) (only parsing, Γ at level 1) : stdpp_scope.
-Arguments lookupE _ _ _ _ _ _ !_ !_ / : simpl nomatch, assert.
-
-Class InsertE (E K A M : Type) := insertE: E → K → A → M → M.
-Hint Mode InsertE - - - ! : typeclass_instances.
-Instance: Params (@insertE) 6 := {}.
-Notation "<[ k := a ]{ Γ }>" := (insertE Γ k a)
-  (at level 5, right associativity, format "<[ k := a ]{ Γ }>") : stdpp_scope.
-Arguments insertE _ _ _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
-
 
 (** * Notations for lattices. *)
 (** SqSubsetEq registers the "canonical" partial order for a type, and is used
