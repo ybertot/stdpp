@@ -89,6 +89,11 @@ Proof.
   unfold is_Some. setoid_rewrite lookup_insert_Some.
   destruct (decide (i = j)); set_solver.
 Qed.
+Lemma dom_insert_lookup {A} (m : M A) i x :
+  is_Some (m !! i) → dom D (<[i:=x]>m) ≡ dom D m.
+Proof.
+  intros Hindom%elem_of_dom. rewrite dom_insert. set_solver.
+Qed.
 Lemma dom_insert_subseteq {A} (m : M A) i x : dom D m ⊆ dom D (<[i:=x]>m).
 Proof. rewrite (dom_insert _). set_solver. Qed.
 Lemma dom_insert_subseteq_compat_l {A} (m : M A) i x X :
@@ -171,6 +176,9 @@ Section leibniz.
   Proof. unfold_leibniz; apply dom_alter. Qed.
   Lemma dom_insert_L {A} (m : M A) i x : dom D (<[i:=x]>m) = {[ i ]} ∪ dom D m.
   Proof. unfold_leibniz; apply dom_insert. Qed.
+  Lemma dom_insert_lookup_L {A} (m : M A) i x :
+    is_Some (m !! i) → dom D (<[i:=x]>m) = dom D m.
+  Proof. unfold_leibniz; apply dom_insert_lookup. Qed.
   Lemma dom_singleton_L {A} (i : K) (x : A) : dom D ({[i := x]} : M A) = {[ i ]}.
   Proof. unfold_leibniz; apply dom_singleton. Qed.
   Lemma dom_delete_L {A} (m : M A) i : dom D (delete i m) = dom D m ∖ {[ i ]}.
