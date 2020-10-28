@@ -883,6 +883,10 @@ Section fin_to_set.
 
   Lemma elem_of_fin_to_set a : a ∈ fin_to_set A.
   Proof. apply elem_of_list_to_set, elem_of_enum. Qed.
+
+  Global Instance set_unfold_fin_to_set a :
+    SetUnfoldElemOf a (fin_to_set A) True.
+  Proof. constructor. split; auto using elem_of_fin_to_set. Qed.
 End fin_to_set.
 
 
