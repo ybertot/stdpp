@@ -875,7 +875,7 @@ Section option_and_list_to_set.
 End option_and_list_to_set.
 
 (** * Finite types to sets. *)
-Definition fin_to_set (A : Type) `{SemiSet A C, Finite A} : C :=
+Definition fin_to_set (A : Type) `{Singleton A C, Empty C, Union C, Finite A} : C :=
   list_to_set (enum A).
 
 Section fin_to_set.
@@ -889,7 +889,6 @@ Section fin_to_set.
     SetUnfoldElemOf (C:=C) a (fin_to_set A) True.
   Proof. constructor. split; auto using elem_of_fin_to_set. Qed.
 End fin_to_set.
-
 
 (** * Guard *)
 Global Instance set_guard `{MonadSet M} : MGuard M :=
