@@ -43,7 +43,8 @@ The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
 ```
 sed -i '
-s/\bQp_not_plus_q_ge_1\b/Qp_not_plus_ge/g
+s/\bQp_plus/Qp_add/g
+s/\bQp_mult/Qp_mul/g
 ' $(find theories -name "*.v")
 ```
 
