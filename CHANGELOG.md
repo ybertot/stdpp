@@ -196,7 +196,7 @@ Changes:
 - Make `gset` a `Definition` instead of a `Notation` to improve performance.
 - Use `disj_union` (notation `⊎`) for disjoint union on multisets (that adds the
   multiplicities). Repurpose `∪` on multisets for the actual union (that takes
-  the max of the multiplicities). 
+  the max of the multiplicities).
 
 Naming:
 
