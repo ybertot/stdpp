@@ -882,11 +882,11 @@ Section fin_to_set.
   Context `{SemiSet A C, Finite A}.
   Implicit Types a : A.
 
-  Lemma elem_of_fin_to_set a : a ∈ fin_to_set A.
+  Lemma elem_of_fin_to_set a : a ∈@{C} fin_to_set A.
   Proof. apply elem_of_list_to_set, elem_of_enum. Qed.
 
   Global Instance set_unfold_fin_to_set a :
-    SetUnfoldElemOf a (fin_to_set A) True.
+    SetUnfoldElemOf (C:=C) a (fin_to_set A) True.
   Proof. constructor. split; auto using elem_of_fin_to_set. Qed.
 End fin_to_set.
 
