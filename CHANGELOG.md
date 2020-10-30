@@ -42,7 +42,7 @@ Coq 8.8 and 8.9 are no longer supported.
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
 ```
-sed -i '
+sed -i -E '
 s/\bQp_plus/Qp_add/g
 s/\bQp_mult/Qp_mul/g
 ' $(find theories -name "*.v")
