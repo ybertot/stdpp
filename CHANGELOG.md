@@ -15,12 +15,36 @@ Coq 8.8 and 8.9 are no longer supported.
   `zip_with` and `Forall2` versions of `∪`, `∖`, and `##`.
 - Remove unused type classes `DisjointE`, `DisjointList`, `LookupE`, and
   `InsertE`.
+- Overhaul of the theory of positive rationals `Qp`:
+  + Add the orders `Qp_le` and `Qp_lt`.
+  + Rename `Qp_plus` into `Qp_add` and `Qp_mult` into `Qp_mul` to be consistent
+    with the corresponding names for `nat`, `N`, and `Z`.
+  + Add a function `Qp_inv` for the multiplicative inverse.
+  + Define the division function `Qp_div` in terms of `Qp_inv`, and generalize
+    the second argument from `positive` to `Qp`.
+  + Add a function `pos_to_Qp` that converts a `positive` into a positive
+    rational `Qp`.
+  + Add many lemmas and missing type class instances, especially for orders,
+    multiplication, multiplicative inverse, division, and the conversion.
+  + Remove the coercion from `Qp` to `Qc`. This follows our recent tradition of
+    getting rid of coercions since they are more often confusing than useful.
+  + Rename the conversion from `Qp_car : Qp → Qc` into `Qp_to_Qc` to be
+    consistent with other conversion functions in std++. Also rename the lemma
+    `Qp_eq` into `Qp_to_Qc_inj_iff`.
+  + Use `let '(..) = ...` in the definitions of `Qp_plus`, `Qp_mult`, `Qp_inv`,
+    `Qp_le` and `Qp_lt` to avoid Coq tactics (like `injection`) to unfold these
+    definitions eagerly.
+  + Define the `Qp` literals 1, 2, 3, 4 in terms of `pos_to_Qp` instead of
+    iterated addition.
+  + Rename and restate many lemmas so as to be consistent with the conventions
+    for Coq's number types `nat`, `N`, and `Z`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
 ```
 sed -i '
-s/\bQp_not_plus_q_ge_1\b/Qp_not_plus_ge/g
+s/\bQp_plus/Qp_add/g
+s/\bQp_mult/Qp_mul/g
 ' $(find theories -name "*.v")
 ```
 
