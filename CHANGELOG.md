@@ -14,7 +14,6 @@ Coq 8.8 and 8.9 are no longer supported.
   `InsertE`.
 - Overhaul of the theory of positive rationals `Qp`:
   + Add `max` and `min` operations for `Qp`.
-  + Add additional lemmas for `Qp`.
   + Add the orders `Qp_le` and `Qp_lt`.
   + Rename `Qp_plus` into `Qp_add` and `Qp_mult` into `Qp_mul` to be consistent
     with the corresponding names for `nat`, `N`, and `Z`.
@@ -42,8 +41,15 @@ The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
 ```
 sed -i -E '
-s/\bQp_plus/Qp_add/g
-s/\bQp_mult/Qp_mul/g
+s/\bQp_plus\b/Qp_add/g
+s/\bQp_mult\b/Qp_mul/g
+s/\bQp_mult_1_l\b/Qp_mul_1_l/g
+s/\bQp_mult_1_r\b/Qp_mul_1_r/g
+s/\bQp_plus_id_free\b/Qp_add_id_free/g
+s/\bQp_not_plus_ge\b/Qp_not_add_le_l/g
+s/\bQp_le_plus_l\b/Qp_le_add_l/g
+s/\bQp_mult_plus_distr_l\b/Qp_mul_add_distr_r/g
+s/\bQp_mult_plus_distr_r\b/Qp_mul_add_distr_l/g
 ' $(find theories -name "*.v")
 ```
 
