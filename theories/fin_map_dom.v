@@ -156,6 +156,13 @@ Proof.
   intros m1 m2 EQm. apply elem_of_equiv. intros i.
   rewrite !elem_of_dom, EQm. done.
 Qed.
+Lemma dom_list_to_map {A : Type} (l : list (K * A)) :
+  dom D (list_to_map l : M A) ≡ list_to_set l.*1.
+Proof.
+  induction l as [|?? IH].
+  - by rewrite dom_empty.
+  - simpl. by rewrite dom_insert, IH.
+Qed.
 (** If [D] has Leibniz equality, we can show an even stronger result.  This is a
 common case e.g. when having a [gmap K A] where the key [K] has Leibniz equality
 (and thus also [gset K], the usual domain) but the value type [A] does not. *)
@@ -197,6 +204,9 @@ Section leibniz.
     (∀ i, i ∈ X ↔ ∃ x, m !! i = Some x ∧ is_Some (f i x)) →
     dom D (map_imap f m) = X.
   Proof. unfold_leibniz; apply dom_imap. Qed.
+  Lemma dom_list_to_map_L {A : Type} (l : list (K * A)) :
+    dom D (list_to_map l : M A) = list_to_set l.*1.
+  Proof. unfold_leibniz. apply dom_list_to_map. Qed.
 End leibniz.
 
 (** * Set solver instances *)

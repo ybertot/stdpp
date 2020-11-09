@@ -838,6 +838,15 @@ Proof. done. Qed.
 Lemma list_to_map_cons {A} (l : list (K * A)) i x :
   list_to_map ((i, x) :: l) = <[i:=x]>(list_to_map l : M A).
 Proof. done. Qed.
+Lemma list_to_map_snoc {A} (l : list (K * A)) i x :
+  i ∉ l.*1 → list_to_map (l ++ [(i, x)]) = <[i:=x]>(list_to_map l : M A).
+Proof.
+  induction l as [|[k y] l IH]; [done|].
+  intros [Hneq Hni]%not_elem_of_cons. simpl.
+  rewrite (IH Hni).
+  rewrite insert_commute; [done|].
+  rewrite comm; [apply Hneq|apply _].
+Qed.
 Lemma list_to_map_fmap {A B} (f : A → B) l :
   list_to_map (prod_map id f <$> l) = f <$> (list_to_map l : M A).
 Proof.
