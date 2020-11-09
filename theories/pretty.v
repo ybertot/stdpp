@@ -44,6 +44,7 @@ Proof.
   by destruct (decide (0 < x)%N); auto using pretty_N_go_help_irrel.
 Qed.
 
+(** Helper lemma to prove [pretty_N_inj] and [pretty_Z_inj]. *)
 Lemma pretty_N_go_ne_0 x s : s ≠ "0" → pretty_N_go x s ≠ "0".
 Proof.
   revert s. induction (N.lt_wf_0 x) as [x _ IH]; intros s ?.
@@ -56,6 +57,16 @@ Proof.
   - rewrite 2!pretty_N_go_step by (try apply N.div_str_pos_iff; lia).
     apply IH; [|done].
     trans (x `div` 10)%N; apply N.div_lt; auto using N.div_str_pos with lia.
+Qed.
+(** Helper lemma to prove [pretty_Z_inj]. *)
+Lemma pretty_N_go_ne_dash x s s' : s ≠ "-" +:+ s' → pretty_N_go x s ≠ "-" +:+ s'.
+Proof.
+  revert s. induction (N.lt_wf_0 x) as [x _ IH]; intros s ?.
+  assert (x = 0 ∨ 0 < x)%N as [->|?] by lia.
+  - by rewrite pretty_N_go_0.
+  - rewrite pretty_N_go_step by done. apply IH.
+    { by apply N.div_lt. }
+    unfold pretty_N_char. by repeat case_match.
 Qed.
 
 Instance pretty_N_inj : Inj (=@{N}) (=) pretty.
@@ -87,11 +98,20 @@ Proof.
   rewrite (N.div_mod x 10), (N.div_mod y 10) by done. lia.
 Qed.
 
-Instance pretty_Z : Pretty Z := λ x,
-  match x with
-  | Z0 => "" | Zpos x => pretty (Npos x) | Zneg x => "-" +:+ pretty (Npos x)
-  end%string.
-
 Instance pretty_nat : Pretty nat := λ x, pretty (N.of_nat x).
 Instance pretty_nat_inj : Inj (=@{nat}) (=) pretty.
 Proof. apply _. Qed.
+
+Instance pretty_Z : Pretty Z := λ x,
+  match x with
+  | Z0 => "0" | Zpos x => pretty (Npos x) | Zneg x => "-" +:+ pretty (Npos x)
+  end%string.
+Instance pretty_Z_inj : Inj (=@{Z}) (=) pretty.
+Proof.
+  unfold pretty, pretty_Z.
+  intros [|x|x] [|y|y] Hpretty; simplify_eq/=; try done.
+  - by destruct (pretty_N_go_ne_0 (N.pos y) "").
+  - by destruct (pretty_N_go_ne_0 (N.pos x) "").
+  - by edestruct (pretty_N_go_ne_dash (N.pos x) "").
+  - by edestruct (pretty_N_go_ne_dash (N.pos y) "").
+Qed.
