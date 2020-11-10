@@ -36,6 +36,8 @@ Coq 8.8 and 8.9 are no longer supported.
     iterated addition.
   + Rename and restate many lemmas so as to be consistent with the conventions
     for Coq's number types `nat`, `N`, and `Z`.
+- Fix a bug where `pretty 0` was defined as `""`, the empty string. It now
+  returns `"0"` for `N`, `Z`, and `nat`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`):
