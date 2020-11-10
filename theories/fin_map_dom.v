@@ -156,7 +156,7 @@ Proof.
   intros m1 m2 EQm. apply elem_of_equiv. intros i.
   rewrite !elem_of_dom, EQm. done.
 Qed.
-Lemma dom_list_to_map {A : Type} (l : list (K * A)) :
+Lemma dom_list_to_map {A} (l : list (K * A)) :
   dom D (list_to_map l : M A) ≡ list_to_set l.*1.
 Proof.
   induction l as [|?? IH].
@@ -204,7 +204,7 @@ Section leibniz.
     (∀ i, i ∈ X ↔ ∃ x, m !! i = Some x ∧ is_Some (f i x)) →
     dom D (map_imap f m) = X.
   Proof. unfold_leibniz; apply dom_imap. Qed.
-  Lemma dom_list_to_map_L {A : Type} (l : list (K * A)) :
+  Lemma dom_list_to_map_L {A} (l : list (K * A)) :
     dom D (list_to_map l : M A) = list_to_set l.*1.
   Proof. unfold_leibniz. apply dom_list_to_map. Qed.
 End leibniz.
