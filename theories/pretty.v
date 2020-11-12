@@ -4,6 +4,7 @@ From Coq Require Import Ascii.
 From stdpp Require Import options.
 
 Class Pretty A := pretty : A → string.
+Hint Mode Pretty ! : typeclass_instances.
 
 Definition pretty_N_char (x : N) : ascii :=
   match x with
