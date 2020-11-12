@@ -228,6 +228,7 @@ Changes:
 - Use `disj_union` (notation `⊎`) for disjoint union on multisets (that adds the
   multiplicities). Repurpose `∪` on multisets for the actual union (that takes
   the max of the multiplicities).
+- Set `Hint Mode` for `pretty`.
 
 Naming:
 
