@@ -79,30 +79,30 @@ Create HintDb ndisj discriminated.
 (** If-and-only-if rules. Well, not quite, but for the fragment we are
 considering they are. *)
 Local Definition coPset_subseteq_difference_r := subseteq_difference_r (C:=coPset).
-Hint Resolve coPset_subseteq_difference_r : ndisj.
+Global Hint Resolve coPset_subseteq_difference_r : ndisj.
 Local Definition coPset_empty_subseteq := empty_subseteq (C:=coPset).
-Hint Resolve coPset_empty_subseteq : ndisj.
+Global Hint Resolve coPset_empty_subseteq : ndisj.
 Local Definition coPset_union_least := union_least (C:=coPset).
-Hint Resolve coPset_union_least : ndisj.
+Global Hint Resolve coPset_union_least : ndisj.
 (** Fallback, loses lots of information but lets other rules make progress. *)
 Local Definition coPset_subseteq_difference_l := subseteq_difference_l (C:=coPset).
-Hint Resolve coPset_subseteq_difference_l | 100 : ndisj.
-Hint Resolve nclose_subseteq' | 100 : ndisj.
+Global Hint Resolve coPset_subseteq_difference_l | 100 : ndisj.
+Global Hint Resolve nclose_subseteq' | 100 : ndisj.
 
 (** Rules for goals of the form [_ ## _] *)
 (** The base rule that we want to ultimately get down to. *)
-Hint Extern 0 (_ ## _) => apply ndot_ne_disjoint; congruence : ndisj.
+Global Hint Extern 0 (_ ## _) => apply ndot_ne_disjoint; congruence : ndisj.
 (** Fallback, loses lots of information but lets other rules make progress.
 Tests show trying [disjoint_difference_l1] first gives better performance. *)
 Local Definition coPset_disjoint_difference_l1 := disjoint_difference_l1 (C:=coPset).
-Hint Resolve coPset_disjoint_difference_l1 | 50 : ndisj.
+Global Hint Resolve coPset_disjoint_difference_l1 | 50 : ndisj.
 Local Definition coPset_disjoint_difference_l2 := disjoint_difference_l2 (C:=coPset).
-Hint Resolve coPset_disjoint_difference_l2 | 100 : ndisj.
-Hint Resolve ndot_preserve_disjoint_l ndot_preserve_disjoint_r | 100 : ndisj.
+Global Hint Resolve coPset_disjoint_difference_l2 | 100 : ndisj.
+Global Hint Resolve ndot_preserve_disjoint_l ndot_preserve_disjoint_r | 100 : ndisj.
 
 Ltac solve_ndisj :=
   repeat match goal with
   | H : _ ∪ _ ⊆ _ |- _ => apply union_subseteq in H as [??]
   end;
   solve [eauto 12 with ndisj].
-Hint Extern 1000 => solve_ndisj : solve_ndisj.
+Global Hint Extern 1000 => solve_ndisj : solve_ndisj.

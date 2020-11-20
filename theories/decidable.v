@@ -115,7 +115,7 @@ Lemma bool_decide_unpack (P : Prop) {dec : Decision P} : bool_decide P → P.
 Proof. rewrite bool_decide_spec; trivial. Qed.
 Lemma bool_decide_pack (P : Prop) {dec : Decision P} : P → bool_decide P.
 Proof. rewrite bool_decide_spec; trivial. Qed.
-Hint Resolve bool_decide_pack : core.
+Global Hint Resolve bool_decide_pack : core.
 
 Lemma bool_decide_eq_true (P : Prop) `{Decision P} : bool_decide P = true ↔ P.
 Proof. case_bool_decide; intuition discriminate. Qed.
@@ -224,4 +224,4 @@ Definition flip_dec {A} (R : relation A) `{!RelDecision R} :
 (** We do not declare this as an actual instance since Coq can unify [flip ?R]
 with any relation. Coq's standard library is carrying out the same approach for
 the [Reflexive], [Transitive], etc, instance of [flip]. *)
-Hint Extern 3 (RelDecision (flip _)) => apply flip_dec : typeclass_instances.
+Global Hint Extern 3 (RelDecision (flip _)) => apply flip_dec : typeclass_instances.

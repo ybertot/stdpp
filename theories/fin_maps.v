@@ -27,8 +27,8 @@ which enables us to give a generic implementation of [union_with],
 [intersection_with], and [difference_with]. *)
 
 Class FinMapToList K A M := map_to_list: M → list (K * A).
-Hint Mode FinMapToList ! - - : typeclass_instances.
-Hint Mode FinMapToList - - ! : typeclass_instances.
+Global Hint Mode FinMapToList ! - - : typeclass_instances.
+Global Hint Mode FinMapToList - - ! : typeclass_instances.
 
 Class FinMap K M `{FMap M, ∀ A, Lookup K A (M A), ∀ A, Empty (M A), ∀ A,
     PartialAlter K A (M A), OMap M, Merge M, ∀ A, FinMapToList K A (M A),
@@ -99,7 +99,7 @@ Definition map_included `{∀ A, Lookup K A (M A)} {A}
 Definition map_disjoint `{∀ A, Lookup K A (M A)} {A} : relation (M A) :=
   map_relation (λ _ _, False) (λ _, True) (λ _, True).
 Infix "##ₘ" := map_disjoint (at level 70) : stdpp_scope.
-Hint Extern 0 (_ ##ₘ _) => symmetry; eassumption : core.
+Global Hint Extern 0 (_ ##ₘ _) => symmetry; eassumption : core.
 Notation "( m ##ₘ.)" := (map_disjoint m) (only parsing) : stdpp_scope.
 Notation "(.##ₘ m )" := (λ m2, m2 ##ₘ m) (only parsing) : stdpp_scope.
 Instance map_subseteq `{∀ A, Lookup K A (M A)} {A} : SubsetEq (M A) :=
@@ -2296,30 +2296,30 @@ Ltac solve_map_disjoint :=
 
 (** We declare these hints using [Hint Extern] instead of [Hint Resolve] as
 [eauto] works badly with hints parametrized by type class constraints. *)
-Hint Extern 1 (_ ##ₘ _) => done : map_disjoint.
-Hint Extern 2 (∅ ##ₘ _) => apply map_disjoint_empty_l : map_disjoint.
-Hint Extern 2 (_ ##ₘ ∅) => apply map_disjoint_empty_r : map_disjoint.
-Hint Extern 2 ({[ _ := _ ]} ##ₘ _) =>
+Global Hint Extern 1 (_ ##ₘ _) => done : map_disjoint.
+Global Hint Extern 2 (∅ ##ₘ _) => apply map_disjoint_empty_l : map_disjoint.
+Global Hint Extern 2 (_ ##ₘ ∅) => apply map_disjoint_empty_r : map_disjoint.
+Global Hint Extern 2 ({[ _ := _ ]} ##ₘ _) =>
   apply map_disjoint_singleton_l_2 : map_disjoint.
-Hint Extern 2 (_ ##ₘ {[ _ := _ ]}) =>
+Global Hint Extern 2 (_ ##ₘ {[ _ := _ ]}) =>
   apply map_disjoint_singleton_r_2 : map_disjoint.
-Hint Extern 2 (_ ∪ _ ##ₘ _) => apply map_disjoint_union_l_2 : map_disjoint.
-Hint Extern 2 (_ ##ₘ _ ∪ _) => apply map_disjoint_union_r_2 : map_disjoint.
-Hint Extern 2 ({[_:= _]} ##ₘ _) => apply map_disjoint_singleton_l : map_disjoint.
-Hint Extern 2 (_ ##ₘ {[_:= _]}) => apply map_disjoint_singleton_r : map_disjoint.
-Hint Extern 2 (<[_:=_]>_ ##ₘ _) => apply map_disjoint_insert_l_2 : map_disjoint.
-Hint Extern 2 (_ ##ₘ <[_:=_]>_) => apply map_disjoint_insert_r_2 : map_disjoint.
-Hint Extern 2 (delete _ _ ##ₘ _) => apply map_disjoint_delete_l : map_disjoint.
-Hint Extern 2 (_ ##ₘ delete _ _) => apply map_disjoint_delete_r : map_disjoint.
-Hint Extern 2 (list_to_map _ ##ₘ _) =>
+Global Hint Extern 2 (_ ∪ _ ##ₘ _) => apply map_disjoint_union_l_2 : map_disjoint.
+Global Hint Extern 2 (_ ##ₘ _ ∪ _) => apply map_disjoint_union_r_2 : map_disjoint.
+Global Hint Extern 2 ({[_:= _]} ##ₘ _) => apply map_disjoint_singleton_l : map_disjoint.
+Global Hint Extern 2 (_ ##ₘ {[_:= _]}) => apply map_disjoint_singleton_r : map_disjoint.
+Global Hint Extern 2 (<[_:=_]>_ ##ₘ _) => apply map_disjoint_insert_l_2 : map_disjoint.
+Global Hint Extern 2 (_ ##ₘ <[_:=_]>_) => apply map_disjoint_insert_r_2 : map_disjoint.
+Global Hint Extern 2 (delete _ _ ##ₘ _) => apply map_disjoint_delete_l : map_disjoint.
+Global Hint Extern 2 (_ ##ₘ delete _ _) => apply map_disjoint_delete_r : map_disjoint.
+Global Hint Extern 2 (list_to_map _ ##ₘ _) =>
   apply map_disjoint_list_to_map_zip_l_2 : mem_disjoint.
-Hint Extern 2 (_ ##ₘ list_to_map _) =>
+Global Hint Extern 2 (_ ##ₘ list_to_map _) =>
   apply map_disjoint_list_to_map_zip_r_2 : mem_disjoint.
-Hint Extern 2 (⋃ _ ##ₘ _) => apply map_disjoint_union_list_l_2 : mem_disjoint.
-Hint Extern 2 (_ ##ₘ ⋃ _) => apply map_disjoint_union_list_r_2 : mem_disjoint.
-Hint Extern 2 (foldr delete _ _ ##ₘ _) =>
+Global Hint Extern 2 (⋃ _ ##ₘ _) => apply map_disjoint_union_list_l_2 : mem_disjoint.
+Global Hint Extern 2 (_ ##ₘ ⋃ _) => apply map_disjoint_union_list_r_2 : mem_disjoint.
+Global Hint Extern 2 (foldr delete _ _ ##ₘ _) =>
   apply map_disjoint_foldr_delete_l : map_disjoint.
-Hint Extern 2 (_ ##ₘ foldr delete _ _) =>
+Global Hint Extern 2 (_ ##ₘ foldr delete _ _) =>
   apply map_disjoint_foldr_delete_r : map_disjoint.
 
 (** The tactic [simpl_map by tac] simplifies occurrences of finite map look
@@ -2367,10 +2367,10 @@ Tactic Notation "simpl_map" "by" tactic3(tac) := repeat
 Create HintDb simpl_map discriminated.
 Tactic Notation "simpl_map" := simpl_map by eauto with simpl_map map_disjoint.
 
-Hint Extern 80 ((_ ∪ _) !! _ = Some _) => apply lookup_union_Some_l : simpl_map.
-Hint Extern 81 ((_ ∪ _) !! _ = Some _) => apply lookup_union_Some_r : simpl_map.
-Hint Extern 80 ({[ _:=_ ]} !! _ = Some _) => apply lookup_singleton : simpl_map.
-Hint Extern 80 (<[_:=_]> _ !! _ = Some _) => apply lookup_insert : simpl_map.
+Global Hint Extern 80 ((_ ∪ _) !! _ = Some _) => apply lookup_union_Some_l : simpl_map.
+Global Hint Extern 81 ((_ ∪ _) !! _ = Some _) => apply lookup_union_Some_r : simpl_map.
+Global Hint Extern 80 ({[ _:=_ ]} !! _ = Some _) => apply lookup_singleton : simpl_map.
+Global Hint Extern 80 (<[_:=_]> _ !! _ = Some _) => apply lookup_insert : simpl_map.
 
 (** Now we take everything together and also discharge conflicting look ups,
 simplify overlapping look ups, and perform cancellations of equalities

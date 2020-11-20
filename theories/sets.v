@@ -96,14 +96,14 @@ rewriting to ensure that we traverse each term at most once and to be able to
 deal with occurences of the set operations under binders. *)
 Class SetUnfold (P Q : Prop) := { set_unfold : P ↔ Q }.
 Arguments set_unfold _ _ {_} : assert.
-Hint Mode SetUnfold + - : typeclass_instances.
+Global Hint Mode SetUnfold + - : typeclass_instances.
 
 (** The class [SetUnfoldElemOf] is a more specialized version of [SetUnfold]
 for propositions of the shape [x ∈ X] to improve performance. *)
 Class SetUnfoldElemOf `{ElemOf A C} (x : A) (X : C) (Q : Prop) :=
   { set_unfold_elem_of : x ∈ X ↔ Q }.
 Arguments set_unfold_elem_of {_ _ _} _ _ _ {_} : assert.
-Hint Mode SetUnfoldElemOf + + + - + - : typeclass_instances.
+Global Hint Mode SetUnfoldElemOf + + + - + - : typeclass_instances.
 
 Instance set_unfold_elem_of_default `{ElemOf A C} (x : A) (X : C) :
   SetUnfoldElemOf x X (x ∈ X) | 1000.
@@ -113,7 +113,7 @@ Instance set_unfold_elem_of_set_unfold `{ElemOf A C} (x : A) (X : C) Q :
 Proof. by destruct 1; constructor. Qed.
 
 Class SetUnfoldSimpl (P Q : Prop) := { set_unfold_simpl : SetUnfold P Q }.
-Hint Extern 0 (SetUnfoldSimpl _ _) => csimpl; constructor : typeclass_instances.
+Global Hint Extern 0 (SetUnfoldSimpl _ _) => csimpl; constructor : typeclass_instances.
 
 Instance set_unfold_default P : SetUnfold P P | 1000. done. Qed.
 Definition set_unfold_1 `{SetUnfold P Q} : P → Q := proj1 (set_unfold P Q).
@@ -142,19 +142,19 @@ Proof. constructor. naive_solver. Qed.
 
 (* Avoid too eager application of the above instances (and thus too eager
 unfolding of type class transparent definitions). *)
-Hint Extern 0 (SetUnfold (_ → _) _) =>
+Global Hint Extern 0 (SetUnfold (_ → _) _) =>
   class_apply set_unfold_impl : typeclass_instances.
-Hint Extern 0 (SetUnfold (_ ∧ _) _) =>
+Global Hint Extern 0 (SetUnfold (_ ∧ _) _) =>
   class_apply set_unfold_and : typeclass_instances.
-Hint Extern 0 (SetUnfold (_ ∨ _) _) =>
+Global Hint Extern 0 (SetUnfold (_ ∨ _) _) =>
   class_apply set_unfold_or : typeclass_instances.
-Hint Extern 0 (SetUnfold (_ ↔ _) _) =>
+Global Hint Extern 0 (SetUnfold (_ ↔ _) _) =>
   class_apply set_unfold_iff : typeclass_instances.
-Hint Extern 0 (SetUnfold (¬ _) _) =>
+Global Hint Extern 0 (SetUnfold (¬ _) _) =>
   class_apply set_unfold_not : typeclass_instances.
-Hint Extern 1 (SetUnfold (∀ _, _) _) =>
+Global Hint Extern 1 (SetUnfold (∀ _, _) _) =>
   class_apply set_unfold_forall : typeclass_instances.
-Hint Extern 0 (SetUnfold (∃ _, _) _) =>
+Global Hint Extern 0 (SetUnfold (∃ _, _) _) =>
   class_apply set_unfold_exist : typeclass_instances.
 
 Section set_unfold_simple.
@@ -347,9 +347,9 @@ Tactic Notation "set_solver" := set_solver by idtac.
 Tactic Notation "set_solver" "-" hyp_list(Hs) := clear Hs; set_solver.
 Tactic Notation "set_solver" "+" hyp_list(Hs) := clear -Hs; set_solver.
 
-Hint Extern 1000 (_ ∉ _) => set_solver : set_solver.
-Hint Extern 1000 (_ ∈ _) => set_solver : set_solver.
-Hint Extern 1000 (_ ⊆ _) => set_solver : set_solver.
+Global Hint Extern 1000 (_ ∉ _) => set_solver : set_solver.
+Global Hint Extern 1000 (_ ∈ _) => set_solver : set_solver.
+Global Hint Extern 1000 (_ ⊆ _) => set_solver : set_solver.
 
 
 (** * Sets with [∪], [∅] and [{[_]}] *)

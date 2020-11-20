@@ -21,11 +21,11 @@ Ltac f_equal :=
 (** We declare hint databases [f_equal], [congruence] and [lia] and containing
 solely the tactic corresponding to its name. These hint database are useful in
 to be combined in combination with other hint database. *)
-Hint Extern 998 (_ = _) => f_equal : f_equal.
-Hint Extern 999 => congruence : congruence.
-Hint Extern 1000 => lia : lia.
-Hint Extern 1000 => omega : omega.
-Hint Extern 1001 => progress subst : subst. (** backtracking on this one will
+Global Hint Extern 998 (_ = _) => f_equal : f_equal.
+Global Hint Extern 999 => congruence : congruence.
+Global Hint Extern 1000 => lia : lia.
+Global Hint Extern 1000 => omega : omega.
+Global Hint Extern 1001 => progress subst : subst. (** backtracking on this one will
 be very bad, so use with care! *)
 
 (** The tactic [intuition] expands to [intuition auto with *] by default. This

@@ -8,7 +8,7 @@ Class Countable A `{EqDecision A} := {
   decode : positive → option A;
   decode_encode x : decode (encode x) = Some x
 }.
-Hint Mode Countable ! - : typeclass_instances.
+Global Hint Mode Countable ! - : typeclass_instances.
 Arguments encode : simpl never.
 Arguments decode : simpl never.
 
