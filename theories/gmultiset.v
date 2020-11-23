@@ -170,7 +170,7 @@ universally quantified hypotheses [H : ∀ x : A, P x] in two ways:
 Class MultisetUnfold `{Countable A} (x : A) (X : gmultiset A) (n : nat) :=
   { multiset_unfold : multiplicity x X = n }.
 Arguments multiset_unfold {_ _ _} _ _ _ {_} : assert.
-Hint Mode MultisetUnfold + + + - + - : typeclass_instances.
+Global Hint Mode MultisetUnfold + + + - + - : typeclass_instances.
 
 Section multiset_unfold.
   Context `{Countable A}.

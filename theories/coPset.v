@@ -45,7 +45,7 @@ Definition coPNode' (b : bool) (l r : coPset_raw) : coPset_raw :=
 Arguments coPNode' : simpl never.
 Lemma coPNode_wf b l r : coPset_wf l → coPset_wf r → coPset_wf (coPNode' b l r).
 Proof. destruct b, l as [[]|], r as [[]|]; simpl; auto. Qed.
-Hint Resolve coPNode_wf : core.
+Global Hint Resolve coPNode_wf : core.
 
 Fixpoint coPset_elem_of_raw (p : positive) (t : coPset_raw) {struct t} : bool :=
   match t, p with
@@ -184,7 +184,7 @@ Qed.
 
 (** Iris and specifically [solve_ndisj] heavily rely on this hint. *)
 Local Definition coPset_top_subseteq := top_subseteq (C:=coPset).
-Hint Resolve coPset_top_subseteq : core.
+Global Hint Resolve coPset_top_subseteq : core.
 
 Instance coPset_leibniz : LeibnizEquiv coPset.
 Proof.

@@ -89,7 +89,7 @@ Instance: PartialOrder divide.
 Proof.
   repeat split; try apply _. intros ??. apply Nat.divide_antisym_nonneg; lia.
 Qed.
-Hint Extern 0 (_ | _) => reflexivity : core.
+Global Hint Extern 0 (_ | _) => reflexivity : core.
 Lemma Nat_divide_ne_0 x y : (x | y) → y ≠ 0 → x ≠ 0.
 Proof. intros Hxy Hy ->. by apply Hy, Nat.divide_0_l. Qed.
 
@@ -314,7 +314,7 @@ Qed.
 Instance N_le_total: Total (≤)%N.
 Proof. repeat intro; lia. Qed.
 
-Hint Extern 0 (_ ≤ _)%N => reflexivity : core.
+Global Hint Extern 0 (_ ≤ _)%N => reflexivity : core.
 
 (** * Notations and properties of [Z] *)
 Local Open Scope Z_scope.
@@ -410,12 +410,12 @@ Proof. by destruct x. Qed.
 Lemma Z_mod_pos x y : 0 < y → 0 ≤ x `mod` y.
 Proof. apply Z.mod_pos_bound. Qed.
 
-Hint Resolve Z.lt_le_incl : zpos.
-Hint Resolve Z.add_nonneg_pos Z.add_pos_nonneg Z.add_nonneg_nonneg : zpos.
-Hint Resolve Z.mul_nonneg_nonneg Z.mul_pos_pos : zpos.
-Hint Resolve Z.pow_pos_nonneg Z.pow_nonneg: zpos.
-Hint Resolve Z_mod_pos Z.div_pos : zpos.
-Hint Extern 1000 => lia : zpos.
+Global Hint Resolve Z.lt_le_incl : zpos.
+Global Hint Resolve Z.add_nonneg_pos Z.add_pos_nonneg Z.add_nonneg_nonneg : zpos.
+Global Hint Resolve Z.mul_nonneg_nonneg Z.mul_pos_pos : zpos.
+Global Hint Resolve Z.pow_pos_nonneg Z.pow_nonneg: zpos.
+Global Hint Resolve Z_mod_pos Z.div_pos : zpos.
+Global Hint Extern 1000 => lia : zpos.
 
 Lemma Z_to_nat_nonpos x : x ≤ 0 → Z.to_nat x = 0%nat.
 Proof. destruct x; simpl; auto using Z2Nat.inj_neg. by intros []. Qed.
@@ -509,7 +509,7 @@ Notation "x ≤ y ≤ z ≤ z'" := (x ≤ y ∧ y ≤ z ∧ z ≤ z') : Qc_scope
 Notation "(≤)" := Qcle (only parsing) : Qc_scope.
 Notation "(<)" := Qclt (only parsing) : Qc_scope.
 
-Hint Extern 1 (_ ≤ _) => reflexivity || discriminate : core.
+Global Hint Extern 1 (_ ≤ _) => reflexivity || discriminate : core.
 Arguments Qred : simpl never.
 
 Instance Qc_eq_dec: EqDecision Qc := Qc_eq_dec.
@@ -740,7 +740,7 @@ Notation "p ≤ q ≤ r ≤ r'" := (p ≤ q ∧ q ≤ r ∧ r ≤ r') : Qp_scope
 Notation "(≤)" := Qp_le (only parsing) : Qp_scope.
 Notation "(<)" := Qp_lt (only parsing) : Qp_scope.
 
-Hint Extern 0 (_ ≤ _)%Qp => reflexivity : core.
+Global Hint Extern 0 (_ ≤ _)%Qp => reflexivity : core.
 
 Lemma Qp_to_Qc_inj_le p q : p ≤ q ↔ (Qp_to_Qc p ≤ Qp_to_Qc q)%Qc.
 Proof. by destruct p, q. Qed.

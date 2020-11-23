@@ -75,7 +75,7 @@ Definition confluent {A} (R : relation A) :=
 Definition locally_confluent {A} (R : relation A) :=
   ∀ x y1 y2, R x y1 → R x y2 → ∃ z, rtc R y1 z ∧ rtc R y2 z.
 
-Hint Unfold nf red : core.
+Global Hint Unfold nf red : core.
 
 (** * General theorems *)
 Section closure.

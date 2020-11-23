@@ -38,13 +38,13 @@ approach based on reflection would be better, but for small inputs, the overhead
 of reification will probably not be worth it. *)
 
 Class NatCancel (m n m' n' : nat) := nat_cancel : m' + n = m + n'.
-Hint Mode NatCancel ! ! - - : typeclass_instances.
+Global Hint Mode NatCancel ! ! - - : typeclass_instances.
 
 Module nat_cancel.
   Class NatCancelL (m n m' n' : nat) := nat_cancel_l : m' + n = m + n'.
-  Hint Mode NatCancelL ! ! - - : typeclass_instances.
+  Global Hint Mode NatCancelL ! ! - - : typeclass_instances.
   Class NatCancelR (m n m' n' : nat) := nat_cancel_r : NatCancelL m n m' n'.
-  Hint Mode NatCancelR ! ! - - : typeclass_instances.
+  Global Hint Mode NatCancelR ! ! - - : typeclass_instances.
   Existing Instance nat_cancel_r | 100.
 
   (** The implementation of the canceler is highly non-deterministic, but since

@@ -7,7 +7,7 @@ Class Finite A `{EqDecision A} := {
   NoDup_enum : NoDup enum;
   elem_of_enum x : x ∈ enum
 }.
-Hint Mode Finite ! - : typeclass_instances.
+Global Hint Mode Finite ! - : typeclass_instances.
 Arguments enum : clear implicits.
 Arguments enum _ {_ _} : assert.
 Arguments NoDup_enum : clear implicits.
@@ -26,7 +26,7 @@ Next Obligation.
   rewrite Nat2Pos.id by done; simpl; rewrite Hi; simpl.
   destruct (list_find_Some (x =.) xs i y); naive_solver.
 Qed.
-Hint Immediate finite_countable : typeclass_instances.
+Global Hint Immediate finite_countable : typeclass_instances.
 
 Definition find `{Finite A} P `{∀ x, Decision (P x)} : option A :=
   list_find P (enum A) ≫= decode_nat ∘ fst.

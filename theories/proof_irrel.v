@@ -2,7 +2,7 @@
 From stdpp Require Export base.
 From stdpp Require Import options.
 
-Hint Extern 200 (ProofIrrel _) => progress (lazy beta) : typeclass_instances.
+Global Hint Extern 200 (ProofIrrel _) => progress (lazy beta) : typeclass_instances.
 
 Instance True_pi: ProofIrrel True.
 Proof. intros [] []; reflexivity. Qed.
