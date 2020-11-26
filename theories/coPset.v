@@ -26,7 +26,7 @@ Fixpoint coPset_wf (t : coPset_raw) : bool :=
   | coPLeaf _ => true
   | coPNode true (coPLeaf true) (coPLeaf true) => false
   | coPNode false (coPLeaf false) (coPLeaf false) => false
-  | coPNode b l r => coPset_wf l && coPset_wf r
+  | coPNode _ l r => coPset_wf l && coPset_wf r
   end.
 Arguments coPset_wf !_ / : simpl nomatch, assert.
 

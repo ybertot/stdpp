@@ -22,12 +22,12 @@ Definition htail {A As} (xs : hlist (tcons A As)) : hlist As :=
 Fixpoint hheads {As Bs} : hlist (tapp As Bs) → hlist As :=
   match As with
   | tnil => λ _, hnil
-  | tcons A As => λ xs, hcons (hhead xs) (hheads (htail xs))
+  | tcons _ _ => λ xs, hcons (hhead xs) (hheads (htail xs))
   end.
 Fixpoint htails {As Bs} : hlist (tapp As Bs) → hlist Bs :=
   match As with
   | tnil => id
-  | tcons A As => λ xs, htails (htail xs)
+  | tcons _ _ => λ xs, htails (htail xs)
   end.
 
 Fixpoint himpl (As : tlist) (B : Type) : Type :=
