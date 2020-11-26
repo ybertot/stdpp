@@ -45,7 +45,7 @@ Notably:
 
 This version is known to compile with:
 
- - Coq version 8.10.2 / 8.11.2 / 8.12.0
+ - Coq version 8.10.2 / 8.11.2 / 8.12.1
 
 ## Installing via opam
 
