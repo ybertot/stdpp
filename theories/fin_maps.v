@@ -570,9 +570,7 @@ Qed.
 Lemma insert_subseteq_l {A} (m1 m2 : M A) i x :
   m2 !! i = Some x → m1 ⊆ m2 → <[i:=x]> m1 ⊆ m2.
 Proof.
-  intros Hi Hincl. replace m2 with (<[i:=x]> m2).
-  - apply insert_mono. done.
-  - apply insert_id. done.
+  intros Hi Hincl. etrans; [apply insert_mono, Hincl|]. by rewrite insert_id.
 Qed.
 
 Lemma insert_delete_subseteq {A} (m1 m2 : M A) i x :
