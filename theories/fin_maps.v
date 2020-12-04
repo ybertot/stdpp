@@ -567,6 +567,11 @@ Lemma insert_subseteq_r {A} (m1 m2 : M A) i x :
 Proof.
   intros. trans (<[i:=x]> m1); eauto using insert_subseteq, insert_mono.
 Qed.
+Lemma insert_subseteq_l {A} (m1 m2 : M A) i x :
+  m2 !! i = Some x → m1 ⊆ m2 → <[i:=x]> m1 ⊆ m2.
+Proof.
+  intros Hi Hincl. etrans; [apply insert_mono, Hincl|]. by rewrite insert_id.
+Qed.
 
 Lemma insert_delete_subseteq {A} (m1 m2 : M A) i x :
   m1 !! i = None → <[i:=x]> m1 ⊆ m2 → m1 ⊆ delete i m2.
